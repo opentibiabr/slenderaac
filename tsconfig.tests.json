@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"module": "esnext",
+		"moduleResolution": "node",
+		"target": "es2020",
+		"esModuleInterop": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"resolveJsonModule": true,
+		"outDir": "tests-dist",
+		"noEmit": true
+	},
+	"include": ["tests/**/*.ts", "src/routes/api/outfits/parseIntWithDefault.ts"]
+}

@@ -1,8 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { existsSync, readdirSync, writeFileSync } from 'fs';
 import path, { relative, resolve } from 'path';
-import invariant from 'tiny-invariant';
-
 import { outfitImagesPath, walkSpeeds } from '$lib/server/animations/config';
 import {
 	loadData,
@@ -11,6 +9,7 @@ import {
 } from '$lib/server/animations/outfits';
 
 import type { RequestHandler } from './$types';
+import { parseIntWithDefault } from './parseIntWithDefault';
 
 const CACHE_FILE_PATH = './cache.generated.txt';
 
@@ -94,18 +93,6 @@ function generateCacheIfNeeded(): boolean {
 		return true;
 	}
 	return false;
-}
-
-function parseIntWithDefault(value: unknown, def = 0): number {
-	if (!value) return def;
-
-	invariant(
-		typeof value === 'string' || typeof value === 'number',
-		'value must be a string or number found ' + typeof value + ' instead',
-	);
-	if (typeof value === 'number') return value;
-
-	return parseInt(value) ?? def;
 }
 
 export const GET = (async ({ url, request }) => {
