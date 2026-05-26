@@ -155,6 +155,81 @@ Anything you put into the `static` folder in this repo will be served by the ser
 </details>
 
 <details>
+<summary><h2>Theme layouts and external asset packs</h2></summary>
+
+SlenderAAC supports build-time layout shells through the theme registry. The current themes are `legbone` and `cip-slender`.
+
+Use `SLENDER_THEME` to select the server-side layout shell:
+
+```env
+SLENDER_THEME=legbone
+```
+
+or:
+
+```env
+SLENDER_THEME=cip-slender
+```
+
+`PUBLIC_THEME` may still be used by existing Skeleton/Tailwind `data-theme` behavior, but it is not the runtime layout selector. Layout selection is resolved on the server from `SLENDER_THEME` and only the selected theme id is sent to the client.
+
+### External assets
+
+Theme-specific binary assets must not be committed to this repository. Mount or deploy them outside the repo and point `THEME_ASSETS_ROOT` to that directory:
+
+```env
+THEME_ASSETS_ROOT=/var/lib/slender/theme-assets
+```
+
+Example `cip-slender` asset pack layout:
+
+```text
+/var/lib/slender/theme-assets/cip-slender/
+  manifest.json
+  images/
+  backgrounds/
+  icons/
+  boxes/
+```
+
+`manifest.json` must include `schemaVersion`, `name`, `version`, and `assets`. `hashes` is optional.
+
+```json
+{
+  "schemaVersion": 1,
+  "name": "cip-slender",
+  "version": "2026.05.26",
+  "assets": {
+    "logo": "images/logo.png",
+    "background": "backgrounds/background.webp",
+    "menuOrnament": "icons/menu-ornament.png",
+    "contentOrnament": "icons/content-ornament.png",
+    "themeBoxOrnament": "boxes/box-ornament.png"
+  },
+  "hashes": {
+    "images/logo.png": "sha256-example"
+  }
+}
+```
+
+Only `png`, `jpg`, `jpeg`, `gif`, `webp`, and `ico` files are served by `/theme-assets/[theme]/[...path]`. Asset paths are validated before public URLs are generated, and the endpoint rejects traversal, dotfiles, backslashes, null bytes, directories, blocked extensions, and symlinks that escape the theme root.
+
+`cip-slender` works without an asset pack and falls back to neutral placeholders. Missing or invalid asset pack warnings are only shown to admins.
+
+The deployment operator is responsible for confirming asset rights and authorization. Keeping CipSoft-like assets outside the MIT repository keeps the code repository clean, but it does not remove legal risk from deploying or distributing those assets.
+
+### Acceptance checklist
+
+- `SLENDER_THEME=legbone` keeps the existing visual and flows.
+- `SLENDER_THEME=cip-slender` works without external assets.
+- `SLENDER_THEME=cip-slender` works with a mounted external asset pack.
+- Asset endpoint attacks using `..`, encoded traversal, backslashes, null bytes, dotfiles, symlink escape, directories, and blocked extensions fail.
+- No MyAAC PHP/Twig/CSS/JS is copied into this repository.
+- No CipSoft-like binary assets are committed to this repository.
+
+</details>
+
+<details>
 <summary><h2>Screenshots</h2></summary>
 
 ### Homepage (as admin)
