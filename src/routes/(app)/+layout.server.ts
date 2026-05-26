@@ -5,7 +5,9 @@ import { PlayerGroup } from '$lib/players';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { parseTimeString } from '$lib/server/utils';
+import { normalizeTheme } from '$lib/themes/theme-ids';
 
+import { env } from '$env/dynamic/private';
 import { SERVER_SAVE_TIME } from '$env/static/private';
 
 import type { LayoutServerLoad } from './$types';
@@ -33,6 +35,7 @@ export const load = loadFlashMessage(async ({ locals }) => {
 		: null;
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
+	const selectedTheme = normalizeTheme(env.SLENDER_THEME);
 
 	return {
 		highscores: highscores.map(dbToPlayer),
@@ -43,5 +46,6 @@ export const load = loadFlashMessage(async ({ locals }) => {
 		staticPages,
 		accountCharacters: accountCharacters?.map(dbToPlayer),
 		nextServerSave,
+		selectedTheme,
 	};
 }) satisfies LayoutServerLoad;
