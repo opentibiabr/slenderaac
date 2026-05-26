@@ -25,9 +25,15 @@ body {
 	@apply relative z-0;
 }
 
-body {
+.theme-legbone .theme-legbone-content {
+	@apply relative z-10 m-auto overflow-auto max-w-6xl;
+}
+
+.theme-legbone .theme-legbone-background {
+	@apply fixed inset-0 z-0 pointer-events-none;
 	@apply bg-cover md:bg-[100%] bg-fixed bg-no-repeat bg-top;
-	background-image: url('/images/background-artwork.jpg'),
+	background-image:
+		url('/images/background-artwork.jpg'),
 		radial-gradient(
 			at 0% 0%,
 			rgb(var(--color-tertiary-500)) 0px,
@@ -45,21 +51,21 @@ body {
 		);
 }
 
-a[disabled='true'],
-buttoa[disabled='true'],
-button:disabled {
-	@apply opacity-50 cursor-not-allowed pointer-events-none;
-}
-
-.backdrop {
-	@apply fixed inset-0 z-0;
+.theme-legbone .theme-legbone-backdrop {
+	@apply fixed inset-0 z-0 pointer-events-none;
 	@apply w-full h-[100vh];
 	@apply backdrop-brightness-150;
 	@apply transition-all;
 }
 
-.dark .backdrop {
+.dark .theme-legbone .theme-legbone-backdrop {
 	@apply backdrop-brightness-50;
+}
+
+a[disabled='true'],
+buttoa[disabled='true'],
+button:disabled {
+	@apply opacity-50 cursor-not-allowed pointer-events-none;
 }
 
 @layer components {

@@ -2,6 +2,7 @@ import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
 import { PlayerGroup } from '$lib/players';
+import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { parseTimeString } from '$lib/server/utils';
@@ -31,21 +32,28 @@ export const load = loadFlashMessage(async ({ locals }) => {
 		? await prisma.players.findMany({
 				where: { account_id: locals.session.accountId },
 				select: PlayerSelectForList,
-		  })
+			})
 		: null;
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
 	const selectedTheme = normalizeTheme(env.SLENDER_THEME);
+	const isAdmin = locals.session?.type === AccountType.God;
+	const themeAssetMetadata =
+		selectedTheme === 'cip-slender'
+			? await loadThemeAssetMetadata(selectedTheme)
+			: { assets: {}, version: null, warning: null };
 
 	return {
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,
 		boostedCreature,
 		isLoggedIn: Boolean(locals.session),
-		isAdmin: locals.session?.type === AccountType.God,
+		isAdmin,
 		staticPages,
 		accountCharacters: accountCharacters?.map(dbToPlayer),
 		nextServerSave,
 		selectedTheme,
+		themeAssets: themeAssetMetadata.assets,
+		themeAssetWarning: isAdmin ? themeAssetMetadata.warning : null,
 	};
 }) satisfies LayoutServerLoad;

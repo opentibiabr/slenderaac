@@ -1,4 +1,5 @@
 import LegboneShell from '$lib/themes/legbone/Shell.svelte';
+import CipSlenderShell from '$lib/themes/cip-slender/Shell.svelte';
 
 import type { ComponentType } from 'svelte';
 
@@ -12,6 +13,7 @@ export const themeRegistry = {
 	legbone: {
 		Shell: LegboneShell,
 	},
-} satisfies Partial<Record<ThemeId, ThemeDefinition>> & {
-	legbone: ThemeDefinition;
-};
+	'cip-slender': {
+		Shell: CipSlenderShell,
+	},
+} satisfies Record<ThemeId, ThemeDefinition>;
