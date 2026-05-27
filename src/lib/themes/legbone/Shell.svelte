@@ -49,6 +49,13 @@
 	} = data);
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: staticPages = data.staticPages;
+	$: previewTheme = $page.url.searchParams.get('themePreview');
+	$: cipPreviewHref = (() => {
+		const nextUrl = new URL($page.url.href);
+		nextUrl.searchParams.set('themePreview', 'cip-slender');
+
+		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+	})();
 
 	function drawerOpen(): void {
 		drawerStore.open({});
@@ -72,6 +79,15 @@
 	<div class="theme-legbone-background"></div>
 	<div class="theme-legbone-backdrop"></div>
 	<div class="theme-legbone-content">
+		{#if previewTheme === 'legbone'}
+			<a
+				class="theme-legbone-preview-switch"
+				href={cipPreviewHref}
+				aria-label="Preview Cip layout">
+				Cip
+			</a>
+		{/if}
+
 		{#if isAdmin}
 			<div
 				class="hidden md:flex flex-row justify-center items-start fixed top-0 left-0 right-0"
@@ -229,3 +245,33 @@
 		</AppShell>
 	</div>
 </div>
+
+<style>
+	.theme-legbone .theme-legbone-preview-switch {
+		position: fixed;
+		top: 14px;
+		right: 16px;
+		z-index: 60;
+		display: inline-flex;
+		width: 72px;
+		height: 24px;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid rgb(148 163 184 / 0.65);
+		border-radius: 6px;
+		background: rgb(15 23 42 / 0.78);
+		color: rgb(255 244 194);
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 1;
+		text-decoration: none;
+		text-shadow: 1px 1px 0 rgb(0 0 0 / 0.8);
+	}
+
+	.theme-legbone .theme-legbone-preview-switch:hover,
+	.theme-legbone .theme-legbone-preview-switch:focus {
+		border-color: rgb(250 204 21 / 0.9);
+		background: rgb(30 41 59 / 0.92);
+		color: white;
+	}
+</style>

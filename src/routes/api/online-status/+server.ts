@@ -14,5 +14,14 @@ export const GET: RequestHandler = async () => {
 		where: { player: { group_id: { lt: PlayerGroup.Gamemaster } } },
 	});
 
-	return json({ serverOnline, onlinePlayerCount });
+	return json({
+		serverOnline,
+		onlinePlayerCount,
+		topbarStats: {
+			twitchChannels: 0,
+			twitchViewers: 0,
+			youtubeChannels: 0,
+			youtubeViewers: 0,
+		},
+	});
 };

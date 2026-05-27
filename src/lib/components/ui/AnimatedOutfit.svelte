@@ -45,7 +45,8 @@
 			}),
 		);
 		const data = await response.json();
-		frames = (data.frames as { duration: number; image: string }[]).map(
+		const nextFrames = Array.isArray(data?.frames) ? data.frames : [];
+		frames = (nextFrames as { duration: number; image: string }[]).map(
 			(frame) => ({
 				...frame,
 				image: (() => {

@@ -6,14 +6,14 @@ import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { parseTimeString } from '$lib/server/utils';
-import { normalizeTheme } from '$lib/themes/theme-ids';
+import { isThemeId, normalizeTheme } from '$lib/themes/theme-ids';
 
 import { env } from '$env/dynamic/private';
 import { SERVER_SAVE_TIME } from '$env/static/private';
 
 import type { LayoutServerLoad } from './$types';
 
-export const load = loadFlashMessage(async ({ locals }) => {
+export const load = loadFlashMessage(async ({ locals, url }) => {
 	const highscores = await prisma.players.findMany({
 		where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
 		select: PlayerSelectForList,
@@ -36,7 +36,11 @@ export const load = loadFlashMessage(async ({ locals }) => {
 		: null;
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
-	const selectedTheme = normalizeTheme(env.SLENDER_THEME);
+	const configuredTheme = normalizeTheme(env.SLENDER_THEME);
+	const previewTheme = url.searchParams.get('themePreview');
+	const selectedTheme = isThemeId(previewTheme)
+		? previewTheme
+		: configuredTheme;
 	const isAdmin = locals.session?.type === AccountType.God;
 	const themeAssetMetadata =
 		selectedTheme === 'cip-slender'

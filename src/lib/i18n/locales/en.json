@@ -85,6 +85,8 @@
   "new-password": "New Password",
   "new-password-confirmation": "New password confirmation",
   "news": "News",
+  "news-empty-message": "There are no published news articles yet.",
+  "news-empty-title": "No news available",
   "next": "Next",
   "offline": "Offline",
   "online": "Online",

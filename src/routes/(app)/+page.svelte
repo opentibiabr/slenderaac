@@ -12,6 +12,17 @@
 </script>
 
 <div class="w-full">
+	{#if data.articles.length === 0}
+		<section class="news-empty">
+			<header
+				class="card !variant-filled-secondary p-1 px-4 text-md -mx-2 flex flex-row gap-2 items-center">
+				<Fa icon={faCalendar} size="xs" />
+				<strong>{$_('news-empty-title')}</strong>
+			</header>
+			<p>{$_('news-empty-message')}</p>
+		</section>
+	{/if}
+
 	{#each data.articles as article, i}
 		<header
 			class="card !variant-filled-secondary p-1 px-4 text-md -mx-2 flex flex-row gap-2 items-center justify-between">

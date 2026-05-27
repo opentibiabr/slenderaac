@@ -188,8 +188,14 @@ Example `cip-slender` asset pack layout:
   manifest.json
   images/
   backgrounds/
+  buttons/
   icons/
+  menu/
   boxes/
+  frames/
+  content/
+  strings/
+  themeboxes/
 ```
 
 `manifest.json` must include `schemaVersion`, `name`, `version`, and `assets`. `hashes` is optional.
@@ -217,6 +223,8 @@ Only `png`, `jpg`, `jpeg`, `gif`, `webp`, and `ico` files are served by `/theme-
 `cip-slender` works without an asset pack and falls back to neutral placeholders. Missing or invalid asset pack warnings are only shown to admins.
 
 The deployment operator is responsible for confirming asset rights and authorization. Keeping CipSoft-like assets outside the MIT repository keeps the code repository clean, but it does not remove legal risk from deploying or distributing those assets.
+
+For local visual review, a `cip-slender` pack can contain official/Cip-like pieces such as the page background, logo, menu icons and labels, blue button sprites, content frame borders, news headline strips, topbar social/status icons, right-side theme boxes, trailer/screenshot previews, and shop/poll panels. These files must remain external to the repository. Before production distribution, either obtain authorization for those assets or replace/modify them with assets the deployment operator is allowed to use.
 
 ### Acceptance checklist
 
