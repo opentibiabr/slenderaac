@@ -68,6 +68,8 @@
 	$: topIconYoutube = cipAsset(data.themeAssets, 'topIconYoutube');
 	$: topIconDownload = cipAsset(data.themeAssets, 'topIconDownload');
 	$: topIconOnline = cipAsset(data.themeAssets, 'topIconOnline');
+	$: topIconSignal = cipAsset(data.themeAssets, 'topIconSignal');
+	$: topIconEye = cipAsset(data.themeAssets, 'topIconEye');
 	$: contentTitleBackground = cipAsset(
 		data.themeAssets,
 		'contentTitleBackground',
@@ -94,6 +96,22 @@
 	$: contentCornerBottomRight = cipAsset(
 		data.themeAssets,
 		'contentCornerBottomRight',
+	);
+	$: contentCornerTopLeftClean = cipAsset(
+		data.themeAssets,
+		'contentCornerTopLeftClean',
+	);
+	$: contentCornerTopRightClean = cipAsset(
+		data.themeAssets,
+		'contentCornerTopRightClean',
+	);
+	$: contentCornerBottomLeftClean = cipAsset(
+		data.themeAssets,
+		'contentCornerBottomLeftClean',
+	);
+	$: contentCornerBottomRightClean = cipAsset(
+		data.themeAssets,
+		'contentCornerBottomRightClean',
 	);
 	$: contentBorder = cipAsset(data.themeAssets, 'contentBorder');
 	$: paperTexture = cipAsset(data.themeAssets, 'paperTexture');
@@ -172,6 +190,18 @@
 		contentFrameEdge
 			? `--cip-content-frame-edge: url("${contentFrameEdge}")`
 			: '',
+		contentCornerTopLeftClean
+			? `--cip-ticker-corner-tl: url("${contentCornerTopLeftClean}")`
+			: '',
+		contentCornerTopRightClean
+			? `--cip-ticker-corner-tr: url("${contentCornerTopRightClean}")`
+			: '',
+		contentCornerBottomLeftClean
+			? `--cip-ticker-corner-bl: url("${contentCornerBottomLeftClean}")`
+			: '',
+		contentCornerBottomRightClean
+			? `--cip-ticker-corner-br: url("${contentCornerBottomRightClean}")`
+			: '',
 		tickerExpandIcon ? `--cip-ticker-expand: url("${tickerExpandIcon}")` : '',
 		contentBorder ? `--cip-content-border: url("${contentBorder}")` : '',
 	]
@@ -221,6 +251,8 @@
 		contentCornerBottomRight
 			? `--cip-info-corner-br: url("${contentCornerBottomRight}")`
 			: '',
+		topIconSignal ? `--cip-top-icon-signal: url("${topIconSignal}")` : '',
+		topIconEye ? `--cip-top-icon-eye: url("${topIconEye}")` : '',
 		newsHeadlineIcon ? `--cip-news-icon: url("${newsHeadlineIcon}")` : '',
 	]
 		.filter(Boolean)
@@ -274,17 +306,38 @@
 		};
 	}
 
-	const topbarNumberFormat = new Intl.NumberFormat('en-US');
+	$: isCipSlenderThemePreview =
+		$page.url.searchParams.get('themePreview') === 'cip-slender';
+	$: effectiveTopbarStats = isCipSlenderThemePreview
+		? {
+				twitchChannels: 0,
+				twitchViewers: 0,
+				youtubeChannels: 0,
+				youtubeViewers: 0,
+			}
+		: topbarStats;
+	$: effectiveOnlinePlayerCount = isCipSlenderThemePreview
+		? 0
+		: onlinePlayerCount;
+
 	const formatTopbarCount = (value: number): string =>
-		topbarNumberFormat.format(normalizeTopbarCount(value));
+		String(normalizeTopbarCount(value));
 
 	$: formattedOnlinePlayerCount = new Intl.NumberFormat('en-US').format(
-		onlinePlayerCount,
+		effectiveOnlinePlayerCount,
 	);
-	$: formattedTwitchChannels = formatTopbarCount(topbarStats.twitchChannels);
-	$: formattedTwitchViewers = formatTopbarCount(topbarStats.twitchViewers);
-	$: formattedYoutubeChannels = formatTopbarCount(topbarStats.youtubeChannels);
-	$: formattedYoutubeViewers = formatTopbarCount(topbarStats.youtubeViewers);
+	$: formattedTwitchChannels = formatTopbarCount(
+		effectiveTopbarStats.twitchChannels,
+	);
+	$: formattedTwitchViewers = formatTopbarCount(
+		effectiveTopbarStats.twitchViewers,
+	);
+	$: formattedYoutubeChannels = formatTopbarCount(
+		effectiveTopbarStats.youtubeChannels,
+	);
+	$: formattedYoutubeViewers = formatTopbarCount(
+		effectiveTopbarStats.youtubeViewers,
+	);
 
 	async function refreshOnlineStatus(): Promise<void> {
 		const response = await fetch('/api/online-status');
@@ -457,10 +510,18 @@
 						{:else}
 							<Fa icon={faDiscord} />
 						{/if}
-						<span>({formattedTwitchChannels})</span>
+						<span class="theme-cip-slender__info-count theme-cip-slender__info-count--channels"
+							><span class="theme-cip-slender__topbar-number"
+								>{formattedTwitchChannels}</span
+							></span
+						>
 						<span class="theme-cip-slender__info-watch" aria-hidden="true"
 						></span>
-						<span>{formattedTwitchViewers}</span>
+						<span class="theme-cip-slender__info-count theme-cip-slender__info-count--viewers"
+							><span class="theme-cip-slender__topbar-number"
+								>{formattedTwitchViewers}</span
+							></span
+						>
 					</a>
 					{#if PUBLIC_WIKI_URL}
 						<a
@@ -473,10 +534,19 @@
 							{:else}
 								<Fa icon={faBookBookmark} />
 							{/if}
-							<span>({formattedYoutubeChannels})</span>
+							<span
+								class="theme-cip-slender__info-count theme-cip-slender__info-count--channels"
+								><span class="theme-cip-slender__topbar-number"
+									>{formattedYoutubeChannels}</span
+								></span
+							>
 							<span class="theme-cip-slender__info-watch" aria-hidden="true"
 							></span>
-							<span>{formattedYoutubeViewers}</span>
+							<span class="theme-cip-slender__info-count theme-cip-slender__info-count--viewers"
+								><span class="theme-cip-slender__topbar-number"
+									>{formattedYoutubeViewers}</span
+								></span
+							>
 						</a>
 					{/if}
 					<a
@@ -495,7 +565,10 @@
 						{:else}
 							<Fa icon={faGift} />
 						{/if}
-						<span>{formattedOnlinePlayerCount} Players Online</span>
+						<span class="theme-cip-slender__players-online-count"
+							>{formattedOnlinePlayerCount}</span
+						>
+						<span class="theme-cip-slender__players-online-label">Players Online</span>
 					</a>
 				</div>
 			</header>
@@ -518,44 +591,54 @@
 				</header>
 				<div class="theme-cip-slender__ticker-body">
 					<a href="/">
+						{#if newsTickerIconCommunity}
+							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
+						{/if}
+						<span class="theme-cip-slender__ticker-date">May 22 2026 -</span>
+						<span class="theme-cip-slender__ticker-copy"
+							><strong>SlenderAAC</strong>
+							has received a new Cip-like external theme pack preview.</span
+						>
+					</a>
+					<a href="/">
 						{#if newsTickerIconDevelopment}
 							<img src={newsTickerIconDevelopment} alt="" aria-hidden="true" />
 						{/if}
-						<span>May 22 2026</span>
-						<strong>SlenderAAC</strong>
-						has received a new Cip-like external theme pack preview.
+						<span class="theme-cip-slender__ticker-date">May 21 2026 -</span>
+						<span class="theme-cip-slender__ticker-copy"
+							><strong>Theme assets</strong>
+							are loaded from the mounted pack instead of the repository.</span
+						>
 					</a>
 					<a href="/">
 						{#if newsTickerIconCommunity}
 							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
 						{/if}
-						<span>May 21 2026</span>
-						<strong>Theme assets</strong>
-						are loaded from the mounted pack instead of the repository.
-					</a>
-					<a href="/">
-						{#if newsTickerIconDevelopment}
-							<img src={newsTickerIconDevelopment} alt="" aria-hidden="true" />
-						{/if}
-						<span>May 20 2026</span>
-						<strong>Layout shell</strong>
-						now uses shared routes, shared loads and external images.
+						<span class="theme-cip-slender__ticker-date">May 20 2026 -</span>
+						<span class="theme-cip-slender__ticker-copy"
+							><strong>Layout shell</strong>
+							now uses shared routes, shared loads and external images.</span
+						>
 					</a>
 					<a href="/">
 						{#if newsTickerIconCommunity}
 							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
 						{/if}
-						<span>May 19 2026</span>
-						<strong>Security</strong>
-						blocks traversal, dotfiles, directories and invalid extensions.
+						<span class="theme-cip-slender__ticker-date">May 19 2026 -</span>
+						<span class="theme-cip-slender__ticker-copy"
+							><strong>Security</strong>
+							blocks traversal, dotfiles, directories and invalid extensions.</span
+						>
 					</a>
 					<a href="/">
-						{#if newsTickerIconDevelopment}
-							<img src={newsTickerIconDevelopment} alt="" aria-hidden="true" />
+						{#if newsTickerIconCommunity}
+							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
 						{/if}
-						<span>May 18 2026</span>
-						<strong>Preview mode</strong>
-						keeps layout comparison data separate from application routes.
+						<span class="theme-cip-slender__ticker-date">May 18 2026 -</span>
+						<span class="theme-cip-slender__ticker-copy"
+							><strong>Preview mode</strong>
+							keeps layout comparison data separate from application routes.</span
+						>
 					</a>
 				</div>
 			</section>
@@ -762,7 +845,7 @@
 		position: relative;
 		z-index: 1;
 		display: grid;
-		grid-template-columns: 180px minmax(620px, 868px) 180px;
+		grid-template-columns: 180px minmax(620px, 865px) 180px;
 		align-items: start;
 		column-gap: 14px;
 		row-gap: 12px;
@@ -797,8 +880,8 @@
 		background: rgb(0 0 0 / 0.72);
 		color: rgb(255 238 140);
 		font-size: 11px;
-		font-weight: 700;
-		text-shadow: 1px 1px 0 rgb(0 0 0);
+		font-weight: 600;
+		text-shadow: none;
 	}
 
 	.theme-cip-slender .theme-cip-slender__left,
@@ -817,6 +900,7 @@
 		min-width: 0;
 		flex-direction: column;
 		gap: 8px;
+		transform: translate(1.5px, 0);
 	}
 
 	.theme-cip-slender .theme-cip-slender__center-spacer {
@@ -1103,11 +1187,14 @@
 		align-items: flex-start;
 		justify-content: space-between;
 		gap: 0;
-		margin-left: 2px;
+		margin-left: 0;
 		padding: 12px 6px 0 7px;
+		--cip-info-frame-edge: var(--cip-content-frame-edge, none);
+		--cip-info-frame-vertical: var(--cip-content-frame-vertical, none);
+		--cip-center-chrome-top-border-position: 1px 0;
+		--cip-center-chrome-bottom-border-position: 1px bottom;
 		--cip-center-chrome-fill:
-			linear-gradient(rgb(93 14 10), rgb(93 14 10)) 0 6px / 4px 28px no-repeat,
-			var(--cip-cache-title, var(--cip-news-headline, none)) -2px 6px / 83px
+			var(--cip-cache-title, var(--cip-news-headline, none)) 1px 6px / 83px
 				28px repeat-x,
 			rgb(93 14 10);
 		box-shadow: none;
@@ -1118,36 +1205,81 @@
 		line-height: 1;
 	}
 
-	.theme-cip-slender .theme-cip-slender__topbar.theme-cip-slender__center-chrome::before,
-	.theme-cip-slender .theme-cip-slender__topbar.theme-cip-slender__center-chrome::after {
-		left: -3px;
-		width: calc(100% + 7px);
+	.theme-cip-slender .theme-cip-slender__topbar.theme-cip-slender__center-chrome::before {
+		background-position:
+			left top,
+			calc(100% - 2px) top;
 	}
 
 	.theme-cip-slender .theme-cip-slender__topbar.theme-cip-slender__center-chrome::after {
-		left: -4px;
-		width: calc(100% + 8px);
+		background-position:
+			-1px top,
+			calc(100% - 1px) top;
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker {
 		position: relative;
 		--cip-center-chrome-fill: rgb(35 35 34);
+		--cip-center-chrome-top-border-position: 1px -1px;
+		--cip-center-chrome-bottom-border-position: 1px calc(100% - 1px);
 		margin-top: 10px;
-		margin-bottom: 8px;
-		padding: 4px 5px;
-		box-shadow: 0 8px 22px rgb(0 0 0 / 0.35);
+		margin-bottom: 10px;
+		padding: 6px 6px 6px;
+		background:
+			var(--cip-info-frame-edge, none) left top 4px / 5px 5px no-repeat,
+			var(--cip-info-frame-edge, none) right top 4px / 5px 5px no-repeat,
+			var(--cip-info-frame-edge, none) left bottom 4px / 5px 5px no-repeat,
+			var(--cip-info-frame-edge, none) right bottom 4px / 5px 5px no-repeat,
+			linear-gradient(rgb(58 55 56), rgb(58 55 56)) left -1px top 5px / 2px
+				calc(100% - 10px) no-repeat,
+			linear-gradient(rgb(58 55 56), rgb(58 55 56)) right -1px top 5px / 2px
+				calc(100% - 10px) no-repeat,
+			var(--cip-content-border, none)
+				var(--cip-center-chrome-top-border-position, -1px 0) / 16px 6px
+				repeat-x,
+			var(--cip-content-border, none)
+				var(--cip-center-chrome-bottom-border-position, -1px bottom) / 16px
+				6px repeat-x,
+			var(--cip-center-chrome-fill, rgb(35 35 34));
+		box-shadow: none;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__ticker.theme-cip-slender__center-chrome::before {
+		top: -5px;
+		width: calc(100% + 3px);
+		background-image:
+			var(--cip-ticker-corner-tl, var(--cip-info-corner-tl, none)),
+			var(--cip-ticker-corner-tr, var(--cip-info-corner-tr, none));
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__ticker.theme-cip-slender__center-chrome::after {
+		bottom: -3px;
+		width: calc(100% + 4px);
+		background-image:
+			var(--cip-ticker-corner-bl, var(--cip-info-corner-bl, none)),
+			var(--cip-ticker-corner-br, var(--cip-info-corner-br, none));
+		background-position:
+			-1px top,
+			right top;
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker header {
 		display: flex;
-		align-items: center;
-		gap: 8px;
-		min-height: 28px;
-		padding: 0 10px;
+		align-items: flex-start;
+		gap: 0;
+		height: 24px;
+		min-height: 24px;
+		margin: 0 -4px;
+		padding: 0 14px 0 5px;
 		border: 0;
 		background:
 			var(--cip-content-title, none) repeat-x,
 			linear-gradient(180deg, rgb(31 74 23), rgb(20 48 16));
+		background-position:
+			0 1px,
+			0 0;
 		color: rgb(240 224 178);
 	}
 
@@ -1161,8 +1293,10 @@
 		header
 		.theme-cip-slender__headline-image {
 		width: 250px;
-		height: 24px;
-		object-fit: contain;
+		height: 28px;
+		object-fit: none;
+		object-position: left top;
+		transform: translateY(0);
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker h2 {
@@ -1177,27 +1311,43 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body {
-		padding: 5px 6px 6px;
+		box-sizing: border-box;
+		min-height: 120px;
+		margin: 0 -4px 0;
+		padding: 10px 10px 6px;
 		background:
-			linear-gradient(rgb(247 225 184 / 0.97), rgb(233 198 142 / 0.97)),
-			rgb(241 213 169);
+			linear-gradient(rgb(120 63 16), rgb(120 63 16)) left 4px top 4px /
+				1px 112px no-repeat,
+			linear-gradient(rgb(120 63 16), rgb(120 63 16)) right 4px top 4px /
+				1px 112px no-repeat,
+			linear-gradient(
+					180deg,
+					rgb(120 63 16) 0 1px,
+					rgb(254 241 217) 1px 6px,
+					rgb(211 193 163) 6px 26px,
+					rgb(240 225 200) 26px 46px,
+					rgb(211 193 163) 46px 66px,
+					rgb(240 225 200) 66px 86px,
+					rgb(211 193 163) 86px 106px,
+					rgb(254 241 217) 106px 111px,
+					rgb(120 63 16) 111px 112px
+				)
+				left 4px top 4px / calc(100% - 8px) 112px no-repeat,
+			rgb(221 188 160);
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body a {
 		position: relative;
-		display: flex;
-		align-items: center;
-		gap: 5px;
+		display: block;
 		overflow: hidden;
-		height: 21px;
-		padding: 2px 22px 2px 6px;
-		border: 1px solid rgb(177 126 61);
-		background:
-			linear-gradient(90deg, rgb(255 247 205 / 0.78), rgb(239 194 128 / 0.76)),
-			rgb(242 210 155);
-		color: rgb(79 38 13);
-		font-size: 13px;
-		line-height: 16px;
+		height: 20px;
+		padding: 2px 22px 2px 2px;
+		border: 0;
+		background: transparent;
+		color: rgb(90 40 0);
+		font-family: Verdana, Arial, 'Times New Roman', sans-serif;
+		font-size: 12px;
+		line-height: normal;
 		text-decoration: none;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -1206,31 +1356,54 @@
 	.theme-cip-slender .theme-cip-slender__ticker-body a::after {
 		position: absolute;
 		top: 50%;
-		right: 5px;
+		right: 3px;
 		width: 12px;
 		height: 12px;
-		transform: translateY(-50%);
+		transform: translateY(calc(-50% - 1px));
 		background: var(--cip-ticker-expand, none) center / contain no-repeat;
 		content: '';
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body a > img {
+		position: absolute;
+		top: 2px;
+		left: 2px;
 		width: 16px;
 		height: 16px;
 		flex: 0 0 16px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body a + a {
-		margin-top: 2px;
+		margin-top: 0;
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body span {
-		margin-right: 6px;
-		color: rgb(91 49 21);
+		margin-right: 0;
+		color: rgb(90 40 0);
+	}
+
+	.theme-cip-slender .theme-cip-slender__ticker-date {
+		display: inline-block;
+		margin-left: 20px;
+		overflow: visible;
+		white-space: nowrap;
+	}
+
+	.theme-cip-slender .theme-cip-slender__ticker-copy {
+		position: absolute;
+		top: 2px;
+		right: 22px;
+		left: 112px;
+		display: block;
+		height: 16px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body strong {
-		color: rgb(0 55 125);
+		color: rgb(0 66 148);
+		font-weight: 700;
 	}
 
 	.theme-cip-slender .theme-cip-slender__links,
@@ -1261,10 +1434,67 @@
 		line-height: 16px;
 		letter-spacing: 0;
 		text-decoration: none;
-		text-shadow:
-			1px 1px 0 rgb(0 0 0),
-			0 0 4px rgb(0 0 0 / 0.9);
+		text-shadow: none;
 		white-space: nowrap;
+	}
+
+	.theme-cip-slender .theme-cip-slender__info-count {
+		display: inline-block;
+		color: rgb(255 255 255);
+		font-size: 9px;
+		font-weight: 400;
+		white-space: nowrap;
+	}
+
+	.theme-cip-slender .theme-cip-slender__topbar-number {
+		position: relative;
+		top: 1px;
+		display: inline-block;
+		color: rgb(255 255 255);
+		font-size: 9px;
+		font-weight: 400;
+		transform-origin: left center;
+	}
+
+	.theme-cip-slender .theme-cip-slender__info-count--channels {
+		min-width: 27px;
+		margin-left: 1px;
+		position: relative;
+	}
+
+	.theme-cip-slender .theme-cip-slender__info-count--channels::before {
+		display: inline-block;
+		width: 11px;
+		height: 8px;
+		margin-right: 3px;
+		position: relative;
+		left: 3px;
+		top: 1px;
+		background: var(--cip-top-icon-signal, none) center / 11px 8px no-repeat;
+		content: '';
+	}
+
+	.theme-cip-slender .theme-cip-slender__info-count--viewers {
+		min-width: 34px;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-count--channels
+		.theme-cip-slender__topbar-number {
+		left: 5px;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-count--viewers
+		.theme-cip-slender__topbar-number {
+		left: 5px;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-item--youtube
+		.theme-cip-slender__info-count--viewers
+		.theme-cip-slender__topbar-number {
+		left: 5px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__info-item:hover,
@@ -1287,37 +1517,69 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__info-item--youtube {
-		margin-left: 6px;
+		margin-left: 5px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__info-item--download {
-		margin-left: 8px;
+		margin-left: 5px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__info-item--twitch {
+		margin-left: -1px;
+		padding-right: 4px;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-item--twitch
+		.theme-cip-slender__info-count--channels {
+		min-width: 38px;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-item--youtube
+		.theme-cip-slender__info-count--channels {
+		min-width: 31px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__info-item--download > img {
-		margin-right: 2px;
+		margin-right: 1px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__info-item--download > span {
+		position: relative;
+		top: 1px;
+		margin-left: 4px;
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 9px;
+		font-weight: 700;
+		color: rgb(255 255 255);
+		text-shadow: none;
 	}
 
 	.theme-cip-slender .theme-cip-slender__info-watch {
 		position: relative;
 		display: inline-block;
-		width: 10px;
-		height: 7px;
+		width: 11px;
+		height: 8px;
 		margin: 0 2px;
-		border-radius: 50%;
-		background: rgb(245 239 225);
-		box-shadow: 1px 1px 0 rgb(0 0 0 / 0.85);
+		top: 0;
+		background: var(--cip-top-icon-eye, none) center / 11px 8px no-repeat;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-item--twitch
+		.theme-cip-slender__info-watch {
+		left: 1px;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__info-item--youtube
+		.theme-cip-slender__info-watch {
+		left: 1px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__info-watch::after {
-		position: absolute;
-		top: 2px;
-		left: 4px;
-		width: 3px;
-		height: 3px;
-		border-radius: 50%;
-		background: rgb(72 21 15);
-		content: '';
+		display: none;
 	}
 
 	.theme-cip-slender .theme-cip-slender__footer a {
@@ -1334,7 +1596,8 @@
 		flex: 0 0 auto;
 		margin-left: auto;
 		padding-top: 0;
-		color: rgb(255 237 202);
+		transform: translate(2px, -2px);
+		color: rgb(252 231 177);
 		font-weight: 700;
 		text-shadow: 1px 1px 0 rgb(0 0 0);
 	}
@@ -1343,11 +1606,33 @@
 		gap: 0;
 	}
 
+	.theme-cip-slender .theme-cip-slender__players-online-count {
+		position: relative;
+		display: inline-block;
+		min-width: 46px;
+		color: rgb(255 255 255);
+		font-size: 9px;
+		font-weight: 400;
+		text-align: right;
+	}
+
+	.theme-cip-slender .theme-cip-slender__players-online-label {
+		position: relative;
+		top: 1px;
+		margin-left: 3px;
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 10px;
+		font-weight: 700;
+		color: rgb(255 255 255);
+		text-shadow: none;
+	}
+
 	.theme-cip-slender .theme-cip-slender__players-online img {
 		display: block;
 		width: 11px;
 		height: 14px;
 		margin-right: 4px;
+		transform: translate(9px, 1px);
 	}
 
 	.theme-cip-slender .theme-cip-slender__mobile-menu {
