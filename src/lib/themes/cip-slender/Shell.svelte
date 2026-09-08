@@ -3,7 +3,6 @@
 	import {
 		faBars,
 		faBookBookmark,
-		faGift,
 		faToolbox,
 	} from '@fortawesome/free-solid-svg-icons';
 	import { Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
@@ -11,25 +10,24 @@
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
-	import { beforeNavigate } from '$app/navigation';
+	import { beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
-	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import {
-		PUBLIC_DISCORD_URL,
-		PUBLIC_TITLE,
 		PUBLIC_DOWNLOAD_URL,
+		PUBLIC_TITLE,
 		PUBLIC_WIKI_URL,
 	} from '$env/static/public';
 
-	import ContentFrame from './ContentFrame.svelte';
-	import Menu from './Menu.svelte';
-	import ThemeBox from './ThemeBox.svelte';
-	import { cipAsset } from './theme';
-
 	import type { LayoutData } from '../../../routes/(app)/$types';
+	import type { CipNewsReference } from './reference-types';
+	import ContentFrame from './ContentFrame.svelte';
+	import InfoBar from './InfoBar.svelte';
+	import { cipLayoutForPath } from './layout';
+	import Menu from './Menu.svelte';
+	import { cipAsset } from './theme';
 
 	type CipSlenderLayoutData = LayoutData & {
 		selectedTheme?: string;
@@ -44,12 +42,60 @@
 		youtubeViewers?: number | null;
 	};
 
+	type CipSlenderNewsArticle = {
+		id: number | string;
+		title: string;
+		created_at: Date | string;
+		content?: string | null;
+		category?: string;
+	};
+
+	type CipSlenderTickerSegment = {
+		text: string;
+		kind: 'text' | 'link';
+		href?: string;
+	};
+
+	type CipSlenderTickerItem = {
+		id: string;
+		href: string;
+		date: string;
+		title: string;
+		copySegments: CipSlenderTickerSegment[];
+		icon: string;
+	};
+
+	const cipTickerMonths = [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec',
+	];
+
 	const drawerStore = getDrawerStore();
 
 	export let data: CipSlenderLayoutData;
-
-	$: ({ highscores, isLoggedIn, isAdmin, boostedBoss, boostedCreature } = data);
+	let tickerUrl = '';
+	let expandedTickers: boolean[] = [];
+	$: ({ isLoggedIn, isAdmin } = data);
+	$: cipReference = ($page.data as { cipReference?: CipNewsReference | null })
+		.cipReference;
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
+	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
+	$: layout = cipLayoutForPath(currentPath);
+	$: isNewsArchivePage = currentPath === '/news/archive';
+	$: isEventSchedulePage = layout === 'compact-wide';
+	$: isCompactNewsToolPage = layout !== 'news';
+	$: showNewsTicker = !isCompactNewsToolPage && tickerItems.length > 0;
+	$: showAuxiliaryThemeboxes = !isCompactNewsToolPage;
 	$: showCipGrid = $page.url.searchParams.get('cipGrid') === '1';
 	$: themeSwitchHref = (() => {
 		const nextUrl = new URL($page.url.href);
@@ -58,12 +104,67 @@
 
 		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 	})();
+	$: homeHref = makeCipPreviewHref($page.url, '/');
+	$: accountHref = makeCipPreviewHref($page.url, '/account');
+	$: accountLoginHref = makeCipPreviewHref($page.url, '/account/login');
+	$: accountSignupHref = makeCipPreviewHref($page.url, '/account/signup');
+	$: onlineHref = makeCipPreviewHref($page.url, '/online');
+	$: shopHref = makeCipPreviewHref($page.url, '/shop');
+	$: presentation = data.cipPresentation;
+	$: fansitesHref = presentationHref(
+		'fansites',
+		'https://www.tibia.com/community/?subtopic=fansites',
+	);
+
+	function presentationHref(key: string, fallback: string): string {
+		return themePreviewHref($page.url, presentation?.links[key] ?? fallback);
+	}
+	$: tickerPageArticles = getTickerArticles($page.data.tickers);
+	$: tickerItems = (
+		cipReference
+			? cipReference.ticker.map((item, index) => ({
+					id: String(index),
+					href: homeHref,
+					date: item.date,
+					title: '',
+					copySegments: makeTickerTextSegments(item.text),
+					icon: item.icon,
+				}))
+			: tickerPageArticles.map((article) => ({
+					id: String(article.id),
+					href: makeCipPreviewHref($page.url, `/?ticker=${article.id}`),
+					date: `${formatCipTickerDate(article.created_at)} -`,
+					title: '',
+					copySegments: makeTickerSummarySegments(article),
+					icon: tickerCategoryIcon(article.category),
+				}))
+	) satisfies CipSlenderTickerItem[];
+	$: if (tickerUrl !== $page.url.href) {
+		tickerUrl = $page.url.href;
+		expandedTickers = tickerItems.map(
+			(item) => $page.url.searchParams.get('ticker') === item.id,
+		);
+	}
+	function tickerCategoryIcon(category?: string): string {
+		const keys = {
+			cipsoft: 'newsArchiveIconCipsoft',
+			community: 'newsArchiveIconCommunity',
+			development: 'newsArchiveIconDevelopment',
+			support: 'newsArchiveIconSupport',
+			technical: 'newsArchiveIconTechnical',
+		} as const;
+		return (
+			cipAsset(
+				data.themeAssets,
+				keys[category as keyof typeof keys] ?? keys.community,
+			) ?? ''
+		);
+	}
 	$: staticPages = data.staticPages;
 	$: logo = cipAsset(data.themeAssets, 'logo');
 	$: background = cipAsset(data.themeAssets, 'background');
 	$: menuOrnament = cipAsset(data.themeAssets, 'menuOrnament');
 	$: contentOrnament = cipAsset(data.themeAssets, 'contentOrnament');
-	$: themeBoxOrnament = cipAsset(data.themeAssets, 'themeBoxOrnament');
 	$: topIconTwitch = cipAsset(data.themeAssets, 'topIconTwitch');
 	$: topIconYoutube = cipAsset(data.themeAssets, 'topIconYoutube');
 	$: topIconDownload = cipAsset(data.themeAssets, 'topIconDownload');
@@ -121,6 +222,11 @@
 	);
 	$: headlineNewsTicker = cipAsset(data.themeAssets, 'headlineNewsTicker');
 	$: headlineNews = cipAsset(data.themeAssets, 'headlineNews');
+	$: headlineNewsArchive = cipAsset(data.themeAssets, 'headlineNewsArchive');
+	$: headlineEventSchedule = cipAsset(
+		data.themeAssets,
+		'headlineEventSchedule',
+	);
 	$: newsTickerIconCommunity = cipAsset(
 		data.themeAssets,
 		'newsTickerIconCommunity',
@@ -129,11 +235,13 @@
 		data.themeAssets,
 		'newsTickerIconDevelopment',
 	);
-	$: newsHeadlineIcon = cipAsset(data.themeAssets, 'newsHeadlineIcon');
+	$: newsHeadlineIcon =
+		cipReference?.assets.newsHeadlineIcon ??
+		cipAsset(data.themeAssets, 'newsHeadlineIcon');
 	$: tickerExpandIcon = cipAsset(data.themeAssets, 'menuExpandPlus');
+	$: tickerCollapseIcon = cipAsset(data.themeAssets, 'menuExpandMinus');
 	$: boxTop = cipAsset(data.themeAssets, 'boxTop');
 	$: boxBottom = cipAsset(data.themeAssets, 'boxBottom');
-	$: boxHeader = cipAsset(data.themeAssets, 'boxHeader');
 	$: chain = cipAsset(data.themeAssets, 'chain');
 	$: loginButton = cipAsset(data.themeAssets, 'loginButton');
 	$: myAccountButton = cipAsset(data.themeAssets, 'myAccountButton');
@@ -203,17 +311,45 @@
 			? `--cip-ticker-corner-br: url("${contentCornerBottomRightClean}")`
 			: '',
 		tickerExpandIcon ? `--cip-ticker-expand: url("${tickerExpandIcon}")` : '',
+		tickerCollapseIcon
+			? `--cip-ticker-collapse: url("${tickerCollapseIcon}")`
+			: '',
 		contentBorder ? `--cip-content-border: url("${contentBorder}")` : '',
 	]
 		.filter(Boolean)
 		.join('; ');
 	$: promoPremiumBox = cipAsset(data.themeAssets, 'promoPremiumBox');
-	$: premiumPromoArt = cipAsset(data.themeAssets, 'premiumPromoArt');
+	$: premiumPromoArt =
+		cipReference?.assets.premiumPromoArt ??
+		cipAsset(data.themeAssets, 'premiumPromoArt');
+	$: premiumCrown =
+		cipReference?.assets.premiumCrown ??
+		cipAsset(data.themeAssets, 'premiumCrown');
+	$: premiumOverlay = cipAsset(data.themeAssets, 'premiumOverlay');
+	$: premiumButtonLabel = cipAsset(data.themeAssets, 'shopButton');
+	$: premiumButtonDecor =
+		cipAsset(data.themeAssets, 'premiumButtonDecor') ??
+		cipAsset(data.themeAssets, 'premiumButtonPremiumTime');
+	$: premiumOfferText =
+		cipReference?.premiumText ??
+		presentation?.premiumText ??
+		(isNewsArchivePage ? 'Access ALL Areas!' : 'Get Supplies Anywhere!');
+	$: premiumButtonText =
+		cipReference?.premiumButtonText ??
+		presentation?.premiumButtonText ??
+		(isNewsArchivePage ? 'Get Premium' : 'Get Tibia Coins');
 	$: premiumButtonBackground = cipAsset(
 		data.themeAssets,
 		'premiumButtonBackground',
 	);
 	$: premiumButtonHover = cipAsset(data.themeAssets, 'premiumButtonHover');
+	$: promoFansitesBox = cipAsset(data.themeAssets, 'promoFansitesBox');
+	$: fansiteLogoFrame = cipAsset(data.themeAssets, 'fansiteLogoFrame');
+	$: fansiteLogo = cipAsset(data.themeAssets, 'fansiteLogo');
+	$: fansiteButtonBackground = cipAsset(
+		data.themeAssets,
+		'fansiteButtonBackground',
+	);
 	$: premiumButtonStyle = [
 		premiumButtonBackground
 			? `--cip-premium-button: url("${premiumButtonBackground}")`
@@ -221,6 +357,27 @@
 		premiumButtonHover
 			? `--cip-premium-button-hover: url("${premiumButtonHover}")`
 			: '',
+	]
+		.filter(Boolean)
+		.join('; ');
+	$: fansitesBoxStyle = [
+		fansiteLogoFrame
+			? `--cip-fansites-logo-frame: url("${fansiteLogoFrame}")`
+			: '',
+		fansiteButtonBackground
+			? `--cip-fansites-button: url("${fansiteButtonBackground}")`
+			: '',
+	]
+		.filter(Boolean)
+		.join('; ');
+	$: pollBoxStyle = [
+		smallButtonBackground
+			? `--cip-poll-button: url("${smallButtonBackground}")`
+			: '',
+		smallButtonHover
+			? `--cip-poll-button-hover: url("${smallButtonHover}")`
+			: '',
+		boxBottom ? `--cip-poll-bottom: url("${boxBottom}")` : '',
 	]
 		.filter(Boolean)
 		.join('; ');
@@ -254,6 +411,7 @@
 		topIconSignal ? `--cip-top-icon-signal: url("${topIconSignal}")` : '',
 		topIconEye ? `--cip-top-icon-eye: url("${topIconEye}")` : '',
 		newsHeadlineIcon ? `--cip-news-icon: url("${newsHeadlineIcon}")` : '',
+		boxBottom ? `--cip-right-themebox-bottom: url("${boxBottom}")` : '',
 	]
 		.filter(Boolean)
 		.join('; ');
@@ -264,11 +422,16 @@
 	$: trailerPreview = cipAsset(data.themeAssets, 'trailerPreview');
 	$: promoScreenshotBox = cipAsset(data.themeAssets, 'promoScreenshotBox');
 	$: promoScreenshotFrame = cipAsset(data.themeAssets, 'promoScreenshotFrame');
-	$: promoScreenshotImage = cipAsset(data.themeAssets, 'promoScreenshotImage');
+	$: promoScreenshotImage =
+		cipReference?.assets.promoScreenshotImage ??
+		cipAsset(data.themeAssets, 'promoScreenshotImage');
 	$: promoPollBox = cipAsset(data.themeAssets, 'promoPollBox');
 	$: rightTopper = cipAsset(data.themeAssets, 'rightTopper');
-	$: rightCreature = cipAsset(data.themeAssets, 'rightCreature');
-	$: rightBoss = cipAsset(data.themeAssets, 'rightBoss');
+	$: rightCreature =
+		cipReference?.assets.rightCreature ??
+		cipAsset(data.themeAssets, 'rightCreature');
+	$: rightBoss =
+		cipReference?.assets.rightBoss ?? cipAsset(data.themeAssets, 'rightBoss');
 
 	function drawerOpen(): void {
 		drawerStore.open({});
@@ -277,8 +440,149 @@
 		drawerStore.close();
 	}
 
-	beforeNavigate(() => {
+	function isTickerArticle(value: unknown): value is CipSlenderNewsArticle {
+		if (typeof value !== 'object' || value === null) {
+			return false;
+		}
+
+		const article = value as Partial<CipSlenderNewsArticle>;
+
+		return (
+			(typeof article.id === 'number' || typeof article.id === 'string') &&
+			typeof article.title === 'string' &&
+			(article.created_at instanceof Date ||
+				typeof article.created_at === 'string')
+		);
+	}
+
+	function getTickerArticles(value: unknown): CipSlenderNewsArticle[] {
+		return Array.isArray(value)
+			? value.filter(isTickerArticle).slice(0, 5)
+			: [];
+	}
+
+	function formatCipTickerDate(value: Date | string): string {
+		const date = value instanceof Date ? value : new Date(value);
+
+		if (!Number.isFinite(date.getTime())) {
+			return '';
+		}
+
+		return `${cipTickerMonths[date.getUTCMonth()]} ${String(
+			date.getUTCDate(),
+		).padStart(2, '0')} ${date.getUTCFullYear()}`;
+	}
+
+	function makeTickerSummarySegments(
+		article: CipSlenderNewsArticle,
+	): CipSlenderTickerSegment[] {
+		return typeof article.content === 'string'
+			? summarizeTickerSegments(article.content)
+			: [];
+	}
+
+	function summarizeTickerSegments(value: string): CipSlenderTickerSegment[] {
+		return makeTickerTextSegments(
+			value
+				.replace(/```[\s\S]*?```/g, ' ')
+				.replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+				.replace(/^\s*[-*+]\s+/gm, '')
+				.replace(/\s+/g, ' ')
+				.trim(),
+		);
+	}
+
+	function makeTickerTextSegments(value: string): CipSlenderTickerSegment[] {
+		const linkPattern =
+			/\[([^\]]+)\]\(([^)\s]+)\)|(https?:\/\/[^\s)]+|www\.[^\s)]+)/g;
+		const segments: CipSlenderTickerSegment[] = [];
+		const cleanValue = value.trim();
+		let lastIndex = 0;
+
+		for (const match of cleanValue.matchAll(linkPattern)) {
+			const index = match.index ?? 0;
+			pushTickerSegment(segments, cleanValue.slice(lastIndex, index), 'text');
+			const href = match[2] ?? match[3];
+			const safeHref = /^(https?:\/\/|\/(?!\/)|#|www\.)/.test(href)
+				? href.startsWith('www.')
+					? `https://${href}`
+					: href
+				: undefined;
+			pushTickerSegment(
+				segments,
+				match[1] ?? match[3] ?? '',
+				safeHref ? 'link' : 'text',
+				safeHref,
+			);
+			lastIndex = index + match[0].length;
+		}
+
+		pushTickerSegment(segments, cleanValue.slice(lastIndex), 'text');
+
+		return segments;
+	}
+
+	function pushTickerSegment(
+		segments: CipSlenderTickerSegment[],
+		value: string,
+		kind: CipSlenderTickerSegment['kind'],
+		href?: string,
+	): void {
+		const text = normalizeTickerText(value, kind === 'link');
+
+		if (!text) {
+			return;
+		}
+
+		const last = segments[segments.length - 1];
+
+		if (last?.kind === kind && last.href === href) {
+			last.text += text;
+			return;
+		}
+
+		segments.push({ text, kind, href });
+	}
+
+	function normalizeTickerText(value: string, trim = false): string {
+		const text = value.replace(/[>#*_`~]/g, '').replace(/\s+/g, ' ');
+
+		return trim ? text.trim() : text;
+	}
+
+	function makeCipPreviewHref(
+		currentUrl: URL,
+		path: string,
+		hash = '',
+	): string {
+		const nextUrl = makeCipPreviewUrl(currentUrl, path);
+		nextUrl.hash = hash;
+
+		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
+	}
+
+	function makeCipPreviewUrl(currentUrl: URL, path: string): URL {
+		const nextUrl = new URL(
+			themePreviewHref(currentUrl, path),
+			currentUrl.origin,
+		);
+		nextUrl.searchParams.set('themePreview', 'cip-slender');
+
+		return nextUrl;
+	}
+
+	beforeNavigate(({ to, cancel, type }) => {
 		drawerClose();
+		if (
+			type !== 'link' ||
+			!to ||
+			to.url.origin !== $page.url.origin ||
+			!$page.url.searchParams.has('themePreview') ||
+			to.url.searchParams.has('themePreview')
+		)
+			return;
+		cancel();
+		void goto(themePreviewHref($page.url, to.url.href));
 	});
 
 	let onlinePlayerCount = 0;
@@ -308,17 +612,26 @@
 
 	$: isCipSlenderThemePreview =
 		$page.url.searchParams.get('themePreview') === 'cip-slender';
-	$: effectiveTopbarStats = isCipSlenderThemePreview
+	$: effectiveTopbarStats = cipReference
 		? {
-				twitchChannels: 0,
-				twitchViewers: 0,
-				youtubeChannels: 0,
-				youtubeViewers: 0,
+				twitchChannels: cipReference.topbarStats[0]?.[0] ?? 0,
+				twitchViewers: cipReference.topbarStats[0]?.[1] ?? 0,
+				youtubeChannels: cipReference.topbarStats[1]?.[0] ?? 0,
+				youtubeViewers: cipReference.topbarStats[1]?.[1] ?? 0,
 			}
-		: topbarStats;
-	$: effectiveOnlinePlayerCount = isCipSlenderThemePreview
-		? 0
-		: onlinePlayerCount;
+		: isCipSlenderThemePreview
+			? {
+					twitchChannels: 0,
+					twitchViewers: 0,
+					youtubeChannels: 0,
+					youtubeViewers: 0,
+				}
+			: topbarStats;
+	$: effectiveOnlinePlayerCount = cipReference
+		? Number(cipReference.onlineCount.replace(/[^0-9]/g, ''))
+		: isCipSlenderThemePreview
+			? 0
+			: onlinePlayerCount;
 
 	const formatTopbarCount = (value: number): string =>
 		String(normalizeTopbarCount(value));
@@ -359,7 +672,11 @@
 	});
 </script>
 
-<div class="theme-cip-slender" style={shellStyle}>
+<div
+	class={`theme-cip-slender${
+		layout === 'compact-wide' ? ' theme-cip-slender--wide' : ''
+	}${isCompactNewsToolPage ? ' theme-cip-slender--compact-news' : ''}`}
+	style={shellStyle}>
 	<div
 		class="theme-cip-slender__background {!background
 			? 'theme-cip-slender__background--placeholder'
@@ -399,7 +716,10 @@
 
 	<div class="theme-cip-slender__shell">
 		<aside class="theme-cip-slender__left">
-			<a href="/" class="theme-cip-slender__logo" aria-label={PUBLIC_TITLE}>
+			<a
+				href={homeHref}
+				class="theme-cip-slender__logo"
+				aria-label={PUBLIC_TITLE}>
 				{#if logo}
 					<img src={logo} alt={PUBLIC_TITLE} />
 				{:else}
@@ -417,7 +737,7 @@
 					{#if isLoggedIn}
 						<a
 							class="theme-cip-slender__image-button theme-cip-slender__image-button--medium"
-							href="/account">
+							href={accountHref}>
 							{#if myAccountButton}
 								<img src={myAccountButton} alt={$_('my-account')} />
 							{:else}
@@ -438,11 +758,9 @@
 					{:else}
 						<a
 							class={`theme-cip-slender__image-button theme-cip-slender__image-button--medium ${
-								loginButton
-									? 'theme-cip-slender__image-button--rendered'
-									: ''
+								loginButton ? 'theme-cip-slender__image-button--rendered' : ''
 							}`}
-							href="/account/login">
+							href={accountLoginHref}>
 							{#if loginButton}
 								<img src={loginButton} alt={$_('login')} />
 							{:else}
@@ -451,7 +769,7 @@
 						</a>
 						<a
 							class="theme-cip-slender__create-account-link theme-cip-slender__create-account-link--loginbox"
-							href="/account/signup">
+							href={accountSignupHref}>
 							{#if loginCreateAccountText}
 								<img src={loginCreateAccountText} alt={$_('create-account')} />
 							{:else if createAccountButton}
@@ -468,11 +786,9 @@
 				<div class="theme-cip-slender__download-panel">
 					<a
 						class={`theme-cip-slender__image-button theme-cip-slender__image-button--medium ${
-							downloadButton
-								? 'theme-cip-slender__image-button--rendered'
-								: ''
+							downloadButton ? 'theme-cip-slender__image-button--rendered' : ''
 						}`}
-						href={PUBLIC_DOWNLOAD_URL}>
+						href={themePreviewHref($page.url, PUBLIC_DOWNLOAD_URL)}>
 						{#if downloadButton}
 							<img src={downloadButton} alt={$_('download')} />
 						{:else}
@@ -491,7 +807,8 @@
 
 		<section class="theme-cip-slender__center">
 			<div class="theme-cip-slender__center-spacer"></div>
-			<header class="theme-cip-slender__topbar theme-cip-slender__center-chrome">
+			<header
+				class="theme-cip-slender__topbar theme-cip-slender__center-chrome">
 				<button
 					class="theme-cip-slender__mobile-menu"
 					type="button"
@@ -499,149 +816,101 @@
 					aria-label="Open menu">
 					<Fa icon={faBars} />
 				</button>
-				<div class="theme-cip-slender__links">
-					<a
-						class="theme-cip-slender__info-item theme-cip-slender__info-item--twitch"
-						href={PUBLIC_DISCORD_URL}
-						target="_blank"
-						rel="noreferrer">
-						{#if topIconTwitch}
-							<img src={topIconTwitch} alt="Twitch" />
-						{:else}
-							<Fa icon={faDiscord} />
-						{/if}
-						<span class="theme-cip-slender__info-count theme-cip-slender__info-count--channels"
-							><span class="theme-cip-slender__topbar-number"
-								>{formattedTwitchChannels}</span
-							></span
-						>
-						<span class="theme-cip-slender__info-watch" aria-hidden="true"
-						></span>
-						<span class="theme-cip-slender__info-count theme-cip-slender__info-count--viewers"
-							><span class="theme-cip-slender__topbar-number"
-								>{formattedTwitchViewers}</span
-							></span
-						>
-					</a>
-					{#if PUBLIC_WIKI_URL}
-						<a
-							class="theme-cip-slender__info-item theme-cip-slender__info-item--youtube"
-							href={PUBLIC_WIKI_URL}
-							target="_blank"
-							rel="noreferrer">
-							{#if topIconYoutube}
-								<img src={topIconYoutube} alt="YouTube" />
-							{:else}
-								<Fa icon={faBookBookmark} />
-							{/if}
-							<span
-								class="theme-cip-slender__info-count theme-cip-slender__info-count--channels"
-								><span class="theme-cip-slender__topbar-number"
-									>{formattedYoutubeChannels}</span
-								></span
-							>
-							<span class="theme-cip-slender__info-watch" aria-hidden="true"
-							></span>
-							<span class="theme-cip-slender__info-count theme-cip-slender__info-count--viewers"
-								><span class="theme-cip-slender__topbar-number"
-									>{formattedYoutubeViewers}</span
-								></span
-							>
-						</a>
-					{/if}
-					<a
-						class="theme-cip-slender__info-item theme-cip-slender__info-item--download"
-						href={PUBLIC_DOWNLOAD_URL}>
-						{#if topIconDownload}
-							<img src={topIconDownload} alt="" aria-hidden="true" />
-						{/if}
-						<span>Fankit</span>
-					</a>
-				</div>
-				<div class="theme-cip-slender__status">
-					<a class="theme-cip-slender__players-online" href="/online">
-						{#if topIconOnline}
-							<img src={topIconOnline} alt="" aria-hidden="true" />
-						{:else}
-							<Fa icon={faGift} />
-						{/if}
-						<span class="theme-cip-slender__players-online-count"
-							>{formattedOnlinePlayerCount}</span
-						>
-						<span class="theme-cip-slender__players-online-label">Players Online</span>
-					</a>
-				</div>
+				<InfoBar
+					channels={[
+						{
+							href: presentationHref(
+								'twitch',
+								'https://www.twitch.tv/directory/game/Tibia',
+							),
+							label: 'Twitch',
+							icon: topIconTwitch,
+							channels: formattedTwitchChannels,
+							viewers: formattedTwitchViewers,
+						},
+						...(PUBLIC_WIKI_URL || presentation
+							? [
+									{
+										href: presentationHref(
+											'youtube',
+											'https://www.youtube.com/channel/UCg5vFOB3tN8KGcJDyk6QQzQ/home',
+										),
+										label: 'YouTube',
+										icon: topIconYoutube,
+										channels: formattedYoutubeChannels,
+										viewers: formattedYoutubeViewers,
+									},
+								]
+							: []),
+					]}
+					signal={topIconSignal}
+					eye={topIconEye}
+					downloadIcon={topIconDownload}
+					downloadHref={presentationHref(
+						'fankit',
+						'https://www.tibia.com/forum/?action=announcement&announcementid=87&boardid=89516',
+					)}
+					onlineIcon={topIconOnline}
+					{onlineHref}
+					onlineCount={formattedOnlinePlayerCount} />
 			</header>
 
-			<section
-				class="theme-cip-slender__ticker theme-cip-slender__center-chrome"
-				style={contentChromeStyle}>
-				<header>
-					{#if headlineNewsTicker}
-						<img
-							class="theme-cip-slender__headline-image"
-							src={headlineNewsTicker}
-							alt="News Ticker" />
-					{:else if contentOrnament}
-						<img src={contentOrnament} alt="" aria-hidden="true" />
-						<h2>News Ticker</h2>
-					{:else}
-						<h2>News Ticker</h2>
-					{/if}
-				</header>
-				<div class="theme-cip-slender__ticker-body">
-					<a href="/">
-						{#if newsTickerIconCommunity}
-							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
+			{#if showNewsTicker}
+				<section
+					class="theme-cip-slender__ticker theme-cip-slender__center-chrome"
+					style={contentChromeStyle}>
+					<header>
+						{#if headlineNewsTicker}
+							<img
+								class="theme-cip-slender__headline-image"
+								src={headlineNewsTicker}
+								alt="News Ticker" />
+						{:else if contentOrnament}
+							<img src={contentOrnament} alt="" aria-hidden="true" />
+							<h2>News Ticker</h2>
+						{:else}
+							<h2>News Ticker</h2>
 						{/if}
-						<span class="theme-cip-slender__ticker-date">May 22 2026 -</span>
-						<span class="theme-cip-slender__ticker-copy"
-							><strong>SlenderAAC</strong>
-							has received a new Cip-like external theme pack preview.</span
-						>
-					</a>
-					<a href="/">
-						{#if newsTickerIconDevelopment}
-							<img src={newsTickerIconDevelopment} alt="" aria-hidden="true" />
-						{/if}
-						<span class="theme-cip-slender__ticker-date">May 21 2026 -</span>
-						<span class="theme-cip-slender__ticker-copy"
-							><strong>Theme assets</strong>
-							are loaded from the mounted pack instead of the repository.</span
-						>
-					</a>
-					<a href="/">
-						{#if newsTickerIconCommunity}
-							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
-						{/if}
-						<span class="theme-cip-slender__ticker-date">May 20 2026 -</span>
-						<span class="theme-cip-slender__ticker-copy"
-							><strong>Layout shell</strong>
-							now uses shared routes, shared loads and external images.</span
-						>
-					</a>
-					<a href="/">
-						{#if newsTickerIconCommunity}
-							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
-						{/if}
-						<span class="theme-cip-slender__ticker-date">May 19 2026 -</span>
-						<span class="theme-cip-slender__ticker-copy"
-							><strong>Security</strong>
-							blocks traversal, dotfiles, directories and invalid extensions.</span
-						>
-					</a>
-					<a href="/">
-						{#if newsTickerIconCommunity}
-							<img src={newsTickerIconCommunity} alt="" aria-hidden="true" />
-						{/if}
-						<span class="theme-cip-slender__ticker-date">May 18 2026 -</span>
-						<span class="theme-cip-slender__ticker-copy"
-							><strong>Preview mode</strong>
-							keeps layout comparison data separate from application routes.</span
-						>
-					</a>
-				</div>
-			</section>
+					</header>
+					<div class="theme-cip-slender__ticker-body">
+						{#each tickerItems as item, index}
+							<input
+								class="theme-cip-slender__ticker-toggle"
+								type="checkbox"
+								bind:checked={expandedTickers[index]}
+								id={`theme-cip-slender-ticker-${index}`} />
+							<label
+								class={`theme-cip-slender__ticker-row ${
+									index % 2 === 0
+										? 'theme-cip-slender__ticker-row--odd'
+										: 'theme-cip-slender__ticker-row--even'
+								}`}
+								for={`theme-cip-slender-ticker-${index}`}
+								data-news-href={item.href}>
+								{#if item.icon.startsWith('/theme-assets/cip-slender/')}
+									<img src={item.icon} alt="" aria-hidden="true" />
+								{:else if item.icon === 'development' && newsTickerIconDevelopment}
+									<img
+										src={newsTickerIconDevelopment}
+										alt=""
+										aria-hidden="true" />
+								{:else if newsTickerIconCommunity}
+									<img
+										src={newsTickerIconCommunity}
+										alt=""
+										aria-hidden="true" />
+								{/if}
+								<span class="theme-cip-slender__ticker-date">{item.date}</span>
+								<!-- prettier-ignore -->
+								<span class="theme-cip-slender__ticker-copy">{#each item.copySegments as segment}{#if segment.href}<a class="theme-cip-slender__ticker-link" href={themePreviewHref($page.url, segment.href)}>{segment.text}</a>{:else}{segment.text}{/if}{/each}</span>
+								<span
+									class="theme-cip-slender__ticker-control"
+									aria-hidden="true"></span>
+							</label>
+						{/each}
+					</div>
+				</section>
+			{/if}
 
 			<ContentFrame
 				{title}
@@ -650,20 +919,47 @@
 				frameHorizontal={contentFrameHorizontal}
 				frameVertical={contentFrameVertical}
 				frameEdge={contentFrameEdge}
+				cornerTopLeft={contentCornerTopLeftClean ?? contentCornerTopLeft}
+				cornerTopRight={contentCornerTopRightClean ?? contentCornerTopRight}
+				cornerBottomLeft={contentCornerBottomLeftClean ??
+					contentCornerBottomLeft}
+				cornerBottomRight={contentCornerBottomRightClean ??
+					contentCornerBottomRight}
 				border={contentBorder}
-				headlineImage={title === 'Latest News' ? headlineNews : null}
+				headlineImage={title === 'Latest News'
+					? headlineNews
+					: title === 'News Archive'
+						? headlineNewsArchive
+						: title === 'Event Schedule'
+							? headlineEventSchedule
+							: null}
+				headlineWidth={isEventSchedulePage ? 192 : 250}
+				headlineHeight={isEventSchedulePage ? 32 : 28}
+				compact={isCompactNewsToolPage}
+				paperMinHeight={layout === 'compact-wide'
+					? 640
+					: layout === 'compact'
+						? 241
+						: 620}
 				{paperTexture}>
 				<slot />
 			</ContentFrame>
 
 			<footer class="theme-cip-slender__footer">
-				© {new Date().getFullYear()}
-				<a
-					href="https://github.com/luan/slenderaac"
-					target="_blank"
-					rel="noreferrer">
-					SlenderAAC
-				</a>
+				<div>
+					{presentation?.footer ??
+						'Copyright by SlenderAAC. All rights reserved.'}
+				</div>
+				<div>
+					<a href={presentationHref('about', '/pages/about')}
+						>{presentation ? 'About CipSoft' : 'About SlenderAAC'}</a>
+					|
+					<a href={presentationHref('agreement', '/pages/rules')}
+						>Service Agreement</a>
+					|
+					<a href={presentationHref('privacy', '/pages/privacy')}
+						>Privacy Policy</a>
+				</div>
 			</footer>
 		</section>
 
@@ -682,50 +978,74 @@
 						alt=""
 						aria-hidden="true" />
 				{/if}
-				<div
-					class="theme-cip-slender__right-boost theme-cip-slender__right-boost--creature">
+				<a
+					class="theme-cip-slender__right-boost theme-cip-slender__right-boost--creature"
+					href={presentationHref(
+						'creature',
+						'https://www.tibia.com/library/?subtopic=creatures',
+					)}
+					aria-label="Today's boosted creature">
 					{#if rightCreature}
 						<img src={rightCreature} alt="" aria-hidden="true" />
 					{/if}
-					{#if boostedCreature}
-						<AnimatedOutfit
-							outfit={boostedCreature}
-							alt={boostedCreature.boostname ?? 'Boosted creature'}
-							class="theme-cip-slender__boosted-avatar theme-cip-slender__boosted-avatar--creature"
-							innerClass="theme-cip-slender__boosted-avatar-inner theme-cip-slender__boosted-avatar-inner--creature" />
-					{/if}
-				</div>
-				<div
-					class="theme-cip-slender__right-boost theme-cip-slender__right-boost--boss">
+				</a>
+				<a
+					class="theme-cip-slender__right-boost theme-cip-slender__right-boost--boss"
+					href={presentationHref(
+						'boss',
+						'https://www.tibia.com/library/?subtopic=boostablebosses',
+					)}
+					aria-label="Today's boosted boss">
 					{#if rightBoss}
 						<img src={rightBoss} alt="" aria-hidden="true" />
 					{/if}
-					{#if boostedBoss}
-						<AnimatedOutfit
-							outfit={boostedBoss}
-							alt={boostedBoss.boostname ?? 'Boosted boss'}
-							class="theme-cip-slender__boosted-avatar theme-cip-slender__boosted-avatar--boss"
-							innerClass="theme-cip-slender__boosted-avatar-inner theme-cip-slender__boosted-avatar-inner--boss" />
-					{/if}
-				</div>
+				</a>
 			</div>
 
 			{#if promoPremiumBox}
 				<a
 					class="theme-cip-slender__official-box theme-cip-slender__official-box--premium"
 					style={premiumButtonStyle}
-					href="/shop">
+					aria-label={`${premiumOfferText} ${premiumButtonText}`}
+					href={shopHref}>
 					<img src={promoPremiumBox} alt="Webshop" />
-					<strong class="theme-cip-slender__premium-offer">
-						Get Supplies Anywhere!
-					</strong>
+					{#if premiumCrown}
+						<img
+							class="theme-cip-slender__premium-crown"
+							src={premiumCrown}
+							alt=""
+							aria-hidden="true" />
+					{/if}
 					{#if premiumPromoArt}
 						<span class="theme-cip-slender__premium-art">
 							<img src={premiumPromoArt} alt="" aria-hidden="true" />
 						</span>
 					{/if}
+					{#if premiumOverlay}
+						<img
+							class="theme-cip-slender__premium-overlay"
+							src={premiumOverlay}
+							alt=""
+							aria-hidden="true" />
+					{/if}
+					<strong class="theme-cip-slender__premium-offer">
+						{premiumOfferText}
+					</strong>
 					<span class="theme-cip-slender__premium-button">
-						<span>Get Tibia Coins</span>
+						{#if premiumButtonLabel}
+							<img
+								class="theme-cip-slender__premium-button-label"
+								src={premiumButtonLabel}
+								alt=""
+								aria-hidden="true" />
+						{/if}
+						<span class:sr-only={!!premiumButtonLabel}
+							>{premiumButtonText}</span>
+						{#if premiumButtonDecor}<img
+								class="theme-cip-slender__premium-button-decor"
+								src={premiumButtonDecor}
+								alt=""
+								aria-hidden="true" />{/if}
 					</span>
 				</a>
 			{/if}
@@ -735,17 +1055,29 @@
 					class="theme-cip-slender__official-box theme-cip-slender__official-box--network">
 					<img src={promoNetworksBox} alt="Networks" />
 					<div class="theme-cip-slender__network-links">
-						<a href={PUBLIC_DISCORD_URL} target="_blank" rel="noreferrer">
+						<a
+							href={presentationHref(
+								'facebook',
+								'https://www.facebook.com/tibia',
+							)}
+							target="_blank"
+							rel="noreferrer">
 							{#if networkFacebook}
-								<img src={networkFacebook} alt="Discord" />
+								<img src={networkFacebook} alt="Facebook" />
 							{:else}
 								<Fa icon={faDiscord} />
 							{/if}
 						</a>
-						{#if PUBLIC_WIKI_URL}
-							<a href={PUBLIC_WIKI_URL} target="_blank" rel="noreferrer">
+						{#if PUBLIC_WIKI_URL || presentation}
+							<a
+								href={presentationHref(
+									'networkYoutube',
+									'https://www.youtube.com/@cipsoft',
+								)}
+								target="_blank"
+								rel="noreferrer">
 								{#if networkYoutube}
-									<img src={networkYoutube} alt="Wiki" />
+									<img src={networkYoutube} alt="YouTube" />
 								{:else}
 									<Fa icon={faBookBookmark} />
 								{/if}
@@ -755,9 +1087,14 @@
 				</div>
 			{/if}
 
-			{#if promoTrailerBox}
-				<div
-					class="theme-cip-slender__official-box theme-cip-slender__official-box--trailer">
+			{#if showAuxiliaryThemeboxes && promoTrailerBox}
+				<a
+					class="theme-cip-slender__official-box theme-cip-slender__official-box--trailer"
+					href={presentationHref(
+						'trailer',
+						'https://www.youtube.com/watch?v=OpAaLT_PTCU',
+					)}
+					aria-label="Play Tibia trailer">
 					<img src={promoTrailerBox} alt="Trailer" />
 					{#if trailerPreview}
 						<img
@@ -765,52 +1102,75 @@
 							src={trailerPreview}
 							alt="" />
 					{/if}
-				</div>
+				</a>
 			{/if}
 
-			{#if promoScreenshotBox}
-				<div
-					class="theme-cip-slender__official-box theme-cip-slender__official-box--screenshot">
+			{#if showAuxiliaryThemeboxes && promoScreenshotBox}
+				<a
+					class="theme-cip-slender__official-box theme-cip-slender__official-box--screenshot"
+					href={presentationHref(
+						'screenshot',
+						'https://www.tibia.com/abouttibia/?subtopic=screenshots',
+					)}
+					aria-label="Screenshot of the day">
 					<img src={promoScreenshotBox} alt="Screenshots" />
 					{#if promoScreenshotFrame && promoScreenshotImage}
-						<div
-							class="theme-cip-slender__screenshot-frame"
-							style={`background-image: url("${promoScreenshotFrame}")`}>
-							<img src={promoScreenshotImage} alt="" />
+						<div class="theme-cip-slender__screenshot-image-clip">
+							<span
+								class="theme-cip-slender__screenshot-image"
+								style={`background-image: url("${promoScreenshotImage}")`}
+							></span>
 						</div>
+						<img
+							class="theme-cip-slender__screenshot-frame"
+							src={promoScreenshotFrame}
+							alt=""
+							aria-hidden="true" />
 					{/if}
-				</div>
+				</a>
 			{/if}
 
-			{#if promoPollBox}
+			{#if showAuxiliaryThemeboxes && promoPollBox}
 				<div
-					class="theme-cip-slender__official-box theme-cip-slender__official-box--poll">
+					class="theme-cip-slender__official-box theme-cip-slender__official-box--poll"
+					style={pollBoxStyle}>
 					<img src={promoPollBox} alt="Current Poll" />
+					<strong class="theme-cip-slender__poll-question">
+						<span
+							>{#if cipReference?.pollText ?? presentation?.pollText}{cipReference?.pollText ??
+									presentation?.pollText}{:else}Guess the Date of<br />the
+								Update!{/if}</span>
+					</strong>
+					<a
+						class="theme-cip-slender__poll-button"
+						href={presentationHref(
+							'poll',
+							'https://www.tibia.com/community/?subtopic=polls',
+						)}>Vote Now</a>
+					<span class="theme-cip-slender__poll-bottom" aria-hidden="true"
+					></span>
 				</div>
 			{/if}
-
-			<ThemeBox
-				title={$_('highscores')}
-				ornament={themeBoxOrnament}
-				headerBackground={boxHeader}
-				top={boxTop}
-				bottom={boxBottom}>
-				<div class="theme-cip-slender__compact-characters">
-					{#each highscores as character, i}
-						<a href="/characters/{character.name}">
-							<span class="theme-cip-slender__rank">{i + 1}</span>
-							<strong>{character.name}</strong>
-							<small>{$_('level')}: {character.level}</small>
-						</a>
-					{/each}
+			{#if promoFansitesBox}
+				<div
+					class="theme-cip-slender__official-box theme-cip-slender__official-box--fansites"
+					style={fansitesBoxStyle}>
+					<img src={promoFansitesBox} alt="Fansites" />
+					<a
+						class="theme-cip-slender__fansite-logo-frame"
+						href={presentationHref('fansite', fansitesHref)}
+						target="_blank"
+						rel="noreferrer"
+						aria-label="Featured fansite">
+						{#if fansiteLogo}
+							<img src={fansiteLogo} alt="" aria-hidden="true" />
+						{/if}
+					</a>
+					<a class="theme-cip-slender__fansite-button" href={fansitesHref}>
+						View all Fansites
+					</a>
 				</div>
-				<Button
-					href="/highscores"
-					size="sm"
-					class="theme-cip-slender__box-button">
-					{$_('view-more')}
-				</Button>
-			</ThemeBox>
+			{/if}
 		</aside>
 	</div>
 </div>
@@ -818,21 +1178,24 @@
 <style>
 	.theme-cip-slender {
 		position: relative;
+		box-sizing: border-box;
 		min-height: 100vh;
-		padding: 8px 0 42px;
-		background: rgb(6 17 33);
+		padding: 8px 0 0;
+		display: flow-root;
+		overflow-x: clip;
+		background: rgb(5 17 34);
 		color: rgb(42 27 17);
 		font-family: Verdana, Arial, ui-sans-serif, system-ui, sans-serif;
 	}
 
 	.theme-cip-slender .theme-cip-slender__background {
-		position: fixed;
+		position: absolute;
 		inset: 0;
 		z-index: 0;
-		background-color: rgb(6 17 33);
+		background-color: rgb(5 17 34);
 		background-position: top center;
 		background-repeat: no-repeat;
-		background-size: min(1600px, 100vw) auto;
+		background-size: 1600px auto;
 	}
 
 	.theme-cip-slender .theme-cip-slender__background--placeholder {
@@ -845,14 +1208,33 @@
 		position: relative;
 		z-index: 1;
 		display: grid;
-		grid-template-columns: 180px minmax(620px, 865px) 180px;
+		grid-template-columns: 180px minmax(0, var(--cip-center-width, 865px)) 180px;
 		align-items: start;
-		column-gap: 14px;
+		column-gap: var(--cip-column-gap, 14px);
 		row-gap: 12px;
-		width: min(1263px, calc(100vw - 24px));
-		margin: 0 auto;
-		left: 6px;
+		width: min(
+			var(--cip-shell-width, 1263px),
+			calc(100% - var(--cip-shell-gutter, 24px))
+		);
+		margin: 0 auto -3px;
+		left: var(--cip-shell-left, 5px);
 		top: -3px;
+	}
+
+	.theme-cip-slender:not(.theme-cip-slender--compact-news) {
+		--cip-shell-width: 1253px;
+		--cip-shell-left: 0.5px;
+		--cip-shell-gutter: 27px;
+	}
+
+	.theme-cip-slender.theme-cip-slender--wide {
+		--cip-center-width: 915px;
+		--cip-column-gap: 7px;
+		--cip-shell-width: 1299px;
+		--cip-shell-left: 22.5px;
+		--cip-left-offset: 1px;
+		--cip-center-offset: 10px;
+		--cip-right-offset: 18px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__alignment-grid {
@@ -891,8 +1273,13 @@
 		gap: 10px;
 	}
 
+	.theme-cip-slender .theme-cip-slender__right {
+		transform: translateX(var(--cip-right-offset, 3px));
+	}
+
 	.theme-cip-slender .theme-cip-slender__left {
 		gap: 4px;
+		transform: translateX(var(--cip-left-offset, 0px));
 	}
 
 	.theme-cip-slender .theme-cip-slender__center {
@@ -900,7 +1287,13 @@
 		min-width: 0;
 		flex-direction: column;
 		gap: 8px;
-		transform: translate(1.5px, 0);
+		transform: translateX(var(--cip-center-offset, 2px));
+	}
+
+	.theme-cip-slender .theme-cip-slender__footer {
+		margin-top: 10px;
+		margin-left: -5px;
+		width: calc(100% + 10px);
 	}
 
 	.theme-cip-slender .theme-cip-slender__center-spacer {
@@ -1099,8 +1492,7 @@
 		text-decoration: none;
 	}
 
-	.theme-cip-slender
-		.theme-cip-slender__create-account-link--loginbox {
+	.theme-cip-slender .theme-cip-slender__create-account-link--loginbox {
 		min-height: 11px;
 		align-items: flex-start;
 	}
@@ -1135,12 +1527,12 @@
 			var(--cip-info-frame-vertical, none) left top 5px / 3px 13px repeat-y,
 			var(--cip-info-frame-vertical, none) right top 5px / 3px 13px repeat-y,
 			var(--cip-content-border, none)
-				var(--cip-center-chrome-top-border-position, -1px 0) / 16px 6px
-				repeat-x,
+				var(--cip-center-chrome-top-border-position, -1px 0) / 16px 6px repeat-x,
 			var(--cip-content-border, none)
-				var(--cip-center-chrome-bottom-border-position, -1px bottom) / 16px
-				6px repeat-x,
+				var(--cip-center-chrome-bottom-border-position, -1px bottom) / 16px 6px
+				repeat-x,
 			var(--cip-center-chrome-fill, rgb(35 35 34));
+		image-rendering: pixelated;
 	}
 
 	.theme-cip-slender .theme-cip-slender__center-chrome::before,
@@ -1150,8 +1542,11 @@
 		width: calc(100% + 8px);
 		height: 17px;
 		background-repeat: no-repeat;
-		background-size: 17px 17px, 17px 17px;
+		background-size:
+			17px 17px,
+			17px 17px;
 		content: '';
+		image-rendering: pixelated;
 		pointer-events: none;
 		z-index: 3;
 	}
@@ -1159,8 +1554,7 @@
 	.theme-cip-slender .theme-cip-slender__center-chrome::before {
 		top: -4px;
 		background-image:
-			var(--cip-info-corner-tl, none),
-			var(--cip-info-corner-tr, none);
+			var(--cip-info-corner-tl, none), var(--cip-info-corner-tr, none);
 		background-position:
 			left top,
 			right top;
@@ -1169,8 +1563,7 @@
 	.theme-cip-slender .theme-cip-slender__center-chrome::after {
 		bottom: -4px;
 		background-image:
-			var(--cip-info-corner-bl, none),
-			var(--cip-info-corner-br, none);
+			var(--cip-info-corner-bl, none), var(--cip-info-corner-br, none);
 		background-position:
 			left top,
 			right top;
@@ -1180,7 +1573,7 @@
 		position: relative;
 		box-sizing: border-box;
 		display: flex;
-		width: 865px;
+		width: var(--cip-center-width, 865px);
 		max-width: 100%;
 		height: 40px;
 		min-height: 40px;
@@ -1194,8 +1587,8 @@
 		--cip-center-chrome-top-border-position: 1px 0;
 		--cip-center-chrome-bottom-border-position: 1px bottom;
 		--cip-center-chrome-fill:
-			var(--cip-cache-title, var(--cip-news-headline, none)) 1px 6px / 83px
-				28px repeat-x,
+			var(--cip-cache-title, var(--cip-news-headline, none)) 1px 6px / 83px 28px
+				repeat-x,
 			rgb(93 14 10);
 		box-shadow: none;
 		color: rgb(242 226 195);
@@ -1205,13 +1598,15 @@
 		line-height: 1;
 	}
 
-	.theme-cip-slender .theme-cip-slender__topbar.theme-cip-slender__center-chrome::before {
+	.theme-cip-slender
+		.theme-cip-slender__topbar.theme-cip-slender__center-chrome::before {
 		background-position:
 			left top,
 			calc(100% - 2px) top;
 	}
 
-	.theme-cip-slender .theme-cip-slender__topbar.theme-cip-slender__center-chrome::after {
+	.theme-cip-slender
+		.theme-cip-slender__topbar.theme-cip-slender__center-chrome::after {
 		background-position:
 			-1px top,
 			calc(100% - 1px) top;
@@ -1219,7 +1614,7 @@
 
 	.theme-cip-slender .theme-cip-slender__ticker {
 		position: relative;
-		--cip-center-chrome-fill: rgb(35 35 34);
+		--cip-center-chrome-fill: rgb(222 187 157);
 		--cip-center-chrome-top-border-position: 1px -1px;
 		--cip-center-chrome-bottom-border-position: 1px calc(100% - 1px);
 		margin-top: 10px;
@@ -1235,11 +1630,10 @@
 			linear-gradient(rgb(58 55 56), rgb(58 55 56)) right -1px top 5px / 2px
 				calc(100% - 10px) no-repeat,
 			var(--cip-content-border, none)
-				var(--cip-center-chrome-top-border-position, -1px 0) / 16px 6px
-				repeat-x,
+				var(--cip-center-chrome-top-border-position, -1px 0) / 16px 6px repeat-x,
 			var(--cip-content-border, none)
-				var(--cip-center-chrome-bottom-border-position, -1px bottom) / 16px
-				6px repeat-x,
+				var(--cip-center-chrome-bottom-border-position, -1px bottom) / 16px 6px
+				repeat-x,
 			var(--cip-center-chrome-fill, rgb(35 35 34));
 		box-shadow: none;
 	}
@@ -1286,6 +1680,7 @@
 	.theme-cip-slender .theme-cip-slender__ticker header img {
 		width: 16px;
 		height: 16px;
+		image-rendering: pixelated;
 	}
 
 	.theme-cip-slender
@@ -1294,6 +1689,7 @@
 		.theme-cip-slender__headline-image {
 		width: 250px;
 		height: 28px;
+		image-rendering: pixelated;
 		object-fit: none;
 		object-position: left top;
 		transform: translateY(0);
@@ -1311,40 +1707,39 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body {
+		position: relative;
 		box-sizing: border-box;
 		min-height: 120px;
-		margin: 0 -4px 0;
+		margin: 0 -4px;
 		padding: 10px 10px 6px;
-		background:
-			linear-gradient(rgb(120 63 16), rgb(120 63 16)) left 4px top 4px /
-				1px 112px no-repeat,
-			linear-gradient(rgb(120 63 16), rgb(120 63 16)) right 4px top 4px /
-				1px 112px no-repeat,
-			linear-gradient(
-					180deg,
-					rgb(120 63 16) 0 1px,
-					rgb(254 241 217) 1px 6px,
-					rgb(211 193 163) 6px 26px,
-					rgb(240 225 200) 26px 46px,
-					rgb(211 193 163) 46px 66px,
-					rgb(240 225 200) 66px 86px,
-					rgb(211 193 163) 86px 106px,
-					rgb(254 241 217) 106px 111px,
-					rgb(120 63 16) 111px 112px
-				)
-				left 4px top 4px / calc(100% - 8px) 112px no-repeat,
-			rgb(221 188 160);
+	}
+	.theme-cip-slender .theme-cip-slender__ticker-body::before {
+		position: absolute;
+		inset: 4px;
+		border: 1px solid rgb(121 61 3);
+		background: rgb(255 242 219);
+		content: '';
+		pointer-events: none;
 	}
 
-	.theme-cip-slender .theme-cip-slender__ticker-body a {
+	.theme-cip-slender .theme-cip-slender__ticker-toggle {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: 0;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	.theme-cip-slender .theme-cip-slender__ticker-row {
 		position: relative;
 		display: block;
 		overflow: hidden;
 		height: 20px;
 		padding: 2px 22px 2px 2px;
 		border: 0;
-		background: transparent;
 		color: rgb(90 40 0);
+		cursor: text;
 		font-family: Verdana, Arial, 'Times New Roman', sans-serif;
 		font-size: 12px;
 		line-height: normal;
@@ -1353,28 +1748,54 @@
 		white-space: nowrap;
 	}
 
-	.theme-cip-slender .theme-cip-slender__ticker-body a::after {
-		position: absolute;
-		top: 50%;
-		right: 3px;
-		width: 12px;
-		height: 12px;
-		transform: translateY(calc(-50% - 1px));
-		background: var(--cip-ticker-expand, none) center / contain no-repeat;
-		content: '';
+	.theme-cip-slender .theme-cip-slender__ticker-row--odd {
+		background: rgb(212 192 161);
 	}
 
-	.theme-cip-slender .theme-cip-slender__ticker-body a > img {
+	.theme-cip-slender .theme-cip-slender__ticker-row--even {
+		background: rgb(241 224 198);
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__ticker-toggle:checked
+		+ .theme-cip-slender__ticker-row {
+		height: auto;
+		min-height: 34px;
+		padding-left: 112px;
+		white-space: normal;
+	}
+
+	.theme-cip-slender .theme-cip-slender__ticker-control {
+		position: absolute;
+		top: 3px;
+		right: 3px;
+		z-index: 2;
+		width: 12px;
+		height: 12px;
+		background: var(--cip-ticker-expand, none) center / 12px 12px no-repeat;
+		cursor: pointer;
+		content: '';
+		image-rendering: pixelated;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__ticker-toggle:checked
+		+ .theme-cip-slender__ticker-row
+		.theme-cip-slender__ticker-control {
+		background-image: var(
+			--cip-ticker-collapse,
+			var(--cip-ticker-expand, none)
+		);
+	}
+
+	.theme-cip-slender .theme-cip-slender__ticker-row > img {
 		position: absolute;
 		top: 2px;
 		left: 2px;
 		width: 16px;
 		height: 16px;
 		flex: 0 0 16px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__ticker-body a + a {
-		margin-top: 0;
+		image-rendering: pixelated;
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-body span {
@@ -1383,8 +1804,11 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__ticker-date {
-		display: inline-block;
-		margin-left: 20px;
+		position: absolute;
+		top: 2px;
+		left: 22px;
+		display: block;
+		margin-left: 0;
 		overflow: visible;
 		white-space: nowrap;
 	}
@@ -1401,238 +1825,36 @@
 		white-space: nowrap;
 	}
 
-	.theme-cip-slender .theme-cip-slender__ticker-body strong {
+	.theme-cip-slender
+		.theme-cip-slender__ticker-toggle:checked
+		+ .theme-cip-slender__ticker-row
+		.theme-cip-slender__ticker-copy {
+		position: static;
+		height: auto;
+		min-height: 30px;
+		white-space: normal;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__ticker-toggle:focus-visible
+		+ .theme-cip-slender__ticker-row {
+		outline: 1px solid rgb(0 66 148);
+		outline-offset: -1px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__ticker-link {
 		color: rgb(0 66 148);
 		font-weight: 700;
 	}
 
-	.theme-cip-slender .theme-cip-slender__links,
-	.theme-cip-slender .theme-cip-slender__status {
-		display: flex;
-		align-items: center;
-		gap: 0;
-		min-width: 0;
-		height: 16px;
-		position: relative;
-		z-index: 2;
-	}
-
-	.theme-cip-slender .theme-cip-slender__links {
-		flex: 1 1 auto;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item,
-	.theme-cip-slender .theme-cip-slender__players-online {
-		display: flex;
-		align-items: center;
-		height: 16px;
-		gap: 0;
-		color: rgb(255 245 222);
-		font-family: Verdana, Arial, Helvetica, sans-serif;
-		font-size: 10px;
-		font-weight: 700;
-		line-height: 16px;
-		letter-spacing: 0;
-		text-decoration: none;
-		text-shadow: none;
-		white-space: nowrap;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-count {
-		display: inline-block;
-		color: rgb(255 255 255);
-		font-size: 9px;
-		font-weight: 400;
-		white-space: nowrap;
-	}
-
-	.theme-cip-slender .theme-cip-slender__topbar-number {
-		position: relative;
-		top: 1px;
-		display: inline-block;
-		color: rgb(255 255 255);
-		font-size: 9px;
-		font-weight: 400;
-		transform-origin: left center;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-count--channels {
-		min-width: 27px;
-		margin-left: 1px;
-		position: relative;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-count--channels::before {
-		display: inline-block;
-		width: 11px;
-		height: 8px;
-		margin-right: 3px;
-		position: relative;
-		left: 3px;
-		top: 1px;
-		background: var(--cip-top-icon-signal, none) center / 11px 8px no-repeat;
-		content: '';
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-count--viewers {
-		min-width: 34px;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-count--channels
-		.theme-cip-slender__topbar-number {
-		left: 5px;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-count--viewers
-		.theme-cip-slender__topbar-number {
-		left: 5px;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-item--youtube
-		.theme-cip-slender__info-count--viewers
-		.theme-cip-slender__topbar-number {
-		left: 5px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item:hover,
-	.theme-cip-slender .theme-cip-slender__players-online:hover {
-		color: white;
-		text-decoration: none;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item > img {
-		display: block;
-		width: auto;
-		height: 16px;
-		margin-right: 1px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item > svg {
-		width: 16px;
-		height: 16px;
-		margin-right: 2px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item--youtube {
-		margin-left: 5px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item--download {
-		margin-left: 5px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item--twitch {
-		margin-left: -1px;
-		padding-right: 4px;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-item--twitch
-		.theme-cip-slender__info-count--channels {
-		min-width: 38px;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-item--youtube
-		.theme-cip-slender__info-count--channels {
-		min-width: 31px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item--download > img {
-		margin-right: 1px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-item--download > span {
-		position: relative;
-		top: 1px;
-		margin-left: 4px;
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 9px;
-		font-weight: 700;
-		color: rgb(255 255 255);
-		text-shadow: none;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-watch {
-		position: relative;
-		display: inline-block;
-		width: 11px;
-		height: 8px;
-		margin: 0 2px;
-		top: 0;
-		background: var(--cip-top-icon-eye, none) center / 11px 8px no-repeat;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-item--twitch
-		.theme-cip-slender__info-watch {
-		left: 1px;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__info-item--youtube
-		.theme-cip-slender__info-watch {
-		left: 1px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__info-watch::after {
-		display: none;
-	}
-
 	.theme-cip-slender .theme-cip-slender__footer a {
-		color: rgb(252 231 177);
+		color: rgb(255 255 255);
 		text-decoration: none;
 	}
 
 	.theme-cip-slender .theme-cip-slender__footer a:hover {
 		color: white;
 		text-decoration: underline;
-	}
-
-	.theme-cip-slender .theme-cip-slender__status {
-		flex: 0 0 auto;
-		margin-left: auto;
-		padding-top: 0;
-		transform: translate(2px, -2px);
-		color: rgb(252 231 177);
-		font-weight: 700;
-		text-shadow: 1px 1px 0 rgb(0 0 0);
-	}
-
-	.theme-cip-slender .theme-cip-slender__players-online {
-		gap: 0;
-	}
-
-	.theme-cip-slender .theme-cip-slender__players-online-count {
-		position: relative;
-		display: inline-block;
-		min-width: 46px;
-		color: rgb(255 255 255);
-		font-size: 9px;
-		font-weight: 400;
-		text-align: right;
-	}
-
-	.theme-cip-slender .theme-cip-slender__players-online-label {
-		position: relative;
-		top: 1px;
-		margin-left: 3px;
-		font-family: Arial, Helvetica, sans-serif;
-		font-size: 10px;
-		font-weight: 700;
-		color: rgb(255 255 255);
-		text-shadow: none;
-	}
-
-	.theme-cip-slender .theme-cip-slender__players-online img {
-		display: block;
-		width: 11px;
-		height: 14px;
-		margin-right: 4px;
-		transform: translate(9px, 1px);
 	}
 
 	.theme-cip-slender .theme-cip-slender__mobile-menu {
@@ -1651,11 +1873,20 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__footer {
-		padding: 8px;
-		color: rgb(255 244 218);
-		font-size: 12px;
+		box-sizing: border-box;
+		min-height: 42px;
+		padding: 0 0 20px;
+		color: rgb(255 255 255);
+		font-family: Verdana, Arial, sans-serif;
+		font-size: 9.33333px;
+		font-weight: 400;
+		line-height: 11px;
 		text-align: center;
 		text-shadow: 1px 1px 2px rgb(0 0 0);
+	}
+
+	.theme-cip-slender .theme-cip-slender__footer div + div {
+		margin-top: 0;
 	}
 
 	.theme-cip-slender .theme-cip-slender__admin {
@@ -1697,7 +1928,7 @@
 		top: 10px;
 		right: -92px;
 		z-index: 6;
-		display: inline-flex;
+		display: none;
 		width: 82px;
 		height: 20px;
 		align-items: center;
@@ -1723,7 +1954,7 @@
 		display: block;
 		max-width: 161px;
 		height: auto;
-		transform: translateY(15px);
+		transform: translate(1px, 15px);
 	}
 
 	.theme-cip-slender .theme-cip-slender__right-boost {
@@ -1737,19 +1968,20 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__right-boost--creature {
-		left: 29px;
+		left: 23px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__right-boost--boss {
-		right: 29px;
+		left: 80px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__right-boost > img {
 		position: absolute;
-		top: -12px;
+		top: -24px;
 		left: -9px;
 		z-index: 1;
 		width: 64px;
+		max-width: none;
 		height: 64px;
 		object-fit: contain;
 	}
@@ -1769,87 +2001,6 @@
 	:global(.theme-cip-slender .theme-cip-slender__boosted-avatar canvas) {
 		width: 72px !important;
 		height: 72px !important;
-	}
-
-	.theme-cip-slender .theme-cip-slender__characters {
-		display: flex;
-		flex-direction: column;
-		gap: 6px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__characters a {
-		display: grid;
-		grid-template-columns: 24px 38px minmax(0, 1fr);
-		align-items: center;
-		gap: 4px;
-		min-height: 44px;
-		color: rgb(242 226 195);
-		text-decoration: none;
-	}
-
-	.theme-cip-slender .theme-cip-slender__characters a:hover {
-		background: rgb(99 59 30 / 0.8);
-	}
-
-	.theme-cip-slender .theme-cip-slender__characters strong,
-	.theme-cip-slender .theme-cip-slender__characters small {
-		display: block;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.theme-cip-slender .theme-cip-slender__compact-characters {
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__compact-characters a {
-		display: grid;
-		grid-template-columns: 22px minmax(0, 1fr);
-		grid-template-rows: auto auto;
-		column-gap: 8px;
-		min-height: 34px;
-		align-items: center;
-		color: rgb(242 226 195);
-		text-decoration: none;
-	}
-
-	.theme-cip-slender
-		.theme-cip-slender__compact-characters
-		.theme-cip-slender__rank {
-		grid-row: 1 / 3;
-	}
-
-	.theme-cip-slender .theme-cip-slender__compact-characters strong,
-	.theme-cip-slender .theme-cip-slender__compact-characters small {
-		display: block;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	.theme-cip-slender .theme-cip-slender__compact-characters small {
-		color: rgb(213 185 139);
-		font-size: 10px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__characters small {
-		color: rgb(213 185 139);
-		font-size: 11px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__rank {
-		display: inline-flex;
-		width: 22px;
-		height: 22px;
-		align-items: center;
-		justify-content: center;
-		background: rgb(127 84 34);
-		color: white;
-		font-size: 12px;
-		font-weight: 800;
 	}
 
 	.theme-cip-slender .theme-cip-slender__promo {
@@ -1903,7 +2054,7 @@
 		filter: brightness(1.12);
 	}
 
-	.theme-cip-slender .theme-cip-slender__network-links svg {
+	.theme-cip-slender .theme-cip-slender__network-links :global(svg) {
 		width: 22px;
 		height: 22px;
 	}
@@ -1954,23 +2105,6 @@
 		content: '';
 	}
 
-	.theme-cip-slender .theme-cip-slender__screenshot-frame {
-		position: absolute;
-		inset: 17px 5px 5px;
-		background-position: center;
-		background-repeat: no-repeat;
-		background-size: 100% 100%;
-	}
-
-	.theme-cip-slender .theme-cip-slender__screenshot-frame img {
-		position: absolute;
-		top: 8px;
-		left: 8px;
-		width: calc(100% - 16px) !important;
-		height: calc(100% - 16px) !important;
-		object-fit: cover;
-	}
-
 	.theme-cip-slender .theme-cip-slender__poll-copy {
 		position: absolute;
 		inset: 36px 16px auto;
@@ -2006,30 +2140,151 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__official-box--network {
-		height: 104px;
+		height: 98px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__official-box--fansites {
+		height: 188px;
+		background: transparent;
+	}
+
+	.theme-cip-slender
+		.theme-cip-slender__official-box--fansites
+		> img:first-child {
+		height: 43px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__official-box--trailer {
 		height: 153px;
-		background: rgb(14 12 11 / 0.86);
+		background: transparent;
 	}
 
 	.theme-cip-slender .theme-cip-slender__official-box--screenshot {
 		height: 154px;
-		background: rgb(14 12 11 / 0.86);
+		background: transparent;
+	}
+
+	.theme-cip-slender .theme-cip-slender__official-box--network::after,
+	.theme-cip-slender .theme-cip-slender__official-box--trailer::after,
+	.theme-cip-slender .theme-cip-slender__official-box--screenshot::after {
+		position: absolute;
+		bottom: 0;
+		left: -1px;
+		z-index: 3;
+		display: block;
+		width: 180px;
+		height: 12px;
+		background: var(--cip-right-themebox-bottom, transparent) center / 180px
+			12px no-repeat;
+		content: '';
+		pointer-events: none;
 	}
 
 	.theme-cip-slender .theme-cip-slender__official-box--poll {
-		height: 143px;
+		height: 154px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__fansite-logo-frame {
+		position: absolute;
+		top: 31px;
+		left: 0;
+		display: block;
+		width: 180px;
+		height: 145px;
+		background: var(--cip-fansites-logo-frame, transparent) center / 180px 145px
+			no-repeat;
+	}
+
+	.theme-cip-slender .theme-cip-slender__fansite-logo-frame img {
+		position: absolute;
+		top: 8px;
+		left: 15px;
+		display: block;
+		width: 150px;
+		height: 100px;
+		max-width: none;
+		object-fit: cover;
+	}
+
+	.theme-cip-slender .theme-cip-slender__fansite-button {
+		position: absolute;
+		top: 144px;
+		left: 22px;
+		z-index: 2;
+		display: block;
+		width: 135px;
+		height: 25px;
+		color: rgb(255 209 140);
+		font-family: Verdana, Arial, sans-serif;
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 25px;
+		text-align: center;
+		text-decoration: none;
+		text-shadow: 1px 1px 0 rgb(0 0 0);
+		background: var(--cip-fansites-button, rgb(17 37 154)) center / 135px 25px
+			no-repeat;
+	}
+
+	.theme-cip-slender .theme-cip-slender__poll-question {
+		position: absolute;
+		top: 37px;
+		left: 15px;
+		z-index: 2;
+		display: block;
+		width: 150px;
+		height: 75px;
+		color: rgb(90 40 0);
+		font-family: Verdana, Arial, sans-serif;
+		font-size: 13.3333px;
+		font-weight: 700;
+		line-height: 14.6667px;
+		text-align: center;
+	}
+
+	.theme-cip-slender .theme-cip-slender__poll-button {
+		position: absolute;
+		top: 109px;
+		left: 22px;
+		z-index: 2;
+		display: block;
+		width: 135px;
+		height: 25px;
+		color: rgb(255 209 140);
+		font-family: Verdana, Arial, 'Times New Roman', sans-serif;
+		font-size: 12px;
+		font-weight: 700;
+		line-height: 25px;
+		text-align: center;
+		text-shadow: 1px 1px 0 rgb(0 0 0);
+		background: var(--cip-poll-button, rgb(17 37 154)) center / 135px 25px
+			no-repeat;
+	}
+
+	.theme-cip-slender .theme-cip-slender__poll-button:hover {
+		background-image: var(--cip-poll-button-hover, var(--cip-poll-button));
+	}
+
+	.theme-cip-slender .theme-cip-slender__poll-bottom {
+		position: absolute;
+		top: 142px;
+		left: 0;
+		z-index: 3;
+		display: block;
+		width: 180px;
+		height: 12px;
+		background: var(--cip-poll-bottom, transparent) center / 180px 12px
+			no-repeat;
+		pointer-events: none;
 	}
 
 	.theme-cip-slender .theme-cip-slender__premium-art {
 		position: absolute;
-		top: 53px;
-		left: 11px;
+		top: 34px;
+		left: 10px;
 		display: flex;
-		width: 154px;
-		height: 82px;
+		width: 160px;
+		height: 126px;
 		align-items: center;
 		justify-content: center;
 		overflow: hidden;
@@ -2038,35 +2293,62 @@
 
 	.theme-cip-slender .theme-cip-slender__premium-art img {
 		display: block;
-		width: 154px;
-		height: 82px;
+		width: 160px;
+		height: 126px;
 		object-fit: cover;
+	}
+
+	.theme-cip-slender .theme-cip-slender__premium-crown,
+	.theme-cip-slender .theme-cip-slender__premium-overlay,
+	.theme-cip-slender .theme-cip-slender__premium-button-label {
+		position: absolute;
+		display: block;
+		max-width: none;
+		pointer-events: none;
+	}
+
+	.theme-cip-slender .theme-cip-slender__premium-crown {
+		top: -28px;
+		left: 5px;
+		z-index: 2;
+		width: 64px;
+		height: 64px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__premium-overlay {
+		top: 34px;
+		left: 10px;
+		z-index: 3;
+		width: 163px;
+		height: 26px;
 	}
 
 	.theme-cip-slender .theme-cip-slender__premium-offer {
 		position: absolute;
-		top: 38px;
-		right: 8px;
-		left: 8px;
-		z-index: 2;
+		top: 37px;
+		left: 10px;
+		z-index: 4;
 		display: block;
+		width: 163px;
+		height: 13px;
+		overflow: hidden;
 		color: white;
 		font-family: Verdana, Arial, sans-serif;
 		font-size: 11px;
-		font-weight: 800;
-		line-height: 14px;
+		font-weight: 400;
+		line-height: 13px;
 		text-align: center;
 		text-shadow:
 			1px 1px 0 rgb(0 0 0),
-			0 0 4px rgb(0 0 0 / 0.9);
+			0 0 3px rgb(0 0 0 / 0.8);
 	}
 
 	.theme-cip-slender .theme-cip-slender__premium-button {
 		position: absolute;
-		right: 19px;
-		bottom: 8px;
-		left: 19px;
+		top: 161px;
+		left: 18px;
 		display: flex;
+		width: 142px;
 		height: 34px;
 		align-items: center;
 		justify-content: center;
@@ -2082,6 +2364,25 @@
 			0 0 5px rgb(0 0 0 / 0.8);
 		background: var(--cip-premium-button, rgb(19 25 142)) center / 142px 34px
 			no-repeat;
+	}
+
+	.theme-cip-slender .theme-cip-slender__premium-button-decor {
+		position: absolute;
+		display: block;
+		max-width: none;
+		pointer-events: none;
+		top: -17px;
+		left: 15px;
+		z-index: 2;
+		width: 114px;
+		height: 26px;
+	}
+
+	.theme-cip-slender .theme-cip-slender__premium-button-label {
+		top: 2px;
+		left: 1px;
+		width: 140px;
+		height: 30px;
 	}
 
 	.theme-cip-slender
@@ -2100,150 +2401,76 @@
 
 	.theme-cip-slender .theme-cip-slender__network-links {
 		position: absolute;
-		right: 0;
-		bottom: 15px;
-		left: 0;
+		top: 42px;
+		right: auto;
+		bottom: auto;
+		left: 57px;
 		display: flex;
-		justify-content: center;
-		gap: 8px;
+		width: 63px;
+		height: 53px;
+		align-items: flex-start;
+		justify-content: flex-start;
+		gap: 3px;
 	}
 
-	.theme-cip-slender .theme-cip-slender__network-links a,
-	.theme-cip-slender .theme-cip-slender__network-links img {
+	.theme-cip-slender .theme-cip-slender__network-links a {
 		display: block;
 		width: 30px;
-		height: 30px;
+		height: 53px;
+		min-height: 0;
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+		padding: 0;
+	}
+
+	.theme-cip-slender .theme-cip-slender__network-links img {
+		display: block;
+		width: 30px !important;
+		max-width: none;
+		height: 30px !important;
+		object-fit: contain;
 	}
 
 	.theme-cip-slender .theme-cip-slender__trailer-preview {
 		position: absolute;
-		top: 35px;
+		top: 31px;
 		left: 5px;
 		width: 170px !important;
 		height: 110px !important;
 	}
 
-	.theme-cip-slender .theme-cip-slender__screenshot-frame {
+	.theme-cip-slender .theme-cip-slender__screenshot-image-clip {
 		position: absolute;
-		top: 36px;
+		top: 35px;
 		left: 5px;
 		width: 170px;
-		height: 110px;
-		background-position: center;
+		height: 102px;
+		overflow: hidden;
+	}
+
+	.theme-cip-slender .theme-cip-slender__screenshot-image {
+		position: absolute;
+		top: -120px;
+		left: -155px;
+		display: block;
+		width: 480px;
+		height: 352px;
+		background-position: left top;
 		background-repeat: no-repeat;
-		background-size: 170px 110px;
+		background-size: 480px 352px;
 	}
 
-	.theme-cip-slender .theme-cip-slender__screenshot-frame img {
+	.theme-cip-slender .theme-cip-slender__screenshot-frame {
 		position: absolute;
-		top: 8px;
-		left: 8px;
-		width: 154px !important;
-		height: 94px !important;
-		object-fit: cover;
-	}
-
-	:global(.theme-cip-slender .theme-cip-slender__box-button) {
-		margin-top: 8px;
-		width: 100%;
-		border: 1px solid rgb(238 209 64);
-		background: linear-gradient(180deg, rgb(25 53 229), rgb(12 8 136));
-		color: rgb(255 239 75);
-		font-weight: 800;
-		text-shadow: 1px 1px 0 rgb(0 0 0);
-	}
-
-	.theme-cip-slender :global(.card.card-surface),
-	.theme-cip-slender :global(.data-table),
-	.theme-cip-slender :global(.table-container) {
-		border-color: rgb(105 74 44);
-		background-color: rgb(239 215 176);
-		color: rgb(42 27 17);
-	}
-
-	.theme-cip-slender :global(.table-container .table thead) {
-		background-color: rgb(88 54 32);
-		color: rgb(252 231 177);
-	}
-
-	.theme-cip-slender :global(.anchor) {
-		color: rgb(111 58 24);
-	}
-
-	.theme-cip-slender
-		:global(.theme-cip-slender-content-frame__paper > .w-full) {
-		color: rgb(83 43 16);
-		font-family: Verdana, Arial, sans-serif;
-		font-size: 13px;
-		line-height: 1.42;
-	}
-
-	.theme-cip-slender
-		:global(.theme-cip-slender-content-frame__paper > .w-full > header.card) {
-		position: relative;
-		margin: 0 0 14px;
-		min-height: 28px;
-		padding-left: 34px;
-		border: 1px solid rgb(80 12 8);
-		border-radius: 0;
-		background:
-			var(--cip-news-headline, none) repeat-x,
-			linear-gradient(180deg, rgb(153 24 16), rgb(84 12 8));
-		color: rgb(255 244 210);
-		box-shadow:
-			inset 0 0 0 1px rgb(255 214 127 / 0.18),
-			0 1px 0 rgb(255 255 255 / 0.25);
-		font-size: 13px;
-		text-shadow: 1px 1px 0 rgb(0 0 0);
-	}
-
-	.theme-cip-slender
-		:global(
-			.theme-cip-slender-content-frame__paper > .w-full > header.card::before
-		) {
-		position: absolute;
-		top: 50%;
-		left: 9px;
-		width: 16px;
-		height: 16px;
-		transform: translateY(-50%);
-		background: var(--cip-news-icon, none) center / contain no-repeat;
-		content: '';
-	}
-
-	.theme-cip-slender
-		:global(
-			.theme-cip-slender-content-frame__paper > .w-full > header.card svg
-		) {
-		display: none;
-	}
-
-	.theme-cip-slender
-		:global(
-			.theme-cip-slender-content-frame__paper > .w-full > header.card strong
-		) {
-		color: white;
-	}
-
-	.theme-cip-slender
-		:global(.theme-cip-slender-content-frame__paper > .w-full p) {
-		margin: 10px 10px 14px;
-	}
-
-	.theme-cip-slender
-		:global(
-			.theme-cip-slender-content-frame__paper
-				> .w-full
-				> p:first-of-type::first-letter
-		) {
-		float: left;
-		margin: 0 6px 0 0;
-		color: rgb(113 19 12);
-		font-family: Georgia, 'Times New Roman', serif;
-		font-size: 34px;
-		font-weight: 700;
-		line-height: 0.85;
-		text-shadow: 0 1px 0 rgb(255 245 207);
+		top: 31px;
+		left: 5px;
+		z-index: 2;
+		display: block;
+		width: 170px;
+		max-width: none;
+		height: 111px;
+		pointer-events: none;
 	}
 
 	.theme-cip-slender
@@ -2313,7 +2540,29 @@
 
 	.theme-cip-slender
 		:global(.theme-cip-slender-content-frame__paper > .w-full .divider) {
-		border-color: rgb(160 112 58);
+		display: none;
+	}
+
+	@media (max-width: 1280px) {
+		.theme-cip-slender .theme-cip-slender__background {
+			background-position: -170px top;
+		}
+	}
+
+	@media (min-width: 981px) and (max-width: 1280px) {
+		.theme-cip-slender.theme-cip-slender--compact-news
+			.theme-cip-slender__shell {
+			grid-template-columns: 180px minmax(0, 865px) 180px;
+			width: calc(100% - 27px);
+			margin-left: 14px;
+			margin-right: 0;
+			left: 0;
+		}
+		.theme-cip-slender.theme-cip-slender--wide .theme-cip-slender__shell {
+			grid-template-columns: 180px 915px 180px;
+			width: 1299px;
+			margin-left: 13px;
+		}
 	}
 
 	@media (max-width: 980px) {
@@ -2323,6 +2572,12 @@
 
 		.theme-cip-slender .theme-cip-slender__shell {
 			grid-template-columns: minmax(0, 1fr);
+			width: 100%;
+			left: 0;
+		}
+
+		.theme-cip-slender .theme-cip-slender__center {
+			transform: none;
 		}
 
 		.theme-cip-slender .theme-cip-slender__left,
@@ -2332,6 +2587,10 @@
 
 		.theme-cip-slender .theme-cip-slender__topbar {
 			flex-wrap: wrap;
+			height: auto;
+			min-height: 40px;
+			padding: 8px;
+			gap: 6px;
 		}
 
 		.theme-cip-slender .theme-cip-slender__mobile-menu {

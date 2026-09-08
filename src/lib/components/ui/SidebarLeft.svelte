@@ -9,7 +9,10 @@
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
 	import Button from '$lib/components/ui/Button.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
@@ -62,9 +65,18 @@
 				<svelte:fragment slot="content">
 					<nav class="list-nav">
 						<ul>
-							<li><a href="/">{$_('latest-news')}</a></li>
-							<!-- <li><a href="/news-archive">News archive</a></li> -->
-							<!-- <li><a href="/events">Event schedule</a></li> -->
+							<li>
+								<a href={themePreviewHref($page.url, '/')}
+									>{$_('latest-news')}</a>
+							</li>
+							<li>
+								<a href={themePreviewHref($page.url, '/news/archive')}
+									>{$_('news-archive')}</a>
+							</li>
+							<li>
+								<a href={themePreviewHref($page.url, '/news/event-schedule')}
+									>{$_('event-schedule')}</a>
+							</li>
 						</ul>
 					</nav>
 				</svelte:fragment>

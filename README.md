@@ -33,6 +33,11 @@ bun migrate
 bun generate
 ```
 
+Latest News, News Archive, Event Schedule and their administrative editors are
+included in this setup and available in the default theme. No separate page
+creation, theme assets or sample-content import is required. See
+[built-in news and events](docs/news.md) for routes and content management.
+
 ### Running
 
 At this point you should be ready to run the server:
@@ -158,6 +163,8 @@ Anything you put into the `static` folder in this repo will be served by the ser
 <summary><h2>Theme layouts and external asset packs</h2></summary>
 
 SlenderAAC supports build-time layout shells through the theme registry. The current themes are `legbone` and `cip-slender`.
+
+See [Cip Slender news layouts](docs/cip-slender.md) for the shared page components, local content management, external pack updater and visual verification workflow.
 
 Use `SLENDER_THEME` to select the server-side layout shell:
 

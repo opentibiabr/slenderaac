@@ -5,9 +5,18 @@
 	export let frameHorizontal: string | null = null;
 	export let frameVertical: string | null = null;
 	export let frameEdge: string | null = null;
+	export let cornerTopLeft: string | null = null;
+	export let cornerTopRight: string | null = null;
+	export let cornerBottomLeft: string | null = null;
+	export let cornerBottomRight: string | null = null;
 	export let border: string | null = null;
 	export let headlineImage: string | null = null;
+	export let headlineWidth = 250;
+	export let headlineHeight = 28;
+	export let headlineOffsetX = 0;
 	export let paperTexture: string | null = null;
+	export let compact = false;
+	export let paperMinHeight = 620;
 
 	$: frameStyle = [
 		titleBackground ? `--cip-content-title: url("${titleBackground}")` : '',
@@ -18,20 +27,33 @@
 			? `--cip-content-frame-vertical: url("${frameVertical}")`
 			: '',
 		frameEdge ? `--cip-content-frame-edge: url("${frameEdge}")` : '',
+		cornerTopLeft ? `--cip-info-corner-tl: url("${cornerTopLeft}")` : '',
+		cornerTopRight ? `--cip-info-corner-tr: url("${cornerTopRight}")` : '',
+		cornerBottomLeft ? `--cip-info-corner-bl: url("${cornerBottomLeft}")` : '',
+		cornerBottomRight
+			? `--cip-info-corner-br: url("${cornerBottomRight}")`
+			: '',
 		border ? `--cip-content-border: url("${border}")` : '',
 		paperTexture ? `--cip-paper-texture: url("${paperTexture}")` : '',
-		'--cip-center-chrome-fill: rgb(35 35 34)',
+		`--cip-content-headline-width: ${headlineWidth}px`,
+		`--cip-content-headline-height: ${headlineHeight}px`,
+		`--cip-content-headline-offset-x: ${headlineOffsetX}px`,
+		`--cip-content-paper-min-height: ${paperMinHeight}px`,
+		'--cip-center-chrome-fill: rgb(222 187 157)',
 	]
 		.filter(Boolean)
 		.join('; ');
 </script>
 
 <main
-	class="theme-cip-slender-content-frame theme-cip-slender__center-chrome"
+	class={`theme-cip-slender-content-frame theme-cip-slender__center-chrome${
+		compact ? ' theme-cip-slender-content-frame--compact' : ''
+	}`}
 	style={frameStyle}>
 	<div
 		class="theme-cip-slender-content-frame__border theme-cip-slender-content-frame__border--top"
-		aria-hidden="true"></div>
+		aria-hidden="true">
+	</div>
 	{#if title.length > 0}
 		<header>
 			{#if headlineImage}
@@ -48,7 +70,10 @@
 		</header>
 	{/if}
 
-	<div class="theme-cip-slender-content-frame__border" aria-hidden="true"></div>
+	<div
+		class="theme-cip-slender-content-frame__border theme-cip-slender-content-frame__border--gap"
+		aria-hidden="true">
+	</div>
 	<div class="theme-cip-slender-content-frame__body">
 		<span
 			class="theme-cip-slender-content-frame__side theme-cip-slender-content-frame__side--left"
@@ -60,24 +85,75 @@
 			<slot />
 		</div>
 	</div>
-	<div class="theme-cip-slender-content-frame__border" aria-hidden="true"></div>
+	<div
+		class="theme-cip-slender-content-frame__border theme-cip-slender-content-frame__border--bottom"
+		aria-hidden="true">
+	</div>
 </main>
 
 <style>
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame {
 		position: relative;
-		padding: 4px 3px 5px;
-		box-shadow: 0 12px 30px rgb(0 0 0 / 0.42);
+		padding: 0 2px;
+		background:
+			var(--cip-content-frame-edge, none) left top 4px / 5px 5px no-repeat,
+			var(--cip-content-frame-edge, none) right top 4px / 5px 5px no-repeat,
+			var(--cip-content-frame-edge, none) left bottom 4px / 5px 5px no-repeat,
+			var(--cip-content-frame-edge, none) right bottom 4px / 5px 5px no-repeat,
+			var(--cip-content-frame-vertical, none) left top 5px / 3px 13px repeat-y,
+			var(--cip-content-frame-vertical, none) right top 5px / 3px 13px repeat-y,
+			var(--cip-center-chrome-fill, rgb(222 187 157));
+		box-shadow: none;
 		color: rgb(42 27 17);
+		image-rendering: pixelated;
+	}
+
+	:global(.theme-cip-slender) .theme-cip-slender-content-frame--compact {
+		margin-top: 10px;
+	}
+
+	:global(.theme-cip-slender) .theme-cip-slender-content-frame::before,
+	:global(.theme-cip-slender) .theme-cip-slender-content-frame::after {
+		position: absolute;
+		left: -4px;
+		width: calc(100% + 8px);
+		height: 17px;
+		background-repeat: no-repeat;
+		background-size:
+			17px 17px,
+			17px 17px;
+		content: '';
+		image-rendering: pixelated;
+		pointer-events: none;
+		z-index: 4;
+	}
+
+	:global(.theme-cip-slender) .theme-cip-slender-content-frame::before {
+		top: -4px;
+		background-image:
+			var(--cip-info-corner-tl, none), var(--cip-info-corner-tr, none);
+		background-position:
+			left top,
+			right top;
+	}
+
+	:global(.theme-cip-slender) .theme-cip-slender-content-frame::after {
+		bottom: -4px;
+		background-image:
+			var(--cip-info-corner-bl, none), var(--cip-info-corner-br, none);
+		background-position:
+			left top,
+			right top;
 	}
 
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame header {
 		position: relative;
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		gap: 0;
-		min-height: 28px;
-		padding: 0 8px;
+		height: 24px;
+		min-height: 24px;
+		padding: 0 14px 0 5px;
 		border: 0;
 		background:
 			var(--cip-content-title, none) repeat-x,
@@ -100,16 +176,20 @@
 		width: 16px;
 		height: 16px;
 		flex: 0 0 16px;
+		image-rendering: pixelated;
 	}
 
 	:global(.theme-cip-slender)
 		.theme-cip-slender-content-frame
 		header
 		.theme-cip-slender-content-frame__headline {
-		width: 250px;
-		height: 28px;
-		flex: 0 0 250px;
-		object-fit: contain;
+		width: var(--cip-content-headline-width, 250px);
+		height: var(--cip-content-headline-height, 28px);
+		flex: 0 0 var(--cip-content-headline-width, 250px);
+		image-rendering: pixelated;
+		object-fit: none;
+		object-position: left top;
+		transform: translateX(var(--cip-content-headline-offset-x, 0));
 	}
 
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame__border {
@@ -117,24 +197,23 @@
 		background:
 			var(--cip-content-border, none) repeat-x,
 			rgb(70 62 46);
+		image-rendering: pixelated;
+	}
+
+	:global(.theme-cip-slender) .theme-cip-slender-content-frame__border--gap {
+		display: none;
 	}
 
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame__body {
 		position: relative;
-		min-height: 620px;
-		padding: 0;
-		background: rgb(47 47 47);
-		overflow-x: auto;
+		margin: 4px;
+		padding: 1px;
+		background: rgb(121 61 3);
+		overflow: visible;
 	}
 
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame__side {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		z-index: 1;
-		width: 3px;
-		background: var(--cip-content-frame-vertical, none) repeat-y;
-		pointer-events: none;
+		display: none;
 	}
 
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame__side--left {
@@ -148,12 +227,12 @@
 	:global(.theme-cip-slender) .theme-cip-slender-content-frame__paper {
 		position: relative;
 		z-index: 2;
-		min-height: 620px;
-		padding: 16px 18px;
+		min-height: var(--cip-content-paper-min-height, 620px);
+		padding: 10px;
 		border: 0;
 		background:
 			var(--cip-paper-texture, none) repeat,
-			rgb(242 222 181);
-		box-shadow: inset 0 0 16px rgb(132 87 43 / 0.16);
+			rgb(255 242 219);
+		box-shadow: none;
 	}
 </style>

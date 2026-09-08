@@ -2,9 +2,10 @@ import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
 import { PlayerGroup } from '$lib/players';
-import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
+import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
+import { loadPresentationReference } from '$lib/server/theme-assets/presentation-reference';
 import { parseTimeString } from '$lib/server/utils';
 import { isThemeId, normalizeTheme } from '$lib/themes/theme-ids';
 
@@ -48,6 +49,7 @@ export const load = loadFlashMessage(async ({ locals, url }) => {
 			: { assets: {}, version: null, warning: null };
 
 	return {
+		cipPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,
 		boostedCreature,

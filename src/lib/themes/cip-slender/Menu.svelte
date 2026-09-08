@@ -13,6 +13,10 @@
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
+	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
+
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
 	import { cipAsset } from './theme';
@@ -27,10 +31,34 @@
 	export let assets: Record<string, string | undefined> | null | undefined = {};
 	export let showAccountActions = true;
 
+	$: presentation = (
+		$page.data as {
+			cipPresentation?: import('./reference-types').CipPresentation | null;
+		}
+	).cipPresentation;
 	$: menuIdPrefix = showAccountActions ? 'cip-menu-drawer' : 'cip-menu-main';
-	$: firstStaticPageHref =
-		staticPages.length > 0 ? `/pages/${staticPages[0].slug}` : '/pages/rules';
-	$: accountHref = isLoggedIn ? '/account' : '/account/login';
+	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
+	$: latestNewsHref = withThemePreview($page.url, '/');
+	$: newsArchiveHref = withThemePreview($page.url, '/news/archive');
+	$: eventScheduleHref = withThemePreview($page.url, '/news/event-schedule');
+	$: charactersHref = withThemePreview($page.url, '/characters');
+	$: onlineHref = withThemePreview($page.url, '/online');
+	$: highscoresHref = withThemePreview($page.url, '/highscores');
+	$: guildsHref = withThemePreview($page.url, '/guilds');
+	$: shopHref = withThemePreview($page.url, '/shop');
+	$: rulesHref = withThemePreview($page.url, '/pages/rules');
+	$: accountPageHref = withThemePreview($page.url, '/account');
+	$: accountLoginHref = withThemePreview($page.url, '/account/login');
+	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
+	$: accountLostHref = withThemePreview($page.url, '/account/lost');
+	$: firstStaticPageHref = withThemePreview(
+		$page.url,
+		staticPages.length > 0 ? `/pages/${staticPages[0].slug}` : '/pages/rules',
+	);
+	$: accountHref = isLoggedIn ? accountPageHref : accountLoginHref;
+	$: isLatestNewsActive = currentPath === '/';
+	$: isNewsArchiveActive = currentPath === '/news/archive';
+	$: isEventScheduleActive = currentPath === '/news/event-schedule';
 
 	$: menuButtonBackground = cipAsset(assets, 'menuButtonBackground');
 	$: menuButtonHover = cipAsset(assets, 'menuButtonHover');
@@ -102,7 +130,7 @@
 	{#if showAccountActions}
 		<section class="theme-cip-slender-menu__account">
 			{#if isLoggedIn}
-				<a class="theme-cip-slender-menu__action" href="/account">
+				<a class="theme-cip-slender-menu__action" href={accountPageHref}>
 					<Fa icon={faUser} />
 					{$_('my-account')}
 				</a>
@@ -113,16 +141,18 @@
 					</button>
 				</form>
 			{:else}
-				<a class="theme-cip-slender-menu__action" href="/account/login">
+				<a class="theme-cip-slender-menu__action" href={accountLoginHref}>
 					<Fa icon={faRightToBracket} />
 					{$_('login')}
 				</a>
-				<a class="theme-cip-slender-menu__link-action" href="/account/signup">
+				<a class="theme-cip-slender-menu__link-action" href={accountSignupHref}>
 					<Fa icon={faUserPlus} />
 					{$_('create-account')}
 				</a>
 			{/if}
-			<a class="theme-cip-slender-menu__action" href={PUBLIC_DOWNLOAD_URL}>
+			<a
+				class="theme-cip-slender-menu__action"
+				href={withThemePreview($page.url, PUBLIC_DOWNLOAD_URL)}>
 				<Fa icon={faDownload} />
 				{$_('download')}
 			</a>
@@ -159,10 +189,21 @@
 				aria-label="Toggle News"></label>
 		</h2>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-news`}>
-			<a class="theme-cip-slender-menu__submenu-link--active" href="/"
-				>Latest News</a>
-			<a href="/">News Archive</a>
-			<a href="/">Event Schedule</a>
+			<a
+				class={isLatestNewsActive
+					? 'theme-cip-slender-menu__submenu-link--active'
+					: undefined}
+				href={latestNewsHref}>Latest News</a>
+			<a
+				class={isNewsArchiveActive
+					? 'theme-cip-slender-menu__submenu-link--active'
+					: undefined}
+				href={newsArchiveHref}>News Archive</a>
+			<a
+				class={isEventScheduleActive
+					? 'theme-cip-slender-menu__submenu-link--active'
+					: undefined}
+				href={eventScheduleHref}>Event Schedule</a>
 		</div>
 	</section>
 
@@ -172,7 +213,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-about-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href="/characters">
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.about}
 					<img src={menuIcons.about} alt="" aria-hidden="true" />
 				{:else}
@@ -186,7 +227,7 @@
 				{:else}
 					<span class="theme-cip-slender-menu__text-label">About Tibia</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-about-toggle`}
@@ -197,11 +238,17 @@
 				aria-label="Toggle About Tibia"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-about`}>
-			<a href="/characters">What Is Tibia?</a>
-			<a href="/">Screenshots</a>
-			<a href="/">Game Features</a>
-			<a href="/shop">Premium Features</a>
-			<a href="/">About CipSoft</a>
+			{#if presentation?.navigation.about}
+				{#each presentation.navigation.about as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={charactersHref}>What Is Tibia?</a>
+				<a href={latestNewsHref}>Screenshots</a>
+				<a href={latestNewsHref}>Game Features</a>
+				<a href={shopHref}>Premium Features</a>
+				<a href={latestNewsHref}>About CipSoft</a>
+			{/if}
 		</div>
 	</section>
 
@@ -211,7 +258,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-guides-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href="/pages/rules">
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.guides}
 					<img src={menuIcons.guides} alt="" aria-hidden="true" />
 				{:else}
@@ -225,7 +272,7 @@
 				{:else}
 					<span class="theme-cip-slender-menu__text-label">Game Guides</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-guides-toggle`}
@@ -236,9 +283,15 @@
 				aria-label="Toggle Game Guides"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-guides`}>
-			<a href="/pages/rules">Quickstart</a>
-			<a href="/pages/rules">Manual</a>
-			<a href="/pages/rules">Security Hints</a>
+			{#if presentation?.navigation.guides}
+				{#each presentation.navigation.guides as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={rulesHref}>Quickstart</a>
+				<a href={rulesHref}>Manual</a>
+				<a href={rulesHref}>Security Hints</a>
+			{/if}
 		</div>
 	</section>
 
@@ -248,7 +301,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-library-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href={firstStaticPageHref}>
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.library}
 					<img src={menuIcons.library} alt="" aria-hidden="true" />
 				{:else}
@@ -262,7 +315,7 @@
 				{:else}
 					<span>{$_('library')}</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-library-toggle`}
@@ -273,8 +326,14 @@
 				aria-label="Toggle Library"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-library`}>
-			<a href={firstStaticPageHref}>Rules</a>
-			<a href={firstStaticPageHref}>Server Info</a>
+			{#if presentation?.navigation.library}
+				{#each presentation.navigation.library as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={firstStaticPageHref}>Rules</a>
+				<a href={firstStaticPageHref}>Server Info</a>
+			{/if}
 		</div>
 	</section>
 
@@ -284,7 +343,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-community-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href="/characters">
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.community}
 					<img src={menuIcons.community} alt="" aria-hidden="true" />
 				{:else}
@@ -298,7 +357,7 @@
 				{:else}
 					<span>{$_('community')}</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-community-toggle`}
@@ -308,11 +367,19 @@
 				for={`${menuIdPrefix}-community-toggle`}
 				aria-label="Toggle Community"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-community`}>
-			<a href="/characters">Characters</a>
-			<a href="/online">Who Is Online?</a>
-			<a href="/highscores">Highscores</a>
-			<a href="/guilds">Guilds</a>
+		<div
+			class="theme-cip-slender-menu__submenu"
+			id={`${menuIdPrefix}-community`}>
+			{#if presentation?.navigation.community}
+				{#each presentation.navigation.community as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={charactersHref}>Characters</a>
+				<a href={onlineHref}>Who Is Online?</a>
+				<a href={highscoresHref}>Highscores</a>
+				<a href={guildsHref}>Guilds</a>
+			{/if}
 		</div>
 	</section>
 
@@ -322,7 +389,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-forum-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href="/guilds">
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.forum}
 					<img src={menuIcons.forum} alt="" aria-hidden="true" />
 				{:else}
@@ -336,7 +403,7 @@
 				{:else}
 					<span>Forum</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-forum-toggle`}
@@ -347,8 +414,14 @@
 				aria-label="Toggle Forum"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-forum`}>
-			<a href="/guilds">Guild Boards</a>
-			<a href="/characters">Character Discussions</a>
+			{#if presentation?.navigation.forum}
+				{#each presentation.navigation.forum as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={guildsHref}>Guild Boards</a>
+				<a href={charactersHref}>Character Discussions</a>
+			{/if}
 		</div>
 	</section>
 
@@ -358,7 +431,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-account-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href={accountHref}>
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.account}
 					<img src={menuIcons.account} alt="" aria-hidden="true" />
 				{:else}
@@ -372,7 +445,7 @@
 				{:else}
 					<span>{$_('my-account')}</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-account-toggle`}
@@ -383,11 +456,17 @@
 				aria-label="Toggle Account"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-account`}>
-			<a href={accountHref}>{isLoggedIn ? $_('my-account') : $_('login')}</a>
-			{#if !isLoggedIn}
-				<a href="/account/signup">{$_('create-account')}</a>
+			{#if presentation?.navigation.account}
+				{#each presentation.navigation.account as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={accountHref}>{isLoggedIn ? $_('my-account') : $_('login')}</a>
+				{#if !isLoggedIn}
+					<a href={accountSignupHref}>{$_('create-account')}</a>
+				{/if}
+				<a href={accountLostHref}>Lost Account?</a>
 			{/if}
-			<a href="/account/lost">Lost Account?</a>
 		</div>
 	</section>
 
@@ -397,7 +476,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-character-trade-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href="/characters">
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.characterTrade}
 					<img src={menuIcons.characterTrade} alt="" aria-hidden="true" />
 				{:else}
@@ -411,7 +490,7 @@
 				{:else}
 					<span class="theme-cip-slender-menu__text-label">Char Bazaar</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-character-trade-toggle`}
@@ -424,8 +503,14 @@
 		<div
 			class="theme-cip-slender-menu__submenu"
 			id={`${menuIdPrefix}-character-trade`}>
-			<a href="/characters">Current Auctions</a>
-			<a href="/characters">Create Auction</a>
+			{#if presentation?.navigation.characterTrade}
+				{#each presentation.navigation.characterTrade as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={charactersHref}>Current Auctions</a>
+				<a href={charactersHref}>Create Auction</a>
+			{/if}
 		</div>
 	</section>
 
@@ -435,7 +520,7 @@
 			type="checkbox"
 			id={`${menuIdPrefix}-support-toggle`} />
 		<div class="theme-cip-slender-menu__category">
-			<a class="theme-cip-slender-menu__category-link" href="/account/lost">
+			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.support}
 					<img src={menuIcons.support} alt="" aria-hidden="true" />
 				{:else}
@@ -449,7 +534,7 @@
 				{:else}
 					<span>Support</span>
 				{/if}
-			</a>
+			</span>
 			<label
 				class="theme-cip-slender-menu__header-hitbox"
 				for={`${menuIdPrefix}-support-toggle`}
@@ -460,8 +545,14 @@
 				aria-label="Toggle Support"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-support`}>
-			<a href="/account/lost">Lost Account?</a>
-			<a href={firstStaticPageHref}>Rules</a>
+			{#if presentation?.navigation.support}
+				{#each presentation.navigation.support as link}
+					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+				{/each}
+			{:else}
+				<a href={accountLostHref}>Lost Account?</a>
+				<a href={firstStaticPageHref}>Rules</a>
+			{/if}
 		</div>
 	</section>
 </nav>
@@ -640,8 +731,7 @@
 	}
 
 	:global(.theme-cip-slender) .theme-cip-slender-menu__category:hover,
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__category:focus-within {
+	:global(.theme-cip-slender) .theme-cip-slender-menu__category:focus-within {
 		background-image: var(--cip-menu-button-hover, var(--cip-menu-button));
 		filter: none;
 	}
@@ -726,7 +816,7 @@
 	:global(.theme-cip-slender) .theme-cip-slender-menu__toggle {
 		position: absolute;
 		top: 20px;
-		right: 2.5px;
+		right: 2px;
 		z-index: 7;
 		display: block;
 		width: 12px;
@@ -734,9 +824,10 @@
 		padding: 0;
 		border: 0;
 		background-color: transparent;
-		background: var(--cip-expand-plus, none) center / contain no-repeat;
+		background: var(--cip-expand-plus, none) center / 12px 12px no-repeat;
 		cursor: pointer;
 		font-size: 0;
+		image-rendering: pixelated;
 	}
 
 	:global(.theme-cip-slender)
@@ -756,7 +847,7 @@
 		box-sizing: border-box;
 		height: 21px;
 		min-height: 0;
-		margin: 0 9.5px 0 10.5px;
+		margin: 0 9px 0 11px;
 		padding: 2px 0 2px 15px;
 		background: rgb(13 46 43);
 		box-shadow: inset 0 -1px 0 rgb(76 119 116);

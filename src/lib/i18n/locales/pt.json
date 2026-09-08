@@ -63,6 +63,9 @@
 	"inventory": "Inventário",
 	"last-login": "Último login",
 	"latest-news": "Últimas notícias",
+	"news-archive": "Arquivo de notícias",
+	"news-ticker": "Notas rápidas",
+	"event-schedule": "Calendário de eventos",
 	"layout": {
 		"join_discord": "Discord",
 		"join_whatsapp": "WhatsApp",
@@ -85,6 +88,7 @@
 	"new-password": "Nova Senha",
 	"new-password-confirmation": "Confirmação de Nova Senha",
 	"news": "Notícias",
+	"news-comment-link": "Comentar esta notícia",
 	"news-empty-message": "Ainda não há notícias publicadas.",
 	"news-empty-title": "Nenhuma notícia disponível",
 	"next": "Próximo",

@@ -1,20 +1,31 @@
 <!-- adapted from https://github.com/movingbrands/svelte-portable-text -->
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte';
 	import {
 		default as Markdoc,
 		type RenderableTreeNode,
 	} from '@markdoc/markdoc';
 
-	import Callout from './Callout.svelte';
-	import Col from './Col.svelte';
-	import Row from './Row.svelte';
+	import { page } from '$app/stores';
 
-	type ComponentType = typeof Callout | typeof Col | typeof Row;
+	import { themePreviewHref } from '$lib/themes/preview';
+
+	import Callout from './Callout.svelte';
+
+	type ComponentType = typeof Callout;
 
 	export let node: RenderableTreeNode;
 	export let components: Map<string, ComponentType>;
 	export let isRoot = false;
+
+	function previewAttributes(value: unknown, url: URL) {
+		const attributes = value as Record<string, unknown>;
+		if (
+			!url.searchParams.has('themePreview') ||
+			typeof attributes.href !== 'string'
+		)
+			return attributes;
+		return { ...attributes, href: themePreviewHref(url, attributes.href) };
+	}
 
 	const nodeName = (node: RenderableTreeNode) => {
 		if (typeof node === 'string' || typeof node === 'number') return 'text';
@@ -24,18 +35,11 @@
 		return node.name;
 	};
 
-	const filterAttributes = (attributes: { [key: string]: any }) => {
-		// Filter out any attributes that might cause type conflicts
-		const filtered: Record<string, never> = {} as Record<string, never>;
-		const validKeys = ['center'];
-
-		for (const [key, value] of Object.entries(attributes)) {
-			if (validKeys.includes(key)) {
-				(filtered as Record<string, any>)[key] = value;
-			}
-		}
-
-		return filtered;
+	const filterAttributes = (value: unknown) => {
+		const attributes = value as Record<string, unknown>;
+		return typeof attributes.center === 'boolean'
+			? { center: attributes.center }
+			: {};
 	};
 </script>
 
@@ -59,10 +63,14 @@
 	{#if isRoot}
 		<svelte:self node={node.children} {components} />
 	{:else}
-		<svelte:element this={node.name} {...node.attributes}>
+		<svelte:element
+			this={node.name}
+			{...previewAttributes(node.attributes, $page.url)}>
 			<svelte:self node={node.children} {components} />
 		</svelte:element>
 	{/if}
 {:else}
-	<svelte:element this={node.name} {...node.attributes} />
+	<svelte:element
+		this={node.name}
+		{...previewAttributes(node.attributes, $page.url)} />
 {/if}

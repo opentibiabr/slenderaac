@@ -64,6 +64,9 @@
 
   "last-login": "Last login",
   "latest-news": "Latest news",
+  "news-archive": "News archive",
+  "news-ticker": "News ticker",
+  "event-schedule": "Event schedule",
   "layout": {
     "join_discord": "Join Discord",
     "join_whatsapp": "Join WhatsApp",
@@ -85,6 +88,7 @@
   "new-password": "New Password",
   "new-password-confirmation": "New password confirmation",
   "news": "News",
+  "news-comment-link": "Comment on this news",
   "news-empty-message": "There are no published news articles yet.",
   "news-empty-title": "No news available",
   "next": "Next",
