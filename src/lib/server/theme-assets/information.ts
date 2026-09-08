@@ -6,7 +6,11 @@ import { parseInformationPresentation } from '$lib/information-content';
 import { env } from '$env/dynamic/private';
 
 export async function loadInformationPresentation(theme: string, id: string) {
-	if (theme !== 'cip-slender' || !env.THEME_ASSETS_ROOT || !/^[a-z]+$/.test(id))
+	if (
+		theme !== 'cip-slender' ||
+		!env.THEME_ASSETS_ROOT ||
+		!/^[a-z]+(?:-[a-z_]+)?$/.test(id)
+	)
 		return null;
 	try {
 		const root = await fs.realpath(

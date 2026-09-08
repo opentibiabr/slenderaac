@@ -67,6 +67,37 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'Create an account, download the configured game client and choose your character. Follow the in-game introduction to learn movement, combat and communication.',
 	},
+	{
+		id: 'manual',
+		section: 'guides',
+		slug: 'manual',
+		title: 'Manual',
+		source: 'https://www.tibia.com/gameguides/?subtopic=manual',
+		summary:
+			'Use the game manual to learn about the interface, characters, combat, communication and account features. Server-specific settings may change the available features.',
+	},
+];
+
+export const manualSections = [
+	'introduction',
+	'starting',
+	'interface',
+	'controls',
+	'controls_communication',
+	'controls_trading',
+	'characters',
+	'world',
+	'combat',
+	'magic',
+	'quests',
+	'achievements',
+	'houses',
+	'guilds',
+	'store',
+	'products',
+	'accounts',
+	'support',
+	'forum',
 ];
 
 export function informationPath(page: InformationPage): string {

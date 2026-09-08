@@ -98,6 +98,13 @@ Its minimum desktop body width follows the native 1020px client illustration.
 Account links use local signup, download links use `PUBLIC_DOWNLOAD_URL`, and
 guide references retain section queries and fragment anchors.
 
+`/guides/manual` provides the contents and 19 allowlisted `section` destinations
+through the same route. Chapters use external `manual-<section>.json` documents.
+The updater derives each chapter's minimum body width from its images and list
+insets. Native previous/contents/next links and named anchors retain the preview.
+Manual styles cover nested lists, image spacing, legacy float breaks and the
+shallow table variant without changing the approved news table components.
+
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
 The server rejects unknown elements, oversized documents, invalid image URLs and

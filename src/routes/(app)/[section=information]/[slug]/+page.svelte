@@ -1,4 +1,6 @@
 <script lang="ts">
+	import '$lib/components/information/manual.css';
+
 	import { page } from '$app/stores';
 
 	import Content from '$lib/components/information/Content.svelte';
@@ -14,6 +16,7 @@
 
 <article
 	class="information-page"
+	class:information-page--manual={data.informationPage.id === 'manual'}
 	data-information-page={data.informationPage.id}>
 	{#if data.informationPresentation}
 		<Content nodes={data.informationPresentation.body} />

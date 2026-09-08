@@ -10,6 +10,7 @@ export type InformationPresentation = {
 	headline: { src: string; width: number; height: number };
 	body: InformationNode[];
 	gallery?: InformationGallery;
+	minimumBodyWidth?: number;
 };
 
 export type InformationGallery = {
@@ -47,6 +48,20 @@ const tags = new Set([
 	'a',
 ]);
 const classes = new Set([
+	'ShallowTable',
+	'ManualNavigation',
+	'TopNavigation',
+	'BottomNavigation',
+	'Gamewindow-Legend',
+	'ContentImageExtraSpace',
+	'ContentImageList',
+	'BulletpointNoBottomMargin',
+	'LabelH',
+	'TableOfContents',
+	'UnmarkedList',
+	'IndentedList',
+	'WrapAnywhere',
+	'MutedRow',
 	'Bulletpoint',
 	'ContactTable',
 	'CompactTable',
@@ -90,6 +105,25 @@ export function informationAttributes(attrs: Record<string, unknown>) {
 		if (key === 'href' && /^(https?:\/\/|\/(?!\/)|#)/.test(value))
 			safe.href = informationDestination(value);
 		if (key === 'alt') safe.alt = value;
+		if (['id', 'name'].includes(key) && /^[a-zA-Z][\w-]{0,127}$/.test(value))
+			safe.id = value;
+		if (
+			[
+				'start',
+				'colspan',
+				'rowspan',
+				'hspace',
+				'vspace',
+				'cellspacing',
+				'cellpadding',
+			].includes(key) &&
+			/^\d{1,3}$/.test(value)
+		)
+			safe[key] = value;
+		if (key === 'clear' && /^(all|left|right|none)$/.test(value))
+			safe[key] = value;
+		if (key === 'valign' && /^(top|middle|bottom|baseline)$/.test(value))
+			safe[key] = value;
 		if (key === 'target' && value === '_blank') {
 			safe.target = '_blank';
 			safe.rel = 'noopener noreferrer';
@@ -122,6 +156,10 @@ export function parseInformationPresentation(
 		data.id !== id ||
 		!data.headline ||
 		!informationAsset(data.headline.src) ||
+		(data.minimumBodyWidth !== undefined &&
+			(!Number.isInteger(data.minimumBodyWidth) ||
+				data.minimumBodyWidth < 0 ||
+				data.minimumBodyWidth > 1900)) ||
 		![data.headline.width, data.headline.height].every(
 			(size) => Number.isInteger(size) && size > 0 && size <= 1000,
 		)
@@ -173,6 +211,9 @@ export function parseInformationPresentation(
 			id,
 			headline: data.headline,
 			body: nodes(data.body),
+			...(data.minimumBodyWidth !== undefined
+				? { minimumBodyWidth: data.minimumBodyWidth }
+				: {}),
 			...(data.gallery ? { gallery: data.gallery } : {}),
 		};
 	} catch {

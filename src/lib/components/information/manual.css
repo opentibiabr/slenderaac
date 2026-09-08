@@ -1,0 +1,211 @@
+.theme-cip-slender .information-page.information-page--manual ul {
+	list-style: disc;
+	margin: 1em 0;
+	padding-left: 40px;
+}
+.theme-cip-slender .information-page.information-page--manual ol {
+	list-style: decimal;
+	margin: 1em 0;
+	padding-left: 40px;
+}
+.theme-cip-slender .information-page.information-page--manual li {
+	margin: 0;
+	padding: 0;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	:is(ul, ol)
+	:is(ul, ol) {
+	margin-block: 0;
+}
+.theme-cip-slender .information-page.information-page--manual :is(ul, ol) ul {
+	list-style-type: circle;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	:is(ul, ol)
+	:is(ul, ol)
+	ul {
+	list-style-type: square;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.TableOfContents
+	ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: item;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.TableOfContents
+	li {
+	display: table;
+	counter-increment: item;
+	font-size: 10pt;
+	line-height: 19.99px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.TableOfContents
+	> ol
+	> li {
+	margin-bottom: 15px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.TableOfContents
+	li::before {
+	display: table-cell;
+	padding-right: 10px;
+	content: counters(item, '.') ' ';
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ManualNavigation {
+	width: auto;
+	margin-inline: auto;
+	border-collapse: separate;
+	border-spacing: 2px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ManualNavigation
+	td {
+	box-sizing: content-box;
+	width: 150px;
+	padding: 1px;
+	font-size: 10pt;
+	vertical-align: middle;
+	text-align: center;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ManualNavigation
+	td:first-child {
+	text-align: left;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ManualNavigation
+	td:last-child {
+	text-align: right;
+}
+.theme-cip-slender .information-page.information-page--manual .TopNavigation {
+	margin-bottom: 44px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.BottomNavigation {
+	margin-top: 42px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.Gamewindow-Legend {
+	display: flex;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	img.ContentImageExtraSpace {
+	margin: 30px 20px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ContentImageList {
+	padding-left: 20px;
+	list-style: none;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ContentImageList
+	li {
+	margin-bottom: 5px;
+	list-style: none;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ContentImageList
+	ul {
+	padding-left: 25px;
+	list-style: none;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	:is(.ContentImageList, .BulletpointNoBottomMargin)
+	img {
+	margin-right: 5px;
+	vertical-align: bottom;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	.BulletpointNoBottomMargin {
+	margin: 20px 0 0;
+}
+.theme-cip-slender .information-page.information-page--manual .UnmarkedList {
+	list-style-type: none;
+}
+.theme-cip-slender .information-page.information-page--manual .IndentedList {
+	padding-left: 48px;
+}
+.theme-cip-slender .information-page.information-page--manual .WrapAnywhere {
+	overflow-wrap: anywhere;
+}
+.theme-cip-slender .information-page.information-page--manual .LabelH {
+	font-weight: bold;
+}
+.theme-cip-slender .information-page.information-page--manual .MutedRow {
+	background: #a5a5a5;
+}
+
+.theme-cip-slender
+	.information-page.information-page--manual
+	table:not(.TableContent) {
+	border-collapse: separate;
+	border-spacing: 2px;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	table:not(.TableContent)
+	td {
+	padding: 1px;
+	font-size: 10pt;
+	vertical-align: middle;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	table[cellspacing='0'] {
+	border-spacing: 0;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	table[cellpadding='0']
+	td {
+	padding: 0;
+}
+.theme-cip-slender .information-page.information-page--manual img[align='top'] {
+	vertical-align: top;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	img[align='middle'] {
+	vertical-align: middle;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	img[align='bottom'] {
+	vertical-align: baseline;
+}
+
+.theme-cip-slender
+	.information-page.information-page--manual
+	table[cellspacing='3'] {
+	border-spacing: 3px;
+}
+
+.theme-cip-slender
+	.information-page.information-page--manual
+	.ContentImageList
+	ul.ContentImageList {
+	padding-left: 20px;
+}
