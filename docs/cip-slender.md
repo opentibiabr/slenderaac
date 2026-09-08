@@ -93,6 +93,11 @@ open local character queries, and institutional links keep their external
 destinations. Company text and member lists remain external reference content;
 the built-in fallback uses a short introduction without copied company details.
 
+`/guides/quickstart` uses the common document layout and numbered marker sprites.
+Its minimum desktop body width follows the native 1020px client illustration.
+Account links use local signup, download links use `PUBLIC_DOWNLOAD_URL`, and
+guide references retain section queries and fragment anchors.
+
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
 The server rejects unknown elements, oversized documents, invalid image URLs and

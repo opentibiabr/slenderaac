@@ -47,6 +47,7 @@ const tags = new Set([
 	'a',
 ]);
 const classes = new Set([
+	'Bulletpoint',
 	'ContactTable',
 	'CompactTable',
 	'LabelV150',

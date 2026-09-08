@@ -57,6 +57,16 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'CipSoft is the developer of Tibia. Visit the company website for information about its games, team and services.',
 	},
+	{
+		id: 'quickstart',
+		section: 'guides',
+		slug: 'quickstart',
+		title: 'Quickstart',
+		minimumBodyWidth: 1020,
+		source: 'https://www.tibia.com/gameguides/?subtopic=quickstart',
+		summary:
+			'Create an account, download the configured game client and choose your character. Follow the in-game introduction to learn movement, combat and communication.',
+	},
 ];
 
 export function informationPath(page: InformationPage): string {
@@ -70,7 +80,10 @@ export function informationPageForPath(pathname: string) {
 }
 
 /** Keep source deep links usable as their built-in equivalents become available. */
-export function informationDestination(href: string): string {
+export function informationDestination(
+	href: string,
+	downloadHref?: string,
+): string {
 	let url: URL;
 	try {
 		url = new URL(href);
@@ -79,6 +92,19 @@ export function informationDestination(href: string): string {
 	}
 	if (url.protocol !== 'https:' || url.hostname !== 'www.tibia.com')
 		return href;
+	if (
+		url.pathname === '/account/' &&
+		url.searchParams.get('subtopic') === 'createaccount'
+	) {
+		url.searchParams.delete('subtopic');
+		return `/account/signup${url.search}${url.hash}`;
+	}
+	if (
+		url.pathname === '/account/' &&
+		url.searchParams.get('subtopic') === 'downloadclient' &&
+		downloadHref
+	)
+		return downloadHref;
 	const page = informationPages.find((entry) => {
 		const source = new URL(entry.source);
 		return (

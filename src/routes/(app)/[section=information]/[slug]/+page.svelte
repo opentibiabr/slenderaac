@@ -32,6 +32,13 @@
 </article>
 
 <style>
+	:global(.theme-cip-slender) .information-page :global(.Bulletpoint) {
+		margin: 20px 0 8px;
+	}
+	:global(.theme-cip-slender) .information-page :global(.Bulletpoint img) {
+		margin-right: 5px;
+		vertical-align: bottom;
+	}
 	:global(.theme-cip-slender)
 		.information-page
 		:global(.TableContent.CompactTable td) {

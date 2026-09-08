@@ -4,8 +4,11 @@
 	import type { InformationNode } from '$lib/information-content';
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
+	import { informationDestination } from '$lib/information';
 	import { informationAttributes } from '$lib/information-content';
 	import { themePreviewHref } from '$lib/themes/preview';
+
+	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
 	import ActionLink from './ActionLink.svelte';
 	import Tooltip from './Tooltip.svelte';
@@ -16,7 +19,11 @@
 	}
 	function attributes(attrs: Record<string, string>) {
 		const safe = informationAttributes(attrs);
-		if (safe.href) safe.href = themePreviewHref($page.url, safe.href);
+		if (safe.href)
+			safe.href = themePreviewHref(
+				$page.url,
+				informationDestination(safe.href, PUBLIC_DOWNLOAD_URL),
+			);
 		return safe;
 	}
 </script>
