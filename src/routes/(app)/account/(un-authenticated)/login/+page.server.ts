@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
+import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
 import { performLogin } from '$lib/server/session';
 import { check2faToken, comparePassword } from '$lib/server/utils';
@@ -31,7 +32,7 @@ export const actions: Actions = {
 		let email = data.get('email');
 		const password = data.get('password');
 		const token = data.get('token');
-		const returnTo = url.searchParams.get('returnTo') ?? '/account';
+		const returnTo = localReturnTo(url.searchParams.get('returnTo'), url);
 
 		const errors = await validate(
 			{
