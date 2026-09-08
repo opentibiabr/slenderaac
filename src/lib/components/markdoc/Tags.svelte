@@ -1,5 +1,6 @@
 <!-- adapted from https://github.com/movingbrands/svelte-portable-text -->
 <script lang="ts">
+	import type { ComponentType } from 'svelte';
 	import {
 		default as Markdoc,
 		type RenderableTreeNode,
@@ -8,10 +9,6 @@
 	import { page } from '$app/stores';
 
 	import { themePreviewHref } from '$lib/themes/preview';
-
-	import Callout from './Callout.svelte';
-
-	type ComponentType = typeof Callout;
 
 	export let node: RenderableTreeNode;
 	export let components: Map<string, ComponentType>;
