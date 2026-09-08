@@ -3,13 +3,19 @@
 	import { _ } from 'svelte-i18n';
 
 	import { goto } from '$app/navigation';
+	import { page as currentPage } from '$app/stores';
 
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import Select from '$lib/components/ui/forms/Select.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	$: previewParameters = new URL(
+		themePreviewHref($currentPage.url, '/highscores'),
+		$currentPage.url,
+	).searchParams;
 
 	$: page = {
 		page: data.page,
@@ -21,7 +27,10 @@
 
 	function onPageChange() {
 		void goto(
-			`/highscores?skill=${data.skill}&vocation=${data.vocation}&page=${page.page}&limit=${page.limit}`,
+			themePreviewHref(
+				$currentPage.url,
+				`/highscores?skill=${data.skill}&vocation=${data.vocation}&page=${page.page}&limit=${page.limit}`,
+			),
 		);
 	}
 
@@ -45,6 +54,9 @@
 
 <div class="flex flex-col gap-2">
 	<form bind:this={form} class="flex flex-row gap-2" method="get">
+		{#each Array.from(previewParameters) as [name, value]}
+			<input type="hidden" {name} {value} />
+		{/each}
 		<Select
 			name="skill"
 			label={$_('skill')}
