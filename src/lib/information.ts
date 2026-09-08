@@ -39,6 +39,15 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'Develop your character, learn spells, explore cities and dungeons, complete quests and join other players in guilds. Create an account to discover the game.',
 	},
+	{
+		id: 'premiumfeatures',
+		section: 'about',
+		slug: 'premium-features',
+		title: 'Premium Features',
+		source: 'https://www.tibia.com/abouttibia/?subtopic=premiumfeatures',
+		summary:
+			'Premium status can unlock additional areas, spells and other game features. Visit the shop to see the options available on this server.',
+	},
 ];
 
 export function informationPath(page: InformationPage): string {

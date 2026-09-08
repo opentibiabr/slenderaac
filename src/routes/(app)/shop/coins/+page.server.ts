@@ -12,6 +12,7 @@ import { enableStripeCheckout, enableStripeCustom } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
 import { stripe } from '$lib/server/stripe';
+import { themePreviewHref, themePreviewLoginHref } from '$lib/themes/preview';
 import { formatCurrency, groupBy } from '$lib/utils';
 
 import { PUBLIC_BASE_URL, PUBLIC_TITLE } from '$env/static/public';
@@ -26,7 +27,7 @@ const enabledPaymentMethods = [
 export const load = (async ({ locals, url, depends }) => {
 	depends('shop:order');
 
-	requireLogin(locals);
+	requireLogin(locals, '', themePreviewLoginHref(url));
 
 	const offers = groupBy(
 		(await prisma.coinOffers.findMany({ orderBy: { amount: 'asc' } })).map(
@@ -83,7 +84,7 @@ export const load = (async ({ locals, url, depends }) => {
 			order.status !== CoinOrderStatus.PENDING &&
 			order.status !== CoinOrderStatus.FAILED_ATTEMPT
 		) {
-			throw redirect(302, '/shop/coins');
+			throw redirect(302, themePreviewHref(url, '/shop/coins'));
 		}
 	}
 
@@ -100,7 +101,7 @@ export const load = (async ({ locals, url, depends }) => {
 			? {
 					status: order.status,
 					amount: order.amount,
-			  }
+				}
 			: null,
 	};
 }) satisfies PageServerLoad;

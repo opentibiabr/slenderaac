@@ -111,8 +111,9 @@ setInterval(() => {
 export function requireLogin(
 	locals: App.Locals,
 	_prefix = '',
+	loginHref = '/account/login',
 ): asserts locals is App.Locals & { session: SessionInfo } {
 	if (!locals.session) {
-		throw redirect(302, '/account/login' /* path.join('/', prefix, 'login') */); // TODO: admin specific login page
+		throw redirect(302, loginHref);
 	}
 }

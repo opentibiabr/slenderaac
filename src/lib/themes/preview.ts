@@ -1,5 +1,12 @@
 const previewKeys = ['themePreview', 'cipReference', 'cipGrid', 'cipDemo'];
 
+export function themePreviewLoginHref(current: URL): string {
+	if (!current.searchParams.has('themePreview')) return '/account/login';
+	const target = new URL(themePreviewHref(current, '/account/login'), current);
+	target.searchParams.set('returnTo', `${current.pathname}${current.search}`);
+	return `${target.pathname}${target.search}`;
+}
+
 export function themePreviewHref(current: URL, href: string): string {
 	href = informationDestination(href);
 	let target: URL;

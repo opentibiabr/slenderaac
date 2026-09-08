@@ -9,7 +9,7 @@
 	><slot /></a>
 
 <style>
-	:global(.theme-cip-slender) a.information-action {
+	:global(.theme-cip-slender .information-page) a.information-action {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -36,7 +36,8 @@
 			-1px 1px 0 black,
 			-1px 0 0 black;
 	}
-	:global(.theme-cip-slender) a.information-action:hover {
+	:global(.theme-cip-slender .information-page) a.information-action:hover {
 		background-image: var(--action-hover);
+		text-decoration: none;
 	}
 </style>

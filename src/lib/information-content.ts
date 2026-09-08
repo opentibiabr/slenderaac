@@ -18,6 +18,16 @@ export type InformationGallery = {
 };
 
 const tags = new Set([
+	'h2',
+	'table-frame',
+	'table-surface',
+	'table',
+	'tbody',
+	'thead',
+	'tr',
+	'td',
+	'th',
+	'tooltip',
 	'h3',
 	'action',
 	'p',
@@ -39,6 +49,15 @@ const classes = new Set([
 	'ContentImageLeftFloat',
 	'ContentImageRightFloat',
 	'BulletPointList',
+	'SpacedParagraph',
+	'TableContent',
+	'ComparisonTable',
+	'Odd',
+	'Even',
+	'LabelV',
+	'TextCenter',
+	'TextStrong',
+	'IconOffset',
 ]);
 
 export function informationAsset(value: unknown): value is string {
@@ -57,6 +76,9 @@ export function informationAttributes(attrs: Record<string, unknown>) {
 		if (typeof value !== 'string') continue;
 		if (key === 'src' && informationAsset(value)) safe.src = value;
 		if (key === 'hover-src' && informationAsset(value)) safe[key] = value;
+		if (['arrow-src', 'ornament-src'].includes(key) && informationAsset(value))
+			safe[key] = value;
+		if (['title', 'tooltip-text'].includes(key)) safe[key] = value;
 		if (key === 'href' && /^(https?:\/\/|\/(?!\/)|#)/.test(value))
 			safe.href = informationDestination(value);
 		if (key === 'alt') safe.alt = value;

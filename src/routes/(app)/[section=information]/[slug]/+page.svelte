@@ -98,4 +98,56 @@
 		margin-right: 5px;
 		vertical-align: bottom;
 	}
+	:global(.theme-cip-slender) .information-page :global(h2) {
+		font-size: 1.5em;
+		font-weight: bold;
+		margin: 0.83em 0;
+	}
+	:global(.theme-cip-slender) .information-page :global(.SpacedParagraph) {
+		margin: 20px 0;
+	}
+	:global(.theme-cip-slender) .information-page :global(.TableContent) {
+		width: 100%;
+		border: 1px solid rgb(250 240 215);
+		border-collapse: collapse;
+		font:
+			13.333333px Verdana,
+			Arial,
+			sans-serif;
+	}
+	:global(.theme-cip-slender) .information-page :global(.TableContent th),
+	:global(.theme-cip-slender) .information-page :global(.TableContent td) {
+		border: 1px solid rgb(250 240 215);
+		padding: 5px;
+		vertical-align: middle;
+	}
+	:global(.theme-cip-slender) .information-page :global(.TableContent th) {
+		white-space: nowrap;
+		font-weight: bold;
+		text-align: left;
+		vertical-align: top;
+		background: rgb(212 192 161);
+	}
+	:global(.theme-cip-slender) .information-page :global(.ComparisonTable td) {
+		padding: 20px 5px;
+	}
+	:global(.theme-cip-slender) .information-page :global(.TableContent .Odd) {
+		background: rgb(241 224 198);
+	}
+	:global(.theme-cip-slender) .information-page :global(.TableContent .Even) {
+		background: rgb(213 192 161);
+	}
+	:global(.theme-cip-slender)
+		.information-page
+		:global(.TableContent .TextCenter) {
+		text-align: center;
+	}
+	:global(.theme-cip-slender) .information-page :global(.TextStrong) {
+		font-weight: bold;
+	}
+	:global(.theme-cip-slender) .information-page :global(.IconOffset) {
+		position: relative;
+		top: 3px;
+		margin-left: 5px;
+	}
 </style>
