@@ -104,6 +104,7 @@
 	.information-page.information-page--manual
 	.Gamewindow-Legend {
 	display: flex;
+	justify-content: space-evenly;
 }
 .theme-cip-slender
 	.information-page.information-page--manual
@@ -145,7 +146,7 @@
 .theme-cip-slender .information-page.information-page--manual .UnmarkedList {
 	list-style-type: none;
 }
-.theme-cip-slender .information-page.information-page--manual .IndentedList {
+.theme-cip-slender .information-page.information-page--manual ul.IndentedList {
 	padding-left: 48px;
 }
 .theme-cip-slender .information-page.information-page--manual .WrapAnywhere {
@@ -170,7 +171,18 @@
 	td {
 	padding: 1px;
 	font-size: 10pt;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	table:not(.TableContent)
+	td:not([valign]) {
 	vertical-align: middle;
+}
+.theme-cip-slender
+	.information-page.information-page--manual
+	table:not(.TableContent)
+	td[width]:not([width$='%']) {
+	box-sizing: content-box;
 }
 .theme-cip-slender
 	.information-page.information-page--manual
