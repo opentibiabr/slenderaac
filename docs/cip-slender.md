@@ -72,6 +72,12 @@ anchors and preview flags. Menu groups expand for the active information page.
 Additional pages should extend this catalog and reuse the document renderer and
 frame rather than add parallel loaders or copy source HTML into the repository.
 
+`/about/screenshots` adds the screenshot gallery. The external document supplies
+captions, thumbnails, full images and the card texture. Native Svelte controls
+open a dialog, wrap previous/next navigation and support arrow keys and Escape.
+`currentscreenshot=<id>` opens a selected image directly, including links from
+the right sidebar. Gallery navigation preserves the preview and browser history.
+
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
 The server rejects unknown elements, oversized documents, invalid image URLs and

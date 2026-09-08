@@ -21,6 +21,15 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'Explore a multiplayer fantasy world, develop your character and adventure with other players. Create an account to begin, or read the game guides to learn more.',
 	},
+	{
+		id: 'screenshots',
+		section: 'about',
+		slug: 'screenshots',
+		title: 'Screenshots',
+		source: 'https://www.tibia.com/abouttibia/?subtopic=screenshots',
+		summary:
+			'Explore scenes from the game world, discover new places and plan your next adventure.',
+	},
 ];
 
 export function informationPath(page: InformationPage): string {

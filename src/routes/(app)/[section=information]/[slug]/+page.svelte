@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 
 	import Content from '$lib/components/information/Content.svelte';
+	import Gallery from '$lib/components/information/Gallery.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
@@ -16,6 +17,9 @@
 	data-information-page={data.informationPage.id}>
 	{#if data.informationPresentation}
 		<Content nodes={data.informationPresentation.body} />
+		{#if data.informationPresentation.gallery}
+			<Gallery gallery={data.informationPresentation.gallery} />
+		{/if}
 	{:else}
 		<p>{data.informationPage.summary}</p>
 		<p>

@@ -9,6 +9,12 @@ export type InformationPresentation = {
 	id: string;
 	headline: { src: string; width: number; height: number };
 	body: InformationNode[];
+	gallery?: InformationGallery;
+};
+
+export type InformationGallery = {
+	background: string;
+	items: { id: number; thumbnail: string; src: string; caption: string }[];
 };
 
 const tags = new Set([
@@ -106,7 +112,28 @@ export function parseInformationPresentation(
 		});
 	}
 	try {
-		return { version: 1, id, headline: data.headline, body: nodes(data.body) };
+		if (
+			data.gallery &&
+			(!informationAsset(data.gallery.background) ||
+				!Array.isArray(data.gallery.items) ||
+				!data.gallery.items.length ||
+				data.gallery.items.length > 200 ||
+				!data.gallery.items.every(
+					(item, index) =>
+						item.id === index + 1 &&
+						informationAsset(item.thumbnail) &&
+						informationAsset(item.src) &&
+						typeof item.caption === 'string',
+				))
+		)
+			return null;
+		return {
+			version: 1,
+			id,
+			headline: data.headline,
+			body: nodes(data.body),
+			...(data.gallery ? { gallery: data.gallery } : {}),
+		};
 	} catch {
 		return null;
 	}
