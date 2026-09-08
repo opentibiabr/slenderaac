@@ -32,6 +32,47 @@
 </article>
 
 <style>
+	:global(.theme-cip-slender)
+		.information-page
+		:global(.TableContent.CompactTable td) {
+		padding: 2px 5px;
+	}
+	:global(.theme-cip-slender)
+		.information-page
+		:global(.TableContent.ContactTable td) {
+		padding: 10px 5px;
+		border: 0;
+	}
+	:global(.theme-cip-slender)
+		.information-page
+		:global(.TableContent td.LabelV150) {
+		width: 150px;
+		font-weight: bold;
+		vertical-align: top;
+		white-space: nowrap;
+	}
+	:global(.theme-cip-slender)
+		.information-page
+		:global(.TableContent .LabelV td) {
+		font-weight: bold;
+		vertical-align: top;
+		white-space: nowrap;
+	}
+	:global(.theme-cip-slender) .information-page :global(.GreedyCell) {
+		width: 100%;
+	}
+	:global(.theme-cip-slender) .information-page :global(.NoWrap) {
+		white-space: nowrap;
+	}
+	:global(.theme-cip-slender) .information-page :global(.Alternate) {
+		background: rgb(212 192 161);
+	}
+	:global(.theme-cip-slender) .information-page :global(sup) {
+		position: static;
+		font-size: smaller;
+		line-height: normal;
+		vertical-align: super;
+	}
 	.information-page {
 		display: flow-root;
 	}

@@ -88,6 +88,11 @@ the benefit comparison. The external converter turns known helper text into
 native tooltips with mouse, focus and Escape support; original handlers are never
 executed. The green Premium action navigates to the local shop.
 
+`/about/cipsoft` reuses the contact and compact table variants. Member actions
+open local character queries, and institutional links keep their external
+destinations. Company text and member lists remain external reference content;
+the built-in fallback uses a short introduction without copied company details.
+
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
 The server rejects unknown elements, oversized documents, invalid image URLs and

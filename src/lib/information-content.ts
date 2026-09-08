@@ -18,6 +18,7 @@ export type InformationGallery = {
 };
 
 const tags = new Set([
+	'sup',
 	'h2',
 	'table-frame',
 	'table-surface',
@@ -46,6 +47,12 @@ const tags = new Set([
 	'a',
 ]);
 const classes = new Set([
+	'ContactTable',
+	'CompactTable',
+	'LabelV150',
+	'GreedyCell',
+	'NoWrap',
+	'Alternate',
 	'ContentImageLeftFloat',
 	'ContentImageRightFloat',
 	'BulletPointList',
@@ -82,6 +89,10 @@ export function informationAttributes(attrs: Record<string, unknown>) {
 		if (key === 'href' && /^(https?:\/\/|\/(?!\/)|#)/.test(value))
 			safe.href = informationDestination(value);
 		if (key === 'alt') safe.alt = value;
+		if (key === 'target' && value === '_blank') {
+			safe.target = '_blank';
+			safe.rel = 'noopener noreferrer';
+		}
 		if (key === 'class')
 			safe.class = value
 				.split(/\s+/)

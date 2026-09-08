@@ -48,6 +48,15 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'Premium status can unlock additional areas, spells and other game features. Visit the shop to see the options available on this server.',
 	},
+	{
+		id: 'aboutcipsoft',
+		section: 'about',
+		slug: 'cipsoft',
+		title: 'About CipSoft',
+		source: 'https://www.tibia.com/abouttibia/?subtopic=aboutcipsoft',
+		summary:
+			'CipSoft is the developer of Tibia. Visit the company website for information about its games, team and services.',
+	},
 ];
 
 export function informationPath(page: InformationPage): string {
