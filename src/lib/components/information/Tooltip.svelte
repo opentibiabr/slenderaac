@@ -70,6 +70,7 @@
 
 <span
 	class="information-tooltip"
+	role="presentation"
 	class:information-tooltip--block={block}
 	on:mouseleave={hide}>
 	<button

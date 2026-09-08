@@ -43,6 +43,12 @@
 			step(1);
 		}
 	}
+	function keyboardNavigation(node: HTMLDialogElement) {
+		node.addEventListener('keydown', keydown);
+		return {
+			destroy: () => node.removeEventListener('keydown', keydown),
+		};
+	}
 </script>
 
 <div
@@ -58,9 +64,9 @@
 <dialog
 	class="screenshot-dialog"
 	bind:this={dialog}
+	use:keyboardNavigation
 	aria-label="Screenshot gallery"
-	on:cancel|preventDefault={() => show()}
-	on:keydown={keydown}>
+	on:cancel|preventDefault={() => show()}>
 	{#if selected}
 		{#each [0, 1] as row}
 			{#if row === 1}
