@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
+	import { informationPages, informationPath } from '$lib/information';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -59,6 +60,32 @@
 <div class="card card-tertiary text-white overflow-hidden">
 	<article class="py-2 px-2">
 		<Accordion>
+			{#each ['about', 'guides'] as section}
+				{#if informationPages.some((entry) => entry.section === section)}
+					<AccordionItem open>
+						<svelte:fragment slot="lead"
+							><Fa icon={faBookBookmark} /></svelte:fragment>
+						<svelte:fragment slot="summary"
+							>{section === 'about'
+								? 'About Tibia'
+								: 'Game Guides'}</svelte:fragment>
+						<svelte:fragment slot="content"
+							><nav class="list-nav">
+								<ul>
+									{#each informationPages.filter((entry) => entry.section === section) as entry}
+										<li>
+											<a
+												href={themePreviewHref(
+													$page.url,
+													informationPath(entry),
+												)}>{entry.title}</a>
+										</li>
+									{/each}
+								</ul>
+							</nav></svelte:fragment>
+					</AccordionItem>
+				{/if}
+			{/each}
 			<AccordionItem open>
 				<svelte:fragment slot="lead"><Fa icon={faNewspaper} /></svelte:fragment>
 				<svelte:fragment slot="summary">{$_('news')}</svelte:fragment>

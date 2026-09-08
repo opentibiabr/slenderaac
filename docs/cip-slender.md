@@ -1,4 +1,4 @@
-# Cip Slender news layouts
+# Cip Slender layouts
 
 These are [built-in SlenderAAC pages](news.md), available in the default theme
 without an external pack. The pack supplies Cip presentation assets and optional
@@ -57,6 +57,33 @@ time with the correct daylight-saving abbreviation. Archive defaults cover the
 last 30 days, normalize invalid day/month combinations and swap inverted ranges.
 
 ## Visual verification
+
+### Built-in information pages
+
+`/about/what-is-tibia` uses the compact content frame with its own intrinsic
+minimum content width. The route is available on a fresh installation without
+database seeding. The default theme renders the built-in introduction; the Cip
+theme can load `cip-slender/reference/pages/whatistibia.json` from the external
+pack. Missing or invalid documents fall back to the built-in content.
+
+`src/lib/information.ts` registers native destinations. The shared link helper
+maps matching official URLs to these routes and preserves query parameters,
+anchors and preview flags. Menu groups expand for the active information page.
+Additional pages should extend this catalog and reuse the document renderer and
+frame rather than add parallel loaders or copy source HTML into the repository.
+
+The external document format is version 1: page ID, local headline image with
+native dimensions, and a bounded tree of supported text/presentation elements.
+The server rejects unknown elements, oversized documents, invalid image URLs and
+paths escaping the external pack. The renderer filters attributes again. No
+source JavaScript, event handlers or arbitrary styles are executed.
+
+The pack updater accepts repeated `--page ID=HTML` captures. `--pages-only` updates
+those pages while retaining the existing news presentation. A full update also
+refreshes the information pages already present in the pack. Use captures from a
+validated browser if direct public-page requests encounter a challenge.
+
+### Capture and interaction checks
 
 Capture both sites freshly in the same viewport before changing shared geometry.
 Keep full captures, same-origin crops, amplified differences and DOM measurements.

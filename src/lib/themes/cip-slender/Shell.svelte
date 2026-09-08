@@ -13,6 +13,7 @@
 	import { beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
+	import type { InformationPresentation } from '$lib/information-content';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import {
@@ -89,6 +90,10 @@
 	$: cipReference = ($page.data as { cipReference?: CipNewsReference | null })
 		.cipReference;
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
+	$: information = (
+		$page.data as { informationPresentation?: InformationPresentation | null }
+	).informationPresentation;
+	$: isInformationPage = !!$page.data.informationPage;
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
 	$: layout = cipLayoutForPath(currentPath);
 	$: isNewsArchivePage = currentPath === '/news/archive';
@@ -382,6 +387,9 @@
 		.filter(Boolean)
 		.join('; ');
 	$: shellStyle = [
+		isInformationPage
+			? `--cip-center-minimum: ${($page.data.informationPage?.minimumBodyWidth ?? 0) + 34}px`
+			: '',
 		newsHeadlineBackground
 			? `--cip-news-headline: url("${newsHeadlineBackground}")`
 			: '',
@@ -932,15 +940,19 @@
 						? headlineNewsArchive
 						: title === 'Event Schedule'
 							? headlineEventSchedule
-							: null}
-				headlineWidth={isEventSchedulePage ? 192 : 250}
-				headlineHeight={isEventSchedulePage ? 32 : 28}
+							: (information?.headline.src ?? null)}
+				headlineWidth={information?.headline.width ??
+					(isEventSchedulePage ? 192 : 250)}
+				headlineHeight={information?.headline.height ??
+					(isEventSchedulePage ? 32 : 28)}
 				compact={isCompactNewsToolPage}
-				paperMinHeight={layout === 'compact-wide'
-					? 640
-					: layout === 'compact'
-						? 241
-						: 620}
+				paperMinHeight={isInformationPage
+					? 0
+					: layout === 'compact-wide'
+						? 640
+						: layout === 'compact'
+							? 241
+							: 620}
 				{paperTexture}>
 				<slot />
 			</ContentFrame>
@@ -1208,7 +1220,12 @@
 		position: relative;
 		z-index: 1;
 		display: grid;
-		grid-template-columns: 180px minmax(0, var(--cip-center-width, 865px)) 180px;
+		grid-template-columns:
+			180px minmax(
+				var(--cip-center-minimum, 0px),
+				var(--cip-center-width, 865px)
+			)
+			180px;
 		align-items: start;
 		column-gap: var(--cip-column-gap, 14px);
 		row-gap: 12px;
@@ -2552,7 +2569,9 @@
 	@media (min-width: 981px) and (max-width: 1280px) {
 		.theme-cip-slender.theme-cip-slender--compact-news
 			.theme-cip-slender__shell {
-			grid-template-columns: 180px minmax(0, 865px) 180px;
+			grid-template-columns:
+				180px minmax(var(--cip-center-minimum, 0px), 865px)
+				180px;
 			width: calc(100% - 27px);
 			margin-left: 14px;
 			margin-right: 0;

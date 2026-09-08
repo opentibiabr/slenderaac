@@ -6,5 +6,7 @@ const routeLayouts: Record<string, CipLayout> = {
 };
 
 export function cipLayoutForPath(pathname: string): CipLayout {
+	if (informationPageForPath(pathname)) return 'compact';
 	return routeLayouts[pathname.replace(/\/$/, '') || '/'] ?? 'news';
 }
+import { informationPageForPath } from '$lib/information';

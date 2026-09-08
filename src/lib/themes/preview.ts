@@ -1,6 +1,7 @@
 const previewKeys = ['themePreview', 'cipReference', 'cipGrid', 'cipDemo'];
 
 export function themePreviewHref(current: URL, href: string): string {
+	href = informationDestination(href);
 	let target: URL;
 	try {
 		target = new URL(href, current);
@@ -17,3 +18,4 @@ export function themePreviewHref(current: URL, href: string): string {
 	}
 	return `${target.pathname}${target.search}${target.hash}`;
 }
+import { informationDestination } from '$lib/information';

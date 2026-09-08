@@ -15,6 +15,7 @@
 
 	import { page } from '$app/stores';
 
+	import { informationPages, informationPath } from '$lib/information';
 	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -38,6 +39,22 @@
 	).cipPresentation;
 	$: menuIdPrefix = showAccountActions ? 'cip-menu-drawer' : 'cip-menu-main';
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
+	$: aboutLinks =
+		presentation?.navigation.about ??
+		informationPages
+			.filter((entry) => entry.section === 'about')
+			.map((entry) => ({ label: entry.title, href: informationPath(entry) }));
+	$: guideLinks =
+		presentation?.navigation.guides ??
+		informationPages
+			.filter((entry) => entry.section === 'guides')
+			.map((entry) => ({ label: entry.title, href: informationPath(entry) }));
+	function isActive(href: string) {
+		return (
+			new URL(withThemePreview($page.url, href), $page.url).pathname ===
+			currentPath
+		);
+	}
 	$: latestNewsHref = withThemePreview($page.url, '/');
 	$: newsArchiveHref = withThemePreview($page.url, '/news/archive');
 	$: eventScheduleHref = withThemePreview($page.url, '/news/event-schedule');
@@ -45,8 +62,6 @@
 	$: onlineHref = withThemePreview($page.url, '/online');
 	$: highscoresHref = withThemePreview($page.url, '/highscores');
 	$: guildsHref = withThemePreview($page.url, '/guilds');
-	$: shopHref = withThemePreview($page.url, '/shop');
-	$: rulesHref = withThemePreview($page.url, '/pages/rules');
 	$: accountPageHref = withThemePreview($page.url, '/account');
 	$: accountLoginHref = withThemePreview($page.url, '/account/login');
 	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
@@ -211,7 +226,8 @@
 		<input
 			class="theme-cip-slender-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-about-toggle`} />
+			id={`${menuIdPrefix}-about-toggle`}
+			checked={currentPath.startsWith('/about/')} />
 		<div class="theme-cip-slender-menu__category">
 			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.about}
@@ -238,17 +254,13 @@
 				aria-label="Toggle About Tibia"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-about`}>
-			{#if presentation?.navigation.about}
-				{#each presentation.navigation.about as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
-				{/each}
-			{:else}
-				<a href={charactersHref}>What Is Tibia?</a>
-				<a href={latestNewsHref}>Screenshots</a>
-				<a href={latestNewsHref}>Game Features</a>
-				<a href={shopHref}>Premium Features</a>
-				<a href={latestNewsHref}>About CipSoft</a>
-			{/if}
+			{#each aboutLinks as link}
+				<a
+					class:theme-cip-slender-menu__submenu-link--active={isActive(
+						link.href,
+					)}
+					href={withThemePreview($page.url, link.href)}>{link.label}</a>
+			{/each}
 		</div>
 	</section>
 
@@ -256,7 +268,8 @@
 		<input
 			class="theme-cip-slender-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-guides-toggle`} />
+			id={`${menuIdPrefix}-guides-toggle`}
+			checked={currentPath.startsWith('/guides/')} />
 		<div class="theme-cip-slender-menu__category">
 			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.guides}
@@ -283,15 +296,13 @@
 				aria-label="Toggle Game Guides"></label>
 		</div>
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-guides`}>
-			{#if presentation?.navigation.guides}
-				{#each presentation.navigation.guides as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
-				{/each}
-			{:else}
-				<a href={rulesHref}>Quickstart</a>
-				<a href={rulesHref}>Manual</a>
-				<a href={rulesHref}>Security Hints</a>
-			{/if}
+			{#each guideLinks as link}
+				<a
+					class:theme-cip-slender-menu__submenu-link--active={isActive(
+						link.href,
+					)}
+					href={withThemePreview($page.url, link.href)}>{link.label}</a>
+			{/each}
 		</div>
 	</section>
 
