@@ -209,19 +209,19 @@ Example `cip-slender` asset pack layout:
 
 ```json
 {
-  "schemaVersion": 1,
-  "name": "cip-slender",
-  "version": "2026.05.26",
-  "assets": {
-    "logo": "images/logo.png",
-    "background": "backgrounds/background.webp",
-    "menuOrnament": "icons/menu-ornament.png",
-    "contentOrnament": "icons/content-ornament.png",
-    "themeBoxOrnament": "boxes/box-ornament.png"
-  },
-  "hashes": {
-    "images/logo.png": "sha256-example"
-  }
+	"schemaVersion": 1,
+	"name": "cip-slender",
+	"version": "2026.05.26",
+	"assets": {
+		"logo": "images/logo.png",
+		"background": "backgrounds/background.webp",
+		"menuOrnament": "icons/menu-ornament.png",
+		"contentOrnament": "icons/content-ornament.png",
+		"themeBoxOrnament": "boxes/box-ornament.png"
+	},
+	"hashes": {
+		"images/logo.png": "sha256-example"
+	}
 }
 ```
 
