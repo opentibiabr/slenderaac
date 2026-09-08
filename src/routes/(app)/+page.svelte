@@ -9,6 +9,7 @@
 	import NewsArticle from '$lib/themes/cip-slender/NewsArticle.svelte';
 	import ReferenceContent from '$lib/themes/cip-slender/ReferenceContent.svelte';
 	import { cipAsset } from '$lib/themes/cip-slender/theme';
+	import { formatDate } from '$lib/utils';
 
 	import type { PageData } from './$types';
 
@@ -38,17 +39,6 @@
 		return `${cipNewsMonths[date.getUTCMonth()]} ${String(
 			date.getUTCDate(),
 		).padStart(2, '0')} ${date.getUTCFullYear()}`;
-	}
-
-	function newsCommentHref(
-		currentUrl: URL,
-		articleId: number | string,
-	): string {
-		const nextUrl = withCurrentThemePreview(currentUrl, '/');
-		nextUrl.searchParams.set('news', String(articleId));
-		nextUrl.hash = 'comments';
-
-		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 	}
 
 	function characterHref(currentUrl: URL, name: string): string {
@@ -86,7 +76,7 @@
 						<time
 							class="text-sm"
 							datetime={new Date(ticker.created_at).toISOString()}
-							>{formatCipNewsDate(ticker.created_at)}</time>
+							>{formatDate(ticker.created_at)}</time>
 						<strong>{ticker.title}</strong>
 					</summary>
 					<Markdoc content={ticker.content} />
@@ -129,7 +119,7 @@
 				<span class="flex flex-row gap-2 items-center">
 					<Fa icon={faCalendar} size="xs" />
 					<span class="text-sm text-secondary-50"
-						>{formatCipNewsDate(article.created_at)} -</span>
+						>{formatDate(article.created_at)}</span>
 					<strong>{article.title}</strong>
 				</span>
 				<em class="text-sm">
@@ -149,13 +139,6 @@
 			{:else}
 				<Markdoc content={article.content} />
 			{/if}
-
-			<div class="news-comment-link">
-				<a href={newsCommentHref($page.url, article.id)}>
-					<span aria-hidden="true">»</span>
-					{$_('news-comment-link')}
-				</a>
-			</div>
 
 			{#if i < data.articles.length - 1}
 				<hr class="divider" />
