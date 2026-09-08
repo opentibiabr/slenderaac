@@ -16,22 +16,18 @@
 
 	$: {
 		if (browser) {
-			$page.url.searchParams.get('search') !== value && onSearchInput();
+			($page.url.searchParams.get('search') ?? '') !== value && onSearchInput();
 		}
 	}
 
 	const onSearchInput = debounce(() => {
+		const url = new URL($page.url);
 		if (value === '') {
-			$page.url.searchParams.delete('search');
-			void goto($page.url.pathname, {
-				replaceState: true,
-				keepFocus: true,
-				noScroll: true,
-			});
-			return;
+			url.searchParams.delete('search');
+		} else {
+			url.searchParams.set('search', value);
 		}
-		$page.url.searchParams.set('search', value);
-		void goto(`?${$page.url.searchParams.toString()}`, {
+		void goto(`${url.pathname}${url.search}${url.hash}`, {
 			replaceState: true,
 			keepFocus: true,
 			noScroll: true,
