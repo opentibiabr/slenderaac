@@ -25,8 +25,8 @@
 
 	import ProgressBar from '$lib/components/ui/ProgressBar.svelte';
 	import { loading } from '$lib/stores/loading';
-	import { normalizeTheme } from '$lib/themes/theme-ids';
 	import { themeRegistry } from '$lib/themes/registry';
+	import { normalizeTheme } from '$lib/themes/theme-ids';
 	import { browserTitle } from '$lib/utils';
 
 	import type { LayoutData } from './$types';

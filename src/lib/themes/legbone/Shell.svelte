@@ -1,8 +1,8 @@
 <script lang="ts">
 	import {
 		faDiscord,
-		faWhatsapp,
 		faInstagram,
+		faWhatsapp,
 	} from '@fortawesome/free-brands-svg-icons';
 	import {
 		faBars,
@@ -18,18 +18,18 @@
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 
+	import BoostedSection from '$lib/components/ui/BoostedSection.svelte';
 	import ServerStatus from '$lib/components/ui/ServerStatus.svelte';
 	import SidebarLeft from '$lib/components/ui/SidebarLeft.svelte';
 	import SidebarRight from '$lib/components/ui/SidebarRight.svelte';
-	import BoostedSection from '$lib/components/ui/BoostedSection.svelte';
 	import { theme } from '$lib/config';
 	import { formatSeconds, secondsUntil } from '$lib/utils';
 
 	import {
 		PUBLIC_DISCORD_URL,
-		PUBLIC_WHATSAPP_URL,
 		PUBLIC_INSTAGRAM_URL,
 		PUBLIC_TITLE,
+		PUBLIC_WHATSAPP_URL,
 		PUBLIC_WIKI_URL,
 	} from '$env/static/public';
 

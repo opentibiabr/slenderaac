@@ -98,10 +98,7 @@ export function encodeThemeAssetUrl(
 	return version ? `${baseUrl}?v=${encodeURIComponent(version)}` : baseUrl;
 }
 
-export function isVersionedAssetRequest(
-	assetPath: string,
-	url: URL,
-): boolean {
+export function isVersionedAssetRequest(assetPath: string, url: URL): boolean {
 	if (url.searchParams.has('v')) {
 		return true;
 	}

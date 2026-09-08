@@ -1,11 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import type { ThemeId } from '$lib/themes/theme-ids';
 import {
 	encodeThemeAssetUrl,
 	normalizeAssetPath,
 } from '$lib/server/theme-assets/paths';
-import type { ThemeId } from '$lib/themes/theme-ids';
 
 import { env } from '$env/dynamic/private';
 
@@ -155,7 +155,9 @@ export async function loadThemeAssetMetadata(
 			return cached;
 		}
 
-		const parsed = JSON.parse(await fs.readFile(manifestPath, 'utf8')) as RawManifest;
+		const parsed = JSON.parse(
+			await fs.readFile(manifestPath, 'utf8'),
+		) as RawManifest;
 		const manifest = validateManifest(theme, parsed);
 		if (!manifest) {
 			return emptyMetadata('theme asset manifest is invalid');

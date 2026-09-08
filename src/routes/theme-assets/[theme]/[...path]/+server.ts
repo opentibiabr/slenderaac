@@ -73,7 +73,10 @@ export const GET: RequestHandler = async ({ params, request, url }) => {
 
 		const lastModified = stats.mtime.toUTCString();
 		const ifModifiedSince = request.headers.get('if-modified-since');
-		if (ifModifiedSince && Date.parse(ifModifiedSince) >= stats.mtime.getTime()) {
+		if (
+			ifModifiedSince &&
+			Date.parse(ifModifiedSince) >= stats.mtime.getTime()
+		) {
 			return new Response(null, {
 				status: 304,
 				headers: {
