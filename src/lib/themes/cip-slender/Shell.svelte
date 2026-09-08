@@ -2165,12 +2165,6 @@
 		background: transparent;
 	}
 
-	.theme-cip-slender
-		.theme-cip-slender__official-box--fansites
-		> img:first-child {
-		height: 43px;
-	}
-
 	.theme-cip-slender .theme-cip-slender__official-box--trailer {
 		height: 153px;
 		background: transparent;
@@ -2183,7 +2177,8 @@
 
 	.theme-cip-slender .theme-cip-slender__official-box--network::after,
 	.theme-cip-slender .theme-cip-slender__official-box--trailer::after,
-	.theme-cip-slender .theme-cip-slender__official-box--screenshot::after {
+	.theme-cip-slender .theme-cip-slender__official-box--screenshot::after,
+	.theme-cip-slender .theme-cip-slender__official-box--fansites::after {
 		position: absolute;
 		bottom: 0;
 		left: -1px;
@@ -2195,6 +2190,10 @@
 			12px no-repeat;
 		content: '';
 		pointer-events: none;
+	}
+
+	.theme-cip-slender .theme-cip-slender__official-box--fansites::after {
+		left: 0;
 	}
 
 	.theme-cip-slender .theme-cip-slender__official-box--poll {
@@ -2234,11 +2233,19 @@
 		color: rgb(255 209 140);
 		font-family: Verdana, Arial, sans-serif;
 		font-size: 12px;
-		font-weight: 700;
+		font-weight: 400;
 		line-height: 25px;
 		text-align: center;
 		text-decoration: none;
-		text-shadow: 1px 1px 0 rgb(0 0 0);
+		text-shadow:
+			-1px -1px 0 black,
+			0 -1px 0 black,
+			1px -1px 0 black,
+			1px 0 0 black,
+			1px 1px 0 black,
+			0 1px 0 black,
+			-1px 1px 0 black,
+			-1px 0 0 black;
 		background: var(--cip-fansites-button, rgb(17 37 154)) center / 135px 25px
 			no-repeat;
 	}

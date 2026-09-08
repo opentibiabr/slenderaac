@@ -29,6 +29,11 @@ area so the outer decoration remains accessible. Clip horizontal overflow only
 in the mobile shell; content frames still contain their own decorative overflow
 without adding internal scrollbars.
 
+The Fansites header keeps its image's natural aspect ratio; the current native
+sprite is 180x31px. Its 180x188px wrapper contains a separate logo frame at
+top 31px and a 12px bottom rail. Do not stretch the header to fill the wrapper or
+retain a fixed height from an older asset pack.
+
 ## Local setup
 
 Apply the repository migrations and generate the Prisma client through the usual
