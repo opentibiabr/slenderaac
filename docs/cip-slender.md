@@ -18,6 +18,11 @@ capped at the normal 865px column width. Compare the strip, content frame and
 right rail together at both desktop widths; checking only the article can miss
 a shortened strip above otherwise correct content.
 
+The desktop compact shell uses a 5.5px offset with its 1263px centering width.
+Reducing that offset to 5px shifts every foreground layer half a pixel relative
+to the aligned background and reference text. The normal news, wide calendar and
+narrow-viewport layouts retain their own measured positioning rules.
+
 ## Local setup
 
 Apply the repository migrations and generate the Prisma client through the usual

@@ -1234,7 +1234,7 @@
 			calc(100% - var(--cip-shell-gutter, 24px))
 		);
 		margin: 0 auto -3px;
-		left: var(--cip-shell-left, 5px);
+		left: var(--cip-shell-left, 5.5px);
 		top: -3px;
 	}
 
