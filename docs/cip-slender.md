@@ -23,6 +23,12 @@ Reducing that offset to 5px shifts every foreground layer half a pixel relative
 to the aligned background and reference text. The normal news, wide calendar and
 narrow-viewport layouts retain their own measured positioning rules.
 
+Desktop pages allow document-level horizontal scrolling when intrinsic content
+exceeds the viewport. Keep the right rail's trailing 10px gutter in that scroll
+area so the outer decoration remains accessible. Clip horizontal overflow only
+in the mobile shell; content frames still contain their own decorative overflow
+without adding internal scrollbars.
+
 ## Local setup
 
 Apply the repository migrations and generate the Prisma client through the usual

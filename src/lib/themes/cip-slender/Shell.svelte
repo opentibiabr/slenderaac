@@ -1194,7 +1194,6 @@
 		min-height: 100vh;
 		padding: 8px 0 0;
 		display: flow-root;
-		overflow-x: clip;
 		background: rgb(5 17 34);
 		color: rgb(42 27 17);
 		font-family: Verdana, Arial, ui-sans-serif, system-ui, sans-serif;
@@ -1291,6 +1290,8 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__right {
+		margin-right: -10px;
+		padding-right: 10px;
 		transform: translateX(var(--cip-right-offset, 3px));
 	}
 
@@ -2586,6 +2587,7 @@
 	@media (max-width: 980px) {
 		.theme-cip-slender {
 			padding: 12px 8px;
+			overflow-x: clip;
 		}
 
 		.theme-cip-slender .theme-cip-slender__shell {
