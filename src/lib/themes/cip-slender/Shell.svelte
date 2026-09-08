@@ -27,6 +27,7 @@
 	import ContentFrame from './ContentFrame.svelte';
 	import InfoBar from './InfoBar.svelte';
 	import { cipLayoutForPath } from './layout';
+	import MediaDialog from './MediaDialog.svelte';
 	import Menu from './Menu.svelte';
 	import { cipAsset } from './theme';
 
@@ -428,6 +429,8 @@
 	$: networkYoutube = cipAsset(data.themeAssets, 'networkYoutube');
 	$: promoTrailerBox = cipAsset(data.themeAssets, 'promoTrailerBox');
 	$: trailerPreview = cipAsset(data.themeAssets, 'trailerPreview');
+	$: trailerFrame = cipAsset(data.themeAssets, 'trailerFrame');
+	$: trailerClose = cipAsset(data.themeAssets, 'trailerClose');
 	$: promoScreenshotBox = cipAsset(data.themeAssets, 'promoScreenshotBox');
 	$: promoScreenshotFrame = cipAsset(data.themeAssets, 'promoScreenshotFrame');
 	$: promoScreenshotImage =
@@ -1102,6 +1105,7 @@
 			{#if showAuxiliaryThemeboxes && promoTrailerBox}
 				<a
 					class="theme-cip-slender__official-box theme-cip-slender__official-box--trailer"
+					data-cip-media="video"
 					href={presentationHref(
 						'trailer',
 						'https://www.youtube.com/watch?v=OpAaLT_PTCU',
@@ -1185,6 +1189,7 @@
 			{/if}
 		</aside>
 	</div>
+	<MediaDialog {trailerFrame} {trailerClose} />
 </div>
 
 <style>

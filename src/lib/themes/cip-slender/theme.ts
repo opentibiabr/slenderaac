@@ -113,6 +113,8 @@ export type CipSlenderAssetKey =
 	| 'promoTrailerBox'
 	| 'trailerPreview'
 	| 'trailerPreviewHover'
+	| 'trailerFrame'
+	| 'trailerClose'
 	| 'promoScreenshotBox'
 	| 'promoScreenshotFrame'
 	| 'promoScreenshotImage'
