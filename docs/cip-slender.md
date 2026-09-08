@@ -105,6 +105,11 @@ insets. Native previous/contents/next links and named anchors retain the preview
 Manual styles cover nested lists, image spacing, legacy float breaks and the
 shallow table variant without changing the approved news table components.
 
+`/guides/security-hints` reuses the common headings and sprite-based lists.
+Inline image alignment retains the source line height instead of accumulating
+extra spacing between hints. Security-provider links and account recovery keep
+their external destinations until an equivalent local feature is available.
+
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
 The server rejects unknown elements, oversized documents, invalid image URLs and

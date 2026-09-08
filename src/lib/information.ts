@@ -76,6 +76,15 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'Use the game manual to learn about the interface, characters, combat, communication and account features. Server-specific settings may change the available features.',
 	},
+	{
+		id: 'securityhints',
+		section: 'guides',
+		slug: 'security-hints',
+		title: 'Security Hints',
+		source: 'https://www.tibia.com/gameguides/?subtopic=securityhints',
+		summary:
+			'Keep your account credentials private, choose a unique password and protect your email account. Use the account security options available on this server and keep your devices updated.',
+	},
 ];
 
 export const manualSections = [

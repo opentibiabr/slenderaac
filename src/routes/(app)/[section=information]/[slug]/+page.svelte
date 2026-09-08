@@ -114,6 +114,9 @@
 		vertical-align: baseline;
 		image-rendering: auto;
 	}
+	:global(.theme-cip-slender) .information-page :global(img[align='top']) {
+		vertical-align: top;
+	}
 	:global(.theme-cip-slender)
 		.information-page
 		:global(.ContentImageLeftFloat) {

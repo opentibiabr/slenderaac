@@ -183,9 +183,6 @@
 	td {
 	padding: 0;
 }
-.theme-cip-slender .information-page.information-page--manual img[align='top'] {
-	vertical-align: top;
-}
 .theme-cip-slender
 	.information-page.information-page--manual
 	img[align='middle'] {
