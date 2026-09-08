@@ -1,24 +1,64 @@
 <script lang="ts">
-	import { computePosition, flip, offset, shift } from '@floating-ui/dom';
-	import { tick } from 'svelte';
+	import {
+		autoUpdate,
+		computePosition,
+		flip,
+		offset,
+		shift,
+	} from '@floating-ui/dom';
+	import { onDestroy, tick } from 'svelte';
+	import { portal } from 'svelte-portal';
 
 	import { page } from '$app/stores';
 
+	import {
+		calendarTooltipSections,
+		type TooltipSection,
+	} from './tooltip-content';
+
 	export let attrs: Record<string, string>;
+	export let id = '';
+	export let calendar = false;
+	export let block = false;
+	export let calendarSections: TooltipSection[] | undefined = undefined;
 	let trigger: HTMLButtonElement;
 	let panel: HTMLSpanElement;
 	let open = false;
 	let position = '';
 	let side = 'right';
-	$: tooltipId = `information-tooltip-${attrs.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+	let stopPositioning: (() => void) | undefined;
+	$: tooltipId =
+		id ||
+		`information-tooltip-${attrs.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+	$: sections =
+		calendarSections ??
+		calendarTooltipSections(attrs['tooltip-text'] ?? '', attrs.title);
+	function hide() {
+		open = false;
+		stopPositioning?.();
+		stopPositioning = undefined;
+	}
+	onDestroy(hide);
+	function mountPanel(node: HTMLElement) {
+		if (calendar) {
+			const root = trigger.closest<HTMLElement>('.theme-cip-slender');
+			if (root) return portal(node, root);
+		}
+	}
 	async function show() {
 		open = true;
 		await tick();
 		if (!open || !panel || !trigger) return;
+		if (calendar && !stopPositioning)
+			stopPositioning = autoUpdate(trigger, panel, () => void updatePosition());
+		else await updatePosition();
+	}
+	async function updatePosition() {
+		if (!open || !panel || !trigger) return;
 		const result = await computePosition(trigger, panel, {
 			placement: 'right-start',
 			middleware: [
-				offset({ mainAxis: 8, alignmentAxis: 19 }),
+				offset({ mainAxis: 8, alignmentAxis: calendar ? 0 : 19 }),
 				flip(),
 				shift({ padding: 8 }),
 			],
@@ -28,7 +68,10 @@
 	}
 </script>
 
-<span class="information-tooltip" on:mouseleave={() => (open = false)}>
+<span
+	class="information-tooltip"
+	class:information-tooltip--block={block}
+	on:mouseleave={hide}>
 	<button
 		bind:this={trigger}
 		type="button"
@@ -37,22 +80,34 @@
 		aria-describedby={open ? tooltipId : undefined}
 		on:mouseenter={show}
 		on:focus={show}
-		on:blur={() => (open = false)}
+		on:blur={hide}
 		on:click={show}
 		on:keydown={(event) => {
-			if (event.key === 'Escape') open = false;
+			if (event.key === 'Escape') hide();
 		}}><slot /></button>
 	{#if open}
 		<span
 			bind:this={panel}
+			use:mountPanel
 			role="tooltip"
 			id={tooltipId}
 			class="information-tooltip__panel"
+			class:information-tooltip__panel--calendar={calendar}
 			class:information-tooltip__panel--left={side === 'left'}
 			style={`${position}; --tooltip-paper: url("${$page.data.themeAssets?.paperTexture}"); --tooltip-arrow: url("${attrs['arrow-src']}")`}>
-			<strong>{attrs.title}</strong><span class="information-tooltip__text"
-				>{attrs['tooltip-text']}</span
-			><span class="information-tooltip__ornament"
+			<strong aria-hidden={calendar ? true : undefined}
+				>{calendar ? '' : attrs.title}</strong>
+			{#if calendar}
+				{#each sections as section}
+					<span class="information-tooltip__section-title"
+						>{section.title}</span>
+					{#if section.text}<span class="information-tooltip__section-text"
+							>{section.text}</span
+						>{/if}
+				{/each}
+			{:else}<span class="information-tooltip__text"
+					>{attrs['tooltip-text']}</span
+				>{/if}<span class="information-tooltip__ornament"
 				><img src={attrs['ornament-src']} alt="" /></span
 			><br />
 		</span>
@@ -74,6 +129,17 @@
 		font: inherit;
 		vertical-align: baseline;
 		cursor: help;
+	}
+	:global(.theme-cip-slender) .information-tooltip--block,
+	:global(.theme-cip-slender) .information-tooltip--block button {
+		display: block;
+		width: 100%;
+		text-align: inherit;
+	}
+	:global(.theme-cip-slender) .information-tooltip--block button {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	:global(.theme-cip-slender) .information-tooltip__panel {
 		position: absolute;
@@ -115,6 +181,18 @@
 		display: block;
 		white-space: pre-line;
 	}
+	:global(.theme-cip-slender) .information-tooltip__section-title {
+		display: block;
+		font-size: 16px;
+		font-weight: bold;
+		word-break: break-word;
+	}
+	:global(.theme-cip-slender) .information-tooltip__section-text {
+		display: block;
+		margin-bottom: 20px;
+		text-align: justify;
+		white-space: pre-line;
+	}
 	:global(.theme-cip-slender) .information-tooltip__ornament {
 		display: block;
 		text-align: center;
@@ -123,5 +201,12 @@
 		width: 220px;
 		max-width: 100%;
 		height: auto;
+	}
+	:global(.theme-cip-slender)
+		.information-tooltip__panel--calendar
+		.information-tooltip__ornament
+		img {
+		display: inline;
+		vertical-align: baseline;
 	}
 </style>

@@ -1,3 +1,7 @@
+import {
+	calendarTooltipSections,
+	mergeCalendarTooltipSections,
+} from '$lib/components/information/tooltip-content';
 import { monthDate, numberParam } from '$lib/server/news/dates';
 import { prisma } from '$lib/server/prisma';
 import { loadCalendarReference } from '$lib/server/theme-assets/calendar-reference';
@@ -81,6 +85,9 @@ export const load = (async ({ url, parent }) => {
 			(event) => event.starts_at <= date && event.ends_at >= date,
 		);
 		const seasonal = scheduled.filter((event) => event.seasonal);
+		const seasonalTooltipSections = day?.seasonalDescription
+			? calendarTooltipSections(day.seasonalDescription, 'Seasonal event')
+			: mergeCalendarTooltipSections(seasonal);
 		return {
 			day: date.getUTCDate(),
 			isoDate,
@@ -89,9 +96,13 @@ export const load = (async ({ url, parent }) => {
 			hasSeasonalIcon: day?.hasSeasonalIcon ?? seasonal.length > 0,
 			seasonalDescription:
 				day?.seasonalDescription ??
-				seasonal
-					.map((event) => `${event.title}: ${event.description}`)
-					.join('\n'),
+				seasonalTooltipSections
+					.map(
+						(section) =>
+							`${section.title}${section.title.endsWith(':') ? '' : ':'}\n${section.text}`,
+					)
+					.join('\n\n'),
+			seasonalTooltipSections,
 			events: (
 				day?.events ??
 				scheduled

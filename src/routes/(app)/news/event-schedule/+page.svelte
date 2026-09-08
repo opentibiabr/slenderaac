@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import Tooltip from '$lib/components/information/Tooltip.svelte';
+	import { mergeCalendarTooltipSections } from '$lib/components/information/tooltip-content';
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { cipAsset } from '$lib/themes/cip-slender/theme';
@@ -26,6 +28,14 @@
 		| null
 		| undefined;
 	$: seasonalIcon = cipAsset(themeAssets, 'eventScheduleIconSeasonal');
+	function tooltipAttrs(title: string, description: string) {
+		return {
+			title,
+			'tooltip-text': description,
+			'arrow-src': themeAssets?.helperArrow ?? '',
+			'ornament-src': themeAssets?.contentOrnament ?? '',
+		};
+	}
 
 	function monthHref(currentUrl: URL, target: { month: number; year: number }) {
 		const nextUrl = new URL(
@@ -77,6 +87,12 @@
 						{#each Array.from({ length: 6 }) as _, rowIndex}
 							<tr>
 								{#each data.cells.slice(rowIndex * 7, rowIndex * 7 + 7) as cell}
+									{@const eventTooltipSections = mergeCalendarTooltipSections(
+										cell.events.map((event) => ({
+											title: event.label.replace(/^\*/, ''),
+											description: event.description ?? '',
+										})),
+									)}
 									<td
 										class={`event-schedule__day${
 											cell.inMonth ? '' : ' event-schedule__day--outside'
@@ -88,8 +104,23 @@
 											{#if cell.hasSeasonalIcon}
 												<span
 													class="event-schedule__seasonal"
-													title={cell.seasonalDescription}>
-													{#if seasonalIcon}<img
+													title={isCipTheme
+														? undefined
+														: cell.seasonalDescription}>
+													{#if isCipTheme}<Tooltip
+															calendar
+															calendarSections={cell.seasonalTooltipSections}
+															id={`calendar-tooltip-${cell.isoDate}-seasonal`}
+															attrs={tooltipAttrs(
+																'Seasonal event',
+																cell.seasonalDescription,
+															)}>
+															{#if seasonalIcon}<img
+																	src={seasonalIcon}
+																	alt="" />{:else}<span aria-hidden="true"
+																	>✦</span
+																>{/if}
+														</Tooltip>{:else if seasonalIcon}<img
 															src={seasonalIcon}
 															alt="Seasonal event" />{:else}<span
 															role="img"
@@ -97,12 +128,23 @@
 														>{/if}</span>
 											{/if}
 										</div>
-										{#each cell.events as event}
+										{#each cell.events as event, eventIndex}
 											<div
 												class="event-schedule__event"
 												style:background-color={event.color}
-												title={event.description || event.label}>
-												{event.label}
+												title={isCipTheme
+													? undefined
+													: event.description || event.label}>
+												{#if isCipTheme}<Tooltip
+														calendar
+														calendarSections={eventTooltipSections}
+														block
+														id={`calendar-tooltip-${cell.isoDate}-event-${eventIndex}`}
+														attrs={tooltipAttrs(
+															event.label.replace(/^\*/, ''),
+															event.description ?? '',
+														)}>{event.label}</Tooltip
+													>{:else}{event.label}{/if}
 											</div>
 										{/each}
 									</td>
@@ -366,9 +408,9 @@
 	}
 
 	:global(.theme-cip-slender) .event-schedule__note {
-		margin: 7px 0 0;
+		margin: 15px 0 0;
 		color: rgb(90 40 0);
-		font-size: 10pt;
-		line-height: 16px;
+		font-size: 12px;
+		line-height: normal;
 	}
 </style>
