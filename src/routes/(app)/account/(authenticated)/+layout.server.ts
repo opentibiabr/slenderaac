@@ -2,11 +2,12 @@ import type { AccountInfo } from '$lib/accounts';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
+import { themePreviewLoginHref } from '$lib/themes/preview';
 
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async ({ locals }) => {
-	requireLogin(locals);
+export const load = (async ({ locals, url }) => {
+	requireLogin(locals, '', themePreviewLoginHref(url));
 	const account = await prisma.accounts.findUniqueOrThrow({
 		where: {
 			id: locals.session?.accountId,
