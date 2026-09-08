@@ -644,7 +644,7 @@
 			? 0
 			: onlinePlayerCount;
 
-	const formatTopbarCount = (value: number): string =>
+	const formatTopbarCount = (value: number | null): string =>
 		String(normalizeTopbarCount(value));
 
 	$: formattedOnlinePlayerCount = new Intl.NumberFormat('en-US').format(
