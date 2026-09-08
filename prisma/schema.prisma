@@ -802,18 +802,53 @@ model AccountSessions {
   @@map("slender_sessions")
 }
 
+enum NewsType {
+  news
+  ticker
+  article
+}
+
+enum NewsCategory {
+  cipsoft
+  community
+  development
+  support
+  technical
+}
+
 model News {
   id         String   @id @default(cuid())
   published  Boolean  @default(false)
   title      String   @db.VarChar(255)
   content    String   @db.Text
+  type       NewsType @default(news)
+  category   NewsCategory @default(community)
+  presentation Json?
   author_id  Int
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
   author     Players  @relation(fields: [author_id], references: [id])
 
   @@index([author_id], map: "slender_news_author_id_fkey")
+  @@index([published, type, category, created_at], map: "slender_news_archive_idx")
   @@map("slender_news")
+}
+
+model ScheduleEvent {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  description String   @db.Text
+  starts_at   DateTime @db.Date
+  ends_at     DateTime @db.Date
+  color       String   @default("#24657b") @db.VarChar(7)
+  seasonal    Boolean  @default(false)
+  published   Boolean  @default(false)
+  sort_order  Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  @@index([published, starts_at, ends_at], map: "slender_schedule_events_range_idx")
+  @@map("slender_schedule_events")
 }
 
 model StaticPage {
