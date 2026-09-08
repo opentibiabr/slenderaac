@@ -755,7 +755,9 @@
 								<span>{$_('my-account')}</span>
 							{/if}
 						</a>
-						<form action="/account/logout" method="post">
+						<form
+							action={themePreviewHref($page.url, '/account/logout')}
+							method="post">
 							<button
 								class="theme-cip-slender__create-account-link"
 								type="submit">

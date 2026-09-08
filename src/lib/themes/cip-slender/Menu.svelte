@@ -149,7 +149,9 @@
 					<Fa icon={faUser} />
 					{$_('my-account')}
 				</a>
-				<form action="/account/logout" method="post">
+				<form
+					action={withThemePreview($page.url, '/account/logout')}
+					method="post">
 					<button class="theme-cip-slender-menu__action" type="submit">
 						<Fa icon={faRightFromBracket} />
 						{$_('logout')}
