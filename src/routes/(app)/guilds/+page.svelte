@@ -21,22 +21,19 @@
 
 	$: {
 		if (browser) {
-			$page.url.searchParams.get('search') !== searchInput && onSearchInput();
+			($page.url.searchParams.get('search') ?? '') !== searchInput &&
+				onSearchInput();
 		}
 	}
 
 	const onSearchInput = debounce(() => {
+		const url = new URL($page.url);
 		if (searchInput === '') {
-			$page.url.searchParams.delete('search');
-			void goto($page.url.pathname, {
-				replaceState: true,
-				keepFocus: true,
-				noScroll: true,
-			});
-			return;
+			url.searchParams.delete('search');
+		} else {
+			url.searchParams.set('search', searchInput);
 		}
-		$page.url.searchParams.set('search', searchInput);
-		void goto(`?${$page.url.searchParams.toString()}`, {
+		void goto(`${url.pathname}${url.search}${url.hash}`, {
 			replaceState: true,
 			keepFocus: true,
 			noScroll: true,
