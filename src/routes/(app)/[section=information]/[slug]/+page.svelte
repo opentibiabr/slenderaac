@@ -75,4 +75,27 @@
 		float: right;
 		margin: 0 0 10px 10px;
 	}
+	:global(.theme-cip-slender) .information-page :global(h3) {
+		font-size: 1.17em;
+		font-weight: bold;
+		margin: 1em 0;
+	}
+	:global(.theme-cip-slender) .information-page :global(.BulletPointList) {
+		margin: 1em 0;
+		padding-left: 20px;
+		list-style: none;
+	}
+	:global(.theme-cip-slender) .information-page :global(.BulletPointList li) {
+		margin-bottom: 5px;
+		padding-left: 17px;
+		text-indent: -17px;
+	}
+	:global(.theme-cip-slender)
+		.information-page
+		:global(.BulletPointList li > img) {
+		width: 12px;
+		height: 15px;
+		margin-right: 5px;
+		vertical-align: bottom;
+	}
 </style>

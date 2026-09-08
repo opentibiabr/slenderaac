@@ -78,6 +78,11 @@ open a dialog, wrap previous/next navigation and support arrow keys and Escape.
 `currentscreenshot=<id>` opens a selected image directly, including links from
 the right sidebar. Gallery navigation preserves the preview and browser history.
 
+`/about/game-features` reuses the compact document frame, native heading rhythm
+and sprite-based bullet list. Captured account-creation buttons become local
+navigation actions; they never submit the original site's form. The reusable
+action component reads normal/hover sprites from the external document.
+
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
 The server rejects unknown elements, oversized documents, invalid image URLs and

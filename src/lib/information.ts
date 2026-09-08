@@ -30,6 +30,15 @@ export const informationPages: InformationPage[] = [
 		summary:
 			'Explore scenes from the game world, discover new places and plan your next adventure.',
 	},
+	{
+		id: 'gamefeatures',
+		section: 'about',
+		slug: 'game-features',
+		title: 'Game Features',
+		source: 'https://www.tibia.com/abouttibia/?subtopic=gamefeatures',
+		summary:
+			'Develop your character, learn spells, explore cities and dungeons, complete quests and join other players in guilds. Create an account to discover the game.',
+	},
 ];
 
 export function informationPath(page: InformationPage): string {

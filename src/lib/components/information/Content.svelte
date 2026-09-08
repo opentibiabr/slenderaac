@@ -5,6 +5,8 @@
 	import { informationAttributes } from '$lib/information-content';
 	import { themePreviewHref } from '$lib/themes/preview';
 
+	import ActionLink from './ActionLink.svelte';
+
 	export let nodes: InformationNode[];
 	function element(value: unknown) {
 		return value as Exclude<InformationNode, string>;
@@ -18,4 +20,4 @@
 
 <!-- Preserve the source document's inline whitespace between text and links. -->
 <!-- prettier-ignore -->
-{#each nodes as node}{#if typeof node === 'string'}{node}{:else if element(node).tag === 'img'}<img {...attributes(element(node).attrs)} alt={element(node).attrs.alt ?? ''} />{:else if element(node).tag === 'br'}<br />{:else}<svelte:element this={element(node).tag} {...attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></svelte:element>{/if}{/each}
+{#each nodes as node}{#if typeof node === 'string'}{node}{:else if element(node).tag === 'action'}<ActionLink attrs={attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></ActionLink>{:else if element(node).tag === 'img'}<img {...attributes(element(node).attrs)} alt={element(node).attrs.alt ?? ''} />{:else if element(node).tag === 'br'}<br />{:else}<svelte:element this={element(node).tag} {...attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></svelte:element>{/if}{/each}
