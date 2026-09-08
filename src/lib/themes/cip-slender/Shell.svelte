@@ -1590,8 +1590,7 @@
 		position: relative;
 		box-sizing: border-box;
 		display: flex;
-		width: var(--cip-center-width, 865px);
-		max-width: 100%;
+		width: 100%;
 		height: 40px;
 		min-height: 40px;
 		align-items: flex-start;

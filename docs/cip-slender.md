@@ -12,6 +12,12 @@ with the same structure should reuse these components before adding page CSS.
 The shared wrappers in `src/lib/components/news/` select the default or Cip
 presentation while keeping the same route data and controls.
 
+The information strip fills the actual center column. Its width must follow
+intrinsic content growth in Quickstart and wide Manual chapters instead of being
+capped at the normal 865px column width. Compare the strip, content frame and
+right rail together at both desktop widths; checking only the article can miss
+a shortened strip above otherwise correct content.
+
 ## Local setup
 
 Apply the repository migrations and generate the Prisma client through the usual
