@@ -26,7 +26,24 @@ information documents, comprising eight top-level information pages and 19
 Manual chapters. Existing account, guild and highscore pages also receive
 functional navigation checks. That coverage does not mean every official
 Library, Community, Forum, Account or Support module has been visually ported;
-unsupported modules retain their official destinations.
+unsupported modules show a local unavailable state. A reference website is never
+used as a fallback application destination.
+
+`/library/creatures` and `/library/boostable-bosses` are also built in. They share
+the catalog layout and the installed external catalog data in both themes. Creature
+portraits open local detail views with previous/back/next navigation. Those views
+currently show the catalog identity and portrait; additional creature descriptions
+and combat data have not been imported. Boss portraits remain noninteractive,
+matching the source catalog. Daily boosted selections come from the server database.
+Without catalog data, these routes retain an honest local empty state.
+
+All adapted reference links pass through the shared destination resolver, including
+pack navigation, article links, footer links and boosted sprites. Known features
+use their Slender routes; unsupported features use `/unavailable`. `/download`
+uses the server's configured client download. This also applies to old asset packs:
+updating a pack cannot restore navigation to Tibia/CipSoft application services.
+Explicit external services such as configured downloads and social networks keep
+their intended destinations.
 
 The information strip fills the actual center column. Its width must follow
 intrinsic content growth in Quickstart and wide Manual chapters instead of being
@@ -101,8 +118,13 @@ node --test tools/test-export-cip-source.mjs
 
 These use temporary fixtures without accessing the application database or
 network. The Python checks cover geometry reporting, rejected activation,
-same-size updates and missing offline sources; the Node checks cover calendar
+same-size updates, missing offline sources and catalog ordering/link validation;
+the Node checks cover calendar
 sections, entities and inert handler parsing.
+
+Run `bun test src/lib/source-navigation.test.ts` from the application checkout to
+check local reference destinations, deep links, preview retention and configured
+external downloads independently of the installed asset pack.
 
 ## Presentation and navigation
 
@@ -114,7 +136,7 @@ the imported presentation with the normal Markdoc renderer.
 
 The pack's presentation data supplies current promo assets/text, menu destinations,
 sidebar links, footer and calendar colors. Routes with local equivalents remain
-local; public modules without an equivalent keep their official destination.
+local; public modules without an equivalent use the local unavailable page.
 Internal preview links preserve `themePreview` and the active comparison flags.
 Keep that state across server redirects and submitted forms as well as anchors.
 Account authentication redirects retain the preview on the login URL and local
@@ -209,8 +231,8 @@ or border-box sizing changes wrapping despite identical outer table bounds.
 
 `/guides/security-hints` reuses the common headings and sprite-based lists.
 Inline image alignment retains the source line height instead of accumulating
-extra spacing between hints. Security-provider links and account recovery keep
-their external destinations until an equivalent local feature is available.
+extra spacing between hints. External security-provider links remain external;
+Tibia/CipSoft account recovery uses the local account flow.
 
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.

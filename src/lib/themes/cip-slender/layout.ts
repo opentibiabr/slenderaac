@@ -1,6 +1,8 @@
 export type CipLayout = 'news' | 'compact' | 'compact-wide';
 
 const routeLayouts: Record<string, CipLayout> = {
+	'/unavailable': 'compact',
+	'/download': 'compact',
 	'/news/archive': 'compact',
 	'/news/event-schedule': 'compact-wide',
 };

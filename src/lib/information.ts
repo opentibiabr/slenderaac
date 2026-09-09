@@ -1,4 +1,9 @@
-export type InformationSection = 'about' | 'guides';
+import {
+	isReferenceWebsite,
+	referenceSiteDestination,
+} from './source-navigation';
+
+export type InformationSection = 'about' | 'guides' | 'library';
 
 export type InformationPage = {
 	id: string;
@@ -11,6 +16,22 @@ export type InformationPage = {
 };
 
 export const informationPages: InformationPage[] = [
+	{
+		id: 'creatures',
+		section: 'library',
+		slug: 'creatures',
+		title: 'Creatures',
+		source: 'https://www.tibia.com/library/?subtopic=creatures',
+		summary: 'No creatures have been added to this server’s library yet.',
+	},
+	{
+		id: 'boostablebosses',
+		section: 'library',
+		slug: 'boostable-bosses',
+		title: 'Boostable Bosses',
+		source: 'https://www.tibia.com/library/?subtopic=boostablebosses',
+		summary: 'No bosses have been added to this server’s library yet.',
+	},
 	{
 		id: 'whatistibia',
 		minimumBodyWidth: 785,
@@ -126,33 +147,19 @@ export function informationDestination(
 ): string {
 	let url: URL;
 	try {
-		url = new URL(href);
+		url = new URL(href, 'https://slender.invalid');
 	} catch {
 		return href;
 	}
-	if (url.protocol !== 'https:' || url.hostname !== 'www.tibia.com')
-		return href;
-	if (
-		url.pathname === '/account/' &&
-		url.searchParams.get('subtopic') === 'createaccount'
-	) {
-		url.searchParams.delete('subtopic');
-		return `/account/signup${url.search}${url.hash}`;
-	}
-	if (
-		url.pathname === '/account/' &&
-		url.searchParams.get('subtopic') === 'downloadclient' &&
-		downloadHref
-	)
-		return downloadHref;
+	if (!isReferenceWebsite(url)) return href;
 	const page = informationPages.find((entry) => {
 		const source = new URL(entry.source);
 		return (
-			source.pathname === url.pathname &&
+			source.pathname.replace(/\/$/, '') === url.pathname.replace(/\/$/, '') &&
 			source.searchParams.get('subtopic') === url.searchParams.get('subtopic')
 		);
 	});
-	if (!page) return href;
+	if (!page) return referenceSiteDestination(url, downloadHref);
 	url.searchParams.delete('subtopic');
 	return `${informationPath(page)}${url.search}${url.hash}`;
 }

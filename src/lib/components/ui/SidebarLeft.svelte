@@ -152,6 +152,12 @@
 				<svelte:fragment slot="content">
 					<nav class="list-nav">
 						<ul>
+							{#each informationPages.filter((entry) => entry.section === 'library') as entry}
+								<li>
+									<a href={themePreviewHref($page.url, informationPath(entry))}
+										>{entry.title}</a>
+								</li>
+							{/each}
 							{#each staticPages as staticPage}
 								<li>
 									<a

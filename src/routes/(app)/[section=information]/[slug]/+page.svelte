@@ -5,6 +5,7 @@
 
 	import Content from '$lib/components/information/Content.svelte';
 	import Gallery from '$lib/components/information/Gallery.svelte';
+	import LibraryBoosted from '$lib/components/information/LibraryBoosted.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
@@ -18,23 +19,95 @@
 	class="information-page"
 	class:information-page--manual={data.informationPage.id === 'manual'}
 	data-information-page={data.informationPage.id}>
-	{#if data.informationPresentation}
+	{#if data.libraryBoosted && !data.libraryDetail}
+		<LibraryBoosted
+			assets={data.themeAssets}
+			boss={data.informationPage.id === 'boostablebosses'}
+			boosted={data.libraryBoosted} />
+	{/if}
+	{#if data.libraryDetail}
+		<nav class="creature-navigation" aria-label="Creature navigation">
+			<span
+				>{#if data.libraryDetail.previous}<a
+						href={themePreviewHref(
+							$page.url,
+							`${$page.url.pathname}?race=${data.libraryDetail.previous}`,
+						)}>previous</a
+					>{/if}</span>
+			<a href={themePreviewHref($page.url, $page.url.pathname)}>back</a>
+			<span
+				>{#if data.libraryDetail.next}<a
+						href={themePreviewHref(
+							$page.url,
+							`${$page.url.pathname}?race=${data.libraryDetail.next}`,
+						)}>next</a
+					>{/if}</span>
+		</nav>
+		<div class="creature-detail">
+			<h2>{data.libraryDetail.entry.name}</h2>
+			<img
+				src={data.libraryDetail.entry.image}
+				alt={data.libraryDetail.entry.name}
+				width="64"
+				height="64" />
+			<p>
+				Additional information about this creature has not been added to the
+				library.
+			</p>
+		</div>
+	{:else if data.informationPresentation}
 		<Content nodes={data.informationPresentation.body} />
 		{#if data.informationPresentation.gallery}
 			<Gallery gallery={data.informationPresentation.gallery} />
 		{/if}
 	{:else}
 		<p>{data.informationPage.summary}</p>
-		<p>
-			<a href={themePreviewHref($page.url, '/account/signup')}
-				>Create account</a>
-			·
-			<a href={themePreviewHref($page.url, '/characters')}>Find a character</a>
-		</p>
+		{#if data.informationPage.section !== 'library'}<p>
+				<a href={themePreviewHref($page.url, '/account/signup')}
+					>Create account</a>
+				·
+				<a href={themePreviewHref($page.url, '/characters')}
+					>Find a character</a>
+			</p>{/if}
 	{/if}
 </article>
 
 <style>
+	.creature-navigation {
+		display: flex;
+		justify-content: space-between;
+	}
+	.creature-navigation > span {
+		flex: 1;
+	}
+	.creature-navigation > span:last-child {
+		text-align: right;
+	}
+	.creature-detail {
+		margin-top: 25px;
+	}
+	.creature-detail h2 {
+		float: right;
+	}
+	.creature-detail p {
+		clear: both;
+		padding-top: 20px;
+	}
+	.information-page :global(.CreatureCatalog) {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		text-align: center;
+	}
+	.information-page :global(.CreatureEntry) {
+		width: 100px;
+		height: 110px;
+		margin: 0;
+	}
+	.information-page :global(.CreatureEntry img) {
+		width: 64px;
+		height: 64px;
+	}
 	:global(.theme-cip-slender) .information-page :global(.Bulletpoint) {
 		margin: 20px 0 8px;
 	}

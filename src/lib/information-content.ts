@@ -48,6 +48,8 @@ const tags = new Set([
 	'a',
 ]);
 const classes = new Set([
+	'CreatureCatalog',
+	'CreatureEntry',
 	'ShallowTable',
 	'ManualNavigation',
 	'TopNavigation',

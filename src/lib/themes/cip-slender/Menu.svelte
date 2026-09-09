@@ -309,7 +309,8 @@
 		<input
 			class="theme-cip-slender-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-library-toggle`} />
+			id={`${menuIdPrefix}-library-toggle`}
+			checked={currentPath.startsWith('/library/')} />
 		<div class="theme-cip-slender-menu__category">
 			<span class="theme-cip-slender-menu__category-link">
 				{#if menuIcons.library}
@@ -338,18 +339,30 @@
 		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-library`}>
 			{#if presentation?.navigation.library}
 				{#each presentation.navigation.library as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					<a
+						class:theme-cip-slender-menu__submenu-link--active={isActive(
+							link.href,
+						)}
+						href={withThemePreview($page.url, link.href)}>{link.label}</a>
 				{/each}
 			{:else}
+				<a
+					class:theme-cip-slender-menu__submenu-link--active={isActive(
+						'/library/creatures',
+					)}
+					href={withThemePreview($page.url, '/library/creatures')}>Creatures</a>
+				<a
+					class:theme-cip-slender-menu__submenu-link--active={isActive(
+						'/library/boostable-bosses',
+					)}
+					href={withThemePreview($page.url, '/library/boostable-bosses')}
+					>Boostable Bosses</a>
 				{#each staticPages as entry}
 					<a
 						href={withThemePreview(
 							$page.url,
 							`/pages/${encodeURIComponent(entry.slug)}`,
 						)}>{entry.title}</a>
-				{:else}
-					<a href="https://www.tibia.com/library/?subtopic=creatures"
-						>Creatures</a>
 				{/each}
 			{/if}
 		</div>
@@ -437,10 +450,14 @@
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
 				{/each}
 			{:else}
-				<a href="https://www.tibia.com/forum/?subtopic=guildboards"
+				<a
+					href={withThemePreview($page.url, '/unavailable?feature=guildboards')}
 					>Guild Boards</a>
-				<a href="https://www.tibia.com/forum/?subtopic=communityboards"
-					>Community Boards</a>
+				<a
+					href={withThemePreview(
+						$page.url,
+						'/unavailable?feature=communityboards',
+					)}>Community Boards</a>
 			{/if}
 		</div>
 	</section>
@@ -529,11 +546,15 @@
 				{/each}
 			{:else}
 				<a
-					href="https://www.tibia.com/charactertrade/?subtopic=currentcharactertrades"
-					>Current Auctions</a>
+					href={withThemePreview(
+						$page.url,
+						'/unavailable?feature=currentcharactertrades',
+					)}>Current Auctions</a>
 				<a
-					href="https://www.tibia.com/charactertrade/?subtopic=pastcharactertrades"
-					>Auction History</a>
+					href={withThemePreview(
+						$page.url,
+						'/unavailable?feature=pastcharactertrades',
+					)}>Auction History</a>
 			{/if}
 		</div>
 	</section>
@@ -579,7 +600,8 @@
 					<a href={withThemePreview($page.url, '/pages/rules')}
 						>{rulesPage.title}</a>
 				{:else}
-					<a href="https://www.tibia.com/support/?subtopic=gethelp">Get Help</a>
+					<a href={withThemePreview($page.url, '/unavailable?feature=gethelp')}
+						>Get Help</a>
 				{/if}
 			{/if}
 		</div>

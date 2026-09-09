@@ -1,4 +1,8 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+
+	import { themePreviewHref } from '$lib/themes/preview';
+
 	export let id: number | string;
 	export let title: string;
 	export let date: string;
@@ -18,7 +22,8 @@
 	</div>
 	{#if commentHref}
 		<div class="cip-news-comment">
-			<a href={commentHref}>» Comment on this news</a>
+			<a href={themePreviewHref($page.url, commentHref)}
+				>» Comment on this news</a>
 		</div>
 	{/if}
 </article>
