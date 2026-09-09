@@ -1309,12 +1309,6 @@
 		transform: translateX(var(--cip-center-offset, 2px));
 	}
 
-	.theme-cip-slender .theme-cip-slender__footer {
-		margin-top: 10px;
-		margin-left: -5px;
-		width: calc(100% + 10px);
-	}
-
 	.theme-cip-slender .theme-cip-slender__center-spacer {
 		height: 146px;
 		flex: 0 0 146px;
@@ -1891,6 +1885,9 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__footer {
+		margin-top: 10px;
+		margin-left: -5px;
+		width: calc(100% + 10px);
 		box-sizing: border-box;
 		min-height: 42px;
 		padding: 0 0 20px;
@@ -2021,53 +2018,6 @@
 		height: 72px !important;
 	}
 
-	.theme-cip-slender .theme-cip-slender__promo {
-		position: relative;
-		display: block;
-		margin: -10px;
-		overflow: hidden;
-		text-decoration: none;
-	}
-
-	.theme-cip-slender .theme-cip-slender__promo img {
-		display: block;
-		width: 100%;
-		height: auto;
-	}
-
-	.theme-cip-slender .theme-cip-slender__promo--network,
-	.theme-cip-slender .theme-cip-slender__promo--media,
-	.theme-cip-slender .theme-cip-slender__promo--screenshot,
-	.theme-cip-slender .theme-cip-slender__promo--poll {
-		min-height: 92px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__network-links {
-		position: absolute;
-		inset: 20px 12px auto;
-		display: flex;
-		justify-content: center;
-		gap: 5px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__network-links a {
-		display: flex;
-		width: 42px;
-		min-height: 42px;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid rgb(141 95 44);
-		background:
-			linear-gradient(rgb(255 245 213 / 0.82), rgb(206 164 98 / 0.82)),
-			rgb(221 189 132);
-		color: rgb(44 27 17);
-		font-size: 0;
-		text-decoration: none;
-		box-shadow:
-			inset 0 0 0 1px rgb(255 255 255 / 0.4),
-			0 2px 4px rgb(0 0 0 / 0.35);
-	}
-
 	.theme-cip-slender .theme-cip-slender__network-links a:hover {
 		filter: brightness(1.12);
 	}
@@ -2075,66 +2025,6 @@
 	.theme-cip-slender .theme-cip-slender__network-links :global(svg) {
 		width: 22px;
 		height: 22px;
-	}
-
-	.theme-cip-slender .theme-cip-slender__promo--media {
-		background: rgb(22 16 12);
-	}
-
-	.theme-cip-slender .theme-cip-slender__promo--media > img:first-child {
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
-
-	.theme-cip-slender .theme-cip-slender__media-preview {
-		position: absolute;
-		inset: 18px 8px 8px;
-		width: calc(100% - 16px) !important;
-		height: 72px !important;
-		border: 1px solid rgb(24 20 18);
-		object-fit: cover;
-		filter: saturate(0.95) contrast(1.08);
-	}
-
-	.theme-cip-slender .theme-cip-slender__play-mark {
-		position: absolute;
-		top: 48px;
-		left: 50%;
-		width: 38px;
-		height: 26px;
-		transform: translate(-50%, -50%);
-		border: 2px solid rgb(255 255 255 / 0.88);
-		border-radius: 5px;
-		background: rgb(176 24 24 / 0.84);
-		box-shadow: 0 2px 8px rgb(0 0 0 / 0.65);
-	}
-
-	.theme-cip-slender .theme-cip-slender__play-mark::before {
-		position: absolute;
-		top: 50%;
-		left: 52%;
-		width: 0;
-		height: 0;
-		transform: translate(-45%, -50%);
-		border-top: 7px solid transparent;
-		border-bottom: 7px solid transparent;
-		border-left: 11px solid white;
-		content: '';
-	}
-
-	.theme-cip-slender .theme-cip-slender__poll-copy {
-		position: absolute;
-		inset: 36px 16px auto;
-		display: flex;
-		flex-direction: column;
-		gap: 3px;
-		align-items: center;
-		color: rgb(87 43 16);
-		font-size: 12px;
-		line-height: 1.15;
-		text-align: center;
-		text-shadow: 0 1px 0 rgb(255 241 209);
 	}
 
 	.theme-cip-slender .theme-cip-slender__official-box {
@@ -2425,6 +2315,7 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__network-links {
+		inset: 20px 12px auto;
 		position: absolute;
 		top: 42px;
 		right: auto;
@@ -2439,6 +2330,11 @@
 	}
 
 	.theme-cip-slender .theme-cip-slender__network-links a {
+		align-items: center;
+		justify-content: center;
+		color: rgb(44 27 17);
+		font-size: 0;
+		text-decoration: none;
 		display: block;
 		width: 30px;
 		height: 53px;
