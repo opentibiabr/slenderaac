@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+
+	import CharacterSearch from '$lib/components/ui/CharacterSearch.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
+	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 
 	import type { PageData } from './$types';
 
@@ -8,6 +12,17 @@
 	$: ({ characters, sort, order } = data);
 </script>
 
-<div class="flex flex-col gap-2">
-	<CharactersTable {characters} {sort} {order} />
-</div>
+{#if $page.data.selectedTheme === 'cip-slender'}
+	<PagePanel title="World Information">
+		<table class="cip-data-table cip-data-table--details">
+			<tbody
+				><tr><td>Players Online:</td><td>{characters.length}</td></tr></tbody>
+		</table>
+	</PagePanel>
+	<CharactersTable {characters} {sort} {order} title="Players Online" />
+	<CharacterSearch />
+{:else}
+	<div class="flex flex-col gap-2">
+		<CharactersTable {characters} {sort} {order} />
+	</div>
+{/if}
