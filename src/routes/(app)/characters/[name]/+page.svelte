@@ -39,11 +39,12 @@
 {#if $page.data.selectedTheme === 'classic'}
 	<ClassicCharacterProfile {data} />
 {:else if character}
-	<div class="flex flex-col gap-2">
+	<div class="character-profile flex flex-col gap-2 w-full min-w-0">
 		<div class="data-table">
-			<div class="flex flex-row justify-center gap-4 items-center px-8">
+			<div
+				class="flex flex-row flex-wrap justify-center gap-4 items-center px-4 sm:px-8">
 				<span
-					class="text-primary-700-200-token font-heading-token text-xl font-semibold">
+					class="text-primary-700-200-token font-heading-token text-xl font-semibold max-w-full">
 					{character.name}
 				</span>
 				<AnimatedOutfit
@@ -154,3 +155,12 @@
 {:else}
 	<h5 class="h4">{data.error}</h5>
 {/if}
+
+<style>
+	.character-profile {
+		overflow-wrap: anywhere;
+	}
+	.character-profile :is(dt, dd) {
+		min-width: 0;
+	}
+</style>

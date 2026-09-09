@@ -22,13 +22,13 @@
 	<CharacterSearch />
 	{#if results.length > 0}<CharactersTable characters={results} />{/if}
 {:else}
-	<div class="flex flex-col items-center gap-2">
+	<div class="flex flex-col items-center gap-2 w-full min-w-0">
 		<slot />
 
 		<SearchQuerier label={$_('character-name')} bind:reset />
 
 		{#if results.length > 0}
-			<div transition:slide>
+			<div class="w-full min-w-0" transition:slide>
 				<CharactersTable characters={results} on:selected={reset} />
 			</div>
 		{/if}
