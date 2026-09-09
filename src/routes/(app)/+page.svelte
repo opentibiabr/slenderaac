@@ -9,6 +9,7 @@
 	import NewsArticle from '$lib/themes/cip-slender/NewsArticle.svelte';
 	import ReferenceContent from '$lib/themes/cip-slender/ReferenceContent.svelte';
 	import { cipAsset } from '$lib/themes/cip-slender/theme';
+	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -42,23 +43,10 @@
 	}
 
 	function characterHref(currentUrl: URL, name: string): string {
-		const nextUrl = withCurrentThemePreview(
+		return themePreviewHref(
 			currentUrl,
 			`/characters/${encodeURIComponent(name)}`,
 		);
-
-		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
-	}
-
-	function withCurrentThemePreview(currentUrl: URL, path: string): URL {
-		const nextUrl = new URL(path, currentUrl.origin);
-		const previewTheme = currentUrl.searchParams.get('themePreview');
-
-		if (previewTheme) {
-			nextUrl.searchParams.set('themePreview', previewTheme);
-		}
-
-		return nextUrl;
 	}
 </script>
 

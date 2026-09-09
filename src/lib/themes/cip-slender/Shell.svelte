@@ -577,8 +577,6 @@
 			themePreviewHref(currentUrl, path),
 			currentUrl.origin,
 		);
-		nextUrl.searchParams.set('themePreview', 'cip-slender');
-
 		return nextUrl;
 	}
 

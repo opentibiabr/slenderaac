@@ -107,8 +107,8 @@ export const load = (async ({ locals, url, depends }) => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-	createIntent: async ({ locals, request }) => {
-		requireLogin(locals);
+	createIntent: async ({ locals, request, url }) => {
+		requireLogin(locals, '', themePreviewLoginHref(url));
 		invariant(locals.session, 'No session found in locals');
 
 		const data = await request.formData();
@@ -145,6 +145,7 @@ export const actions = {
 				({ token, redirectURL } = await handleStripeCheckout(
 					locals.session.email,
 					offer,
+					url,
 				));
 				break;
 			default:
@@ -168,11 +169,15 @@ export const actions = {
 			throw redirect(303, redirectURL);
 		}
 
-		let url = `/shop/coins/?step=payment&paymentMethod=${paymentMethod}&token=${token}&offerId=${offerId}`;
+		const paymentUrl = new URL(themePreviewHref(url, '/shop/coins/'), url);
+		paymentUrl.searchParams.set('step', 'payment');
+		paymentUrl.searchParams.set('paymentMethod', paymentMethod);
+		paymentUrl.searchParams.set('token', token);
+		paymentUrl.searchParams.set('offerId', offerId);
 		if (clientSecret) {
-			url += `&clientSecret=${clientSecret}`;
+			paymentUrl.searchParams.set('clientSecret', clientSecret);
 		}
-		throw redirect(302, url);
+		throw redirect(302, `${paymentUrl.pathname}${paymentUrl.search}`);
 	},
 } satisfies Actions;
 
@@ -193,9 +198,17 @@ async function handleStripe(accountEmail: string, offer: CoinOffers) {
 	return { token: paymentIntent.id, clientSecret: paymentIntent.client_secret };
 }
 
-async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
+async function handleStripeCheckout(
+	accountEmail: string,
+	offer: CoinOffers,
+	currentUrl: URL,
+) {
 	invariant(stripe, 'Stripe not enabled');
-	const redirectURL = `${PUBLIC_BASE_URL}/shop/coins/?step=confirmation`;
+	const returnPath = themePreviewHref(
+		currentUrl,
+		'/shop/coins/?step=confirmation',
+	);
+	const redirectURL = new URL(returnPath, PUBLIC_BASE_URL).href;
 	const session = await stripe.checkout.sessions.create({
 		line_items: [
 			{

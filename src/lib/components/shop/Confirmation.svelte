@@ -12,9 +12,11 @@
 	import { _ } from 'svelte-i18n';
 
 	import { invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import { CoinOrderStatus } from '$lib/shop';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_SUPPORT_EMAIL, PUBLIC_TITLE } from '$env/static/public';
 
@@ -121,8 +123,10 @@
 		{/if}
 	</div>
 	<div class="flex flex-row w-full justify-between gap-2">
-		<Button href="/shop/coins" color="base" class="whitespace-normal"
-			>{$_('shop.goback')}</Button>
+		<Button
+			href={themePreviewHref($page.url, '/shop/coins')}
+			color="base"
+			class="whitespace-normal">{$_('shop.goback')}</Button>
 		<Button href="/account">{$_('my-account')}</Button>
 	</div>
 {/if}

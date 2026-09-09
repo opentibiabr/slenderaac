@@ -2,11 +2,14 @@
 	import { faArrowRight, faLock } from '@fortawesome/free-solid-svg-icons';
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
 	import type { CoinOffer } from '$lib/coinOffers';
 	import PaymentMethodSelection from '$lib/components/shop/PaymentMethodSelection.svelte';
 	import ProductSelection from '$lib/components/shop/ProductSelection.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { enhance } from '$lib/enchance';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	let offerId = '';
 	let paymentMethod = '';
@@ -22,7 +25,7 @@
 <form
 	class="flex flex-col gap-2"
 	method="post"
-	action="?/createIntent"
+	action={themePreviewHref($page.url, '?/createIntent')}
 	use:enhance>
 	<input type="hidden" name="offerId" value={offerId} />
 	<input type="hidden" name="paymentMethod" value={paymentMethod} />

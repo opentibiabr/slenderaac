@@ -24,10 +24,13 @@
 <div class="card card-tertiary card-hover overflow-hidden">
 	<div class="flex flex-col gap-0 py-2 px-2 items-center">
 		{#if isLoggedIn}
-			<Button href="/account" class="w-full">
+			<Button href={themePreviewHref($page.url, '/account')} class="w-full">
 				{$_('my-account')}
 			</Button>
-			<form action="/account/logout" method="post" class="flex w-2/3">
+			<form
+				action={themePreviewHref($page.url, '/account/logout')}
+				method="post"
+				class="flex w-2/3">
 				<Button
 					type="submit"
 					size="sm"
@@ -38,9 +41,11 @@
 				</Button>
 			</form>
 		{:else}
-			<Button href="/account/login" class="w-full">{$_('login')}</Button>
 			<Button
-				href="/account/signup"
+				href={themePreviewHref($page.url, '/account/login')}
+				class="w-full">{$_('login')}</Button>
+			<Button
+				href={themePreviewHref($page.url, '/account/signup')}
 				size="sm"
 				variant="soft"
 				color="secondary"
