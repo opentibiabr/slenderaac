@@ -1,6 +1,7 @@
 <script lang="ts">
+	import Headline from './Headline.svelte';
+
 	export let title = '';
-	export let ornament: string | null = null;
 	export let titleBackground: string | null = null;
 	export let frameHorizontal: string | null = null;
 	export let frameVertical: string | null = null;
@@ -37,9 +38,6 @@
 			: '',
 		border ? `--classic-content-border: url("${border}")` : '',
 		paperTexture ? `--classic-paper-texture: url("${paperTexture}")` : '',
-		`--classic-content-headline-width: ${headlineWidth}px`,
-		`--classic-content-headline-height: ${headlineHeight}px`,
-		`--classic-content-headline-offset-x: ${headlineOffsetX}px`,
 		`--classic-content-paper-min-height: ${paperMinHeight}px`,
 		'--classic-center-chrome-fill: rgb(222 187 157)',
 	]
@@ -58,17 +56,12 @@
 	</div>
 	{#if title.length > 0}
 		<header>
-			{#if headlineImage}
-				<img
-					class="theme-classic-content-frame__headline"
-					src={headlineImage}
-					alt={title} />
-			{:else if ornament}
-				<img src={ornament} alt="" aria-hidden="true" />
-				<h1>{title}</h1>
-			{:else}
-				<h1>{title}</h1>
-			{/if}
+			<Headline
+				{title}
+				image={headlineImage}
+				width={headlineWidth}
+				height={headlineHeight}
+				offsetX={headlineOffsetX} />
 		</header>
 	{/if}
 
@@ -165,37 +158,6 @@
 			var(--classic-content-title, none) repeat-x,
 			linear-gradient(180deg, rgb(28 71 22), rgb(15 44 14));
 		color: rgb(252 231 177);
-	}
-
-	:global(.theme-classic) .theme-classic-content-frame h1 {
-		margin: 0;
-		font-family: Georgia, 'Times New Roman', serif;
-		font-size: 22px;
-		font-weight: 800;
-		line-height: 1.2;
-		text-shadow:
-			1px 1px 0 rgb(0 0 0),
-			0 0 8px rgb(0 0 0 / 0.7);
-	}
-
-	:global(.theme-classic) .theme-classic-content-frame header > img {
-		width: 16px;
-		height: 16px;
-		flex: 0 0 16px;
-		image-rendering: pixelated;
-	}
-
-	:global(.theme-classic)
-		.theme-classic-content-frame
-		header
-		.theme-classic-content-frame__headline {
-		width: var(--classic-content-headline-width, 250px);
-		height: var(--classic-content-headline-height, 28px);
-		flex: 0 0 var(--classic-content-headline-width, 250px);
-		image-rendering: pixelated;
-		object-fit: none;
-		object-position: left top;
-		transform: translateX(var(--classic-content-headline-offset-x, 0));
 	}
 
 	:global(.theme-classic) .theme-classic-content-frame__border {

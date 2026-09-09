@@ -12,6 +12,16 @@ with the same structure should reuse these components before adding page CSS.
 The shared wrappers in `src/lib/components/news/` select the default or Classic
 presentation while keeping the same route data and controls.
 
+`ContentFrame` delegates all page titles to `Headline`. Existing headline sprites
+keep their measured native dimensions; dynamic titles share the external pack's
+`headlineFont`, color, baseline and spacing. New pages inherit this automatically.
+Do not prepend a decorative icon or introduce a page-specific heading font. The
+pack includes an OFL-licensed uncial typeface for dynamic titles; it is an adapted
+text treatment, not a claim of glyph identity with the fixed raster headlines.
+Font binaries and their license remain in the external pack. The asset endpoint
+also accepts TTF with its font MIME type; scripts, stylesheets, SVG and traversal
+paths remain blocked.
+
 Numeric frame/surface dimensions and the sprite border switch are Classic-only
 calibration inputs. The default theme intentionally uses fluid cards and an
 internally scrollable table surface instead of inheriting those pixel widths.
@@ -21,11 +31,12 @@ labels alongside its English headline sprites and imported documents. Applicatio
 locale selection does not translate this source presentation; translating the
 theme and its content pack together is a separate adaptation.
 
-The current visual port covers 30 page states: the three News pages and 27
-information documents, comprising eight top-level information pages and 19
-Manual chapters. Existing account, guild and highscore pages also receive
-functional navigation checks. That coverage does not mean every official
-Library, Community, Forum, Account or Support module has been visually ported;
+The information presentation covers six top-level documents and 19 Manual
+chapters, alongside the three News pages and two library catalogs. The server
+introduction and organization page are local components. Characters, highscores,
+online players, guilds, account forms and checkout reuse native data and actions
+with shared Classic panels and controls. These adaptations do not implement every
+Library, Community, Forum, Account or Support module from the reference;
 unsupported modules show a local unavailable state. A reference website is never
 used as a fallback application destination.
 
@@ -75,6 +86,12 @@ manifest may declare up to 16 optional `aliases` (for example `legacy-classic`)
 for saved preview links or server configuration. Aliases cannot shadow registered
 themes or resolve ambiguously. Preview aliases redirect to the canonical URL;
 missing or invalid aliases retain normal fallback behavior.
+
+`SERVER_NAME` supplies the About menu label and `/about/server` title and welcome
+text. It uses the same server-side configuration as the rest of SlenderAAC, with
+`OpenTibia` as a fallback for an empty value. `/about/company` describes OpenTibiaBR
+and links to its projects. Both pages are built in; external packs cannot replace
+their content. Older introduction URLs redirect locally and preserve the query.
 
 The category-upgrade migration preserves the previous first news category as
 `server`. Fresh installations create the neutral category directly. Existing
@@ -148,7 +165,8 @@ edits preserve the presentation and same-day ordering. Editing the body replaces
 the imported presentation with the normal Markdoc renderer.
 
 The pack's presentation data supplies current promo assets/text, menu destinations,
-sidebar links, footer and calendar colors. Routes with local equivalents remain
+sidebar links and calendar colors. The footer identifies SlenderAAC and OpenTibiaBR.
+Routes with local equivalents remain
 local; public modules without an equivalent use the local unavailable page.
 Internal preview links preserve `themePreview` and the active comparison flags.
 Keep that state across server redirects and submitted forms as well as anchors.
@@ -192,12 +210,6 @@ separate from the query-driven Screenshots gallery and its previous/next control
 
 ### Built-in information pages
 
-`/about/what-is-tibia` uses the compact content frame with its own intrinsic
-minimum content width. The route is available on a fresh installation without
-database seeding. The default theme renders the built-in introduction; the Classic
-theme can load `classic/reference/pages/whatistibia.json` from the external
-pack. Missing or invalid documents fall back to the built-in content.
-
 `src/lib/information.ts` registers native destinations. The shared link helper
 maps matching official URLs to these routes and preserves query parameters,
 anchors and preview flags. Menu groups expand for the active information page.
@@ -220,10 +232,11 @@ the benefit comparison. The external converter turns known helper text into
 native tooltips with mouse, focus and Escape support; original handlers are never
 executed. The green Premium action navigates to the local shop.
 
-`/about/company` reuses the contact and compact table variants. Member actions
-open local character queries, and institutional links keep their external
-destinations. Company text and member lists remain external reference content;
-the built-in fallback uses a short introduction without copied company details.
+`/about/company` uses built-in OpenTibiaBR information in both themes, with links
+to the organization, documentation, SlenderAAC issue tracker and public projects.
+It reuses the contact and compact table variants. Asset packs cannot override
+this page or the application's footer identity; refreshing artwork never replaces
+the organization with source-site company details.
 
 `/guides/quickstart` uses the common document layout and numbered marker sprites.
 Its minimum desktop body width follows the native 1020px client illustration.
@@ -257,6 +270,26 @@ The pack updater accepts repeated `--page ID=HTML` captures. `--pages-only` upda
 those pages while retaining the existing news presentation. A full update also
 refreshes the information pages already present in the pack. Use captures from a
 validated browser if direct public-page requests encounter a challenge.
+
+### Native application pages
+
+Character search/profile, highscores, online players, guilds, account forms and
+checkout use existing Slender data and actions. `PagePanel` selects shared Classic
+`TableFrame`/`TableSurface` presentation, while the default theme retains its own
+layout. Extend those wrappers for future pages with the same structure before
+adding route-specific CSS. Theme-specific native controls are scoped to Classic.
+
+Keep permission gates and backend validation when adapting forms. Highscore
+labels may be translated, but submitted skill values remain canonical. Product
+and payment radios use separate names; currency changes clear an offer that is
+no longer available. Missing or invalid item artwork keeps a readable item
+identifier and cannot interrupt hydration or display a stale response.
+
+The subsequent native-page pass checked the shared heading wrapper against an
+unchanged Characters central-region capture; its pixels were identical. New
+server and organization titles were checked separately with the loaded shared
+font. Narrow-viewport checks cover the selected pages and do not imply that every
+business module has complete visual or end-to-end coverage.
 
 ### Capture and interaction checks
 
@@ -295,9 +328,10 @@ Exercise archive filters, draft visibility, old article/ticker links, ticker
 expansion, browser back/forward, calendar month/year boundaries and admin edits.
 Builds are separate from this visual and runtime review.
 
-### September 2026 audit coverage
+### Initial September 2026 comparison
 
-The detailed comparison captured all 30 ported page states at 1919x945. After the
+The initial comparison captured 30 page states at 1919x945, before replacing the
+server introduction and organization document with local components. After the
 shared corrections, the 27 information documents matched measured document
 dimensions and content-image geometry, with no stable-shell flags or matched
 glyph-position differences greater than 2px. Glyph pairing uses unique normalized
@@ -339,7 +373,7 @@ links lost during conversion. Preserve the observed source mapping in the parity
 pass; any correction needs a separate navigation decision rather than an
 invented target.
 
-The refreshed external pack retained all 27 information documents and both fresh
+At that stage, the refreshed pack retained all 27 information documents and both fresh
 September/October calendar grids. ZIP integrity, all 454 packaged image hashes,
 the bundled tool files and seven focused exporter/updater tests were checked.
 The grids and canonical dates within each captured month retain the source text

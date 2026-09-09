@@ -23,6 +23,7 @@
 	import type { LayoutData } from '../../../routes/(app)/$types';
 	import type { ClassicNewsReference } from './reference-types';
 	import ContentFrame from './ContentFrame.svelte';
+	import { headlineFontStyle } from './headline';
 	import InfoBar from './InfoBar.svelte';
 	import { classicLayoutForPath } from './layout';
 	import MediaDialog from './MediaDialog.svelte';
@@ -112,6 +113,7 @@
 
 		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 	})();
+	$: fontStyle = headlineFontStyle(data.themeAssets?.headlineFont);
 	$: homeHref = makeClassicPreviewHref($page.url, '/');
 	$: accountHref = makeClassicPreviewHref($page.url, '/account');
 	$: accountLoginHref = makeClassicPreviewHref($page.url, '/account/login');
@@ -709,6 +711,10 @@
 	});
 </script>
 
+<svelte:head>
+	{#if fontStyle}{@html `<style>${fontStyle}</style>`}{/if}
+</svelte:head>
+
 <div
 	class={`theme-classic${
 		layout === 'compact-wide' ? ' theme-classic--wide' : ''
@@ -940,7 +946,6 @@
 
 			<ContentFrame
 				{title}
-				ornament={contentOrnament}
 				titleBackground={contentTitleBackground}
 				frameHorizontal={contentFrameHorizontal}
 				frameVertical={contentFrameVertical}
@@ -988,13 +993,10 @@
 			</ContentFrame>
 
 			<footer class="theme-classic__footer">
+				<div>Powered by SlenderAAC · OpenTibiaBR</div>
 				<div>
-					{presentation?.footer ??
-						'Copyright by SlenderAAC. All rights reserved.'}
-				</div>
-				<div>
-					<a href={presentationHref('about', '/pages/about')}
-						>{'About SlenderAAC'}</a>
+					<a href={themePreviewHref($page.url, '/about/company')}
+						>About OpenTibiaBR</a>
 					|
 					<a href={presentationHref('agreement', '/pages/rules')}
 						>Service Agreement</a>

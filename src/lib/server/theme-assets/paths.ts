@@ -2,7 +2,15 @@ import path from 'node:path';
 
 import type { ThemeId } from '$lib/themes/theme-ids';
 
-const allowedExtensions = new Set(['png', 'jpg', 'jpeg', 'gif', 'webp', 'ico']);
+const allowedExtensions = new Set([
+	'png',
+	'jpg',
+	'jpeg',
+	'gif',
+	'webp',
+	'ico',
+	'ttf',
+]);
 
 export const mimeTypes = {
 	png: 'image/png',
@@ -11,6 +19,7 @@ export const mimeTypes = {
 	gif: 'image/gif',
 	webp: 'image/webp',
 	ico: 'image/x-icon',
+	ttf: 'font/ttf',
 } as const;
 
 export type ThemeAssetExtension = keyof typeof mimeTypes;

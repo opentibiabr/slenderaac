@@ -59,6 +59,7 @@ export const load = loadFlashMessage(async ({ locals, url }) => {
 			: { assets: {}, version: null, warning: null };
 
 	return {
+		serverName: env.SERVER_NAME?.trim() || 'OpenTibia',
 		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,

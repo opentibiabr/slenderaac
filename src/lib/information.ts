@@ -33,11 +33,10 @@ export const informationPages: InformationPage[] = [
 		summary: 'No bosses have been added to this server’s library yet.',
 	},
 	{
-		id: 'whatistibia',
-		minimumBodyWidth: 785,
+		id: 'server',
 		section: 'about',
-		slug: 'what-is-tibia',
-		title: 'What Is Tibia?',
+		slug: 'server',
+		title: 'About the Server',
 		source: 'https://www.tibia.com/abouttibia/?subtopic=whatistibia',
 		summary:
 			'Explore a multiplayer fantasy world, develop your character and adventure with other players. Create an account to begin, or read the game guides to learn more.',
@@ -73,10 +72,10 @@ export const informationPages: InformationPage[] = [
 		id: 'company',
 		section: 'about',
 		slug: 'company',
-		title: 'About the Server',
+		title: 'About OpenTibiaBR',
 		source: 'https://www.tibia.com/abouttibia/',
 		summary:
-			'Learn about this server, its team and the services available to players.',
+			'Learn about OpenTibiaBR, its open-source projects and SlenderAAC.',
 	},
 	{
 		id: 'quickstart',

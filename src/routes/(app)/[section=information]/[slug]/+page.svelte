@@ -6,6 +6,8 @@
 	import Content from '$lib/components/information/Content.svelte';
 	import Gallery from '$lib/components/information/Gallery.svelte';
 	import LibraryBoosted from '$lib/components/information/LibraryBoosted.svelte';
+	import Organization from '$lib/components/information/Organization.svelte';
+	import ServerIntroduction from '$lib/components/information/ServerIntroduction.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
@@ -25,7 +27,11 @@
 			boss={data.informationPage.id === 'boostablebosses'}
 			boosted={data.libraryBoosted} />
 	{/if}
-	{#if data.libraryDetail}
+	{#if data.informationPage.id === 'company'}
+		<Organization />
+	{:else if data.informationPage.id === 'server'}
+		<ServerIntroduction />
+	{:else if data.libraryDetail}
 		<nav class="creature-navigation" aria-label="Creature navigation">
 			<span
 				>{#if data.libraryDetail.previous}<a

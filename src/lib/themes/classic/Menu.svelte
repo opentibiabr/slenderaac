@@ -43,11 +43,21 @@
 		? 'classic-menu-drawer'
 		: 'classic-menu-main';
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
-	$: aboutLinks =
+	$: aboutLabel = `About ${$page.data.serverName}`;
+	$: aboutLinks = (
 		presentation?.navigation.about ??
 		informationPages
 			.filter((entry) => entry.section === 'about')
-			.map((entry) => ({ label: entry.title, href: informationPath(entry) }));
+			.map((entry) => ({ label: entry.title, href: informationPath(entry) }))
+	).map((entry) => {
+		const pathname = new URL(withThemePreview($page.url, entry.href), $page.url)
+			.pathname;
+		if (pathname === '/about/company')
+			return { label: 'About OpenTibiaBR', href: '/about/company' };
+		if (['/about/server', '/about/what-is-tibia'].includes(pathname))
+			return { label: aboutLabel, href: '/about/server' };
+		return entry;
+	});
 	$: guideLinks =
 		presentation?.navigation.guides ??
 		informationPages
@@ -240,23 +250,18 @@
 				{:else}
 					<Fa icon={faBookBookmark} />
 				{/if}
-				{#if menuLabels.about}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.about}
-						alt="About Tibia" />
-				{:else}
-					<span class="theme-classic-menu__text-label">About Tibia</span>
-				{/if}
+				<span
+					class="theme-classic-menu__text-label theme-classic-menu__server-label"
+					title={aboutLabel}>{aboutLabel}</span>
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-about-toggle`}
-				aria-label="Toggle About Tibia"></label>
+				aria-label={`Toggle ${aboutLabel}`}></label>
 			<label
 				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-about-toggle`}
-				aria-label="Toggle About Tibia"></label>
+				aria-label={`Toggle ${aboutLabel}`}></label>
 		</div>
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-about`}>
 			{#each aboutLinks as link}
@@ -789,13 +794,21 @@
 	}
 
 	:global(.theme-classic) .theme-classic-menu__text-label {
-		font-family: Georgia, 'Times New Roman', serif;
+		font-family: ClassicHeadline, Georgia, serif;
 		font-size: 17px;
-		font-weight: 800;
+		font-weight: 400;
 		letter-spacing: 0;
 		text-shadow:
 			1px 1px 0 rgb(0 0 0),
 			0 0 4px rgb(0 0 0 / 0.72);
+	}
+	:global(.theme-classic) .theme-classic-menu__server-label {
+		min-width: 0;
+		width: 116px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: 14px;
 	}
 
 	:global(.theme-classic)

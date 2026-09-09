@@ -7,6 +7,7 @@ import { env } from '$env/dynamic/private';
 
 export async function loadInformationPresentation(theme: string, id: string) {
 	if (
+		['company', 'server'].includes(id) ||
 		theme !== 'classic' ||
 		!env.THEME_ASSETS_ROOT ||
 		!/^[a-z]+(?:-[a-z_]+)?$/.test(id)

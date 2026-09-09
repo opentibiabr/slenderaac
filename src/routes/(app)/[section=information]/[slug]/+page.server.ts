@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
 import { informationPageForPath, manualSections } from '$lib/information';
 import { libraryEntries } from '$lib/library';
@@ -7,9 +7,16 @@ import { loadInformationPresentation } from '$lib/server/theme-assets/informatio
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url, parent }) => {
+	if (url.pathname.replace(/\/$/, '') === '/about/what-is-tibia')
+		throw redirect(308, `/about/server${url.search}`);
 	const informationPage = informationPageForPath(url.pathname);
 	if (!informationPage) throw error(404, 'Page not found');
-	const { selectedTheme, boostedCreature, boostedBoss } = await parent();
+	const { selectedTheme, boostedCreature, boostedBoss, serverName } =
+		await parent();
+	const title =
+		informationPage.id === 'server'
+			? `About ${serverName}`
+			: informationPage.title;
 	const section =
 		informationPage.id === 'manual' ? url.searchParams.get('section') : null;
 	if (section && !manualSections.includes(section))
@@ -35,9 +42,10 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 		(entry) => entry.name.toLowerCase() === boosted?.boostname?.toLowerCase(),
 	);
 	return {
-		title: informationPage.title,
+		title,
 		informationPage: {
 			...informationPage,
+			title,
 			minimumBodyWidth:
 				presentation?.minimumBodyWidth ?? informationPage.minimumBodyWidth,
 		},
