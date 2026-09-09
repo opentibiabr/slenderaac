@@ -75,7 +75,7 @@
 <div class="card card-tertiary text-white overflow-hidden">
 	<article class="py-2 px-2">
 		<Accordion>
-			{#each ['about', 'guides', 'library'] as section}
+			{#each ['about', 'guides'] as section}
 				{#if informationLinks.some((entry) => entry.section === section)}
 					<AccordionItem open>
 						<svelte:fragment slot="lead"
@@ -83,9 +83,7 @@
 						<svelte:fragment slot="summary"
 							>{section === 'about'
 								? `About ${$page.data.serverName}`
-								: section === 'library'
-									? 'Library'
-									: 'Game Guides'}</svelte:fragment>
+								: 'Game Guides'}</svelte:fragment>
 						<svelte:fragment slot="content"
 							><nav class="list-nav">
 								<ul>
@@ -167,9 +165,9 @@
 				<svelte:fragment slot="content">
 					<nav class="list-nav">
 						<ul>
-							{#each informationPages.filter((entry) => entry.section === 'library') as entry}
+							{#each informationLinks.filter((entry) => entry.section === 'library') as entry}
 								<li>
-									<a href={themePreviewHref($page.url, informationPath(entry))}
+									<a href={themePreviewHref($page.url, entry.path)}
 										>{entry.title}</a>
 								</li>
 							{/each}
