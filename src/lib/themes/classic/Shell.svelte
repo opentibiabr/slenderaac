@@ -645,8 +645,6 @@
 		};
 	}
 
-	$: isClassicThemePreview =
-		$page.url.searchParams.get('themePreview') === 'classic';
 	$: effectiveTopbarStats = classicReference
 		? {
 				twitchChannels: classicReference.topbarStats[0]?.[0] ?? 0,
@@ -654,19 +652,10 @@
 				youtubeChannels: classicReference.topbarStats[1]?.[0] ?? 0,
 				youtubeViewers: classicReference.topbarStats[1]?.[1] ?? 0,
 			}
-		: isClassicThemePreview
-			? {
-					twitchChannels: 0,
-					twitchViewers: 0,
-					youtubeChannels: 0,
-					youtubeViewers: 0,
-				}
-			: topbarStats;
+		: topbarStats;
 	$: effectiveOnlinePlayerCount = classicReference
 		? Number(classicReference.onlineCount.replace(/[^0-9]/g, ''))
-		: isClassicThemePreview
-			? 0
-			: onlinePlayerCount;
+		: onlinePlayerCount;
 
 	const formatTopbarCount = (value: number | null): string =>
 		String(normalizeTopbarCount(value));
