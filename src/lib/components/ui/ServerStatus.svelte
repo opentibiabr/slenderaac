@@ -4,22 +4,17 @@
 
 	import { page } from '$app/stores';
 
+	import { pollOnlineStatus } from '$lib/online-status';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	let serverOnline: boolean;
 	let onlinePlayerCount: number;
 
-	async function refresh() {
-		({ onlinePlayerCount, serverOnline } = (await (
-			await fetch('/api/online-status')
-		).json()) as { serverOnline: boolean; onlinePlayerCount: number });
-	}
-
-	onMount(() => {
-		void refresh();
-		const interval = setInterval(refresh, 5 * 1000);
-		return () => clearInterval(interval);
-	});
+	onMount(() =>
+		pollOnlineStatus((status) => {
+			({ onlinePlayerCount, serverOnline } = status);
+		}),
+	);
 </script>
 
 <a

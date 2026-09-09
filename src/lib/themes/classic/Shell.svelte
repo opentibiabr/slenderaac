@@ -16,6 +16,11 @@
 	import { page } from '$app/stores';
 
 	import type { InformationPresentation } from '$lib/information-content';
+	import {
+		onlineCounter,
+		type OnlineCounters,
+		pollOnlineStatus,
+	} from '$lib/online-status';
 	import { serverText } from '$lib/site-identity';
 	import { themePreviewHref } from '$lib/themes/preview';
 
@@ -36,13 +41,6 @@
 		selectedTheme?: string;
 		themeAssets?: Record<string, string | undefined>;
 		themeAssetWarning?: string | null;
-	};
-
-	type ClassicTopbarStats = {
-		twitchChannels?: number | null;
-		twitchViewers?: number | null;
-		youtubeChannels?: number | null;
-		youtubeViewers?: number | null;
 	};
 
 	type ClassicNewsArticle = {
@@ -621,29 +619,12 @@
 	});
 
 	let onlinePlayerCount = 0;
-	let topbarStats: Required<ClassicTopbarStats> = {
+	let topbarStats: OnlineCounters = {
 		twitchChannels: 0,
 		twitchViewers: 0,
 		youtubeChannels: 0,
 		youtubeViewers: 0,
 	};
-
-	function normalizeTopbarCount(value: number | null | undefined): number {
-		return typeof value === 'number' && Number.isFinite(value)
-			? Math.max(0, Math.trunc(value))
-			: 0;
-	}
-
-	function normalizeTopbarStats(
-		stats: ClassicTopbarStats | null | undefined,
-	): Required<ClassicTopbarStats> {
-		return {
-			twitchChannels: normalizeTopbarCount(stats?.twitchChannels),
-			twitchViewers: normalizeTopbarCount(stats?.twitchViewers),
-			youtubeChannels: normalizeTopbarCount(stats?.youtubeChannels),
-			youtubeViewers: normalizeTopbarCount(stats?.youtubeViewers),
-		};
-	}
 
 	$: effectiveTopbarStats = classicReference
 		? {
@@ -658,7 +639,7 @@
 		: onlinePlayerCount;
 
 	const formatTopbarCount = (value: number | null): string =>
-		String(normalizeTopbarCount(value));
+		String(onlineCounter(value));
 
 	$: formattedOnlinePlayerCount = new Intl.NumberFormat('en-US').format(
 		effectiveOnlinePlayerCount,
@@ -676,30 +657,11 @@
 		effectiveTopbarStats.youtubeViewers,
 	);
 
-	async function refreshOnlineStatus(): Promise<void> {
-		try {
-			const response = await fetch('/api/online-status');
-			if (!response.ok) return;
-
-			const status = (await response.json()) as {
-				onlinePlayerCount?: number;
-				topbarStats?: ClassicTopbarStats;
-			} | null;
-			if (!status || !Number.isFinite(status.onlinePlayerCount)) return;
-			const nextTopbarStats = normalizeTopbarStats(status.topbarStats);
-			onlinePlayerCount = normalizeTopbarCount(status.onlinePlayerCount);
-			topbarStats = nextTopbarStats;
-		} catch {
-			// Keep the last successful values until the next poll succeeds.
-		}
-	}
-
-	onMount(() => {
-		void refreshOnlineStatus();
-		const interval = setInterval(refreshOnlineStatus, 5000);
-
-		return () => clearInterval(interval);
-	});
+	onMount(() =>
+		pollOnlineStatus((status) => {
+			({ onlinePlayerCount, topbarStats } = status);
+		}),
+	);
 </script>
 
 <svelte:head>
