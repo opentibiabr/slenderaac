@@ -431,3 +431,17 @@ the bundled tool files and seven focused exporter/updater tests were checked.
 The grids and canonical dates within each captured month retain the source text
 including section breaks and bullets. Binary assets, source captures and local
 comparison artifacts remain outside versioned application files.
+
+## Native creature catalogs
+
+Creature and boss entries now come from the configured server library, with
+optional portraits supplied by the external pack in both themes. Their captured
+presentation documents no longer determine the available entries or details.
+See [Server library](server-library.md) for import, identity and data contracts.
+
+The shared `CatalogHeading` has a portrait variant for this family: a 64px slot
+on the left, a title aligned right, and 18px text under Classic's 12px body font.
+`CatalogNavigation` supplies local previous/back/next links. The heading starts
+40px below the navigation row; the first paragraph starts 76px below the heading.
+Creature cards occupy 100x110px, with labels starting 67px below the card top.
+Do not let the inline image baseline increase the 64px detail heading to 67px.

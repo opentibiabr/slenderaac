@@ -1,8 +1,10 @@
 import { error, redirect } from '@sveltejs/kit';
 
+import { boostedCatalogEntry, creatureCatalog } from '$lib/creatures';
 import { informationPageForPath, manualSections } from '$lib/information';
-import { libraryEntries, libraryPortraitForName } from '$lib/library';
+import { loadCreatures } from '$lib/server/catalog';
 import { loadInformationPresentation } from '$lib/server/theme-assets/information';
+import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
 
 import type { PageServerLoad } from './$types';
 
@@ -21,26 +23,41 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 		informationPage.id === 'manual' ? url.searchParams.get('section') : null;
 	if (section && !manualSections.includes(section))
 		throw error(404, 'Manual section not found');
-	const presentation = await loadInformationPresentation(
-		informationPage.section === 'library' ? 'classic' : selectedTheme,
-		section ? `manual-${section}` : informationPage.id,
+	const isLibrary = informationPage.section === 'library';
+	const boss = informationPage.id === 'boostablebosses';
+	const entries = isLibrary ? creatureCatalog(await loadCreatures(), boss) : [];
+	const race = isLibrary ? url.searchParams.get('race') : null;
+	const selected = race
+		? (entries.find(
+				(entry) => entry.id === race || entry.aliases?.includes(race),
+			) ?? null)
+		: null;
+	if (race && (!selected || boss)) throw error(404, 'Creature not found');
+	const boosted = boss ? boostedBoss : boostedCreature;
+	const boostedEntry = boostedCatalogEntry(
+		entries,
+		boosted?.boostname ?? null,
+		Number(boosted?.raceid),
+		boss,
 	);
-	const entries =
-		informationPage.section === 'library' && presentation
-			? libraryEntries(presentation)
-			: [];
-	const race =
-		informationPage.section === 'library' ? url.searchParams.get('race') : null;
-	const selectedIndex = race
-		? entries.findIndex((entry) => entry.race === race)
-		: -1;
-	if (race && presentation && selectedIndex < 0)
-		throw error(404, 'Creature not found');
-	const boosted =
-		informationPage.id === 'boostablebosses' ? boostedBoss : boostedCreature;
-	const boostedEntry = entries.find(
-		(entry) => entry.name.toLowerCase() === boosted?.boostname?.toLowerCase(),
-	);
+	const presentation = isLibrary
+		? null
+		: await loadInformationPresentation(
+				selectedTheme,
+				section ? `manual-${section}` : informationPage.id,
+			);
+	const artwork =
+		isLibrary && selectedTheme !== 'classic'
+			? Object.fromEntries(
+					Object.entries(
+						(await loadThemeAssetMetadata('classic')).assets,
+					).filter(
+						([key]) =>
+							key.startsWith('creatureIcon-') ||
+							['catalogPrevious', 'catalogNext', 'catalogBack'].includes(key),
+					),
+				)
+			: null;
 	return {
 		title,
 		informationPage: {
@@ -50,24 +67,16 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 				presentation?.minimumBodyWidth ?? informationPage.minimumBodyWidth,
 		},
 		informationPresentation: presentation,
-		libraryBoosted:
-			informationPage.section === 'library'
-				? {
+		library: isLibrary
+			? {
+					entries: entries.map(({ id, name }) => ({ id, name })),
+					selected,
+					artwork,
+					boosted: {
 						name: boosted?.boostname ?? null,
-						entry: boostedEntry ?? null,
-						image:
-							presentation && boosted?.boostname
-								? libraryPortraitForName(presentation, boosted.boostname)
-								: null,
-					}
-				: null,
-		libraryDetail:
-			selectedIndex >= 0
-				? {
-						entry: entries[selectedIndex],
-						previous: entries[selectedIndex - 1]?.race ?? null,
-						next: entries[selectedIndex + 1]?.race ?? null,
-					}
-				: null,
+						id: boostedEntry?.id ?? null,
+					},
+				}
+			: null,
 	};
 };

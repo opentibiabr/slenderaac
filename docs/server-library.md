@@ -6,6 +6,13 @@ links. Detail views retain the list filters when returning. Rune requirements
 come from the registered item created by the spell; variable mana is shown as
 `var.`. Unknown spell identities return 404.
 
+`/library/creatures` lists the server's Bestiary definitions. Its local detail
+pages show maximum health, elemental strengths and weaknesses, summon/convince
+requirements, locations, base experience and configured loot. Previous, next
+and back links retain theme preview. `/library/boostable-bosses` lists registered
+Archfoe boss types with a boss race ID. Boss portraits are informational. Both
+pages read the daily boosted selection from the application database.
+
 ## Import and update
 
 Install the repository dependencies, then export the server definitions to a file
@@ -28,12 +35,28 @@ with the shared vocation definitions. Promotions resolve to their base vocation.
 Disabled files, monster script directories and internal command formulas are
 excluded from the player catalog.
 
+Creature definitions come from the shared and selected datapack `monster`
+directories; loot item names come from `data/items/items.xml`. An unnamed item
+keeps its configured numeric identity, displayed as `item #123`, rather than
+receiving a guessed name. Elemental resistance limits come from local
+`minElementalResistance` and `maxElementalResistance`, defaulting to -200 and 200.
+The registration rule preserves complete immunity to all seven player elements.
+Experience values are base values before player stages and other game bonuses.
+
 The importer parses Lua syntax and literal metadata without executing server
 scripts or callbacks. Conditional metadata, unresolved expressions, unknown
 vocations, duplicate identities and invalid requirements reject the import. An
 empty or failed import leaves the previous snapshot unchanged. Custom scripts
 with dynamic registrations need an explicit catalog export; they must not be
 silently represented by guessed defaults.
+
+Creature identities use the registered type name, preserving variants even when
+their displayed game names or Bestiary/boss race IDs overlap. Shared race IDs do
+not merge statistics. A boosted selection must match a name and race ID, or a
+unique race ID; ambiguous selections do not get a guessed link or portrait.
+The boss list describes registered Archfoe types, not a reconstructed runtime
+lottery: shared IDs and runtime registration order can affect that lottery.
+Runtime-generated variants and callbacks require an explicit server export.
 
 For renamed entries or existing links, optionally pass
 `--spell-aliases /path/to/spell-aliases.json`. This JSON object maps saved URL
@@ -46,10 +69,17 @@ unambiguously to an imported spell and cannot collide with another identity:
 }
 ```
 
+`--creature-aliases /path/to/creature-aliases.json` accepts the same mapping for
+registered creature names or canonical IDs. Each import validates spells and
+creatures before replacing the snapshot; a missing or malformed creature catalog
+cannot erase the existing spell catalog, and vice versa.
+
 ## Data and presentation
 
 The snapshot uses `schemaVersion: 1`, an import timestamp, an optional source
-revision and a `spells` array. Requirements, formula, vocations, premium status,
+revision, a `spells` array and a `creatures` array. Older spell-only snapshots
+continue to serve spells and show an empty creature library until refreshed.
+Requirements, formula, vocations, premium status,
 groups, cooldowns, mana, combat type and rune metadata come from the server.
 The application validates and caches this file; it never executes its contents
 or exposes it through the public asset endpoint. A missing configuration gives
@@ -62,6 +92,13 @@ The optional external theme pack supplies `headlineSpells` and
 available. Refresh and package those assets with the tools distributed in the
 pack. Server catalog exports, credentials, raw source captures and machine-local
 paths do not belong in a theme release or the repository.
+
+Creature artwork uses `creatureIcon-<canonical-id>`; catalog navigation uses
+`catalogPrevious`, `catalogNext` and `catalogBack`. The external artwork helper
+can reuse a portrait for variants with an identical complete native outfit.
+Unmatched artwork remains optional; missing images never hide an entry or its
+detail link. The pack's captured page content does not define the creature or
+boss catalogs.
 
 Classic list panels, detail panels, catalog headings and radio filters share
 components. The list uses 21px table rows, while the filter uses native radio

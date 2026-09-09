@@ -18,7 +18,7 @@ export async function readServerFiles(
 	const files = new Map<string, string>();
 	const wanted = (file: string) =>
 		/\.(lua|xml)$/.test(file) &&
-		!file.split('/').some((part) => part.startsWith('#') || part === 'monster');
+		!file.split('/').some((part) => part.startsWith('#'));
 	if (ref) {
 		const git = (args: string[], input?: string): Promise<Buffer> =>
 			new Promise((resolve, reject) => {
@@ -93,11 +93,7 @@ export async function readServerFiles(
 			for (const entry of (
 				await fs.readdir(resolved, { withFileTypes: true })
 			).sort((a, b) => a.name.localeCompare(b.name)))
-				if (
-					!entry.isSymbolicLink() &&
-					!entry.name.startsWith('#') &&
-					entry.name !== 'monster'
-				)
+				if (!entry.isSymbolicLink() && !entry.name.startsWith('#'))
 					await read(`${relative}/${entry.name}`);
 		} else if (wanted(relative) && stat.isFile()) {
 			if (stat.size > 5_000_000) throw new Error('Data file is too large');

@@ -1,8 +1,10 @@
 import type { CallExpression, Expression, Statement } from 'luaparse';
 
 import type { SpellRecord } from '$lib/spells';
-import { parseSpellRecords, spellSlug } from '$lib/spells';
+import { parseSpellRecords } from '$lib/spells';
 
+import { combatTypes } from './combat';
+import { catalogSlug } from './identity';
 import { literalExpression, luaLiteral, parseLua, walkLua } from './lua';
 
 type Declaration = {
@@ -63,19 +65,6 @@ export function spellDeclarations(source: string): Declaration[] {
 			node.arguments[0].name === 'COMBAT_PARAM_TYPE' &&
 			node.arguments[1]?.type === 'Identifier'
 		) {
-			const combatTypes: Record<string, string> = {
-				COMBAT_HEALING: 'Healing',
-				COMBAT_PHYSICALDAMAGE: 'Physical',
-				COMBAT_ENERGYDAMAGE: 'Energy',
-				COMBAT_EARTHDAMAGE: 'Earth',
-				COMBAT_FIREDAMAGE: 'Fire',
-				COMBAT_ICEDAMAGE: 'Ice',
-				COMBAT_HOLYDAMAGE: 'Holy',
-				COMBAT_DEATHDAMAGE: 'Death',
-				COMBAT_LIFEDRAIN: 'Life Drain',
-				COMBAT_MANADRAIN: 'Mana Drain',
-				COMBAT_DROWNDAMAGE: 'Drowning',
-			};
 			const type = combatTypes[node.arguments[1].name];
 			if (type) magicTypes.add(type);
 		}
@@ -321,7 +310,7 @@ export function importSpellCatalog(
 			const title = (value: string) =>
 				value ? value[0].toUpperCase() + value.slice(1).toLowerCase() : '';
 			return {
-				id: spellSlug(name),
+				id: catalogSlug(name),
 				name,
 				words: text(spell, 'words'),
 				vocations: vocationNames(spell),

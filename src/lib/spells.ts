@@ -41,13 +41,6 @@ export const spellSorts = {
 };
 export type SpellSort = keyof typeof spellSorts;
 
-export function spellSlug(name: string) {
-	return name
-		.normalize('NFKD')
-		.toLowerCase()
-		.replace(/[^a-z0-9]/g, '');
-}
-
 export function spellMana(spell: SpellRecord): string {
 	if (spell.variableMana) return 'var.';
 	if (spell.manaPercent) return `${spell.manaPercent}%`;

@@ -40,7 +40,8 @@ void test('server files are read from the selected revision without switching or
 			'local name = "after"',
 		);
 		const { files, revision } = await readServerFiles(root, ['data'], 'HEAD');
-		assert.equal(files.size, 1);
+		assert.equal(files.size, 2);
+		assert.equal(files.get('data/monster/spell.lua'), 'internal');
 		assert.equal(files.get('data/spell.lua'), 'local name = "before"');
 		assert.match(revision!, /^[a-f0-9]{40}$/);
 		assert.equal(
@@ -102,6 +103,47 @@ void test('an empty or malformed import leaves the installed server catalog unch
 		);
 		await assert.rejects(execute(process.execPath, args), /literal expression/);
 		assert.equal(await fs.readFile(output, 'utf8'), 'previous catalog');
+		await fs.writeFile(
+			path.join(root, 'data/scripts/spells/broken.lua'),
+			'local spell = Spell("instant")\nspell:name("Healing")\nspell:words("exura")\nspell:vocation("Mage;true")\nspell:register()',
+		);
+		await assert.rejects(
+			execute(process.execPath, args),
+			/empty creature catalog/,
+		);
+		assert.equal(await fs.readFile(output, 'utf8'), 'previous catalog');
+		await fs.mkdir(path.join(root, 'data/monster'), { recursive: true });
+		await fs.mkdir(path.join(root, 'data/scripts/spells/monster'), {
+			recursive: true,
+		});
+		await fs.writeFile(
+			path.join(root, 'data/scripts/spells/monster/internal.lua'),
+			'invalid player spell metadata',
+		);
+		const creatureFile = path.join(root, 'data/monster/example.lua');
+		const creatureSource =
+			'local mType = Game.createMonsterType("Example")\nlocal monster = {}\nmonster.health = 100\nmonster.experience = 10\nmonster.outfit = {lookType = 99}\nmonster.flags = {summonable = false, convinceable = false}\nmonster.elements = {}\nmType:register(monster)';
+		await fs.writeFile(creatureFile, creatureSource);
+		await execute(process.execPath, args);
+		const installed = await fs.readFile(output, 'utf8');
+		const value = JSON.parse(installed) as {
+			spells: unknown[];
+			creatures: unknown[];
+		};
+		assert.equal(value.spells.length, 1);
+		assert.equal(value.creatures.length, 1);
+		await fs.writeFile(
+			creatureFile,
+			creatureSource.replace(
+				'monster.health = 100',
+				'monster.health = dynamicHealth',
+			),
+		);
+		await assert.rejects(
+			execute(process.execPath, args),
+			/Unresolved metadata/,
+		);
+		assert.equal(await fs.readFile(output, 'utf8'), installed);
 		assert.equal(
 			(await fs.readdir(root)).filter((name) => name.endsWith('.tmp')).length,
 			0,
