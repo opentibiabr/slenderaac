@@ -24,23 +24,27 @@
 </script>
 
 {#if character}
-	<PagePanel title="Character Information" surface>
-		<table class="classic-data-table classic-data-table--details">
+	<PagePanel title="Character Information" surface variant="stack">
+		<table
+			class="classic-data-table classic-data-table--bordered classic-data-table--labels">
 			<tbody>
-				<tr><td>Name:</td><td>{character.name}</td></tr>
-				<tr><td>Sex:</td><td>{sexString(character.sex)}</td></tr>
+				<tr><th scope="row">Name:</th><td>{character.name}</td></tr>
+				<tr><th scope="row">Sex:</th><td>{sexString(character.sex)}</td></tr>
 				{#if pronounsEnabled}<tr
-						><td>Pronouns:</td><td>{getPronoun(character)}</td></tr
+						><th scope="row">Pronouns:</th><td>{getPronoun(character)}</td></tr
 					>{/if}
-				<tr><td>Vocation:</td><td>{vocationString(character.vocation)}</td></tr>
-				<tr><td>Level:</td><td>{character.level}</td></tr>
-				<tr><td>Residence:</td><td>{character.townName}</td></tr>
 				<tr
-					><td>Achievement Points:</td><td
+					><th scope="row">Vocation:</th><td
+						>{vocationString(character.vocation)}</td
+					></tr>
+				<tr><th scope="row">Level:</th><td>{character.level}</td></tr>
+				<tr><th scope="row">Residence:</th><td>{character.townName}</td></tr>
+				<tr
+					><th scope="row">Achievement Points:</th><td
 						>{data.achievementPoints ?? 'Unavailable'}</td
 					></tr>
 				{#if character.guild}<tr
-						><td>Guild Membership:</td><td
+						><th scope="row">Guild Membership:</th><td
 							>{character.guild.rank} of
 							<a href={href('/guilds/', character.guild.name)}
 								>{character.guild.name}</a
@@ -48,12 +52,18 @@
 								({character.guild.nick}){/if}</td
 						></tr
 					>{/if}
-				<tr><td>Last Login:</td><td>{formatDate(character.lastLogin)}</td></tr>
+				<tr
+					><th scope="row">Last Login:</th><td
+						>{formatDate(character.lastLogin)}</td
+					></tr>
 				{#if data.balance != null}<tr
-						><td>Balance:</td><td>{formatGoldCoins(data.balance)}</td></tr
+						><th scope="row">Balance:</th><td
+							>{formatGoldCoins(data.balance)}</td
+						></tr
 					>{/if}
 				{#if character.settings?.comment}<tr
-						><td>Comment:</td><td><pre>{character.settings.comment}</pre></td
+						><th scope="row">Comment:</th><td
+							><pre>{character.settings.comment}</pre></td
 						></tr
 					>{/if}
 			</tbody>
@@ -63,11 +73,12 @@
 		achievements={data.achievements ?? []}
 		available={data.achievementsAvailable} />
 	{#if data.skills}
-		<PagePanel title="Skills" surface
-			><table class="classic-data-table classic-data-table--details">
+		<PagePanel title="Skills" surface variant="stack"
+			><table
+				class="classic-data-table classic-data-table--bordered classic-data-table--labels">
 				<tbody>
 					{#each Object.entries(data.skills) as [skill, level]}<tr
-							><td>{skill}:</td><td>{level}</td></tr
+							><th scope="row">{skill}:</th><td>{level}</td></tr
 						>{/each}
 				</tbody>
 			</table></PagePanel>

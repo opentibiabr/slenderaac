@@ -130,6 +130,16 @@
 }
 .theme-classic
 	.classic-native-content
+	.classic-data-table--labels
+	th[scope='row'] {
+	box-sizing: content-box;
+	width: 175px;
+}
+.theme-classic .classic-native-content .classic-data-table--labels td {
+	overflow-wrap: anywhere;
+}
+.theme-classic
+	.classic-native-content
 	.classic-data-table--properties
 	th[scope='row'] {
 	width: 15%;
