@@ -1176,6 +1176,10 @@
 </div>
 
 <style>
+	:global(html:has(.theme-classic)) {
+		scrollbar-gutter: stable;
+	}
+
 	.theme-classic {
 		position: relative;
 		box-sizing: border-box;
