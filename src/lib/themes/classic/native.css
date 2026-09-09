@@ -148,8 +148,14 @@
 	margin: 3px 3px 0 5px;
 	vertical-align: baseline;
 }
-.theme-classic .classic-native-content .classic-data-table--grid :is(th, td) {
+.theme-classic .classic-native-content .classic-data-table--grid :is(th, td),
+.theme-classic
+	.classic-native-content
+	.classic-data-table--bordered
+	:is(th, td) {
 	border: 1px solid rgb(250 240 215);
+}
+.theme-classic .classic-native-content .classic-data-table--grid :is(th, td) {
 	line-height: 16px;
 }
 .theme-classic

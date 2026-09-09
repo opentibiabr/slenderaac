@@ -20,6 +20,19 @@ Section links work with keyboard navigation and saved fragments; the section
 menu stays visible when scrolling, and each caption links back to the page top.
 Older unavailable-menu links automatically upgrade to this local page.
 
+Character profiles read achievement points and unlocks from native `kv_store`
+values. Points are not recalculated from catalog entries. A missing points key
+uses the game's zero default; malformed numeric storage is shown as unavailable.
+Only selected, still-earned achievements appear in public profile data. Unselected
+secret achievements remain private.
+
+Account owners manage the selection from **Achievements** beside a character.
+The editor accepts up to five distinct earned achievements and can clear the
+display. Ownership and deletion status are checked again when saving. Choices
+are stored in `slender_achievement_showcase`, created by the normal application
+migrations; saving never changes native points or unlock records. A missing
+catalog disables editing until the server-library snapshot is available.
+
 `/worlds` lists the configured game world and opens its local details with
 `?world=<name>`. It uses the application's database for online players and the
 native `server_config.players_record` value. The detail page includes status,
@@ -204,9 +217,9 @@ Description panels reuse the same table frame and native shadow layers, with
 stacked title/description cards. Section navigation uses a shared small frame;
 long introductions use the shared prose style. `headlineAchievements`,
 `achievementGrade` and `backToTop` are optional external asset keys. Missing
-artwork retains readable titles and working controls. The public achievement
-catalog does not yet add character showcase selection or achievement highscores;
-those require the player's earned-achievement data and account permissions.
+artwork retains readable titles and working controls. Character showcases reuse
+the table frame, bordered surface and grade symbols in both themes. Achievement
+highscores remain a separate pending flow.
 
 In the default theme, pages containing section navigation use document scrolling
 through the intermediate shell containers. This lets sticky navigation work

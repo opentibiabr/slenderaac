@@ -2,9 +2,13 @@
 	import { page } from '$app/stores';
 
 	export let grade: number;
+	export let inline = false;
 </script>
 
-<span class="grade-symbols" aria-hidden="true"
+<span
+	class="grade-symbols"
+	class:grade-symbols--inline={inline}
+	aria-hidden="true"
 	>{#each Array(grade) as _}{#if $page.data.themeAssets?.achievementGrade}<img
 				src={$page.data.themeAssets.achievementGrade}
 				alt=""
@@ -18,6 +22,11 @@
 		gap: 2px;
 		margin-left: 10px;
 		height: 16px;
+	}
+	.grade-symbols--inline {
+		margin-left: 0;
+		height: 18px;
+		vertical-align: baseline;
 	}
 	:global(.theme-classic) img {
 		width: 18px;

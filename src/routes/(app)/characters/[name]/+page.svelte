@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
+	import CharacterAchievements from '$lib/components/ui/CharacterAchievements.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import DeathNotice from '$lib/components/ui/DeathNotice.svelte';
@@ -72,6 +73,10 @@
 					<dd>{formatGoldCoins(data.balance)}</dd>
 				</div>
 			{/if}
+			<div class="data-row">
+				<dt>Achievement Points</dt>
+				<dd>{data.achievementPoints ?? 'Unavailable'}</dd>
+			</div>
 			{#if character.guild != null}
 				<div class="data-row">
 					<dt>{$_('guilds.membership')}</dt>
@@ -97,6 +102,10 @@
 						.settings.comment}</pre>
 			</div>
 		{/if}
+
+		<CharacterAchievements
+			achievements={data.achievements ?? []}
+			available={data.achievementsAvailable} />
 
 		{#if skills}
 			<h3 class="h4">{$_('skills.skills')}</h3>

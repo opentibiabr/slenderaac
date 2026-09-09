@@ -1,3 +1,9 @@
+import {
+	MAX_SHOWCASE_ACHIEVEMENTS,
+	selectedAchievements,
+} from '$lib/achievement-showcase';
+import { loadAchievements } from '$lib/server/catalog';
+import { nativeCharacterAchievements } from '$lib/server/character-achievements';
 import { dbToItem } from '$lib/server/items';
 import {
 	dbToPlayer,
@@ -24,6 +30,11 @@ export const load = (async ({ params }) => {
 			lastlogin: true,
 			account_id: true,
 			settings: true,
+			achievement_showcase: {
+				select: { achievement_id: true },
+				orderBy: { position: 'asc' },
+				take: MAX_SHOWCASE_ACHIEVEMENTS,
+			},
 			deaths: {
 				take: 20,
 				orderBy: { time: 'desc' },
@@ -53,10 +64,12 @@ export const load = (async ({ params }) => {
 					},
 					select: { ...PlayerSelectForList },
 				})
-		  ).map(dbToPlayer);
+			).map(dbToPlayer);
 
 	const showSkills = player.settings?.show_skills ?? true;
 	const showInventory = player.settings?.show_inventory ?? true;
+	const catalog = await loadAchievements();
+	const achievements = await nativeCharacterAchievements(player.id, catalog);
 
 	const inventory = !showInventory
 		? []
@@ -66,7 +79,7 @@ export const load = (async ({ params }) => {
 						player_id: player.id,
 					},
 				})
-		  ).map(dbToItem);
+			).map(dbToItem);
 
 	return {
 		character: dbToPlayer({ ...player, town: town }),
@@ -75,5 +88,11 @@ export const load = (async ({ params }) => {
 		skills: showSkills ? dbToSkills(player) : null,
 		inventory: showInventory ? inventory : null,
 		accountCharacters,
+		achievementPoints: achievements.points,
+		achievementsAvailable: catalog.length > 0,
+		achievements: selectedAchievements(
+			player.achievement_showcase.map((entry) => entry.achievement_id),
+			achievements.earned,
+		),
 	};
 }) satisfies PageServerLoad;

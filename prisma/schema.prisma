@@ -698,6 +698,7 @@ model Players {
   online                                            PlayerOnline?
   posted_articles                                   News[]
   settings                                          PlayerSettings?
+  achievement_showcase                              AchievementShowcase[]
 
   @@index([account_id], map: "account_id")
   @@index([vocation], map: "vocation")
@@ -976,6 +977,17 @@ model PlayerSettings {
 
   @@index([player_id], map: "player_id")
   @@map("slender_player_settings")
+}
+
+model AchievementShowcase {
+  player_id      Int
+  achievement_id Int
+  position       Int
+  player         Players @relation(fields: [player_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([player_id, achievement_id])
+  @@unique([player_id, position])
+  @@map("slender_achievement_showcase")
 }
 
 model Monsters {

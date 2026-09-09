@@ -91,6 +91,12 @@
 									<a
 										href={themePreviewHref(
 											$page.url,
+											`/account/characters/${encodeURIComponent(character.name)}/achievements`,
+										)}
+										class="anchor">Achievements</a>
+									<a
+										href={themePreviewHref(
+											$page.url,
 											`/account/characters/${encodeURIComponent(character.name)}/delete`,
 										)}
 										class="anchor"

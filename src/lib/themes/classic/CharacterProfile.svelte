@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import CharacterAchievements from '$lib/components/ui/CharacterAchievements.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import DeathNotice from '$lib/components/ui/DeathNotice.svelte';
@@ -34,6 +35,10 @@
 				<tr><td>Vocation:</td><td>{vocationString(character.vocation)}</td></tr>
 				<tr><td>Level:</td><td>{character.level}</td></tr>
 				<tr><td>Residence:</td><td>{character.townName}</td></tr>
+				<tr
+					><td>Achievement Points:</td><td
+						>{data.achievementPoints ?? 'Unavailable'}</td
+					></tr>
 				{#if character.guild}<tr
 						><td>Guild Membership:</td><td
 							>{character.guild.rank} of
@@ -54,6 +59,9 @@
 			</tbody>
 		</table>
 	</PagePanel>
+	<CharacterAchievements
+		achievements={data.achievements ?? []}
+		available={data.achievementsAvailable} />
 	{#if data.skills}
 		<PagePanel title="Skills" surface
 			><table class="classic-data-table classic-data-table--details">
