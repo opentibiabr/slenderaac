@@ -62,7 +62,7 @@
 	tabindex="0"
 	href={href ? themePreviewHref($page.url, href) : null}
 	{type}
-	disabled={disabled || $loading}
+	disabled={disabled || $loading || undefined}
 	data-sveltekit-noscroll={noscroll ? true : undefined}
 	{form}
 	{formaction}
