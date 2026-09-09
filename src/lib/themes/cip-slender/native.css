@@ -48,7 +48,7 @@
 	box-sizing: border-box;
 	align-items: center;
 	justify-content: center;
-	flex: 0 0 135px;
+	flex: none;
 	width: 135px;
 	height: 25px;
 	min-height: 25px;
@@ -154,6 +154,113 @@
 	justify-content: space-between;
 	gap: 10px;
 	margin: 10px 0;
+}
+.theme-cip-slender .cip-native-content .cip-preserve-lines {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	margin: 5px 0;
+}
+.theme-cip-slender .cip-native-content .cip-data-table tr,
+.theme-cip-slender .cip-native-content .cip-data-table tbody {
+	border-width: 0;
+}
+.theme-cip-slender .cip-native-content .cip-data-table .font-semibold {
+	font-weight: normal;
+}
+.theme-cip-slender
+	.cip-native-content
+	:is(.h1, .h2, .h3, .h4, .h5, .label, .step-header) {
+	font-family: inherit;
+	color: inherit;
+}
+.theme-cip-slender
+	.cip-native-content
+	:is(.h1, .h2, .h3, .h4, .h5, .step-header) {
+	font-size: 13.333333px;
+	font-weight: bold;
+	line-height: normal;
+}
+.theme-cip-slender .cip-native-content .label {
+	font-size: inherit;
+	font-weight: bold;
+}
+.theme-cip-slender .cip-native-content .label > :is(input, select, textarea) {
+	font-weight: normal;
+}
+.theme-cip-slender
+	.cip-native-content
+	:is(.card, .data-table, .data-row, .table-container, .table) {
+	border-radius: 0;
+	box-shadow: none;
+	color: inherit;
+	background: transparent;
+	font: inherit;
+}
+.theme-cip-slender
+	.cip-native-content
+	:is(.data-row, .table tr):nth-child(odd) {
+	background: rgb(212 192 161);
+}
+.theme-cip-slender
+	.cip-native-content
+	:is(.data-row, .table tr):nth-child(even) {
+	background: rgb(241 224 198);
+}
+.theme-cip-slender .cip-native-content .table :is(th, td) {
+	padding: 2px 5px !important;
+	border: 0;
+	font: inherit;
+	color: inherit;
+}
+.theme-cip-slender .cip-native-content .data-row {
+	padding: 2px 5px;
+	border: 0;
+}
+.theme-cip-slender .cip-native-content :is(.flex-row, .cip-actions) {
+	flex-wrap: wrap;
+}
+.theme-cip-slender .cip-native-content .cip-actions {
+	display: flex;
+	gap: 5px;
+	margin-top: 10px;
+}
+.theme-cip-slender .cip-native-content .cip-account-section > .h3 {
+	display: none;
+}
+.theme-cip-slender .cip-native-content .divider {
+	border-color: #7a6044;
+}
+.theme-cip-slender .cip-native-content .radio-group {
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	padding: 0;
+	gap: 5px;
+	flex-wrap: wrap;
+}
+.theme-cip-slender .cip-native-content .cip-stacked-form {
+	gap: 12px;
+	padding: 3px 5px;
+}
+.theme-cip-slender
+	.cip-native-content
+	.cip-stacked-form
+	> .flex-row:not(:last-child) {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 12px;
+}
+.theme-cip-slender .cip-native-content .cip-stacked-form .label {
+	display: grid;
+	grid-template-columns: 155px minmax(80px, 214px);
+	align-items: start;
+	gap: 5px;
+}
+@media (max-width: 767px) {
+	.theme-cip-slender .cip-native-content .cip-stacked-form .label {
+		grid-template-columns: 1fr;
+	}
 }
 @media (max-width: 767px) {
 	.theme-cip-slender .cip-native-content .cip-filter-grid {

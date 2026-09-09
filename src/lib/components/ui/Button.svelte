@@ -3,7 +3,10 @@
 	import Fa from 'svelte-fa';
 	import { tooltip } from 'svooltip';
 
+	import { page } from '$app/stores';
+
 	import { loading } from '$lib/stores/loading';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let type: 'button' | 'submit' | 'reset' | null = null;
 	export let href: string | null = null;
@@ -57,7 +60,7 @@
 	{role}
 	aria-disabled={disabled || $loading}
 	tabindex="0"
-	{href}
+	href={href ? themePreviewHref($page.url, href) : null}
 	{type}
 	disabled={disabled || $loading}
 	data-sveltekit-noscroll={noscroll ? true : undefined}

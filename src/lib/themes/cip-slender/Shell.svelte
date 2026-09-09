@@ -101,7 +101,8 @@
 	$: isEventSchedulePage = layout === 'compact-wide';
 	$: isCompactNewsToolPage = layout !== 'news';
 	$: showNewsTicker = !isCompactNewsToolPage && tickerItems.length > 0;
-	$: showAuxiliaryThemeboxes = !isCompactNewsToolPage;
+	$: showAuxiliaryThemeboxes =
+		!isCompactNewsToolPage || !!nativePage?.auxiliaryThemeboxes;
 	$: showCipGrid = $page.url.searchParams.get('cipGrid') === '1';
 	$: themeSwitchHref = (() => {
 		const nextUrl = new URL($page.url.href);
@@ -1158,7 +1159,7 @@
 				</a>
 			{/if}
 
-			{#if showAuxiliaryThemeboxes && promoPollBox}
+			{#if !isCompactNewsToolPage && promoPollBox}
 				<div
 					class="theme-cip-slender__official-box theme-cip-slender__official-box--poll"
 					style={pollBoxStyle}>
