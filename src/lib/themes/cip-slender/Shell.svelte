@@ -16,11 +16,7 @@
 	import type { InformationPresentation } from '$lib/information-content';
 	import { themePreviewHref } from '$lib/themes/preview';
 
-	import {
-		PUBLIC_DOWNLOAD_URL,
-		PUBLIC_TITLE,
-		PUBLIC_WIKI_URL,
-	} from '$env/static/public';
+	import { PUBLIC_DOWNLOAD_URL, PUBLIC_TITLE } from '$env/static/public';
 
 	import type { LayoutData } from '../../../routes/(app)/$types';
 	import type { CipNewsReference } from './reference-types';
@@ -845,20 +841,16 @@
 							channels: formattedTwitchChannels,
 							viewers: formattedTwitchViewers,
 						},
-						...(PUBLIC_WIKI_URL || presentation
-							? [
-									{
-										href: presentationHref(
-											'youtube',
-											'https://www.youtube.com/channel/UCg5vFOB3tN8KGcJDyk6QQzQ/home',
-										),
-										label: 'YouTube',
-										icon: topIconYoutube,
-										channels: formattedYoutubeChannels,
-										viewers: formattedYoutubeViewers,
-									},
-								]
-							: []),
+						{
+							href: presentationHref(
+								'youtube',
+								'https://www.youtube.com/channel/UCg5vFOB3tN8KGcJDyk6QQzQ/home',
+							),
+							label: 'YouTube',
+							icon: topIconYoutube,
+							channels: formattedYoutubeChannels,
+							viewers: formattedYoutubeViewers,
+						},
 					]}
 					signal={topIconSignal}
 					eye={topIconEye}
@@ -1089,21 +1081,19 @@
 								<Fa icon={faDiscord} />
 							{/if}
 						</a>
-						{#if PUBLIC_WIKI_URL || presentation}
-							<a
-								href={presentationHref(
-									'networkYoutube',
-									'https://www.youtube.com/@cipsoft',
-								)}
-								target="_blank"
-								rel="noreferrer">
-								{#if networkYoutube}
-									<img src={networkYoutube} alt="YouTube" />
-								{:else}
-									<Fa icon={faBookBookmark} />
-								{/if}
-							</a>
-						{/if}
+						<a
+							href={presentationHref(
+								'networkYoutube',
+								'https://www.youtube.com/@cipsoft',
+							)}
+							target="_blank"
+							rel="noreferrer">
+							{#if networkYoutube}
+								<img src={networkYoutube} alt="YouTube" />
+							{:else}
+								<Fa icon={faBookBookmark} />
+							{/if}
+						</a>
 					</div>
 				</div>
 			{/if}
