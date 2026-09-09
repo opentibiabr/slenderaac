@@ -2,6 +2,10 @@
 	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
+	import { themePreviewHref } from '$lib/themes/preview';
+
 	let serverOnline: boolean;
 	let onlinePlayerCount: number;
 
@@ -19,7 +23,7 @@
 </script>
 
 <a
-	href="/online"
+	href={themePreviewHref($page.url, '/online')}
 	class="text-xs px-2 rounded-full py-1 flex flex-row items-center gap-1 bg-surface-200/75 whitespace-nowrap">
 	{#if serverOnline}
 		<div class="w-2 h-2 rounded-full bg-success-500" />

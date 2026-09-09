@@ -4,9 +4,12 @@
 	import { _ } from 'svelte-i18n';
 	import { tooltip } from 'svooltip';
 
+	import { page } from '$app/stores';
+
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import { type Player, vocationString } from '$lib/players';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let highscores: Player[] = [];
 	export let accountCharacters: Player[] | null = null;
@@ -22,7 +25,10 @@
 	<article class="py-2 px-4 flex flex-col gap-2">
 		{#each highscores as character, i}
 			<a
-				href="/characters/{character.name}"
+				href={themePreviewHref(
+					$page.url,
+					`/characters/${encodeURIComponent(character.name)}`,
+				)}
 				class="flex flex-row items-center hover:bg-tertiary-400/50 -mx-4 px-4">
 				<span
 					class="badge-icon variant-filled !text-white"
@@ -78,7 +84,10 @@
 		<article class="py-2 px-4 flex flex-col gap-2">
 			{#each accountCharacters as character}
 				<a
-					href="/characters/{character.name}"
+					href={themePreviewHref(
+						$page.url,
+						`/characters/${encodeURIComponent(character.name)}`,
+					)}
 					class="flex flex-row items-center hover:bg-tertiary-400/50 -mx-4 px-4">
 					<AnimatedOutfit
 						outfit={character}
