@@ -48,8 +48,8 @@
 {#if $currentPage.data.selectedTheme === 'classic'}
 	<ClassicHighscores {data} />
 {:else}
-	<div class="flex flex-col gap-2">
-		<form bind:this={form} class="flex flex-row gap-2" method="get">
+	<div class="flex flex-col gap-2 min-w-0 max-w-full">
+		<form bind:this={form} class="flex flex-row flex-wrap gap-2" method="get">
 			{#each Array.from(previewParameters) as [name, value]}
 				<input type="hidden" {name} {value} />
 			{/each}
