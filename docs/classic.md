@@ -22,6 +22,25 @@ Font binaries and their license remain in the external pack. The asset endpoint
 also accepts TTF with its font MIME type; scripts, stylesheets, SVG and traversal
 paths remain blocked.
 
+Every menu category title uses `MenuLabel`, in both the desktop menu and mobile
+drawer. Existing label images retain their 116x22px slot and one-pixel vertical
+offset inside the 32px category row. Configured names and missing images use the
+same slot, centered text, shared uncial font, 16px size, 22px line height, compact
+letter spacing, `#d9b498` color and black shadow. Long names are ellipsized without
+resizing the row or moving its icon and toggle. Keep the complete name in the
+accessible toggle label. Source images retain their original glyphs; the dynamic
+font is the pack's existing adaptation described above.
+
+New categories must use this component instead of a raw text span, a page
+headline or category-specific typography. In particular, `About <server name>`
+must not acquire a smaller font or separate offset to fit a sample server name.
+It always reads the configured identity; a source label image cannot replace it.
+Image failures fall back to the same text treatment, including failures before
+hydration, and a changed image URL can restore the image. After editing the
+component, compare unchanged label images pixel for pixel, then check a configured
+name, a long name, missing-image recovery and desktop/mobile menu toggles. Preserve
+the shared shell and scrollbar invariant while making title-only changes.
+
 Numeric frame/surface dimensions and the sprite border switch are Classic-only
 calibration inputs. The default theme intentionally uses fluid cards and an
 internally scrollable table surface instead of inheriting those pixel widths.

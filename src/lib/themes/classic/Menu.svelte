@@ -22,6 +22,7 @@
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
+	import MenuLabel from './MenuLabel.svelte';
 	import { classicAsset } from './theme';
 
 	type StaticPage = {
@@ -149,7 +150,6 @@
 		community: classicAsset(assets, 'menuLabelCommunity'),
 		library: classicAsset(assets, 'menuLabelLibrary'),
 		shop: classicAsset(assets, 'menuLabelShop'),
-		about: classicAsset(assets, 'menuLabelAbout'),
 		guides: classicAsset(assets, 'menuLabelGameGuides'),
 		characterTrade: classicAsset(assets, 'menuLabelCharacterTrade'),
 		account: classicAsset(assets, 'menuLabelAccount'),
@@ -225,14 +225,7 @@
 			{:else}
 				<Fa icon={faNewspaper} />
 			{/if}
-			{#if menuLabels.news}
-				<img
-					class="theme-classic-menu__label"
-					src={menuLabels.news}
-					alt={$_('news')} />
-			{:else}
-				<span>{$_('news')}</span>
-			{/if}
+			<MenuLabel text={$_('news')} image={menuLabels.news} />
 			<label
 				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-news-toggle`}
@@ -274,9 +267,7 @@
 				{:else}
 					<Fa icon={faBookBookmark} />
 				{/if}
-				<span
-					class="theme-classic-menu__text-label theme-classic-menu__server-label"
-					title={aboutLabel}>{aboutLabel}</span>
+				<MenuLabel text={aboutLabel} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -310,14 +301,7 @@
 				{:else}
 					<Fa icon={faBookBookmark} />
 				{/if}
-				{#if menuLabels.guides}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.guides}
-						alt="Game Guides" />
-				{:else}
-					<span class="theme-classic-menu__text-label">Game Guides</span>
-				{/if}
+				<MenuLabel text="Game Guides" image={menuLabels.guides} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -351,14 +335,7 @@
 				{:else}
 					<Fa icon={faBookBookmark} />
 				{/if}
-				{#if menuLabels.library}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.library}
-						alt={$_('library')} />
-				{:else}
-					<span>{$_('library')}</span>
-				{/if}
+				<MenuLabel text={$_('library')} image={menuLabels.library} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -420,14 +397,7 @@
 				{:else}
 					<Fa icon={faPeopleArrows} />
 				{/if}
-				{#if menuLabels.community}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.community}
-						alt={$_('community')} />
-				{:else}
-					<span>{$_('community')}</span>
-				{/if}
+				<MenuLabel text={$_('community')} image={menuLabels.community} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -463,14 +433,7 @@
 				{:else}
 					<Fa icon={faPeopleArrows} />
 				{/if}
-				{#if menuLabels.forum}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.forum}
-						alt="Forum" />
-				{:else}
-					<span>Forum</span>
-				{/if}
+				<MenuLabel text="Forum" image={menuLabels.forum} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -512,14 +475,7 @@
 				{:else}
 					<Fa icon={faUser} />
 				{/if}
-				{#if menuLabels.account}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.account}
-						alt={$_('my-account')} />
-				{:else}
-					<span>{$_('my-account')}</span>
-				{/if}
+				<MenuLabel text={$_('my-account')} image={menuLabels.account} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -558,14 +514,7 @@
 				{:else}
 					<Fa icon={faGifts} />
 				{/if}
-				{#if menuLabels.characterTrade}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.characterTrade}
-						alt="Char Bazaar" />
-				{:else}
-					<span class="theme-classic-menu__text-label">Char Bazaar</span>
-				{/if}
+				<MenuLabel text="Char Bazaar" image={menuLabels.characterTrade} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -611,14 +560,7 @@
 				{:else}
 					<Fa icon={faBookBookmark} />
 				{/if}
-				{#if menuLabels.support}
-					<img
-						class="theme-classic-menu__label"
-						src={menuLabels.support}
-						alt="Support" />
-				{:else}
-					<span>Support</span>
-				{/if}
+				<MenuLabel text="Support" image={menuLabels.support} />
 			</span>
 			<label
 				class="theme-classic-menu__header-hitbox"
@@ -831,42 +773,12 @@
 		filter: none;
 	}
 
-	:global(.theme-classic) .theme-classic-menu__text-label {
-		font-family: ClassicHeadline, Georgia, serif;
-		font-size: 17px;
-		font-weight: 400;
-		letter-spacing: 0;
-		text-shadow:
-			1px 1px 0 rgb(0 0 0),
-			0 0 4px rgb(0 0 0 / 0.72);
-	}
-	:global(.theme-classic) .theme-classic-menu__server-label {
-		min-width: 0;
-		width: 116px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		font-size: 14px;
-	}
-
-	:global(.theme-classic)
-		.theme-classic-menu
-		h2
-		> img:not(.theme-classic-menu__label),
-	:global(.theme-classic)
-		.theme-classic-menu__category-link
-		> img:not(.theme-classic-menu__label) {
+	:global(.theme-classic) .theme-classic-menu h2 > img,
+	:global(.theme-classic) .theme-classic-menu__category-link > img {
 		width: 32px;
 		height: 32px;
 		flex: 0 0 32px;
 		object-fit: contain;
-	}
-
-	:global(.theme-classic) .theme-classic-menu__label {
-		width: 116px;
-		height: 22px;
-		object-fit: contain;
-		transform: translateY(1px);
 	}
 
 	:global(.theme-classic) .theme-classic-menu__toggle-input {
