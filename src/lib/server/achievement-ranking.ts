@@ -3,14 +3,18 @@ import { prisma } from './prisma';
 
 type PointRow = { key_name: string; value: Uint8Array | null };
 type ReadRows = (after: string) => Promise<PointRow[]>;
+type PointSnapshot = {
+	points: ReadonlyMap<number, number | null>;
+	updatedAt: Date;
+};
 const BATCH_SIZE = 1000;
 const CACHE_MS = 30_000;
 
 /** Cache only native point scalars. Player visibility is checked for each request. */
 export function createAchievementPointCache(read: ReadRows, now = Date.now) {
-	let snapshot: ReadonlyMap<number, number | null> | undefined;
+	let snapshot: PointSnapshot | undefined;
 	let expires = 0;
-	let pending: Promise<ReadonlyMap<number, number | null>> | undefined;
+	let pending: Promise<PointSnapshot> | undefined;
 	async function refresh() {
 		const points = new Map<number, number | null>();
 		let after = '';
@@ -28,8 +32,9 @@ export function createAchievementPointCache(read: ReadRows, now = Date.now) {
 			}
 			after = rows.at(-1)?.key_name ?? after;
 		} while (rows.length === BATCH_SIZE);
-		snapshot = points;
-		expires = now() + CACHE_MS;
+		const timestamp = now();
+		snapshot = { points, updatedAt: new Date(timestamp) };
+		expires = timestamp + CACHE_MS;
 		return snapshot;
 	}
 	return async () => {

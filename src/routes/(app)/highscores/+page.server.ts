@@ -6,6 +6,7 @@ import {
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { isSkill, skillToColumn } from '$lib/server/skills';
+import { configuredWorld } from '$lib/server/worlds';
 
 import type { PageServerLoad } from './$types';
 
@@ -18,6 +19,7 @@ function positiveInteger(value: string | null, fallback: number) {
 }
 
 export const load = (async ({ url }) => {
+	const world = await configuredWorld();
 	const skillParam = url.searchParams.get('skill');
 	const skill =
 		skillParam === 'achievements' || isSkill(skillParam)
@@ -37,7 +39,7 @@ export const load = (async ({ url }) => {
 		vocation: vocation === 'all' ? undefined : { in: vocationIds(vocation) },
 	};
 	if (skill === 'achievements') {
-		const points = await nativeAchievementPoints();
+		const { points, updatedAt } = await nativeAchievementPoints();
 		const ids: number[] = [];
 		let after = 0;
 		let players: { id: number }[];
@@ -68,6 +70,8 @@ export const load = (async ({ url }) => {
 		);
 		return {
 			title: 'Highscores',
+			world,
+			updatedAt,
 			characters: entries.flatMap((entry, index): PlayerWithRank[] => {
 				const player = playersById.get(entry.playerId);
 				return player
@@ -106,6 +110,8 @@ export const load = (async ({ url }) => {
 
 	return {
 		title: 'Highscores',
+		world,
+		updatedAt: new Date(),
 		characters: characters.map(dbToPlayer).map(
 			(player, index): PlayerWithRank => ({
 				...player,

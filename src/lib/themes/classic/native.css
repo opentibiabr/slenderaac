@@ -130,6 +130,13 @@
 }
 .theme-classic
 	.classic-native-content
+	.classic-data-table
+	.classic-data-cell--numeric {
+	text-align: right;
+	white-space: nowrap;
+}
+.theme-classic
+	.classic-native-content
 	.classic-data-table--labels
 	th[scope='row'] {
 	box-sizing: content-box;

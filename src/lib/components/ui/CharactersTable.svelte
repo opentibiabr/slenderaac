@@ -7,6 +7,7 @@
 
 	import { page } from '$app/stores';
 
+	import type { Pagination } from '$lib/pagination';
 	import type { Order, Sort } from '$lib/sorting';
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import TableHeader from '$lib/components/ui/TableHeader.svelte';
@@ -33,6 +34,9 @@
 	export let order: Order = 'asc';
 	export let skill: string | null = null;
 	export let title = 'Characters';
+	export let worldName: string | undefined = undefined;
+	export let updatedAt: Date | undefined = undefined;
+	export let pagination: Pagination | undefined = undefined;
 	$: skillLabel =
 		highscoreCategories.find((category) => category.value === skill)?.label ??
 		toProperCase(skill ?? '');
@@ -59,6 +63,9 @@
 		{sort}
 		{order}
 		{title}
+		{worldName}
+		{updatedAt}
+		{pagination}
 		on:selected />
 {:else}
 	<div class="table-container">

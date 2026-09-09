@@ -78,7 +78,7 @@ void test('point refresh batches indexed keys and only accepts canonical native 
 					],
 		);
 	});
-	const points = await read();
+	const { points } = await read();
 	assert.deepEqual(afterValues, ['', 'player.10999.achievements.points']);
 	assert.equal(points.size, 1001);
 	assert.equal(points.get(11000), null);
@@ -103,6 +103,7 @@ void test('simultaneous reads share refresh, expired failures reject and later r
 	);
 	const [first, second] = await Promise.all([read(), read()]);
 	assert.equal(first, second);
+	assert.equal(first.updatedAt.getTime(), 0);
 	assert.equal(reads, 1);
 	now = 29_999;
 	assert.equal(await read(), first);
@@ -111,6 +112,8 @@ void test('simultaneous reads share refresh, expired failures reject and later r
 	fail = true;
 	await assert.rejects(read(), /read failed/);
 	fail = false;
-	assert.equal((await read()).get(7), 3);
+	const refreshed = await read();
+	assert.equal(refreshed.points.get(7), 3);
+	assert.equal(refreshed.updatedAt.getTime(), 30_000);
 	assert.equal(reads, 3);
 });
