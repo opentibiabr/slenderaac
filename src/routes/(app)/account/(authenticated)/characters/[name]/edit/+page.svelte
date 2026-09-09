@@ -19,8 +19,8 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	const settings = data.player.settings;
-	const pronoun = data.player.pronoun.toString();
+	$: settings = data.player.settings;
+	$: pronoun = data.player.pronoun.toString();
 
 	async function close() {
 		await goto(themePreviewHref($page.url, '/account'), { noScroll: true });
