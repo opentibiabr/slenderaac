@@ -8,6 +8,7 @@ import type {
 	CipNewsReference,
 	ReferenceNode,
 } from '$lib/themes/cip-slender/reference-types';
+import { referenceDate } from '$lib/server/news/dates';
 
 import { env } from '$env/dynamic/private';
 
@@ -93,6 +94,7 @@ export async function loadNewsReference(
 					typeof article.id === 'string' &&
 					typeof article.title === 'string' &&
 					typeof article.date === 'string' &&
+					Number.isFinite(referenceDate(article.date).getTime()) &&
 					typeof article.icon === 'string' &&
 					validNodes(article.body),
 			) ||
@@ -100,6 +102,7 @@ export async function loadNewsReference(
 				(item) =>
 					item &&
 					typeof item.date === 'string' &&
+					Number.isFinite(referenceDate(item.date).getTime()) &&
 					typeof item.text === 'string' &&
 					typeof item.icon === 'string',
 			)
