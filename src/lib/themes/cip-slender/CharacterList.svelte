@@ -36,7 +36,9 @@
 					{#if ranked}<th>Rank</th>{/if}
 					<th
 						>{#if sort}<a href={sortHref('name')}>Name</a>{:else}Name{/if}</th>
-					<th>Vocation</th>
+					<th
+						>{#if sort}<a href={sortHref('vocation')}>Vocation</a
+							>{:else}Vocation{/if}</th>
 					<th
 						>{#if sort}<a href={sortHref('level')}>Level</a
 							>{:else}Level{/if}</th>

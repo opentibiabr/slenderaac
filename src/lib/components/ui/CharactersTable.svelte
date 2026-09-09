@@ -30,6 +30,7 @@
 	export let sort: Sort | null = null;
 	export let order: Order = 'asc';
 	export let skill: string | null = null;
+	export let title = 'Characters';
 
 	const dispatch = createEventDispatcher();
 
@@ -43,7 +44,14 @@
 </script>
 
 {#if $page.data.selectedTheme === 'cip-slender'}
-	<CipCharacterList {characters} {ranked} {skill} {sort} {order} on:selected />
+	<CipCharacterList
+		{characters}
+		{ranked}
+		{skill}
+		{sort}
+		{order}
+		{title}
+		on:selected />
 {:else}
 	<div class="table-container">
 		<table class="table table-hover table-auto">

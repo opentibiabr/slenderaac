@@ -949,8 +949,10 @@
 								(nativePage ? data.themeAssets?.[nativePage.headline] : null) ??
 								null)}
 				headlineWidth={information?.headline.width ??
+					nativePage?.headlineWidth ??
 					(isEventSchedulePage ? 192 : 250)}
 				headlineHeight={information?.headline.height ??
+					nativePage?.headlineHeight ??
 					(isEventSchedulePage ? 32 : 28)}
 				compact={isCompactNewsToolPage}
 				paperMinHeight={nativePage
