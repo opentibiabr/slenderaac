@@ -116,6 +116,14 @@ for saved preview links or server configuration. Aliases cannot shadow registere
 themes or resolve ambiguously. Preview aliases redirect to the canonical URL;
 missing or invalid aliases retain normal fallback behavior.
 
+The shared Layout menu is enabled by default and uses the theme registry for its
+options. `SLENDER_THEME` sets the initial layout; `SLENDER_THEME_SWITCHER_ENABLED=false`
+hides the menu and enforces that layout on the server after an app restart. With
+switching enabled, the selected layout persists for the browser session, including
+links and forms without preview parameters. Explicit preview URLs override that
+preference. With switching disabled, the server clears the preference and strips
+preview/comparison parameters, including aliases, without changing page filters.
+
 `SERVER_NAME` supplies the server identity in navigation, headings, guides,
 promotions and accessible labels. It uses the same server-side configuration as the rest of SlenderAAC, with
 `OpenTibia` as a fallback for an empty value. `/about/company` describes OpenTibiaBR
@@ -220,7 +228,8 @@ The pack's presentation data supplies current promo assets/text, menu destinatio
 sidebar links and calendar colors. The footer identifies SlenderAAC and OpenTibiaBR.
 Routes with local equivalents remain
 local; public modules without an equivalent use the local unavailable page.
-Internal preview links preserve `themePreview` and the active comparison flags.
+When layout switching is enabled, internal preview links preserve `themePreview`
+and the active comparison flags.
 Keep that state across server redirects and submitted forms as well as anchors.
 Account authentication redirects retain the preview on the login URL and local
 return destination. Highscore filters and pagination retain skill, vocation,
@@ -264,6 +273,14 @@ separate from the query-driven Screenshots gallery and its previous/next control
 ## Visual verification
 
 ### Viewport and scrollbar invariant
+
+The shared layout switcher sits outside the desktop shell and does not add flow
+height or alter background/column offsets. Its mobile treatment provides a
+separate row above the theme header so it does not cover navigation controls.
+Keep one shared switcher for all present and future themes; do not add per-theme
+copies. Test opening the menu and switching both ways as part of geometry checks.
+Keep data preloading disabled on switcher links: preview loads save the session
+choice, so hovering an unselected option must not change the active preference.
 
 Classic reserves vertical scrollbar space at the document root with
 `html:has(.theme-classic) { scrollbar-gutter: stable; }`. This is a shared runtime

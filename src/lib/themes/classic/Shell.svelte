@@ -12,7 +12,7 @@
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
-	import { beforeNavigate, goto } from '$app/navigation';
+	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import type { InformationPresentation } from '$lib/information-content';
@@ -105,13 +105,6 @@
 	$: showAuxiliaryThemeboxes =
 		!isCompactNewsToolPage || !!nativePage?.auxiliaryThemeboxes;
 	$: showClassicGrid = $page.url.searchParams.get('classicGrid') === '1';
-	$: themeSwitchHref = (() => {
-		const nextUrl = new URL($page.url.href);
-		nextUrl.searchParams.set('themePreview', 'legbone');
-		nextUrl.searchParams.delete('classicGrid');
-
-		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
-	})();
 	$: fontStyle = headlineFontStyle(data.themeAssets?.headlineFont);
 	$: homeHref = makeClassicPreviewHref($page.url, '/');
 	$: accountHref = makeClassicPreviewHref($page.url, '/account');
@@ -604,19 +597,7 @@
 		return nextUrl;
 	}
 
-	beforeNavigate(({ to, cancel, type }) => {
-		drawerClose();
-		if (
-			type !== 'link' ||
-			!to ||
-			to.url.origin !== $page.url.origin ||
-			!$page.url.searchParams.has('themePreview') ||
-			to.url.searchParams.has('themePreview')
-		)
-			return;
-		cancel();
-		void goto(themePreviewHref($page.url, to.url.href));
-	});
+	beforeNavigate(drawerClose);
 
 	let onlinePlayerCount = 0;
 	let topbarStats: OnlineCounters = {
@@ -965,12 +946,6 @@
 
 		<aside class="theme-classic__right">
 			<div class="theme-classic__right-spacer">
-				<a
-					class="theme-classic__theme-switch"
-					href={themeSwitchHref}
-					aria-label="Preview normal Slender layout">
-					Slender
-				</a>
 				{#if rightTopper}
 					<img
 						class="theme-classic__pedestal"
@@ -1926,33 +1901,6 @@
 		height: 140px;
 		align-items: flex-end;
 		justify-content: center;
-	}
-
-	.theme-classic .theme-classic__theme-switch {
-		position: absolute;
-		top: 10px;
-		right: -92px;
-		z-index: 6;
-		display: none;
-		width: 82px;
-		height: 20px;
-		align-items: center;
-		justify-content: center;
-		border: 1px solid rgb(92 73 51);
-		background: rgb(15 22 31 / 0.86);
-		color: rgb(246 225 166);
-		font-size: 10px;
-		font-weight: 700;
-		line-height: 1;
-		text-decoration: none;
-		text-shadow: 1px 1px 0 rgb(0 0 0);
-	}
-
-	.theme-classic .theme-classic__theme-switch:hover,
-	.theme-classic .theme-classic__theme-switch:focus {
-		border-color: rgb(180 142 76);
-		background: rgb(52 30 18 / 0.92);
-		color: white;
 	}
 
 	.theme-classic .theme-classic__pedestal {

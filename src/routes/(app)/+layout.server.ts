@@ -3,6 +3,7 @@ import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
 import { PlayerGroup } from '$lib/players';
+import { themeSwitcherEnabled } from '$lib/server/config';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import {
@@ -10,16 +11,40 @@ import {
 	resolveThemeId,
 } from '$lib/server/theme-assets/manifest';
 import { loadPresentationReference } from '$lib/server/theme-assets/presentation-reference';
+import {
+	resolveThemeSelection,
+	themeCookie,
+} from '$lib/server/theme-assets/selection';
 import { parseTimeString } from '$lib/server/utils';
 import { serverName } from '$lib/server/worlds';
-import { normalizeTheme } from '$lib/themes/theme-ids';
 
 import { env } from '$env/dynamic/private';
 import { SERVER_SAVE_TIME } from '$env/static/private';
 
 import type { LayoutServerLoad } from './$types';
 
-export const load = loadFlashMessage(async ({ locals, url }) => {
+export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
+	const { selectedTheme, redirectTo } = await resolveThemeSelection(
+		{
+			configuredTheme: env.SLENDER_THEME,
+			allowSwitching: themeSwitcherEnabled,
+			preference: cookies.get(themeCookie),
+			url,
+		},
+		resolveThemeId,
+	);
+	if (!themeSwitcherEnabled) {
+		cookies.delete(themeCookie, { path: '/' });
+	} else if (url.searchParams.has('themePreview')) {
+		cookies.set(themeCookie, selectedTheme, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: url.protocol === 'https:',
+		});
+	}
+	if (redirectTo) throw redirect(307, redirectTo);
+
 	const highscores = await prisma.players.findMany({
 		where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
 		select: PlayerSelectForList,
@@ -42,17 +67,6 @@ export const load = loadFlashMessage(async ({ locals, url }) => {
 		: null;
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
-	const configuredTheme =
-		(await resolveThemeId(env.SLENDER_THEME)) ??
-		normalizeTheme(env.SLENDER_THEME);
-	const previewTheme = url.searchParams.get('themePreview');
-	const resolvedPreview = await resolveThemeId(previewTheme);
-	const selectedTheme = resolvedPreview ?? configuredTheme;
-	if (resolvedPreview && previewTheme !== resolvedPreview) {
-		const canonical = new URL(url);
-		canonical.searchParams.set('themePreview', selectedTheme);
-		throw redirect(307, canonical.pathname + canonical.search);
-	}
 	const isAdmin = locals.session?.type === AccountType.God;
 	const themeAssetMetadata =
 		selectedTheme === 'classic'
@@ -71,6 +85,7 @@ export const load = loadFlashMessage(async ({ locals, url }) => {
 		accountCharacters: accountCharacters?.map(dbToPlayer),
 		nextServerSave,
 		selectedTheme,
+		themeSwitcherEnabled,
 		themeAssets: themeAssetMetadata.assets,
 		themeAssetWarning: isAdmin ? themeAssetMetadata.warning : null,
 	};

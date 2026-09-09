@@ -189,7 +189,29 @@ or:
 SLENDER_THEME=classic
 ```
 
-`PUBLIC_THEME` may still be used by existing Skeleton/Tailwind `data-theme` behavior, but it is not the runtime layout selector. Layout selection is resolved on the server from `SLENDER_THEME` and only the selected theme id is sent to the client.
+The shared **Layout** menu is enabled by default, including when
+`SLENDER_THEME_SWITCHER_ENABLED` is absent. It switches between registered layouts
+on the current page, retaining filters and anchors. The choice persists for the
+browser session and applies to navigation and form submissions. A valid
+`themePreview` URL takes precedence over that preference; new browser sessions
+start with `SLENDER_THEME`.
+
+To hide the menu and enforce a single layout, set both values in `.env` and restart
+the app:
+
+```env
+SLENDER_THEME=classic
+SLENDER_THEME_SWITCHER_ENABLED=false
+```
+
+The server then ignores and clears the browser preference and removes preview
+parameters from page URLs. Direct preview URLs cannot bypass the lock. Use
+`true` to enable switching again; blank or absent values enable it, while other
+explicit values disable it.
+
+`PUBLIC_THEME` controls existing Skeleton/Tailwind colors, not layout selection.
+The server sends only the selected layout ID and whether switching is enabled;
+environment configuration remains private.
 
 ### External assets
 

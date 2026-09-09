@@ -1,11 +1,17 @@
 import { availableFeatureHref } from '$lib/site-pages';
 
-const previewKeys = [
+export const previewKeys = [
 	'themePreview',
 	'classicReference',
 	'classicGrid',
 	'classicDemo',
 ];
+
+export function themeSelectionHref(current: URL, theme: string): string {
+	const target = new URL(current);
+	target.searchParams.set('themePreview', theme);
+	return target.pathname + target.search + target.hash;
+}
 
 export function themePreviewLoginHref(current: URL): string {
 	if (!current.searchParams.has('themePreview')) return '/account/login';
