@@ -145,6 +145,21 @@
 	width: 15%;
 	font-weight: normal;
 }
+.theme-classic .classic-native-content input[type='checkbox'] {
+	appearance: auto;
+	-webkit-appearance: checkbox;
+	accent-color: auto;
+	background: revert;
+	border: revert;
+	border-radius: revert;
+	box-shadow: none;
+	padding: 0;
+	flex: none;
+	width: 13px;
+	height: 13px;
+	margin: 3px 3px 3px 4px;
+	vertical-align: baseline;
+}
 .theme-classic .classic-native-content input[type='radio'] {
 	appearance: auto;
 	-webkit-appearance: radio;
