@@ -79,6 +79,7 @@ model Accounts {
   passwordReset       PasswordReset?
   accountSessions     AccountSessions[]
   store_history       StoreHistory[]
+  feedback_responses  FeedbackResponse[]
 
   @@map("accounts")
 }
@@ -897,6 +898,37 @@ model WorldQuestResult {
 
   @@index([world_quest_id, published, occurred_at], map: "slender_world_quest_results_public_idx")
   @@map("slender_world_quest_results")
+}
+
+model FeedbackForm {
+  id          String @id @default(cuid())
+  title       String @db.VarChar(255)
+  description String @db.Text
+  questions   Json
+  starts_at   DateTime @db.Date
+  ends_at     DateTime? @db.Date
+  published   Boolean @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  responses   FeedbackResponse[]
+
+  @@index([published, starts_at, ends_at], map: "slender_feedback_forms_public_idx")
+  @@map("slender_feedback_forms")
+}
+
+model FeedbackResponse {
+  id           String @id @default(cuid())
+  form_id      String
+  account_id   Int? @db.UnsignedInt
+  answers      Json
+  submitted_at DateTime @default(now())
+  form         FeedbackForm @relation(fields: [form_id], references: [id], onDelete: Cascade, map: "slender_feedback_responses_form_fk")
+  account      Accounts? @relation(fields: [account_id], references: [id], onDelete: SetNull, map: "slender_feedback_responses_account_fk")
+
+  @@unique([form_id, account_id], map: "slender_feedback_response_account_unique")
+  @@index([submitted_at], map: "slender_feedback_responses_date_idx")
+  @@index([account_id], map: "slender_feedback_responses_account_idx")
+  @@map("slender_feedback_responses")
 }
 
 model StaticPage {

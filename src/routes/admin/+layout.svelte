@@ -81,6 +81,9 @@
 					<a href="/admin/world-quests"><Fa icon={faGlobe} />World Quests</a>
 				</li>
 				<li>
+					<a href="/admin/feedback"><Fa icon={faBookBookmark} />Feedback</a>
+				</li>
+				<li>
 					<a href="/admin/static-pages"
 						><Fa icon={faBookBookmark} />Static Pages</a>
 				</li>
