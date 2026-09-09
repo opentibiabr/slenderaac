@@ -70,10 +70,12 @@ capped at the normal 865px column width. Compare the strip, content frame and
 right rail together at both desktop widths; checking only the article can miss
 a shortened strip above otherwise correct content.
 
-The desktop compact shell uses a 5.5px offset with its 1263px centering width.
-Reducing that offset to 5px shifts every foreground layer half a pixel relative
-to the aligned background and reference text. The normal news, wide calendar and
-narrow-viewport layouts retain their own measured positioning rules.
+News and compact pages share the shell's horizontal sizing and centering rules.
+The wider calendar keeps its explicit variant. Maintain these rules in
+`Shell.svelte`; do not restore separate compact offsets or compensate for a
+viewport difference with page-specific margins. Follow the
+[viewport and scrollbar invariant](#viewport-and-scrollbar-invariant) before
+changing the background or shell geometry.
 
 Desktop pages allow document-level horizontal scrolling when intrinsic content
 exceeds the viewport. Keep the right rail's trailing 10px gutter in that scroll
@@ -242,6 +244,61 @@ separate from the query-driven Screenshots gallery and its previous/next control
 
 ## Visual verification
 
+### Viewport and scrollbar invariant
+
+Classic reserves vertical scrollbar space at the document root with
+`html:has(.theme-classic) { scrollbar-gutter: stable; }`. This is a shared runtime
+guard: short pages, long pages and future routes using the shell retain the same
+available width. It also covers menu expansion, empty/populated results and
+validation messages changing the document height. Keep it on `html`; applying it
+to `body`, the shell or a table does not reserve the document scrollbar's space.
+Do not override it on individual routes. The selector stops applying when Classic
+unmounts, so the default theme retains its own scrolling behavior.
+
+Without this guard, a 15px scrollbar reduced one page's body from 1920px to 1905px
+while a shorter page retained 1920px. Centering then moved both the background
+and every foreground column by 7.5px. Their relative positions could still match,
+so checking only frame-to-background offsets missed the browser viewport cause.
+Do not hardcode a 15px gutter or subtract 7.5px from the shell: scrollbar widths
+depend on the browser, operating system and zoom. Overlay scrollbars do not
+consume the same space. Do not use `stable both-edges`, which also reserves space
+on the other edge and changes the measured centering.
+
+Before accepting any shared layout change, run this regression check in the
+browser where the mismatch was reported, at a fixed viewport and zoom:
+
+1. Open a short Classic page such as `/characters?themePreview=classic` with
+   collapsed optional menu groups. Record the body, background, shell and column
+   rectangles, the computed root `scrollbar-gutter`, viewport dimensions, device
+   pixel ratio and scroll origin.
+2. Expand enough menu groups to make that same page scroll vertically, then
+   collapse them. Confirm the document actually crossed the scrolling threshold.
+   Body/background widths and shell/column x coordinates must stay unchanged in
+   both directions; compare fractional CSS pixels without integer rounding.
+3. Navigate to long content, then to a short page and back. Check the shared
+   anchors again. Intrinsic-width guides and the wide calendar may change center
+   and right-column widths intentionally; compare each of those against its own
+   state, rather than requiring all page families to have identical rectangles.
+4. Switch to the default theme and back. Confirm the Classic selector no longer
+   matches in the default theme and the gutter protection returns with Classic.
+   Repeat at a narrower desktop width and check mobile overflow after changing
+   shared shell rules.
+
+Stop geometry changes if this check fails. Resolve the viewport or scrollbar
+state before adjusting offsets. Verify the usable body/background width as well
+as `innerWidth` and `documentElement.clientWidth`: the latter can still include
+the reserved gutter. A browser using overlay scrollbars alone cannot reproduce
+the original width change; include a browser with space-consuming scrollbars.
+
+Capture screenshots after taking the measurements and verify the rectangles
+again afterward. Some capture helpers temporarily hide scrollbars or resample
+the exported image. If capture changes the viewport, restore the page state
+before comparing pixels. Record actual image dimensions; matching requested
+viewport sizes alone does not establish a valid comparison. Once viewport and
+background-only patches match, freeze the background and correct only the
+measured foreground residual. This check covers shared alignment, not complete
+visual or functional parity of every page.
+
 ### Built-in information pages
 
 `src/lib/information.ts` registers native destinations. The shared link helper
@@ -318,8 +375,9 @@ tables described in [Server library](server-library.md). At the desktop content
 width, the selection panel is 833x85px, with a 531x19px selector and a 135x25px
 submit button. Plain property rows have a 20px cadence; bordered online-player
 rows have a 21px cadence. Additional local properties and player counts determine
-panel height. Compare matching frame origins when scrollbars change the usable
-viewport width; do not move the background to compensate for content length.
+panel height. Verify the shared scrollbar invariant before comparing frame
+origins; do not shift captures or the background to hide a usable-width difference
+caused by content length.
 
 World Quests uses the shared `SectionNavigation`, `DescriptionPanel`,
 `CatalogDetails` and `PagePanel` components with native local records. Linked card

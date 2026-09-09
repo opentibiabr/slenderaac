@@ -1176,6 +1176,9 @@
 </div>
 
 <style>
+	/* Keep short and scrolling pages on the same horizontal anchors.
+	   Reserve the gutter on the document, not on the shell or individual pages.
+	   See docs/classic.md#viewport-and-scrollbar-invariant before changing this. */
 	:global(html:has(.theme-classic)) {
 		scrollbar-gutter: stable;
 	}
