@@ -231,7 +231,7 @@
     "leave": "Leave guild",
     "founded": "{name} was founded on {date}.",
     "balance": "Guild bank account balance: <strong class=\"font-normal\">{balance}</strong> gold.",
-    "leader-label": "<a href=\"/characters/{name}\" class=\"text-semibold text-primary-600-300-token\">{name}</a> is their guild leader.",
+    "leader-label": "{name} is their guild leader.",
     "uninvite": "Revoke invitation",
     "invited-players": "Invited players",
     "edit": "Edit",

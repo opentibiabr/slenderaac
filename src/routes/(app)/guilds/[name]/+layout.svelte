@@ -7,6 +7,7 @@
 	import GuildInfoBox from '$lib/components/guilds/GuildInfoBox.svelte';
 	import GuildOperations from '$lib/components/guilds/GuildOperations.svelte';
 	import ClassicGuildProfile from '$lib/themes/classic/GuildProfile.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { LayoutData } from './$types';
 
@@ -21,6 +22,12 @@
 	function isSelf(name: string) {
 		return Boolean(
 			data.accountCharacters?.some((character) => character.name === name),
+		);
+	}
+	function characterHref(name: string) {
+		return themePreviewHref(
+			$page.url,
+			'/characters/' + encodeURIComponent(name),
 		);
 	}
 
@@ -50,7 +57,8 @@
 					name={guild.name}
 					createdAt={guild.createdAt}
 					balance={guild.balance}
-					ownerName={owner.name} />
+					ownerName={owner.name}
+					ownerHref={characterHref} />
 			</div>
 
 			<div class="table-container">

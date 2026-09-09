@@ -229,7 +229,7 @@
 		"leave": "Sair da guild",
 		"founded": "{name} foi fundada em {date}.",
 		"balance": "Saldo da conta bancária da guild: <strong class=\"font-normal\">{balance}</strong> ouro.",
-		"leader-label": "<a href=\"/characters/{name}\" class=\"text-semibold text-primary-600-300-token\">{name}</a> é o líder da guild.",
+		"leader-label": "{name} é o líder da guild.",
 		"uninvite": "Revogar convite",
 		"invited-players": "Jogadores convidados",
 		"edit": "Editar",
