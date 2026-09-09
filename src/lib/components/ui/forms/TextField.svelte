@@ -30,6 +30,7 @@
 		class:text-right={type === 'number'}
 		class:input-error={Boolean(errors)}
 		{autocomplete}
+		on:input
 		use:typeAction />
 	{#if error}
 		<p class="absolute top-full text-xs text-error-500-400-token">{error}</p>
