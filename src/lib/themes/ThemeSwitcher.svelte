@@ -97,13 +97,15 @@
 		justify-content: center;
 		gap: 6px;
 		width: 100%;
-		font-size: 13px;
-		height: 34px;
-		min-height: 34px;
 		padding: 0;
 		cursor: pointer;
 		white-space: nowrap;
 		list-style: none;
+	}
+	.layout-switcher:not(.layout-switcher--classic) .layout-switcher__trigger {
+		font-size: 13px;
+		height: 34px;
+		min-height: 34px;
 	}
 	summary::-webkit-details-marker {
 		display: none;
@@ -153,11 +155,6 @@
 	}
 	.layout-switcher--classic {
 		width: 135px;
-	}
-	.layout-switcher--classic .layout-switcher__trigger {
-		height: 25px;
-		min-height: 25px;
-		font-size: 12px;
 	}
 	.layout-switcher__trigger--fallback {
 		border: 1px solid #c5a25e;
