@@ -187,12 +187,18 @@ for these compact details and player tables, with a 15px gap between panels.
 Online lists share `AlphabetNavigation`, sorting URLs and the configured preview.
 The `headlineWorlds` asset is optional. Older menu packs that label `/online` as
 Worlds are upgraded to `/worlds`, while direct online-player links keep working.
+
 Optional `worldLocation-<region>` and `worldPvp-<mode>` assets retain their native
 48x48px slots; region names use lowercase words separated by hyphens. The
 10x10px `sortAscending`/`sortDescending` assets indicate the next sort direction.
 The plain panel sets a shared rail-color variable on `TableFrame`, so component
 stylesheet loading order cannot replace its background. Decorative icons sit
 above the rail, do not cover values, and are omitted from narrow layouts.
+
+World Quests is a separate native module with operator-managed definitions,
+calendar occurrences and explicit local results. Its records use the application
+database and are not supplied by the server-library importer. See
+[World quests](news.md#world-quests) for publication, history and administration.
 
 Description panels reuse the same table frame and native shadow layers, with
 stacked title/description cards. Section navigation uses a shared small frame;

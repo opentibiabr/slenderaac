@@ -10,6 +10,15 @@ type FeaturePage = {
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	worldquests: {
+		path: '/library/world-quests',
+		title: 'World Quests',
+		section: 'library',
+		headline: 'headlineWorldQuests',
+		headlineWidth: 192,
+		headlineHeight: 32,
+		queryKeys: ['worldquest', 'page', 'resultpage'],
+	},
 	worlds: {
 		path: '/worlds',
 		title: 'Worlds',

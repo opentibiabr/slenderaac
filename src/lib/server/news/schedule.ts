@@ -1,6 +1,8 @@
+import type { Prisma } from '@prisma/client';
+
 import { newsDate } from '$lib/news';
 
-export function scheduleInput(form: FormData) {
+export function scheduleInput(form: FormData, linkedQuest = false) {
 	const title = String(form.get('title') ?? '').trim();
 	const description = String(form.get('description') ?? '').trim();
 	const starts_at = newsDate(form.get('starts_at'));
@@ -8,7 +10,7 @@ export function scheduleInput(form: FormData) {
 	const color = String(form.get('color') ?? '');
 	const sort_order = Number(form.get('sort_order'));
 	if (
-		!title ||
+		(!title && !linkedQuest) ||
 		title.length > 255 ||
 		description.length > 16000 ||
 		!starts_at ||
@@ -31,5 +33,36 @@ export function scheduleInput(form: FormData) {
 		sort_order,
 		seasonal: form.get('seasonal') === 'on',
 		published: form.get('published') === 'on',
+	};
+}
+
+export async function linkedScheduleInput(
+	form: FormData,
+	tx: Prisma.TransactionClient,
+) {
+	const id = String(form.get('world_quest_id') ?? '').trim() || null;
+	if (
+		id &&
+		!(await tx.worldQuest.findFirst({
+			where: { id, kind: 'event' },
+			select: { id: true },
+		}))
+	)
+		return null;
+	const data = scheduleInput(form, Boolean(id));
+	return data ? { ...data, world_quest_id: id } : null;
+}
+
+export function schedulePresentation<
+	T extends {
+		title: string;
+		description: string;
+		world_quest?: { name: string; description: string } | null;
+	},
+>(event: T) {
+	return {
+		...event,
+		title: event.title || event.world_quest?.name || '',
+		description: event.description || event.world_quest?.description || '',
 	};
 }

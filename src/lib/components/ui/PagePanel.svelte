@@ -7,8 +7,15 @@
 	export let title: string;
 	export let compact = false;
 	export let surface = false;
-	export let variant: 'native' | 'list' | 'form' | 'stack' | 'plain' | 'flush' =
-		'native';
+	export let spacing: 'default' | 'related' | 'section' = 'default';
+	export let variant:
+		| 'native'
+		| 'list'
+		| 'form'
+		| 'stack'
+		| 'plain'
+		| 'flush'
+		| 'message' = 'native';
 </script>
 
 {#if $page.data.selectedTheme === 'classic'}
@@ -19,6 +26,9 @@
 		class:classic-page-panel--stack={variant === 'stack'}
 		class:classic-page-panel--plain={variant === 'plain'}
 		class:classic-page-panel--flush={variant === 'flush'}
+		class:classic-page-panel--message={variant === 'message'}
+		class:classic-page-panel--related={spacing === 'related'}
+		class:classic-page-panel--section={spacing === 'section'}
 		class:classic-page-panel--compact={compact}
 		class:classic-page-panel--surface={surface}>
 		<TableFrame assets={$page.data.themeAssets}>
@@ -129,5 +139,20 @@
 		.theme-classic .classic-page-panel--flush .classic-table-frame__rail
 	) {
 		background: rgb(241 224 197);
+	}
+	:global(.theme-classic)
+		.classic-page-panel--message
+		.classic-page-panel__body {
+		padding: 6px 6px 3px;
+		line-height: 18px;
+	}
+	:global(.theme-classic) .classic-page-panel--message {
+		display: flow-root;
+	}
+	:global(.theme-classic) .classic-page-panel--related {
+		margin-bottom: 15px;
+	}
+	:global(.theme-classic) .classic-page-panel--section {
+		margin-bottom: 30px;
 	}
 </style>

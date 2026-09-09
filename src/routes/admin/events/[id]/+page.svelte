@@ -8,4 +8,4 @@
 </script>
 
 <h1 class="h1">Edit event</h1>
-<EventForm event={data.event} errors={form?.errors} />
+<EventForm event={data.event} errors={form?.errors} quests={data.quests} />

@@ -6,6 +6,10 @@
 
 	export let event: ScheduleEvent | null = null;
 	export let errors: Record<string, string[]> | null = null;
+	export let quests: { id: string; name: string }[] = [];
+	export let selectedQuest = '';
+	let worldQuestId = '';
+	$: worldQuestId = event?.world_quest_id ?? selectedQuest;
 	const today = new Date().toISOString().slice(0, 10);
 </script>
 
@@ -14,10 +18,22 @@
 			{errors.global.join(' ')}
 		</p>{/if}
 	<label class="label"
+		><span>World quest</span><select
+			name="world_quest_id"
+			class="select"
+			bind:value={worldQuestId}>
+			<option value="">Independent calendar event</option>
+			{#each quests as quest}<option value={quest.id}>{quest.name}</option
+				>{/each}
+		</select></label>
+	{#if worldQuestId}<p class="text-sm">
+			Leave title or description empty to use the quest's shared text.
+		</p>{/if}
+	<label class="label"
 		><span>Title</span><input
 			class="input"
 			name="title"
-			required
+			required={!worldQuestId}
 			maxlength="255"
 			value={event?.title ?? ''} /></label>
 	<label class="label"

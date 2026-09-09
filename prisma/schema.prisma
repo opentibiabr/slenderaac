@@ -846,9 +846,56 @@ model ScheduleEvent {
   sort_order  Int      @default(0)
   created_at  DateTime @default(now())
   updated_at  DateTime @default(now()) @updatedAt
+  world_quest_id String?
+  world_quest WorldQuest? @relation(fields: [world_quest_id], references: [id], onDelete: Cascade)
+  quest_result WorldQuestResult?
 
   @@index([published, starts_at, ends_at], map: "slender_schedule_events_range_idx")
+  @@index([world_quest_id], map: "slender_schedule_events_world_quest_idx")
   @@map("slender_schedule_events")
+}
+
+enum WorldQuestKind {
+  event
+  task
+}
+
+enum WorldQuestOutcome {
+  success
+  failure
+}
+
+model WorldQuest {
+  id          String @id @default(cuid())
+  slug        String @unique @db.VarChar(100)
+  name        String @db.VarChar(255)
+  description String @db.Text
+  kind        WorldQuestKind
+  published   Boolean @default(false)
+  sort_order  Int @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  events      ScheduleEvent[]
+  results     WorldQuestResult[]
+
+  @@index([published, kind, sort_order], map: "slender_world_quests_public_idx")
+  @@map("slender_world_quests")
+}
+
+model WorldQuestResult {
+  id                String @id @default(cuid())
+  world_quest_id    String
+  schedule_event_id String? @unique
+  outcome           WorldQuestOutcome
+  occurred_at       DateTime
+  published         Boolean @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+  world_quest       WorldQuest @relation(fields: [world_quest_id], references: [id], onDelete: Cascade)
+  schedule_event    ScheduleEvent? @relation(fields: [schedule_event_id], references: [id], onDelete: Restrict)
+
+  @@index([world_quest_id, published, occurred_at], map: "slender_world_quest_results_public_idx")
+  @@map("slender_world_quest_results")
 }
 
 model StaticPage {

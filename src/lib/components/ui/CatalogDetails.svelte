@@ -8,17 +8,20 @@
 	export let rows: readonly (readonly string[])[];
 	export let variant: 'form' | 'plain' = 'form';
 	export let illustrations: { src: string; alt: string }[] = [];
+	export let fitLabels = false;
+	export let spacing: 'default' | 'related' | 'section' = 'default';
 	$: classic = $page.data.selectedTheme === 'classic';
 </script>
 
 {#if !classic}<h3 class="h3">{title}</h3>{/if}
-<PagePanel {title} surface={variant !== 'plain'} {variant}>
+<PagePanel {title} surface={variant !== 'plain'} {variant} {spacing}>
 	<CatalogTable>
 		<table
 			aria-label={title}
 			class="classic-data-table classic-data-table--grid classic-data-table--properties"
 			class:catalog-details--plain={variant === 'plain'}
 			class:catalog-details--illustrated={illustrations.length > 0}
+			class:catalog-details--fit-labels={fitLabels}
 			class:table={!classic}>
 			<tbody
 				>{#each rows as [label, value]}<tr
@@ -81,7 +84,19 @@
 		padding-right: 10px;
 		font-weight: bold;
 	}
+	:global(.theme-classic .classic-native-content)
+		.catalog-details--plain.catalog-details--fit-labels
+		th[scope='row'] {
+		width: 1%;
+		white-space: nowrap;
+	}
 	@media (max-width: 767px) {
+		:global(.theme-classic .classic-native-content)
+			.catalog-details--plain.catalog-details--fit-labels
+			th[scope='row'] {
+			width: 35%;
+			white-space: normal;
+		}
 		.catalog-details__illustrations {
 			display: none;
 		}

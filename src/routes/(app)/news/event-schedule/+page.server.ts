@@ -3,6 +3,7 @@ import {
 	mergeCalendarTooltipSections,
 } from '$lib/components/information/tooltip-content';
 import { monthDate, numberParam } from '$lib/server/news/dates';
+import { schedulePresentation } from '$lib/server/news/schedule';
 import { prisma } from '$lib/server/prisma';
 import { loadCalendarReference } from '$lib/server/theme-assets/calendar-reference';
 
@@ -66,16 +67,22 @@ export const load = (async ({ url, parent }) => {
 	const today = now.toISOString().slice(0, 10);
 	const end = new Date(start);
 	end.setUTCDate(start.getUTCDate() + 41);
-	const events = reference
+	const records = reference
 		? []
 		: await prisma.scheduleEvent.findMany({
 				where: {
 					published: true,
 					starts_at: { lte: end },
 					ends_at: { gte: start },
+					OR: [
+						{ world_quest_id: null },
+						{ world_quest: { is: { published: true } } },
+					],
 				},
+				include: { world_quest: { select: { name: true, description: true } } },
 				orderBy: [{ sort_order: 'asc' }, { starts_at: 'asc' }, { id: 'asc' }],
 			});
+	const events = records.map(schedulePresentation);
 	const cells = Array.from({ length: 42 }, (_, index) => {
 		const date = new Date(start);
 		date.setUTCDate(start.getUTCDate() + index);

@@ -321,6 +321,18 @@ rows have a 21px cadence. Additional local properties and player counts determin
 panel height. Compare matching frame origins when scrollbars change the usable
 viewport width; do not move the background to compensate for content length.
 
+World Quests uses the shared `SectionNavigation`, `DescriptionPanel`,
+`CatalogDetails` and `PagePanel` components with native local records. Linked card
+titles open local details; optional labeled footers display calendar dates.
+Related sections use 15px gaps, detail sections use 30px gaps, and empty list
+sections use the bare message panel. At the desktop content width, an empty list
+frame is 833x61px and an empty result frame is 833x74px. Plain property labels can
+fit their text without changing the fixed-label variant used by other pages.
+Cards and section aliases retain named anchors; result pagination preserves the
+selected quest and preview. The optional `headlineWorldQuests` asset uses its
+native dimensions. Manage definitions, occurrences and outcomes through the
+[shared administration](news.md#world-quests), independently of the asset pack.
+
 Experience Table is a native Library page in both themes. It calculates levels
 1–3500 from the server's integer experience progression and renders four groups
 of 875 levels. `TableColumns` reuses the shared caption, rail and inner surfaces;

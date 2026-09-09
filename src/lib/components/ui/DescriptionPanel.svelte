@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 
 	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import PagePanel from './PagePanel.svelte';
 
@@ -11,9 +12,16 @@
 		id: string | number;
 		name: string;
 		description: string;
+		href?: string;
+		anchor?: string;
+		footer?: { label: string; value: string };
 	}[] = [];
 	export let backToTop = '#top';
+	export let related = false;
+	export let plainEmpty = false;
+	export let anchorAliases: string[] = [];
 	$: classic = $page.data.selectedTheme === 'classic';
+	$: emptyMessage = plainEmpty && !entries.length;
 </script>
 
 <section
@@ -21,37 +29,60 @@
 	class="description-panel"
 	class:description-panel--default={!classic}
 	aria-label={title}>
+	{#each anchorAliases as alias}<span
+			class="description-panel__anchor"
+			id={alias}
+			aria-hidden="true"></span
+		>{/each}
 	{#if !classic}<h2 class="h2">{title} <slot name="decoration" /></h2>
-		<a class="description-panel__default-back" href={backToTop}>Back to top</a
-		>{/if}
-	<PagePanel {title} variant="stack">
+		{#if !emptyMessage}<a
+				class="description-panel__default-back"
+				href={backToTop}>Back to top</a
+			>{/if}
+	{/if}
+	<PagePanel
+		{title}
+		spacing={related ? 'related' : 'default'}
+		variant={emptyMessage ? 'message' : 'stack'}>
 		<svelte:fragment slot="caption">
 			{title}<slot name="decoration" />
-			<a
-				class="description-panel__back"
-				href={backToTop}
-				aria-label={`Back to top from ${title}`}>
-				{#if $page.data.themeAssets?.backToTop}<img
-						src={$page.data.themeAssets.backToTop}
-						width="18"
-						height="18"
-						alt="Back to top" />{:else}↑{/if}
-			</a>
+			{#if !emptyMessage}<a
+					class="description-panel__back"
+					href={backToTop}
+					aria-label={`Back to top from ${title}`}>
+					{#if $page.data.themeAssets?.backToTop}<img
+							src={$page.data.themeAssets.backToTop}
+							width="18"
+							height="18"
+							alt="Back to top" />{:else}↑{/if}
+				</a>{/if}
 		</svelte:fragment>
-		<div class="description-panel__entries">
-			{#each entries as entry (entry.id)}
-				<TableSurface assets={$page.data.themeAssets} width="100%">
-					<dl
-						class="description-card"
-						class:description-card--default={!classic}>
-						<dt>{entry.name}</dt>
-						<dd>{entry.description}</dd>
-					</dl>
-				</TableSurface>
-			{:else}<TableSurface assets={$page.data.themeAssets} width="100%"
-					><div class="description-panel__message"><slot /></div></TableSurface
-				>{/each}
-		</div>
+		{#if emptyMessage}<slot />{:else}<div class="description-panel__entries">
+				{#each entries as entry (entry.id)}
+					<TableSurface assets={$page.data.themeAssets} width="100%">
+						<dl
+							id={entry.anchor}
+							class="description-card"
+							class:description-card--default={!classic}>
+							<dt>
+								{#if entry.href}<a
+										href={themePreviewHref($page.url, entry.href)}
+										>{entry.name}</a
+									>{:else}{entry.name}{/if}
+							</dt>
+							<dd>{entry.description}</dd>
+							{#if entry.footer}<dd class="description-card__footer">
+									<strong>{entry.footer.label}</strong>
+									{entry.footer.value}
+								</dd>{/if}
+						</dl>
+					</TableSurface>
+				{:else}<TableSurface assets={$page.data.themeAssets} width="100%"
+						><div class="description-panel__message">
+							<slot />
+						</div></TableSurface
+					>{/each}
+			</div>{/if}
 	</PagePanel>
 </section>
 
@@ -64,12 +95,18 @@
 		scroll-margin-top: 100px;
 		width: 100%;
 	}
+	.description-panel__anchor {
+		position: absolute;
+		top: 0;
+		scroll-margin-top: 100px;
+	}
 	.description-panel__entries {
 		display: grid;
 		gap: 9px;
 	}
 	.description-card {
 		margin: 0;
+		scroll-margin-top: 100px;
 	}
 	dt {
 		font-weight: bold;
@@ -122,5 +159,8 @@
 		width: 18px;
 		height: 18px;
 		display: block;
+	}
+	:global(.theme-classic) .description-card__footer {
+		border-top: 1px solid #faf0d7;
 	}
 </style>
