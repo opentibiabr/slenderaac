@@ -12,6 +12,15 @@ with the same structure should reuse these components before adding page CSS.
 The shared wrappers in `src/lib/components/news/` select the default or Cip
 presentation while keeping the same route data and controls.
 
+Numeric frame/surface dimensions and the sprite border switch are Cip-only
+calibration inputs. The default theme intentionally uses fluid cards and an
+internally scrollable table surface instead of inheriting those pixel widths.
+
+The Cip presentation keeps the reference's English navigation and article-action
+labels alongside its English headline sprites and imported documents. Application
+locale selection does not translate this source presentation; translating the
+theme and its content pack together is a separate adaptation.
+
 The current visual port covers 30 page states: the three News pages and 27
 information documents, comprising eight top-level information pages and 19
 Manual chapters. Existing account, guild and highscore pages also receive

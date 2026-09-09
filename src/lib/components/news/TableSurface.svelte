@@ -4,6 +4,7 @@
 	import CipTableSurface from '$lib/themes/cip-slender/TableSurface.svelte';
 
 	export let assets: Record<string, string | undefined> | null | undefined;
+	// The default theme keeps its responsive surface, without Cip sprite sizing.
 	export let width: number | string;
 	export let bordered = true;
 </script>

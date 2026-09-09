@@ -162,7 +162,7 @@ Anything you put into the `static` folder in this repo will be served by the ser
 <details>
 <summary><h2>Theme layouts and external asset packs</h2></summary>
 
-SlenderAAC supports build-time layout shells through the theme registry. The current themes are `legbone` and `cip-slender`.
+SlenderAAC supports server-side layout shells through the theme registry. The current themes are `legbone` and `cip-slender`.
 
 See [Cip Slender news layouts](docs/cip-slender.md) for the shared page components, local content management, external pack updater and visual verification workflow.
 

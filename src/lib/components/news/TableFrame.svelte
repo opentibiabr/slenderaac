@@ -4,6 +4,7 @@
 	import CipTableFrame from '$lib/themes/cip-slender/TableFrame.svelte';
 
 	export let assets: Record<string, string | undefined> | null | undefined;
+	// Sprite calibration dimensions apply only to the Cip frame.
 	export let minWidth = 0;
 	export let minHeight = 0;
 </script>
