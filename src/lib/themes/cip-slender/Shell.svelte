@@ -662,15 +662,21 @@
 	);
 
 	async function refreshOnlineStatus(): Promise<void> {
-		const response = await fetch('/api/online-status');
-		if (!response.ok) return;
+		try {
+			const response = await fetch('/api/online-status');
+			if (!response.ok) return;
 
-		const status = (await response.json()) as {
-			onlinePlayerCount?: number;
-			topbarStats?: CipSlenderTopbarStats;
-		};
-		onlinePlayerCount = normalizeTopbarCount(status.onlinePlayerCount);
-		topbarStats = normalizeTopbarStats(status.topbarStats);
+			const status = (await response.json()) as {
+				onlinePlayerCount?: number;
+				topbarStats?: CipSlenderTopbarStats;
+			} | null;
+			if (!status || !Number.isFinite(status.onlinePlayerCount)) return;
+			const nextTopbarStats = normalizeTopbarStats(status.topbarStats);
+			onlinePlayerCount = normalizeTopbarCount(status.onlinePlayerCount);
+			topbarStats = nextTopbarStats;
+		} catch {
+			// Keep the last successful values until the next poll succeeds.
+		}
 	}
 
 	onMount(() => {
