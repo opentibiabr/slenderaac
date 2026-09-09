@@ -56,7 +56,9 @@
 	</div>
 	<hr class="opacity-5" />
 	<div class="py-2 px-2">
-		<Button href={PUBLIC_DOWNLOAD_URL} class="w-full text-xs p-1">
+		<Button
+			href={themePreviewHref($page.url, PUBLIC_DOWNLOAD_URL)}
+			class="w-full text-xs p-1">
 			{$_('download')}
 		</Button>
 	</div>
@@ -120,10 +122,22 @@
 				<svelte:fragment slot="content">
 					<nav class="list-nav">
 						<ul>
-							<li><a href="/characters">{$_('characters')}</a></li>
-							<li><a href="/online">{$_('whos-online')}</a></li>
-							<li><a href="/highscores">{$_('highscores')}</a></li>
-							<li><a href="/guilds">{$_('guilds.title')}</a></li>
+							<li>
+								<a href={themePreviewHref($page.url, '/characters')}
+									>{$_('characters')}</a>
+							</li>
+							<li>
+								<a href={themePreviewHref($page.url, '/online')}
+									>{$_('whos-online')}</a>
+							</li>
+							<li>
+								<a href={themePreviewHref($page.url, '/highscores')}
+									>{$_('highscores')}</a>
+							</li>
+							<li>
+								<a href={themePreviewHref($page.url, '/guilds')}
+									>{$_('guilds.title')}</a>
+							</li>
 							<!-- <li><a href="/latest-deaths">Latest deaths</a></li> -->
 							<!-- <li><a href="#">Power gamers</a></li> -->
 							<!-- <li><a href="#">Staff</a></li> -->
@@ -138,9 +152,13 @@
 				<svelte:fragment slot="content">
 					<nav class="list-nav">
 						<ul>
-							{#each staticPages as page}
+							{#each staticPages as staticPage}
 								<li>
-									<a href={`/pages/${page.slug}`}>{page.title}</a>
+									<a
+										href={themePreviewHref(
+											$page.url,
+											`/pages/${encodeURIComponent(staticPage.slug)}`,
+										)}>{staticPage.title}</a>
 								</li>
 							{/each}
 						</ul>
@@ -153,7 +171,10 @@
 				<svelte:fragment slot="content">
 					<nav class="list-nav">
 						<ul>
-							<li><a href="/shop">{$_('buy-coins')}</a></li>
+							<li>
+								<a href={themePreviewHref($page.url, '/shop')}
+									>{$_('buy-coins')}</a>
+							</li>
 						</ul>
 					</nav>
 				</svelte:fragment>

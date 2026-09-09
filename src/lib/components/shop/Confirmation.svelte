@@ -127,6 +127,7 @@
 			href={themePreviewHref($page.url, '/shop/coins')}
 			color="base"
 			class="whitespace-normal">{$_('shop.goback')}</Button>
-		<Button href="/account">{$_('my-account')}</Button>
+		<Button href={themePreviewHref($page.url, '/account')}
+			>{$_('my-account')}</Button>
 	</div>
 {/if}
