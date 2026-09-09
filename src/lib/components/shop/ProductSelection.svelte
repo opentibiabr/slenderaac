@@ -14,6 +14,9 @@
 
 	let selectedCurrency = Object.keys(offers)[0] ?? 'USD';
 	export let value = '';
+
+	$: availableOffers = offers[selectedCurrency] ?? [];
+	$: if (!availableOffers.some((offer) => offer.id === value)) value = '';
 </script>
 
 <div class="flex flex-col gap-4 items-center">
@@ -33,7 +36,7 @@
 	{/if}
 
 	<RadioGroup display="flex-col">
-		{#each offers[selectedCurrency] as offer}
+		{#each availableOffers as offer}
 			<RadioChoice bind:group={value} name="offer" value={offer.id}>
 				<div class="flex flex-row gap-2 items-center p-1">
 					<Fa icon={faCoins} />

@@ -24,7 +24,10 @@
 		<h4 class="h4">{$_('shop.payment-method')}</h4>
 		<RadioGroup display="flex-col">
 			{#each enabledPaymentMethods as paymentMethod}
-				<RadioChoice bind:group={value} name="offer" value={paymentMethod}>
+				<RadioChoice
+					bind:group={value}
+					name="payment-method-choice"
+					value={paymentMethod}>
 					<div class="flex flex-row gap-2 items-center p-1">
 						<Fa icon={getPaymentMethodIcon(paymentMethod)} />
 						{getPaymentMethodName(paymentMethod)}
