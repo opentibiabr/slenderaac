@@ -137,7 +137,9 @@ Using your favorite method to edit the client (see [this tutorial](https://docs.
 <details>
 <summary><h2>Animated outfits</h2></summary>
 
-You'll need to download the spritesheet from [here](https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#animated-items-and-outfits) and place it in `outfits_anim`. These assets are not included in the repository because they can cause the repo to bloat, and are also not release under the same license as the code.
+Install an outfit sprite pack compatible with your server from the [outfit image provider](https://outfit-images.ots.me/). Set `OUTFIT_ASSETS_ROOT` to the directory containing the numbered outfit folders, or use the default `outfits_anim` directory. Restart the app after changing this setting. Keep sprite packs outside version control; their license is separate from the application code.
+
+The renderer reads the requested outfit's PNG files directly. No generated metadata or cache marker is needed, and the sprite directory can be read-only. Replacing sprites takes effect on subsequent requests; browser responses are revalidated against their rendered content. Animations must contain consecutive frames starting at one, with at most 128 frames in a complete rider/mount loop. Missing optional outfits return `404` with no frames without interrupting character, account, or ranking pages. Invalid request parameters return `400`.
 
 </details>
 

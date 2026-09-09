@@ -4,6 +4,7 @@
 
 	import { browser } from '$app/environment';
 
+	import { outfitFrameData } from '$lib/outfit-animation';
 	import { outfitURL } from '$lib/players';
 
 	type Outfit = {
@@ -33,36 +34,61 @@
 
 	$: void sourceChanged(outfit);
 
-	async function sourceChanged(outfit: Outfit) {
-		frames = [];
+	let controller: AbortController | null = null;
+	let requestId = 0;
+	let loading = false;
+	let index = 0;
+	let shownFor = 0;
+	let renderedIndex = -1;
+	let actualMount: boolean | null = null;
+	$: hasMount = actualMount ?? Boolean(outfit?.lookmount || outfit?.mount);
 
-		if (!outfit || !browser) return;
-		const response = await fetch(
-			outfitURL({
-				...outfit,
-				mount: outfit.mount ?? outfit.lookmount ?? 0,
-				resize: true,
-			}),
-		);
-		const data = await response.json();
-		const nextFrames = Array.isArray(data?.frames) ? data.frames : [];
-		frames = (nextFrames as { duration: number; image: string }[]).map(
-			(frame) => ({
-				...frame,
-				image: (() => {
+	async function sourceChanged(outfit: Outfit) {
+		controller?.abort();
+		const current = ++requestId;
+		frames = [];
+		index = 0;
+		renderedIndex = -1;
+		shownFor = 0;
+		actualMount = null;
+		loading = false;
+		if (!outfit?.looktype || !browser) return;
+		controller = new AbortController();
+		loading = true;
+		try {
+			const response = await fetch(
+				outfitURL({
+					...outfit,
+					mount: outfit.mount ?? outfit.lookmount ?? 0,
+					resize: true,
+				}),
+				{ signal: controller.signal },
+			);
+			if (!response.ok) return;
+			const data: unknown = await response.json();
+			const next = await Promise.all(
+				outfitFrameData(data).map(async (frame) => {
 					const image = new Image();
 					image.src = frame.image;
-					return image;
-				})(),
-			}),
-		);
+					await image.decode();
+					return { image, duration: frame.duration };
+				}),
+			);
+			if (current !== requestId) return;
+			frames = next;
+			if (
+				data &&
+				typeof data === 'object' &&
+				'mounted' in data &&
+				typeof data.mounted === 'boolean'
+			)
+				actualMount = data.mounted;
+		} catch {
+			// A missing or failed optional portrait must not interrupt its parent page.
+		} finally {
+			if (current === requestId) loading = false;
+		}
 	}
-
-	let index = 0;
-	let shownFor = 1000;
-	const hasMount =
-		(outfit.lookmount && outfit.lookmount > 0) ||
-		(outfit.mount && outfit.mount > 0);
 
 	onMount(() => {
 		const interval = setInterval(() => {
@@ -77,12 +103,11 @@
 				if (index >= frames.length) {
 					index = 0;
 				}
-			} else {
-				return;
 			}
-
+			if (renderedIndex === index) return;
+			renderedIndex = index;
 			const frame = frames[index];
-			context.clearRect(0, 0, canvas.width, canvas.height);
+			context.clearRect(0, 0, context.canvas.width, context.canvas.height);
 			context.drawImage(
 				frame.image,
 				0,
@@ -91,11 +116,15 @@
 				frame.image.height,
 				0,
 				0,
-				canvas.width,
-				canvas.height,
+				context.canvas.width,
+				context.canvas.height,
 			);
 		}, 50);
-		return () => clearInterval(interval);
+		return () => {
+			controller?.abort();
+			requestId++;
+			clearInterval(interval);
+		};
 	});
 </script>
 
@@ -105,9 +134,15 @@
 		class="absolute {hasMount
 			? '-left-7 -bottom-1'
 			: '-left-10 bottom-1'} {innerClass}">
-		{#if frames && outfit.looktype > 0}
-			<canvas bind:this={canvas} class="w-20 h-20" aria-details={alt} />
-		{:else}
+		{#if frames.length && outfit?.looktype > 0}
+			<canvas
+				bind:this={canvas}
+				width={frames[0].image.naturalWidth}
+				height={frames[0].image.naturalHeight}
+				class="w-20 h-20"
+				role="img"
+				aria-label={alt} />
+		{:else if loading}
 			<ProgressRadial />
 		{/if}
 	</div>

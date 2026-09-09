@@ -1,4 +1,12 @@
-export const outfitImagesPath = './outfits_anim/';
+export const outfitImagesPath =
+	(process.env.OUTFIT_ASSETS_ROOT || './outfits_anim').replace(/[/\\]+$/, '') +
+	'/';
+
+export function mountOutfitId(value: number): number {
+	if (!Number.isSafeInteger(value) || value < 0 || value > 0xffffffff) return 0;
+	if (value === 0 || value >= 65535) return value & 0xffff;
+	return value < 300 ? (mounts[value] ?? 0) : value;
+}
 
 export const walkSpeeds = [
 	0, // Adjust the index to start from 0 instead of 1
