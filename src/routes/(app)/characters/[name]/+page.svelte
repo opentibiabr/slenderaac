@@ -28,6 +28,9 @@
 			])
 		: null;
 	$: inventory = data.inventory;
+	function guildHref(name: string) {
+		return themePreviewHref($page.url, '/guilds/' + encodeURIComponent(name));
+	}
 	function characterHref(name: string) {
 		return themePreviewHref(
 			$page.url,
@@ -81,7 +84,9 @@
 			{#if character.guild != null}
 				<div class="data-row">
 					<dt>{$_('guilds.membership')}</dt>
-					<dd><GuildMembership guild={character.guild} /></dd>
+					<dd>
+						<GuildMembership guild={character.guild} href={guildHref} />
+					</dd>
 				</div>
 			{/if}
 			<div class="data-row">

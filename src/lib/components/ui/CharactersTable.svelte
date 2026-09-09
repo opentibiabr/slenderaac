@@ -38,6 +38,9 @@
 	function selected() {
 		dispatch('selected');
 	}
+	function guildHref(name: string) {
+		return themePreviewHref($page.url, '/guilds/' + encodeURIComponent(name));
+	}
 
 	if (ranked) {
 		invariant(characters.every((c) => 'rank' in c));
@@ -75,13 +78,8 @@
 			</thead>
 			<tbody class="transition-all duration-300 ease-in-out">
 				{#each characters as character}
-					<a
-						href={themePreviewHref(
-							$page.url,
-							'/characters/' + encodeURIComponent(character.name),
-						)}
-						class="table-row [&>td]:!align-middle cursor-pointer"
-						on:click={selected}
+					<tr
+						class="[&>td]:!align-middle"
 						transition:fly|local={{
 							duration: 300,
 							y: -20,
@@ -91,13 +89,24 @@
 							<td>{'rank' in character && character.rank}</td>
 						{/if}
 						<td>
-							<AnimatedOutfit outfit={character} alt={character.name} />
+							<a
+								href={themePreviewHref(
+									$page.url,
+									'/characters/' + encodeURIComponent(character.name),
+								)}
+								on:click={selected}
+								><AnimatedOutfit outfit={character} alt={character.name} /></a>
 						</td>
 						<td class=" w-fit relative">
 							<div class="flex flex-col w-fit justify-center">
 								<span class="font-semibold flex flex-row gap-1 items-center">
 									<OnlineIndicator online={character.online} />
-									{character.name}
+									<a
+										href={themePreviewHref(
+											$page.url,
+											'/characters/' + encodeURIComponent(character.name),
+										)}
+										on:click={selected}>{character.name}</a>
 									{#if character.isMain}
 										<MainCharacterIndicator />
 									{/if}
@@ -109,7 +118,7 @@
 								{/if}
 								{#if character.guild}
 									<span class="text-xs text-gray-500 dark:text-gray-300">
-										<GuildMembership guild={character.guild} />
+										<GuildMembership guild={character.guild} href={guildHref} />
 									</span>
 								{/if}
 							</div>
@@ -119,7 +128,7 @@
 						{#if skill}
 							<td>{'skill' in character && character.skill}</td>
 						{/if}
-					</a>
+					</tr>
 				{/each}
 			</tbody>
 		</table>
