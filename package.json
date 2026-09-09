@@ -3,6 +3,7 @@
 	"version": "0.2.0",
 	"private": true,
 	"scripts": {
+		"import:server-data": "bun src/scripts/import-server-data.ts",
 		"dev": "bun --env-file=.env vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -26,6 +27,7 @@
 		"@tailwindcss/typography": "^0.5.10",
 		"@types/bcrypt": "^5.0.2",
 		"@types/js-yaml": "^4.0.9",
+		"@types/luaparse": "0.2.13",
 		"@types/node": "^20.10.3",
 		"@types/nodemailer": "^6.4.14",
 		"@types/qrcode": "^1.5.5",
@@ -43,6 +45,7 @@
 		"eslint-plugin-svelte": "^2.35.1",
 		"eslint-plugin-you-dont-need-lodash-underscore": "^6.13.0",
 		"highlight.js": "^11.9.0",
+		"luaparse": "0.3.1",
 		"postcss": "^8.4.32",
 		"prettier": "^3.1.0",
 		"prettier-plugin-svelte": "^3.1.2",

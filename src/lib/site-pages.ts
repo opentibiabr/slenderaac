@@ -3,9 +3,17 @@ type FeaturePage = {
 	title: string;
 	section: string;
 	headline: string;
+	queryKeys?: string[];
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	spells: {
+		path: '/library/spells',
+		title: 'Spells',
+		section: 'library',
+		headline: 'headlineSpells',
+		queryKeys: ['spell', 'vocation', 'group', 'type', 'premium', 'sort'],
+	},
 	experiencetable: {
 		path: '/library/experience-table',
 		title: 'Experience Table',

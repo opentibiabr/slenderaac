@@ -7,11 +7,14 @@
 	export let title: string;
 	export let compact = false;
 	export let surface = false;
+	export let variant: 'native' | 'list' | 'form' = 'native';
 </script>
 
 {#if $page.data.selectedTheme === 'classic'}
 	<section
 		class="classic-page-panel"
+		class:classic-page-panel--list={variant === 'list'}
+		class:classic-page-panel--form={variant === 'form'}
 		class:classic-page-panel--compact={compact}
 		class:classic-page-panel--surface={surface}>
 		<TableFrame assets={$page.data.themeAssets}>
@@ -20,7 +23,7 @@
 				{#if surface}<TableSurface
 						assets={$page.data.themeAssets}
 						width="100%"
-						bordered={false}><slot /></TableSurface
+						bordered={variant !== 'native'}><slot /></TableSurface
 					>{:else}<slot />{/if}
 			</div>
 		</TableFrame>
@@ -30,6 +33,31 @@
 {/if}
 
 <style>
+	:global(.theme-classic) .classic-page-panel--list,
+	:global(.theme-classic) .classic-page-panel--form {
+		display: flow-root;
+	}
+	:global(.theme-classic)
+		.classic-page-panel--form.classic-page-panel--surface {
+		margin-bottom: 15px;
+	}
+	:global(.theme-classic)
+		.classic-page-panel--list.classic-page-panel--surface
+		.classic-page-panel__body {
+		padding: 8px 7px 8px 6px;
+	}
+	:global(.theme-classic)
+		.classic-page-panel--form.classic-page-panel--surface
+		.classic-page-panel__body {
+		padding: 4px 13px 8px 6px;
+	}
+	:global(
+		.theme-classic
+			.classic-page-panel--form.classic-page-panel
+			.classic-table-frame__rail
+	) {
+		background: rgb(212 192 161);
+	}
 	:global(.theme-classic) .classic-page-panel {
 		width: calc(100% + 2px);
 		margin-bottom: 20px;

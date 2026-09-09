@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { availableFeatureHref } from './site-pages';
+import { referenceSiteDestination } from './source-navigation';
 import { themePreviewHref } from './themes/preview';
 
 void test('saved unavailable destinations upgrade without losing preview state or fragments', () => {
@@ -41,5 +42,25 @@ void test('server redirects do not read the browser-only fragment', () => {
 	assert.equal(
 		availableFeatureHref(url),
 		'/library/experience-table?themePreview=classic',
+	);
+});
+
+void test('native catalog links retain selection and filters while dropping unknown source parameters', () => {
+	const target = referenceSiteDestination(
+		new URL(
+			'https://game.example/library/?subtopic=spells&spell=healing&vocation=Mage&group=Healing&type=Instant&premium=yes&sort=mana&redirect=external#information',
+		),
+	);
+	assert.equal(
+		target,
+		'/library/spells?spell=healing&vocation=Mage&group=Healing&type=Instant&premium=yes&sort=mana#information',
+	);
+	assert.equal(
+		availableFeatureHref(
+			new URL(
+				'https://game.example/unavailable?feature=spells&themePreview=classic',
+			),
+		),
+		'/library/spells?themePreview=classic',
 	);
 });

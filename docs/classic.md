@@ -50,6 +50,12 @@ Portrait lookup also accepts noninteractive boss cards, so a local boosted boss
 can display its artwork without acquiring a creature-detail link.
 Without catalog data, these routes retain an honest local empty state.
 
+`/library/spells` uses the [server library import](server-library.md), independently
+of the presentation pack. It provides local list, filter and detail views from
+server spell and rune definitions. Saved unavailable links upgrade to this route.
+`CatalogHeading`, `CatalogFilters` and the list/form variants of `PagePanel` keep
+the same table and control treatments reusable for other native catalogs.
+
 All adapted reference links pass through the shared destination resolver, including
 pack navigation, article links, footer links and boosted sprites. Known features
 use their Slender routes; unsupported features use `/unavailable`. `/download`

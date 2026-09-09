@@ -10,7 +10,6 @@ export function isReferenceWebsite(url: URL): boolean {
 
 export const unavailableFeatures: Record<string, string> = {
 	library: 'Library',
-	spells: 'Spells',
 	achievements: 'Achievements',
 	worldquests: 'World Quests',
 	maps: 'Maps',
@@ -64,6 +63,11 @@ export function referenceSiteDestination(
 		return `${pathname}${query.size ? `?${query.toString()}` : ''}${url.hash}`;
 	};
 	if (section === '' || section === 'mmorpg') return '/';
+	if (Object.hasOwn(featurePages, subtopic)) {
+		const feature = featurePages[subtopic];
+		if (section === feature.section)
+			return path(feature.path, feature.queryKeys);
+	}
 	if (section === 'news') {
 		if (subtopic === 'newsarchive') return path('/news/archive');
 		if (subtopic === 'eventcalendar') return path('/news/event-schedule');

@@ -113,6 +113,60 @@
 .theme-classic .classic-native-content .classic-data-table th {
 	font-weight: bold;
 }
+.theme-classic
+	.classic-native-content
+	.classic-data-table--properties
+	th[scope='row'] {
+	width: 15%;
+	font-weight: normal;
+}
+.theme-classic .classic-native-content input[type='radio'] {
+	appearance: auto;
+	-webkit-appearance: radio;
+	accent-color: auto;
+	background: initial;
+	border: initial;
+	box-shadow: none;
+	padding: 0;
+	width: 13px;
+	height: 13px;
+	margin: 3px 3px 0 5px;
+	vertical-align: baseline;
+}
+.theme-classic .classic-native-content .classic-data-table--grid :is(th, td) {
+	border: 1px solid rgb(250 240 215);
+	line-height: 16px;
+}
+.theme-classic
+	.classic-native-content
+	.classic-data-table--grid
+	tbody
+	tr:nth-child(odd) {
+	background: rgb(241 224 198);
+}
+.theme-classic
+	.classic-native-content
+	.classic-data-table--grid
+	tbody
+	tr:nth-child(even) {
+	background: rgb(212 192 161);
+}
+.theme-classic
+	.classic-native-content
+	.classic-page-panel--form
+	.classic-data-table--grid
+	tbody
+	tr:nth-child(odd) {
+	background: rgb(212 192 161);
+}
+.theme-classic
+	.classic-native-content
+	.classic-page-panel--form
+	.classic-data-table--grid
+	tbody
+	tr:nth-child(even) {
+	background: rgb(241 224 198);
+}
 .theme-classic .classic-native-content .classic-data-table tr:nth-child(odd) {
 	background: rgb(212 192 161);
 }
