@@ -1,3 +1,6 @@
+import { informationPageForPath } from '$lib/information';
+import { featurePages } from '$lib/site-pages';
+
 export type NativePage = {
 	headline: string;
 	headlineWidth?: number;
@@ -50,6 +53,8 @@ export function classicNativePage(pathname: string): NativePage | null {
 			headlineHeight: 32,
 			paperMinHeight: 387,
 		};
-	return { headline: '', paperMinHeight: 387 };
+	const feature = Object.values(featurePages).find(
+		(page) => page.path === pathname,
+	);
+	return { headline: feature?.headline ?? '', paperMinHeight: 387 };
 }
-import { informationPageForPath } from '$lib/information';

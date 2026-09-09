@@ -7,10 +7,11 @@
 	// The default theme keeps its responsive surface, without Classic sprite sizing.
 	export let width: number | string;
 	export let bordered = true;
+	export let additional = false;
 </script>
 
 {#if $page.data.selectedTheme === 'classic'}
-	<ClassicTableSurface {assets} {width} {bordered}
+	<ClassicTableSurface {assets} {width} {bordered} {additional}
 		><slot /></ClassicTableSurface>
 {:else}
 	<div class="news-table-surface"><slot /></div>

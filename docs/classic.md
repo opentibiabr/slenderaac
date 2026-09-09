@@ -301,6 +301,27 @@ checkout use existing Slender data and actions. `PagePanel` selects shared Class
 layout. Extend those wrappers for future pages with the same structure before
 adding route-specific CSS. Theme-specific native controls are scoped to Classic.
 
+Experience Table is a native Library page in both themes. It calculates levels
+1–3500 from the server's integer experience progression and renders four groups
+of 875 levels. `TableColumns` reuses the shared caption, rail and inner surfaces;
+its groups stack on smaller screens. Compact numeric tables share their cell
+borders, row cadence, alternating colors and right alignment through the native
+theme stylesheet. Additional column shadows belong to each inner surface and do
+not alter the outer frame or the existing sprite-based table shadows.
+
+Register newly implemented modules in `site-pages.ts`. That registry supplies
+navigation, the native headline and upgrades saved `/unavailable?feature=...`
+links to their local destination. Query parameters and preview state survive the
+upgrade. Browser navigation also preserves fragments; server redirects do not
+read fragments because those are absent from HTTP requests. Unimplemented
+modules remain explicit gaps and must not redirect to an external application.
+
+The Experience Table pass verified every displayed level against the reference,
+the 833px desktop frame, 22px rows, numeric glyph positions and a 390px viewport
+without horizontal overflow. Browser export resampling can change pixels even
+when CSS colors and text boxes agree; record the usable viewport width separately
+from the requested width before comparing captures.
+
 Keep permission gates and backend validation when adapting forms. Highscore
 labels may be translated, but submitted skill values remain canonical. Product
 and payment radios use separate names; currency changes clear an offer that is

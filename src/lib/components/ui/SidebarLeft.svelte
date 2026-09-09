@@ -13,12 +13,20 @@
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import { informationPages, informationPath } from '$lib/information';
+	import { featurePages } from '$lib/site-pages';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
 	export let isLoggedIn = false;
 	export let staticPages: { title: string; slug: string }[];
+	$: informationLinks = [
+		...informationPages.map((entry) => ({
+			...entry,
+			path: informationPath(entry),
+		})),
+		...Object.entries(featurePages).map(([id, entry]) => ({ ...entry, id })),
+	];
 </script>
 
 <div class="card card-tertiary card-hover overflow-hidden">
@@ -67,25 +75,23 @@
 <div class="card card-tertiary text-white overflow-hidden">
 	<article class="py-2 px-2">
 		<Accordion>
-			{#each ['about', 'guides'] as section}
-				{#if informationPages.some((entry) => entry.section === section)}
+			{#each ['about', 'guides', 'library'] as section}
+				{#if informationLinks.some((entry) => entry.section === section)}
 					<AccordionItem open>
 						<svelte:fragment slot="lead"
 							><Fa icon={faBookBookmark} /></svelte:fragment>
 						<svelte:fragment slot="summary"
 							>{section === 'about'
 								? `About ${$page.data.serverName}`
-								: 'Game Guides'}</svelte:fragment>
+								: section === 'library'
+									? 'Library'
+									: 'Game Guides'}</svelte:fragment>
 						<svelte:fragment slot="content"
 							><nav class="list-nav">
 								<ul>
-									{#each informationPages.filter((entry) => entry.section === section) as entry}
+									{#each informationLinks.filter((entry) => entry.section === section) as entry}
 										<li>
-											<a
-												href={themePreviewHref(
-													$page.url,
-													informationPath(entry),
-												)}
+											<a href={themePreviewHref($page.url, entry.path)}
 												>{entry.id === 'server'
 													? `About ${$page.data.serverName}`
 													: entry.title}</a>

@@ -1,3 +1,5 @@
+import { availableFeatureHref } from '$lib/site-pages';
+
 const previewKeys = [
 	'themePreview',
 	'classicReference',
@@ -21,6 +23,8 @@ export function themePreviewHref(current: URL, href: string): string {
 		return href;
 	}
 	if (target.origin !== current.origin) return href;
+	const available = availableFeatureHref(target, target.hash);
+	if (available) target = new URL(available, current);
 	if (current.searchParams.has('themePreview')) {
 		for (const key of previewKeys) {
 			const value = current.searchParams.get(key);

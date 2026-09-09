@@ -17,6 +17,7 @@
 
 	import { informationPages, informationPath } from '$lib/information';
 	import { serverText } from '$lib/site-identity';
+	import { featurePages } from '$lib/site-pages';
 	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -367,6 +368,13 @@
 					)}
 					href={withThemePreview($page.url, '/library/boostable-bosses')}
 					>Boostable Bosses</a>
+				{#each Object.values(featurePages).filter((entry) => entry.section === 'library') as entry}
+					<a
+						class:theme-classic-menu__submenu-link--active={isActive(
+							entry.path,
+						)}
+						href={withThemePreview($page.url, entry.path)}>{entry.title}</a>
+				{/each}
 				{#each staticPages as entry}
 					<a
 						href={withThemePreview(

@@ -1,3 +1,5 @@
+import { featurePages } from './site-pages';
+
 /** Reference websites supply presentation data, never application destinations. */
 export function isReferenceWebsite(url: URL): boolean {
 	const hostname = url.hostname.replace(/\.$/, '');
@@ -11,7 +13,6 @@ export const unavailableFeatures: Record<string, string> = {
 	spells: 'Spells',
 	achievements: 'Achievements',
 	worldquests: 'World Quests',
-	experiencetable: 'Experience Table',
 	maps: 'Maps',
 	genesis: 'Genesis',
 	soundtrack: 'Soundtrack',
@@ -44,6 +45,7 @@ export const unavailableFeatures: Record<string, string> = {
 };
 
 export function unavailableHref(feature: string): string {
+	if (Object.hasOwn(featurePages, feature)) return featurePages[feature].path;
 	return `/unavailable?feature=${Object.hasOwn(unavailableFeatures, feature) ? feature : 'resource'}`;
 }
 

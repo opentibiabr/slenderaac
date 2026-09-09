@@ -4,6 +4,7 @@
 	export let assets: Record<string, string | undefined> | null | undefined;
 	export let width: number | string;
 	export let bordered = true;
+	export let additional = false;
 
 	$: surfaceStyle = [
 		`width: ${typeof width === 'number' ? `${width}px` : width}`,
@@ -27,11 +28,19 @@
 <div
 	class="classic-table-surface"
 	class:classic-table-surface--bordered={bordered}
+	class:classic-table-surface--additional={additional}
 	style={surfaceStyle}>
 	<slot />
 </div>
 
 <style>
+	:global(.theme-classic) .classic-table-surface--additional {
+		box-shadow: 3px 3px 2px rgb(135 95 62);
+	}
+	:global(.theme-classic) .classic-table-surface--additional::before,
+	:global(.theme-classic) .classic-table-surface--additional::after {
+		display: none;
+	}
 	:global(.theme-classic) .classic-table-surface {
 		box-sizing: border-box;
 		position: relative;
