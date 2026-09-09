@@ -46,6 +46,25 @@ existing sorting defaults.
 
 ## Import and update
 
+`/houses` searches the active map's houses by town, occupancy and house type,
+with name, size, rent, public bid and auction-end sorting. Details and Back links
+retain the filters and selected layout. Current ownership and public auction
+values come from the application database. Modern auction columns take precedence
+when obsolete compatibility columns also exist. Private maximum bids are never
+queried or included in page responses.
+
+House map IDs, client artwork IDs, guildhall classification, entrance coordinates
+and bed capacity come from the selected map's definitions. Existing database rows
+absent from that map are excluded without deleting or changing them. Bed capacity
+is distinct from the number of beds currently installed. Optional operator-supplied
+150x150 illustrations use the external asset key `house-<clientId>`.
+
+This page provides search and inspection. Web bidding, transfers and move-out
+actions still require a game-server integration and are not implemented here.
+The current game server owns these actions in memory; writing auction columns
+from the website would race its save cycle. The page directs players to the
+client's house controls while that integration remains pending.
+
 Install the repository dependencies, then export the server definitions to a file
 outside the checkout and outside the public asset directory:
 
@@ -65,6 +84,12 @@ that selection. It combines the shared and selected datapack spell/rune scripts
 with the shared vocation definitions. Promotions resolve to their base vocation.
 Disabled files, monster script directories and internal command formulas are
 excluded from the player catalog.
+
+The importer reads `mapName` from the same local configuration and loads
+`<datapack>/world/<mapName>-house.xml` from the selected revision. Override that
+relative file with `--house-file <relative-house-file>`. Missing selected files,
+empty definitions, duplicate map IDs and invalid coordinates reject the import.
+Servers without imported house definitions expose an empty house catalog.
 
 The same import projects `serverName`, `location`, `worldType` and `maxPlayers`
 from local `config.lua` into an optional `world` object. These settings remain

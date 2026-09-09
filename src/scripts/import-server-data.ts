@@ -14,6 +14,7 @@ import {
 	readItemNames,
 } from '$lib/server/catalog/creature-import';
 import { catalogDisplayText } from '$lib/server/catalog/display-text';
+import { importHouseDefinitions } from '$lib/server/catalog/house-import';
 import { luaLiteral, parseLua } from '$lib/server/catalog/lua';
 import { readServerFiles, readVocations } from '$lib/server/catalog/source';
 import { importSpellCatalog } from '$lib/server/catalog/spell-import';
@@ -28,6 +29,7 @@ const { values } = parseArgs({
 		'spell-aliases': { type: 'string' },
 		'creature-aliases': { type: 'string' },
 		'display-text': { type: 'string' },
+		'house-file': { type: 'string' },
 	},
 });
 
@@ -39,6 +41,7 @@ async function main() {
 	const root = await fs.realpath(values['server-dir']);
 	let datapack = values.datapack;
 	let world: WorldConfig = {};
+	let mapName: string | undefined;
 	const resistance = { min: -200, max: 200 };
 	try {
 		const source = await fs.readFile(path.join(root, 'config.lua'), 'utf8');
@@ -46,6 +49,16 @@ async function main() {
 		world = importWorldConfig(source);
 		for (const statement of config.body) {
 			if (statement.type !== 'AssignmentStatement') continue;
+			const mapIndex = statement.variables.findIndex(
+				(variable) =>
+					variable.type === 'Identifier' && variable.name === 'mapName',
+			);
+			if (mapIndex >= 0) {
+				const value = luaLiteral(statement.init[mapIndex]);
+				if (typeof value !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(value))
+					throw new Error('Invalid map name');
+				mapName = value;
+			}
 			const index = statement.variables.findIndex(
 				(variable) =>
 					variable.type === 'Identifier' &&
@@ -77,6 +90,9 @@ async function main() {
 	}
 	if (!datapack || !/^[a-zA-Z0-9_-]+$/.test(datapack))
 		throw new Error('Set a valid dataPackDirectory or pass --datapack');
+	const houseFile =
+		values['house-file'] ??
+		(mapName ? `${datapack}/world/${mapName}-house.xml` : undefined);
 	const { files, revision } = await readServerFiles(
 		root,
 		[
@@ -89,6 +105,7 @@ async function main() {
 			'data/scripts/runes',
 			`${datapack}/scripts/spells`,
 			`${datapack}/scripts/runes`,
+			...(houseFile ? [houseFile] : []),
 		],
 		values.ref,
 	);
@@ -140,6 +157,10 @@ async function main() {
 			'Refusing to replace the library with an empty creature catalog',
 		);
 	const output = path.resolve(values.output);
+	const houseSource = houseFile ? files.get(houseFile) : undefined;
+	if (houseFile && !houseSource)
+		throw new Error('House definitions are missing');
+	const houses = houseSource ? importHouseDefinitions(houseSource) : [];
 	const achievementSource = files.get(
 		'data/scripts/lib/register_achievements.lua',
 	);
@@ -171,6 +192,7 @@ async function main() {
 					importedAt: new Date().toISOString(),
 					revision,
 					world,
+					houses,
 					spells,
 					creatures,
 					achievements,
@@ -191,6 +213,7 @@ async function main() {
 			runes: spells.filter((spell) => spell.type === 'Rune').length,
 			creatures: creatures.length,
 			achievements: achievements.length,
+			houses: houses.length,
 			bestiary: creatures.filter((creature) => creature.bestiary).length,
 			boostableBosses: creatures.filter(
 				(creature) => creature.bossCategory === 'Archfoe',

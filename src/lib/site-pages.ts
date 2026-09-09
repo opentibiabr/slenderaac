@@ -10,6 +10,13 @@ type FeaturePage = {
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	houses: {
+		path: '/houses',
+		title: 'Houses',
+		section: 'community',
+		headline: 'headlineHouses',
+		queryKeys: ['world', 'town', 'state', 'type', 'order', 'houseid'],
+	},
 	worldquests: {
 		path: '/library/world-quests',
 		title: 'World Quests',

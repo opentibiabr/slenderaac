@@ -12,6 +12,9 @@
 		Arial,
 		sans-serif;
 }
+.theme-classic .classic-native-content .page-intro--section {
+	margin-bottom: 30px;
+}
 .theme-classic .classic-native-content .page-prose {
 	display: flow-root;
 	margin: 15px 0;
