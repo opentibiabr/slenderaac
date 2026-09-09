@@ -1217,24 +1217,19 @@
 		column-gap: var(--classic-column-gap, 14px);
 		row-gap: 12px;
 		width: min(
-			var(--classic-shell-width, 1263px),
-			calc(100% - var(--classic-shell-gutter, 24px))
+			var(--classic-shell-width, 1253px),
+			calc(100% - var(--classic-shell-gutter, 27px))
 		);
 		margin: 0 auto -3px;
-		left: var(--classic-shell-left, 5.5px);
+		left: var(--classic-shell-left, 0.5px);
 		top: -3px;
-	}
-
-	.theme-classic:not(.theme-classic--compact-news) {
-		--classic-shell-width: 1253px;
-		--classic-shell-left: 0.5px;
-		--classic-shell-gutter: 27px;
 	}
 
 	.theme-classic.theme-classic--wide {
 		--classic-center-width: 915px;
 		--classic-column-gap: 7px;
 		--classic-shell-width: 1299px;
+		--classic-shell-gutter: 24px;
 		--classic-shell-left: 22.5px;
 		--classic-left-offset: 1px;
 		--classic-center-offset: 10px;
