@@ -8,43 +8,41 @@ import type { PageServerLoad } from './$types';
 const PER_PAGE = 50;
 const MAX_PER_PAGE = 200;
 
+function positiveInteger(value: string | null, fallback: number) {
+	const number = Number(value);
+	return Number.isSafeInteger(number) && number > 0 ? number : fallback;
+}
+
 export const load = (async ({ url }) => {
 	const skillParam = url.searchParams.get('skill');
 	const skill = isSkill(skillParam) ? skillParam : 'experience';
-	const vocation = url.searchParams.get('vocation') ?? 'all';
-
-	let take = Number(url.searchParams.get('limit')) || PER_PAGE;
-	if (take > MAX_PER_PAGE) {
-		take = MAX_PER_PAGE;
-	}
-	const page = Number(url.searchParams.get('page')) || 1;
-	const skip = page * take - take;
+	const vocationParam = url.searchParams.get('vocation') ?? 'all';
+	const vocation = vocationIds(vocationParam).length
+		? vocationParam.toLowerCase()
+		: 'all';
+	const take = Math.min(
+		positiveInteger(url.searchParams.get('limit'), PER_PAGE),
+		MAX_PER_PAGE,
+	);
+	const where = {
+		deletion: 0,
+		group_id: { lt: PlayerGroup.Gamemaster },
+		vocation: vocation === 'all' ? undefined : { in: vocationIds(vocation) },
+	};
+	const count = await prisma.players.count({ where });
+	const page = Math.min(
+		positiveInteger(url.searchParams.get('page'), 1),
+		Math.max(1, Math.ceil(count / take)),
+	);
+	const skip = (page - 1) * take;
 	const skillColumn = skillToColumn(skill);
 
 	const characters = await prisma.players.findMany({
-		where: {
-			deletion: 0,
-			group_id: {
-				lt: PlayerGroup.Gamemaster,
-			},
-			vocation:
-				vocation === 'all'
-					? undefined
-					: {
-							in: vocationIds(vocation),
-					  },
-		},
+		where,
 		select: PlayerSelectForList,
 		orderBy: { [skillColumn]: 'desc' },
 		take,
 		skip,
-	});
-	const count = await prisma.players.count({
-		where: {
-			group_id: {
-				lt: PlayerGroup.Gamemaster,
-			},
-		},
 	});
 
 	return {
