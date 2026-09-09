@@ -170,7 +170,7 @@
 	"submit": "Enviar",
 	"token": "Token",
 	"undelete": "Recuperar",
-	"unjustified": " <em class=\"text-error-500\">(injustificado)</em>",
+	"unjustified": "(injustificado)",
 	"validations": {
 		"blocked-words": ":campo não deve conter palavras bloqueadas",
 		"email": ":campo deve ser um endereço de e-mail válido",

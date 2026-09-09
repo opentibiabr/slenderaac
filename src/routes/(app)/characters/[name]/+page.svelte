@@ -6,10 +6,12 @@
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
+	import DeathNotice from '$lib/components/ui/DeathNotice.svelte';
 	import GuildMembership from '$lib/components/ui/GuildMembership.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
 	import ClassicCharacterProfile from '$lib/themes/classic/CharacterProfile.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -25,6 +27,12 @@
 			])
 		: null;
 	$: inventory = data.inventory;
+	function characterHref(name: string) {
+		return themePreviewHref(
+			$page.url,
+			`/characters/${encodeURIComponent(name)}`,
+		);
+	}
 </script>
 
 {#if $page.data.selectedTheme === 'classic'}
@@ -121,35 +129,7 @@
 							<tr class="[&>td]:!p-2">
 								<td>{formatDate(death.time)}</td>
 								<td>
-									{#if death.mostdamage_by !== death.killed_by}
-										{@html $_('death-log-double', {
-											values: {
-												killer: death.is_player
-													? `<a href="/characters/${death.killed_by}" class="anchor">${death.killed_by}</a>`
-													: death.killed_by,
-												killerJust: death.unjustified
-													? '' + $_('unjustified')
-													: '',
-												mostdamage: death.mostdamage_is_player
-													? `<a href="/characters/${death.mostdamage_by}" class="anchor">${death.mostdamage_by}</a>`
-													: death.mostdamage_by,
-												mostdamageJust: death.mostdamage_unjustified
-													? '' + $_('unjustified')
-													: '',
-												level: death.level,
-											},
-										})}
-									{:else}
-										{@html $_('death-log-single', {
-											values: {
-												killer: death.is_player
-													? `<a href="/characters/${death.killed_by} class="anchor">${death.killed_by}</a>`
-													: death.killed_by,
-												just: death.unjustified ? '' + $_('unjustified') : '',
-												level: death.level,
-											},
-										})}
-									{/if}
+									<DeathNotice {death} href={characterHref} />
 								</td>
 							</tr>
 						{/each}

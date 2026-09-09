@@ -3,6 +3,7 @@
 
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
+	import DeathNotice from '$lib/components/ui/DeathNotice.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
@@ -15,6 +16,9 @@
 	$: character = data.character;
 	function href(path: string, name: string) {
 		return themePreviewHref($page.url, path + encodeURIComponent(name));
+	}
+	function characterHref(name: string) {
+		return href('/characters/', name);
 	}
 </script>
 
@@ -70,19 +74,7 @@
 				<tbody>
 					{#each data.deaths as death}<tr
 							><td>{formatDate(death.time)}</td><td>
-								Died at Level {death.level} by
-								{#if death.is_player}<a
-										href={href('/characters/', death.killed_by)}
-										>{death.killed_by}</a
-									>{:else}{death.killed_by}{/if}{#if death.unjustified}
-									(unjustified){/if}
-								{#if death.mostdamage_by !== death.killed_by}
-									and
-									{#if death.mostdamage_is_player}<a
-											href={href('/characters/', death.mostdamage_by)}
-											>{death.mostdamage_by}</a
-										>{:else}{death.mostdamage_by}{/if}{#if death.mostdamage_unjustified}
-										(unjustified){/if}{/if}.
+								<DeathNotice {death} href={characterHref} />
 							</td></tr
 						>{/each}
 				</tbody>
