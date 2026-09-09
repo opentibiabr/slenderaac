@@ -242,7 +242,8 @@
 					</div>
 				{/if}
 
-				<div class="px-4 pt-2 pb-2 overflow-y-auto flex flex-col items-center">
+				<div
+					class="theme-legbone-page-body px-4 pt-2 pb-2 overflow-y-auto flex flex-col items-center">
 					<slot />
 				</div>
 			</main>
@@ -263,6 +264,15 @@
 </div>
 
 <style>
+	/* Section navigation follows the document, so intermediate shells cannot own scrolling. */
+	:global(.theme-legbone:has(.section-navigation) .theme-legbone-content),
+	:global(.theme-legbone:has(.section-navigation) #appShell),
+	:global(.theme-legbone:has(.section-navigation) #appShell > div),
+	:global(.theme-legbone:has(.section-navigation) #page),
+	:global(.theme-legbone:has(.section-navigation) .theme-legbone-page-body) {
+		overflow: visible;
+		min-width: 0;
+	}
 	.server-brand {
 		display: flex;
 		align-items: center;
@@ -315,5 +325,9 @@
 		border-color: rgb(250 204 21 / 0.9);
 		background: rgb(30 41 59 / 0.92);
 		color: white;
+	}
+	:global(.theme-legbone:has(.section-navigation))
+		.theme-legbone-preview-switch {
+		position: absolute;
 	}
 </style>

@@ -3,10 +3,20 @@ type FeaturePage = {
 	title: string;
 	section: string;
 	headline: string;
+	headlineWidth?: number;
+	headlineHeight?: number;
 	queryKeys?: string[];
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	achievements: {
+		path: '/library/achievements',
+		title: 'Achievements',
+		section: 'library',
+		headline: 'headlineAchievements',
+		headlineWidth: 192,
+		headlineHeight: 32,
+	},
 	spells: {
 		path: '/library/spells',
 		title: 'Spells',

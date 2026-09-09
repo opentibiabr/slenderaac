@@ -46,6 +46,19 @@ void test('server redirects do not read the browser-only fragment', () => {
 });
 
 void test('native catalog links retain selection and filters while dropping unknown source parameters', () => {
+	assert.equal(
+		referenceSiteDestination(
+			new URL('https://game.example/library/?subtopic=achievements#Grade+3'),
+		),
+		'/library/achievements#Grade+3',
+	);
+	assert.equal(
+		themePreviewHref(
+			new URL('https://game.example/?themePreview=classic'),
+			'/unavailable?feature=achievements#Grade+3',
+		),
+		'/library/achievements?themePreview=classic#Grade+3',
+	);
 	const target = referenceSiteDestination(
 		new URL(
 			'https://game.example/library/?subtopic=spells&spell=healing&vocation=Mage&group=Healing&type=Instant&premium=yes&sort=mana&redirect=external#information',

@@ -69,6 +69,8 @@
 	<title>{browserTitle(title)}</title>
 </svelte:head>
 
+<div id="top" aria-hidden="true"></div>
+
 {#if browser}
 	<Toast />
 {/if}

@@ -12,6 +12,21 @@
 		Arial,
 		sans-serif;
 }
+.theme-classic .classic-native-content .page-prose {
+	display: flow-root;
+	margin: 15px 0;
+	font:
+		12px/15px Verdana,
+		Arial,
+		sans-serif;
+}
+.theme-classic .classic-native-content .page-prose :is(p, ul) {
+	margin: 12px 0;
+}
+.theme-classic .classic-native-content .page-prose ul {
+	padding-left: 40px;
+	list-style: disc;
+}
 .theme-classic
 	.classic-native-content
 	:is(

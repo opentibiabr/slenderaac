@@ -2,6 +2,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
+import { parseAchievementRecords } from '$lib/achievements';
+import { importAchievementCatalog } from '$lib/server/catalog/achievement-import';
 import {
 	applyCreatureAliases,
 	applySpellAliases,
@@ -10,6 +12,7 @@ import {
 	importCreatureCatalog,
 	readItemNames,
 } from '$lib/server/catalog/creature-import';
+import { catalogDisplayText } from '$lib/server/catalog/display-text';
 import { luaLiteral, parseLua } from '$lib/server/catalog/lua';
 import { readServerFiles, readVocations } from '$lib/server/catalog/source';
 import { importSpellCatalog } from '$lib/server/catalog/spell-import';
@@ -22,6 +25,7 @@ const { values } = parseArgs({
 		output: { type: 'string' },
 		'spell-aliases': { type: 'string' },
 		'creature-aliases': { type: 'string' },
+		'display-text': { type: 'string' },
 	},
 });
 
@@ -75,6 +79,7 @@ async function main() {
 		[
 			'data/XML/vocations.xml',
 			'data/items/items.xml',
+			'data/scripts/lib/register_achievements.lua',
 			'data/monster',
 			`${datapack}/monster`,
 			'data/scripts/spells',
@@ -132,6 +137,26 @@ async function main() {
 			'Refusing to replace the library with an empty creature catalog',
 		);
 	const output = path.resolve(values.output);
+	const achievementSource = files.get(
+		'data/scripts/lib/register_achievements.lua',
+	);
+	if (!achievementSource)
+		throw new Error('Achievement definitions are missing');
+	let achievements = importAchievementCatalog(achievementSource);
+	if (values['display-text']) {
+		const file = await fs.stat(values['display-text']);
+		if (!file.isFile() || file.size > 100_000)
+			throw new Error('Invalid display text file');
+		const displayText = catalogDisplayText(
+			JSON.parse(await fs.readFile(values['display-text'], 'utf8')),
+		);
+		achievements = parseAchievementRecords(
+			achievements.map((entry) => ({
+				...entry,
+				description: displayText(entry.description),
+			})),
+		);
+	}
 	await fs.mkdir(path.dirname(output), { recursive: true });
 	const temporary = `${output}.${process.pid}.tmp`;
 	try {
@@ -144,6 +169,7 @@ async function main() {
 					revision,
 					spells,
 					creatures,
+					achievements,
 				},
 				null,
 				2,
@@ -160,6 +186,7 @@ async function main() {
 			spells: spells.length,
 			runes: spells.filter((spell) => spell.type === 'Rune').length,
 			creatures: creatures.length,
+			achievements: achievements.length,
 			bestiary: creatures.filter((creature) => creature.bestiary).length,
 			boostableBosses: creatures.filter(
 				(creature) => creature.bossCategory === 'Archfoe',

@@ -13,6 +13,13 @@ and back links retain theme preview. `/library/boostable-bosses` lists registere
 Archfoe boss types with a boss race ID. Boss portraits are informational. Both
 pages read the daily boosted selection from the application database.
 
+`/library/achievements` groups the server's public achievements by grade and
+sorts them by name. Grade point ranges and the secret total come from the server
+catalog. Secret identities and descriptions are excluded from page responses.
+Section links work with keyboard navigation and saved fragments; the section
+menu stays visible when scrolling, and each caption links back to the page top.
+Older unavailable-menu links automatically upgrade to this local page.
+
 ## Import and update
 
 Install the repository dependencies, then export the server definitions to a file
@@ -43,6 +50,12 @@ receiving a guessed name. Elemental resistance limits come from local
 The registration rule preserves complete immunity to all seven player elements.
 Experience values are base values before player stages and other game bonuses.
 
+Achievement definitions come from `data/scripts/lib/register_achievements.lua`.
+The importer verifies its literal table and registration loop, including the
+standard missing-field guards and registration defaults. Conditional registration,
+runtime mutations, indirect calls and unresolved metadata require an explicit
+export. Helper function declarations after registration are not executed.
+
 The importer parses Lua syntax and literal metadata without executing server
 scripts or callbacks. Conditional metadata, unresolved expressions, unknown
 vocations, duplicate identities and invalid requirements reject the import. An
@@ -70,15 +83,32 @@ unambiguously to an imported spell and cannot collide with another identity:
 ```
 
 `--creature-aliases /path/to/creature-aliases.json` accepts the same mapping for
-registered creature names or canonical IDs. Each import validates spells and
-creatures before replacing the snapshot; a missing or malformed creature catalog
-cannot erase the existing spell catalog, and vice versa.
+registered creature names or canonical IDs. Each import validates spells,
+creatures and achievements before replacing the snapshot. A missing or malformed
+section cannot erase any previously installed section.
+
+For display names inherited in achievement descriptions, optionally pass
+`--display-text /path/to/display-text.json`. The JSON object maps whole words or
+phrases, case-insensitively, to display text or identity placeholders:
+
+```json
+{
+	"Old Realm": "{{serverName}}",
+	"Old Realm citizens": "{{serverName}} players"
+}
+```
+
+Replacements run once, longest match first, only on descriptions. Native IDs,
+achievement names, grades, points and secret flags stay intact. The app resolves
+`{{serverName}}` from its configured identity at display time. Keep this map
+outside the checkout and pass it on every refresh that needs those substitutions.
 
 ## Data and presentation
 
 The snapshot uses `schemaVersion: 1`, an import timestamp, an optional source
-revision, a `spells` array and a `creatures` array. Older spell-only snapshots
-continue to serve spells and show an empty creature library until refreshed.
+revision, and `spells`, `creatures` and `achievements` arrays. Older snapshots
+continue to serve their existing sections and show an empty state for a missing
+section until refreshed.
 Requirements, formula, vocations, premium status,
 groups, cooldowns, mana, combat type and rune metadata come from the server.
 The application validates and caches this file; it never executes its contents
@@ -120,3 +150,16 @@ components. The list uses 21px table rows, while the filter uses native radio
 controls with a 19px cadence and container-based reflow. Additional server
 vocations or rows naturally change the resulting panel height. Existing native
 page panels retain their default variant.
+
+Description panels reuse the same table frame and native shadow layers, with
+stacked title/description cards. Section navigation uses a shared small frame;
+long introductions use the shared prose style. `headlineAchievements`,
+`achievementGrade` and `backToTop` are optional external asset keys. Missing
+artwork retains readable titles and working controls. The public achievement
+catalog does not yet add character showcase selection or achievement highscores;
+those require the player's earned-achievement data and account permissions.
+
+In the default theme, pages containing section navigation use document scrolling
+through the intermediate shell containers. This lets sticky navigation work
+without changing the scroll behavior of other pages. The temporary theme-preview
+switch stays at the page top so it cannot cover a section link while scrolling.

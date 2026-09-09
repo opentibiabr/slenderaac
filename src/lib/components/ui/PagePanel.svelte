@@ -7,7 +7,7 @@
 	export let title: string;
 	export let compact = false;
 	export let surface = false;
-	export let variant: 'native' | 'list' | 'form' = 'native';
+	export let variant: 'native' | 'list' | 'form' | 'stack' = 'native';
 </script>
 
 {#if $page.data.selectedTheme === 'classic'}
@@ -15,10 +15,12 @@
 		class="classic-page-panel"
 		class:classic-page-panel--list={variant === 'list'}
 		class:classic-page-panel--form={variant === 'form'}
+		class:classic-page-panel--stack={variant === 'stack'}
 		class:classic-page-panel--compact={compact}
 		class:classic-page-panel--surface={surface}>
 		<TableFrame assets={$page.data.themeAssets}>
-			<svelte:fragment slot="caption">{title}</svelte:fragment>
+			<svelte:fragment slot="caption"
+				><slot name="caption">{title}</slot></svelte:fragment>
 			<div class="classic-page-panel__body">
 				{#if surface}<TableSurface
 						assets={$page.data.themeAssets}
@@ -89,6 +91,18 @@
 	}
 	:global(
 		.theme-classic .classic-page-panel--surface .classic-table-frame__rail
+	) {
+		background: rgb(241 224 197);
+	}
+	:global(.theme-classic) .classic-page-panel--stack {
+		display: flow-root;
+		margin-bottom: 30px;
+	}
+	:global(.theme-classic) .classic-page-panel--stack .classic-page-panel__body {
+		padding: 8px 7px 8px 6px;
+	}
+	:global(
+		.theme-classic .classic-page-panel--stack .classic-table-frame__rail
 	) {
 		background: rgb(241 224 197);
 	}

@@ -1,6 +1,10 @@
 import fs from 'node:fs/promises';
 
 import type { SpellRecord } from '$lib/spells';
+import {
+	type AchievementRecord,
+	parseAchievementRecords,
+} from '$lib/achievements';
 import { type CreatureRecord, parseCreatureRecords } from '$lib/creatures';
 import { parseSpellRecords } from '$lib/spells';
 
@@ -12,6 +16,7 @@ let cache: {
 	size: number;
 	spells: SpellRecord[];
 	creatures: CreatureRecord[];
+	achievements: AchievementRecord[];
 } | null = null;
 
 export async function loadSpells(): Promise<SpellRecord[]> {
@@ -22,8 +27,13 @@ export async function loadCreatures(): Promise<CreatureRecord[]> {
 	return (await loadCatalog()).creatures;
 }
 
+export async function loadAchievements(): Promise<AchievementRecord[]> {
+	return (await loadCatalog()).achievements;
+}
+
 async function loadCatalog() {
-	if (!env.SERVER_DATA_FILE) return { spells: [], creatures: [] };
+	if (!env.SERVER_DATA_FILE)
+		return { spells: [], creatures: [], achievements: [] };
 	const file = await fs.realpath(env.SERVER_DATA_FILE);
 	const stat = await fs.stat(file);
 	if (!stat.isFile() || stat.size > 20_000_000)
@@ -46,12 +56,15 @@ async function loadCatalog() {
 	const spells = parseSpellRecords(value.spells);
 	const creatures =
 		'creatures' in value ? parseCreatureRecords(value.creatures) : [];
+	const achievements =
+		'achievements' in value ? parseAchievementRecords(value.achievements) : [];
 	cache = {
 		path: file,
 		stamp: stat.mtimeMs,
 		size: stat.size,
 		spells,
 		creatures,
+		achievements,
 	};
 	return cache;
 }

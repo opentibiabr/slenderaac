@@ -124,14 +124,36 @@ void test('an empty or malformed import leaves the installed server catalog unch
 		const creatureSource =
 			'local mType = Game.createMonsterType("Example")\nlocal monster = {}\nmonster.health = 100\nmonster.experience = 10\nmonster.outfit = {lookType = 99}\nmonster.flags = {summonable = false, convinceable = false}\nmonster.elements = {}\nmType:register(monster)';
 		await fs.writeFile(creatureFile, creatureSource);
+		await assert.rejects(
+			execute(process.execPath, args),
+			/Achievement definitions are missing/,
+		);
+		assert.equal(await fs.readFile(output, 'utf8'), 'previous catalog');
+		await fs.mkdir(path.join(root, 'data/scripts/lib'), { recursive: true });
+		const achievementFile = path.join(
+			root,
+			'data/scripts/lib/register_achievements.lua',
+		);
+		const achievementSource =
+			'ACHIEVEMENTS = {[3] = {name = "Explorer", description = "Explore a cave", grade = 1, points = 2}}\nfor id, item in pairs(ACHIEVEMENTS) do Game.registerAchievement(id, item.name, item.description, item.secret, item.grade, item.points) end';
+		await fs.writeFile(achievementFile, achievementSource);
 		await execute(process.execPath, args);
 		const installed = await fs.readFile(output, 'utf8');
 		const value = JSON.parse(installed) as {
 			spells: unknown[];
 			creatures: unknown[];
+			achievements: unknown[];
 		};
 		assert.equal(value.spells.length, 1);
 		assert.equal(value.creatures.length, 1);
+		assert.equal(value.achievements.length, 1);
+		await fs.writeFile(
+			achievementFile,
+			achievementSource.replace('points = 2', 'points = dynamicPoints'),
+		);
+		await assert.rejects(execute(process.execPath, args), /literal expression/);
+		assert.equal(await fs.readFile(output, 'utf8'), installed);
+		await fs.writeFile(achievementFile, achievementSource);
 		await fs.writeFile(
 			creatureFile,
 			creatureSource.replace(

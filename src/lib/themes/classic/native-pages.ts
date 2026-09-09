@@ -56,5 +56,10 @@ export function classicNativePage(pathname: string): NativePage | null {
 	const feature = Object.values(featurePages).find(
 		(page) => page.path === pathname,
 	);
-	return { headline: feature?.headline ?? '', paperMinHeight: 387 };
+	return {
+		headline: feature?.headline ?? '',
+		headlineWidth: feature?.headlineWidth,
+		headlineHeight: feature?.headlineHeight,
+		paperMinHeight: 387,
+	};
 }
