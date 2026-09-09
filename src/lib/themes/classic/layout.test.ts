@@ -6,10 +6,12 @@ import { classicNativePage } from './native-pages';
 
 void test('future routes inherit the shared native content treatment', () => {
 	assert.equal(classicLayoutForPath('/library/future-page/'), 'compact');
-	assert.deepEqual(classicNativePage('/library/future-page/'), {
-		headline: '',
-		paperMinHeight: 387,
-	});
+	const page = classicNativePage('/library/future-page/');
+	assert.ok(page);
+	assert.equal(page.headline, '');
+	assert.equal(page.paperMinHeight, 387);
+	assert.equal(page.headlineWidth, undefined);
+	assert.equal(page.headlineHeight, undefined);
 });
 
 void test('specialized news and information pages preserve their content ownership', () => {
