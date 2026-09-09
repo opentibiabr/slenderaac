@@ -2,6 +2,9 @@
 	import { slide } from 'svelte/transition';
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
+	import CharacterSearch from '$lib/components/ui/CharacterSearch.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 
@@ -14,14 +17,20 @@
 	$: results = data.results ?? [];
 </script>
 
-<div class="flex flex-col items-center gap-2">
+{#if $page.data.selectedTheme === 'cip-slender'}
 	<slot />
+	<CharacterSearch />
+	{#if results.length > 0}<CharactersTable characters={results} />{/if}
+{:else}
+	<div class="flex flex-col items-center gap-2">
+		<slot />
 
-	<SearchQuerier label={$_('character-name')} bind:reset />
+		<SearchQuerier label={$_('character-name')} bind:reset />
 
-	{#if results.length > 0}
-		<div transition:slide>
-			<CharactersTable characters={results} on:selected={reset} />
-		</div>
-	{/if}
-</div>
+		{#if results.length > 0}
+			<div transition:slide>
+				<CharactersTable characters={results} on:selected={reset} />
+			</div>
+		{/if}
+	</div>
+{/if}

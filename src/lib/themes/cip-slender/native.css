@@ -1,0 +1,133 @@
+.theme-cip-slender .cip-native-content {
+	font:
+		13.333333px Verdana,
+		Arial,
+		sans-serif;
+	color: rgb(90 40 0);
+}
+.theme-cip-slender
+	.cip-native-content
+	:is(
+		input:not([type]),
+		input[type='text'],
+		input[type='search'],
+		input[type='email'],
+		input[type='password'],
+		input[type='number'],
+		textarea,
+		select
+	) {
+	appearance: auto;
+	box-sizing: border-box;
+	background: white;
+	color: black;
+	border: 2px inset rgb(118 118 118);
+	border-radius: 0;
+	padding: 1px 2px;
+	font:
+		13.333333px Arial,
+		sans-serif;
+	line-height: normal;
+	box-shadow: none;
+	min-height: 0;
+}
+.theme-cip-slender .cip-native-content input:not([type]),
+.theme-cip-slender
+	.cip-native-content
+	input:is(
+		[type='text'],
+		[type='search'],
+		[type='email'],
+		[type='password'],
+		[type='number']
+	) {
+	height: 21px;
+}
+.theme-cip-slender .cip-native-content .btn:not(.btn-icon) {
+	display: inline-flex;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 135px;
+	width: 135px;
+	height: 25px;
+	min-height: 25px;
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	font:
+		12px Verdana,
+		Arial,
+		sans-serif;
+	color: rgb(255 209 140);
+	background: var(--cip-native-button) center / 135px 25px no-repeat;
+	text-shadow:
+		-1px -1px #000,
+		0 -1px #000,
+		1px -1px #000,
+		1px 0 #000,
+		1px 1px #000,
+		0 1px #000,
+		-1px 1px #000,
+		-1px 0 #000;
+	text-decoration: none;
+	cursor: pointer;
+	box-shadow: none;
+}
+.theme-cip-slender .cip-native-content .btn:not(.btn-icon):hover {
+	background-image: var(--cip-native-button-hover);
+}
+.theme-cip-slender .cip-native-content .btn[disabled],
+.theme-cip-slender .cip-native-content .btn[aria-disabled='true'] {
+	opacity: 0.5;
+	cursor: default;
+}
+.theme-cip-slender .cip-native-content a:not(.btn) {
+	color: rgb(0 66 148);
+	font-weight: bold;
+}
+.theme-cip-slender .cip-native-content a:not(.btn):hover {
+	text-decoration: underline;
+}
+.theme-cip-slender .cip-native-content .cip-data-table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid rgb(250 240 215);
+	font:
+		13.333333px Verdana,
+		Arial,
+		sans-serif;
+}
+.theme-cip-slender .cip-native-content .cip-data-table :is(th, td) {
+	padding: 2px 5px;
+	text-align: left;
+	vertical-align: top;
+}
+.theme-cip-slender .cip-native-content .cip-data-table th {
+	font-weight: bold;
+}
+.theme-cip-slender .cip-native-content .cip-data-table tr:nth-child(odd) {
+	background: rgb(212 192 161);
+}
+.theme-cip-slender .cip-native-content .cip-data-table tr:nth-child(even) {
+	background: rgb(241 224 198);
+}
+.theme-cip-slender .cip-native-content .cip-data-table thead tr {
+	background: rgb(212 192 161);
+}
+.theme-cip-slender .cip-native-content .cip-data-table--details td:first-child {
+	width: 30%;
+}
+.theme-cip-slender .cip-native-content .cip-data-table pre {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	font: inherit;
+}
+.theme-cip-slender .cip-native-content .box {
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+}
+.theme-cip-slender .cip-native-content .box > .title {
+	display: none;
+}

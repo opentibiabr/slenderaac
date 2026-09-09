@@ -1,4 +1,6 @@
 <script lang="ts">
+	import './native.css';
+
 	import { faDiscord } from '@fortawesome/free-brands-svg-icons';
 	import {
 		faBars,
@@ -25,6 +27,7 @@
 	import { cipLayoutForPath } from './layout';
 	import MediaDialog from './MediaDialog.svelte';
 	import Menu from './Menu.svelte';
+	import { cipNativePage } from './native-pages';
 	import { cipAsset } from './theme';
 
 	type CipSlenderLayoutData = LayoutData & {
@@ -93,6 +96,7 @@
 	$: isInformationPage = !!$page.data.informationPage;
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
 	$: layout = cipLayoutForPath(currentPath);
+	$: nativePage = cipNativePage(currentPath);
 	$: isNewsArchivePage = currentPath === '/news/archive';
 	$: isEventSchedulePage = layout === 'compact-wide';
 	$: isCompactNewsToolPage = layout !== 'news';
@@ -941,21 +945,31 @@
 						? headlineNewsArchive
 						: title === 'Event Schedule'
 							? headlineEventSchedule
-							: (information?.headline.src ?? null)}
+							: (information?.headline.src ??
+								(nativePage ? data.themeAssets?.[nativePage.headline] : null) ??
+								null)}
 				headlineWidth={information?.headline.width ??
 					(isEventSchedulePage ? 192 : 250)}
 				headlineHeight={information?.headline.height ??
 					(isEventSchedulePage ? 32 : 28)}
 				compact={isCompactNewsToolPage}
-				paperMinHeight={isInformationPage
-					? 0
-					: layout === 'compact-wide'
-						? 640
-						: layout === 'compact'
-							? 241
-							: 620}
+				paperMinHeight={nativePage
+					? nativePage.paperMinHeight
+					: isInformationPage
+						? 0
+						: layout === 'compact-wide'
+							? 640
+							: layout === 'compact'
+								? 241
+								: 620}
 				{paperTexture}>
-				<slot />
+				{#if nativePage}
+					<div
+						class="cip-native-content"
+						style={`--cip-native-button: url("${cipAsset(data.themeAssets, 'smallButtonBackground') ?? ''}"); --cip-native-button-hover: url("${cipAsset(data.themeAssets, 'smallButtonHover') ?? ''}")`}>
+						<slot />
+					</div>
+				{:else}<slot />{/if}
 			</ContentFrame>
 
 			<footer class="theme-cip-slender__footer">

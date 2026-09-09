@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import GuildMembership from '$lib/components/ui/GuildMembership.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
+	import CipCharacterProfile from '$lib/themes/cip-slender/CharacterProfile.svelte';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -19,12 +22,14 @@
 		? Object.entries(data.skills).map(([skill, level]) => [
 				$_(`skills.${skill}`),
 				level,
-		  ])
+			])
 		: null;
 	$: inventory = data.inventory;
 </script>
 
-{#if character}
+{#if $page.data.selectedTheme === 'cip-slender'}
+	<CipCharacterProfile {data} />
+{:else if character}
 	<div class="flex flex-col gap-2">
 		<div class="data-table">
 			<div class="flex flex-row justify-center gap-4 items-center px-8">
