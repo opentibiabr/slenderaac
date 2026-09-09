@@ -4,24 +4,13 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { highscoreCategories } from '$lib/highscores';
 	import { vocationFilters as vocations } from '$lib/players';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from '../../../routes/(app)/highscores/$types';
 
 	export let data: PageData;
-	const categories = [
-		['experience', 'Experience Points'],
-		['magic', 'Magic Level'],
-		['fist', 'Fist Fighting'],
-		['club', 'Club Fighting'],
-		['sword', 'Sword Fighting'],
-		['axe', 'Axe Fighting'],
-		['distance', 'Distance Fighting'],
-		['shielding', 'Shielding'],
-		['fishing', 'Fishing'],
-		['balance', 'Balance'],
-	];
 	$: parameters = new URL(themePreviewHref($page.url, '/highscores'), $page.url)
 		.searchParams;
 	$: lastPage = Math.max(1, Math.ceil(data.count / data.limit));
@@ -50,7 +39,7 @@
 		</select>
 		<label for="ranking-category">Category:</label>
 		<select id="ranking-category" name="skill"
-			>{#each categories as [value, label]}<option
+			>{#each highscoreCategories as { value, label }}<option
 					{value}
 					selected={data.skill === value}>{label}</option
 				>{/each}</select>

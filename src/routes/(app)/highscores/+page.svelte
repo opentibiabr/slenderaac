@@ -7,6 +7,7 @@
 
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import Select from '$lib/components/ui/forms/Select.svelte';
+	import { highscoreCategories } from '$lib/highscores';
 	import { vocationFilters as vocations } from '$lib/players';
 	import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
@@ -36,18 +37,10 @@
 		);
 	}
 
-	$: skills = [
-		'experience',
-		'magic',
-		'fist',
-		'club',
-		'sword',
-		'axe',
-		'distance',
-		'shielding',
-		'fishing',
-		'balance',
-	].map((skill) => ({ value: skill, label: $_(`skills.${skill}`) }));
+	$: skills = highscoreCategories.map(({ value }) => ({
+		value,
+		label: $_(`skills.${value}`),
+	}));
 
 	let form: HTMLFormElement;
 </script>

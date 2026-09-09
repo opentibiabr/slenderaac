@@ -144,6 +144,7 @@
   },
   "skill": "Skill",
   "skills": {
+    "achievements": "Achievement Points",
     "axe": "Axe",
     "balance": "Balance",
     "club": "Club",

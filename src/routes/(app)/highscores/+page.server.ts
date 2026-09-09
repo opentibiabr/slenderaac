@@ -1,4 +1,8 @@
 import { PlayerGroup, type PlayerWithRank, vocationIds } from '$lib/players';
+import {
+	nativeAchievementPoints,
+	rankAchievementPlayers,
+} from '$lib/server/achievement-ranking';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { isSkill, skillToColumn } from '$lib/server/skills';
@@ -15,7 +19,10 @@ function positiveInteger(value: string | null, fallback: number) {
 
 export const load = (async ({ url }) => {
 	const skillParam = url.searchParams.get('skill');
-	const skill = isSkill(skillParam) ? skillParam : 'experience';
+	const skill =
+		skillParam === 'achievements' || isSkill(skillParam)
+			? skillParam
+			: 'experience';
 	const vocationParam = url.searchParams.get('vocation') ?? 'all';
 	const vocation = vocationIds(vocationParam).length
 		? vocationParam.toLowerCase()
@@ -29,6 +36,58 @@ export const load = (async ({ url }) => {
 		group_id: { lt: PlayerGroup.Gamemaster },
 		vocation: vocation === 'all' ? undefined : { in: vocationIds(vocation) },
 	};
+	if (skill === 'achievements') {
+		const points = await nativeAchievementPoints();
+		const ids: number[] = [];
+		let after = 0;
+		let players: { id: number }[];
+		do {
+			players = await prisma.players.findMany({
+				where: { ...where, id: { gt: after } },
+				select: { id: true },
+				orderBy: { id: 'asc' },
+				take: 1000,
+			});
+			ids.push(...players.map((player) => player.id));
+			after = players.at(-1)?.id ?? after;
+		} while (players.length === 1000);
+		const ranking = rankAchievementPlayers(ids, points);
+		const count = ranking.length;
+		const page = Math.min(
+			positiveInteger(url.searchParams.get('page'), 1),
+			Math.max(1, Math.ceil(count / take)),
+		);
+		const skip = (page - 1) * take;
+		const entries = ranking.slice(skip, skip + take);
+		const visiblePlayers = await prisma.players.findMany({
+			where: { ...where, id: { in: entries.map((entry) => entry.playerId) } },
+			select: PlayerSelectForList,
+		});
+		const playersById = new Map(
+			visiblePlayers.map((player) => [player.id, player]),
+		);
+		return {
+			title: 'Highscores',
+			characters: entries.flatMap((entry, index): PlayerWithRank[] => {
+				const player = playersById.get(entry.playerId);
+				return player
+					? [
+							{
+								...dbToPlayer(player),
+								rank: skip + index + 1,
+								skill: entry.points.toLocaleString(undefined),
+							},
+						]
+					: [];
+			}),
+			page,
+			limit: take,
+			offset: page - 1,
+			skill,
+			count,
+			vocation,
+		};
+	}
 	const count = await prisma.players.count({ where });
 	const page = Math.min(
 		positiveInteger(url.searchParams.get('page'), 1),

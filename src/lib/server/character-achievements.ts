@@ -2,6 +2,7 @@ import type { Prisma } from '@prisma/client';
 
 import type { AchievementRecord } from '$lib/achievements';
 
+import { achievementPoints } from './achievement-points';
 import { prisma } from './prisma';
 import { storageNumber } from './storage-values';
 
@@ -24,15 +25,11 @@ export async function nativeCharacterAchievements(
 	const values = new Map(
 		rows.map((row) => [row.key_name, storageNumber(row.value)]),
 	);
-	const points = values.has(pointsKey) ? values.get(pointsKey) : 0;
+	const points = achievementPoints(
+		rows.find((row) => row.key_name === pointsKey)?.value,
+	);
 	return {
-		points:
-			typeof points === 'number' &&
-			Number.isInteger(points) &&
-			points >= 0 &&
-			points <= 65535
-				? points
-				: null,
+		points,
 		earned: catalog.filter((entry) => {
 			const value = values.get(unlockedKey(entry.name));
 			return typeof value === 'number' && Number.isInteger(value);

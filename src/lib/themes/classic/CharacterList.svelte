@@ -6,6 +6,7 @@
 	import type { Player, PlayerWithRank } from '$lib/players';
 	import type { Order, Sort } from '$lib/sorting';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { highscoreCategories } from '$lib/highscores';
 	import { vocationString } from '$lib/players';
 	import { sortHref } from '$lib/sorting';
 	import { themePreviewHref } from '$lib/themes/preview';
@@ -16,6 +17,9 @@
 	export let sort: Sort | null = null;
 	export let order: Order = 'asc';
 	export let title = 'Characters';
+	$: skillLabel =
+		highscoreCategories.find((category) => category.value === skill)?.label ??
+		skill;
 	const dispatch = createEventDispatcher();
 </script>
 
@@ -37,8 +41,7 @@
 						>{#if sort}<a href={sortHref($page.url, 'level', sort, order)}
 								>Level</a
 							>{:else}Level{/if}</th>
-					{#if skill}<th>{skill === 'experience' ? 'Experience' : skill}</th
-						>{/if}
+					{#if skill}<th>{skillLabel}</th>{/if}
 					<th>Status</th>
 				</tr></thead>
 			<tbody>

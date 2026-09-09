@@ -218,8 +218,18 @@ stacked title/description cards. Section navigation uses a shared small frame;
 long introductions use the shared prose style. `headlineAchievements`,
 `achievementGrade` and `backToTop` are optional external asset keys. Missing
 artwork retains readable titles and working controls. Character showcases reuse
-the table frame, bordered surface and grade symbols in both themes. Achievement
-highscores remain a separate pending flow.
+the table frame, bordered surface and grade symbols in both themes.
+
+Achievement highscores use native point totals, independently of the selected
+showcase or the sum of imported catalog entries. Missing totals rank as zero;
+malformed totals are omitted. Ties use ascending player ID. Both themes share
+the category registry, vocation filters and bounded pagination. The server caches
+only point scalars for 30 seconds and coalesces concurrent refreshes. It reads
+indexed keys in batches of 1,000 and excludes oversized scalar payloads before
+loading them. Each request reads eligible player IDs in batches, sorts their
+scores, then loads only the requested public profiles. Deleted characters,
+staff and changed vocations are checked against current database values rather
+than the points cache. No native gameplay values are written by this flow.
 
 In the default theme, pages containing section navigation use document scrolling
 through the intermediate shell containers. This lets sticky navigation work

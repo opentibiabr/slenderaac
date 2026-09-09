@@ -11,6 +11,7 @@
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import TableHeader from '$lib/components/ui/TableHeader.svelte';
 	import { pronounsEnabled } from '$lib/config';
+	import { highscoreCategories } from '$lib/highscores';
 	import {
 		getPronoun,
 		type Player,
@@ -32,6 +33,9 @@
 	export let order: Order = 'asc';
 	export let skill: string | null = null;
 	export let title = 'Characters';
+	$: skillLabel =
+		highscoreCategories.find((category) => category.value === skill)?.label ??
+		toProperCase(skill ?? '');
 
 	const dispatch = createEventDispatcher();
 
@@ -72,7 +76,7 @@
 						>{$_('level')}</TableHeader>
 					{#if skill}
 						<TableHeader {sort} {order} col={skill} class="w-24"
-							>{toProperCase(skill)}</TableHeader>
+							>{skillLabel}</TableHeader>
 					{/if}
 				</tr>
 			</thead>
