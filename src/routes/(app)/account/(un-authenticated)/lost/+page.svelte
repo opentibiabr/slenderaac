@@ -11,10 +11,13 @@
 	import { _ } from 'svelte-i18n';
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}<p>
+{#if $page.data.selectedTheme === 'classic'}<p>
 		Enter your account’s email address to request a password reset.
 	</p>{/if}
-<form class="cip-stacked-form flex flex-col gap-4" method="post" use:enhance>
+<form
+	class="classic-stacked-form flex flex-col gap-4"
+	method="post"
+	use:enhance>
 	{#if form?.errors?.global}
 		<p class="text-error-500">{form.errors.global}</p>
 	{/if}
@@ -31,7 +34,7 @@
 
 	<div class="flex flex-row justify-end items-center gap-2">
 		<Button
-			>{$page.data.selectedTheme === 'cip-slender'
+			>{$page.data.selectedTheme === 'classic'
 				? 'Submit'
 				: $_('request-password-reset')}</Button>
 	</div>

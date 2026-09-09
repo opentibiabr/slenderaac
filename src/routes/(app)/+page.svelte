@@ -6,21 +6,21 @@
 	import { page } from '$app/stores';
 
 	import Markdoc from '$lib/components/markdoc/Markdoc.svelte';
-	import NewsArticle from '$lib/themes/cip-slender/NewsArticle.svelte';
-	import ReferenceContent from '$lib/themes/cip-slender/ReferenceContent.svelte';
-	import { cipAsset } from '$lib/themes/cip-slender/theme';
+	import NewsArticle from '$lib/themes/classic/NewsArticle.svelte';
+	import ReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
+	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: isCipTheme = $page.data.selectedTheme === 'cip-slender';
+	$: isClassicTheme = $page.data.selectedTheme === 'classic';
 	$: themeAssets = $page.data.themeAssets as
 		| Record<string, string | undefined>
 		| undefined;
 
-	const cipNewsMonths = [
+	const classicNewsMonths = [
 		'Jan',
 		'Feb',
 		'Mar',
@@ -35,9 +35,9 @@
 		'Dec',
 	];
 
-	function formatCipNewsDate(value: Date | string) {
+	function formatClassicNewsDate(value: Date | string) {
 		const date = value instanceof Date ? value : new Date(value);
-		return `${cipNewsMonths[date.getUTCMonth()]} ${String(
+		return `${classicNewsMonths[date.getUTCMonth()]} ${String(
 			date.getUTCDate(),
 		).padStart(2, '0')} ${date.getUTCFullYear()}`;
 	}
@@ -51,7 +51,7 @@
 </script>
 
 <div class="w-full">
-	{#if !isCipTheme && data.tickers.length > 0}
+	{#if !isClassicTheme && data.tickers.length > 0}
 		<section class="mb-4 space-y-1" aria-label={$_('news-ticker')}>
 			<h2 class="h4 mb-2">{$_('news-ticker')}</h2>
 			{#each data.tickers as ticker, index (ticker.id)}
@@ -85,13 +85,13 @@
 	{/if}
 
 	{#each data.articles as article, i (article.id)}
-		{#if isCipTheme}
+		{#if isClassicTheme}
 			<NewsArticle
 				id={article.id}
 				title={article.title}
-				date={formatCipNewsDate(article.created_at)}
+				date={formatClassicNewsDate(article.created_at)}
 				icon={article.presentation?.icon ??
-					cipAsset(themeAssets, 'newsHeadlineIcon')}
+					classicAsset(themeAssets, 'newsHeadlineIcon')}
 				commentHref={article.presentation?.commentHref ?? null}
 				reference={!!article.presentation}>
 				{#if article.presentation}
@@ -120,9 +120,9 @@
 				</em>
 			</header>
 
-			{#if data.cipReference}
-				<article class="prose cip-news-reference">
-					<ReferenceContent nodes={data.cipReference.articles[i].body} />
+			{#if data.classicReference}
+				<article class="prose classic-news-reference">
+					<ReferenceContent nodes={data.classicReference.articles[i].body} />
 				</article>
 			{:else}
 				<Markdoc content={article.content} />

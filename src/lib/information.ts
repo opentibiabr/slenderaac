@@ -70,13 +70,13 @@ export const informationPages: InformationPage[] = [
 			'Premium status can unlock additional areas, spells and other game features. Visit the shop to see the options available on this server.',
 	},
 	{
-		id: 'aboutcipsoft',
+		id: 'company',
 		section: 'about',
-		slug: 'cipsoft',
-		title: 'About CipSoft',
-		source: 'https://www.tibia.com/abouttibia/?subtopic=aboutcipsoft',
+		slug: 'company',
+		title: 'About the Server',
+		source: 'https://www.tibia.com/abouttibia/',
 		summary:
-			'CipSoft is the developer of Tibia. Visit the company website for information about its games, team and services.',
+			'Learn about this server, its team and the services available to players.',
 	},
 	{
 		id: 'quickstart',

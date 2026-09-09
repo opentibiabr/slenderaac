@@ -5,7 +5,7 @@ export const newsTypes = [
 ] as const;
 
 export const newsCategories = [
-	{ value: 'cipsoft', label: 'CipSoft' },
+	{ value: 'server', label: 'Server' },
 	{ value: 'community', label: 'Community' },
 	{ value: 'development', label: 'Development' },
 	{ value: 'support', label: 'Support' },

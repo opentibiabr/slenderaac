@@ -6,6 +6,7 @@ import {
 	encodeThemeAssetUrl,
 	normalizeAssetPath,
 } from '$lib/server/theme-assets/paths';
+import { isThemeId, themeIds } from '$lib/themes/theme-ids';
 
 import { env } from '$env/dynamic/private';
 
@@ -15,6 +16,7 @@ type RawManifest = {
 	version?: unknown;
 	assets?: unknown;
 	hashes?: unknown;
+	aliases?: unknown;
 };
 
 export type ThemeAssetManifest = {
@@ -23,12 +25,14 @@ export type ThemeAssetManifest = {
 	version: string;
 	assets: Record<string, string>;
 	hashes?: Record<string, string>;
+	aliases?: string[];
 };
 
 export type ThemeAssetMetadata = {
 	assets: Record<string, string>;
 	version: string | null;
 	warning: string | null;
+	aliases?: string[];
 };
 
 const manifestCache = new Map<string, ThemeAssetMetadata>();
@@ -80,6 +84,19 @@ function validateManifest(
 	if (!assets) {
 		return null;
 	}
+	const aliases = rawManifest.aliases;
+	if (
+		aliases !== undefined &&
+		(!Array.isArray(aliases) ||
+			aliases.length > 16 ||
+			aliases.some(
+				(alias) =>
+					typeof alias !== 'string' ||
+					!/^[a-z][a-z0-9-]{0,31}$/.test(alias) ||
+					isThemeId(alias),
+			))
+	)
+		return null;
 
 	let hashes: Record<string, string> | undefined;
 	if (rawManifest.hashes !== undefined) {
@@ -104,6 +121,7 @@ function validateManifest(
 		version: rawManifest.version,
 		assets,
 		hashes,
+		...(aliases ? { aliases: aliases as string[] } : {}),
 	};
 }
 
@@ -175,6 +193,7 @@ export async function loadThemeAssetMetadata(
 			assets,
 			version: manifest.version,
 			warning: null,
+			...(manifest.aliases ? { aliases: manifest.aliases } : {}),
 		};
 
 		manifestCache.clear();
@@ -184,4 +203,20 @@ export async function loadThemeAssetMetadata(
 	} catch {
 		return emptyMetadata('theme asset manifest is invalid');
 	}
+}
+
+export async function resolveThemeId(value: unknown): Promise<ThemeId | null> {
+	if (isThemeId(value)) return value;
+	if (typeof value !== 'string' || !/^[a-z][a-z0-9-]{0,31}$/.test(value))
+		return null;
+	const matches = (
+		await Promise.all(
+			themeIds.map(async (theme) =>
+				(await loadThemeAssetMetadata(theme)).aliases?.includes(value)
+					? theme
+					: null,
+			),
+		)
+	).filter((theme): theme is ThemeId => theme !== null);
+	return matches.length === 1 ? matches[0] : null;
 }

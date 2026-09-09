@@ -52,10 +52,10 @@
 	.library-boosted__content img {
 		float: right;
 	}
-	:global(.theme-cip-slender) .library-boosted {
+	:global(.theme-classic) .library-boosted {
 		width: calc(100% + 2px);
 	}
-	:global(.theme-cip-slender .library-boosted .cip-table-frame__rail) {
+	:global(.theme-classic .library-boosted .classic-table-frame__rail) {
 		background: rgb(212 192 161);
 	}
 </style>

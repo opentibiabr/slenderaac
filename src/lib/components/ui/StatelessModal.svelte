@@ -22,10 +22,10 @@
 	export let title: string;
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
+{#if $page.data.selectedTheme === 'classic'}
 	<PagePanel {title}
 		><slot />
-		<div class="cip-actions">
+		<div class="classic-actions">
 			<Button type="button" on:click={close}>Close</Button>
 		</div></PagePanel>
 {:else}

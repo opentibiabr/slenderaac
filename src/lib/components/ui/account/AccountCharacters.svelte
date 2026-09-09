@@ -16,7 +16,7 @@
 	export let characters: Player[];
 </script>
 
-<div class="cip-account-section flex flex-col gap-2">
+<div class="classic-account-section flex flex-col gap-2">
 	<h3 class="h3">{$_('characters')}</h3>
 
 	<div class="table-container">
@@ -24,7 +24,7 @@
 			<thead>
 				<tr class="[&>th]:!p-2">
 					<th class="w-10" />
-					{#if $page.data.selectedTheme !== 'cip-slender'}<th class="w-20"
+					{#if $page.data.selectedTheme !== 'classic'}<th class="w-20"
 							>{$_('outfit')}</th
 						>{/if}
 					<th>{$_('name')}</th>
@@ -35,7 +35,7 @@
 				{#each characters as character, i}
 					<tr class="[&>td]:!align-middle">
 						<td>{i + 1}</td>
-						{#if $page.data.selectedTheme !== 'cip-slender'}<td>
+						{#if $page.data.selectedTheme !== 'classic'}<td>
 								<AnimatedOutfit outfit={character} alt={character.name} />
 							</td>{/if}
 						<td>

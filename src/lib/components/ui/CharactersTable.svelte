@@ -18,7 +18,7 @@
 		type PlayerWithRank,
 		vocationString,
 	} from '$lib/players';
-	import CipCharacterList from '$lib/themes/cip-slender/CharacterList.svelte';
+	import ClassicCharacterList from '$lib/themes/classic/CharacterList.svelte';
 	import { toProperCase } from '$lib/utils';
 
 	import GuildMembership from './GuildMembership.svelte';
@@ -43,8 +43,8 @@
 	}
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
-	<CipCharacterList
+{#if $page.data.selectedTheme === 'classic'}
+	<ClassicCharacterList
 		{characters}
 		{ranked}
 		{skill}

@@ -3,13 +3,13 @@
 
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
-	import { cipAsset } from '$lib/themes/cip-slender/theme';
+	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: isCipTheme = $page.data.selectedTheme === 'cip-slender';
+	$: isClassicTheme = $page.data.selectedTheme === 'classic';
 	let formUrl = '';
 	let selectedTypes: string[] = [];
 	let selectedCategories: string[] = [];
@@ -27,7 +27,7 @@
 		{ key: 'news', label: 'News' },
 	] as const;
 	const categoryOptionDefs = [
-		{ key: 'cipsoft', label: 'CipSoft', iconKey: 'newsArchiveIconCipsoft' },
+		{ key: 'server', label: 'Server', iconKey: 'newsArchiveIconServer' },
 		{
 			key: 'community',
 			label: 'Community',
@@ -52,17 +52,17 @@
 		| null
 		| undefined;
 	$: archiveButtonBackground =
-		cipAsset(themeAssets, 'newsArchiveButtonBackground') ??
-		cipAsset(themeAssets, 'smallButtonBackground');
+		classicAsset(themeAssets, 'newsArchiveButtonBackground') ??
+		classicAsset(themeAssets, 'smallButtonBackground');
 	$: archiveStyle = archiveButtonBackground
-		? `--cip-news-archive-button: url("${archiveButtonBackground}")`
+		? `--classic-news-archive-button: url("${archiveButtonBackground}")`
 		: '';
 	$: categoryOptions = categoryOptionDefs.map((option) => ({
 		...option,
-		icon: cipAsset(themeAssets, option.iconKey),
+		icon: classicAsset(themeAssets, option.iconKey),
 	}));
 
-	function formatCipDate(value: Date | string) {
+	function formatClassicDate(value: Date | string) {
 		const date = value instanceof Date ? value : new Date(value);
 		return `${String(date.getUTCDate()).padStart(2, '0')}.${String(
 			date.getUTCMonth() + 1,
@@ -75,8 +75,8 @@
 			currentUrl.origin,
 		);
 		if (type === 'ticker') {
-			const index = articleId.startsWith('cip-ticker-')
-				? articleId.slice('cip-ticker-'.length)
+			const index = articleId.startsWith('classic-ticker-')
+				? articleId.slice('classic-ticker-'.length)
 				: articleId;
 			nextUrl.searchParams.set('ticker', index);
 		} else {
@@ -90,12 +90,12 @@
 
 <div
 	class="news-archive w-full"
-	class:news-archive--default={!isCipTheme}
+	class:news-archive--default={!isClassicTheme}
 	style={archiveStyle}>
 	<form class="news-archive__form" method="get" action="/news/archive">
 		{#if previewTheme}
 			<input type="hidden" name="themePreview" value={previewTheme} />
-			{#each ['cipReference', 'cipGrid', 'cipDemo'] as key}
+			{#each ['classicReference', 'classicGrid', 'classicDemo'] as key}
 				{#if $page.url.searchParams.has(key)}<input
 						type="hidden"
 						name={key}
@@ -240,7 +240,7 @@
 					{#if data.articles.length > 0}
 						{#each data.articles as article}
 							<a href={newsHref($page.url, article.id, article.type)}>
-								<span>{formatCipDate(article.created_at)}</span>
+								<span>{formatClassicDate(article.created_at)}</span>
 								<strong>{article.title}</strong>
 							</a>
 						{/each}
@@ -342,7 +342,7 @@
 		overflow-wrap: anywhere;
 	}
 
-	:global(.theme-cip-slender) .news-archive {
+	:global(.theme-classic) .news-archive {
 		width: calc(100% + 2px);
 		margin: 0;
 		color: rgb(90 40 0);
@@ -351,11 +351,11 @@
 		line-height: normal;
 	}
 
-	:global(.theme-cip-slender) .news-archive__form {
+	:global(.theme-classic) .news-archive__form {
 		margin: 0;
 	}
 
-	:global(.theme-cip-slender) .news-archive__inner {
+	:global(.theme-classic) .news-archive__inner {
 		box-sizing: border-box;
 		width: calc(100% - 4px);
 		height: 142px;
@@ -366,7 +366,7 @@
 		font-size: 10pt;
 	}
 
-	:global(.theme-cip-slender) .news-archive__grid {
+	:global(.theme-classic) .news-archive__grid {
 		box-sizing: border-box;
 		position: relative;
 		display: grid;
@@ -378,12 +378,12 @@
 		border: 1px solid rgb(250 240 215);
 	}
 
-	:global(.theme-cip-slender .news-archive__inner > .cip-table-surface) {
+	:global(.theme-classic .news-archive__inner > .classic-table-surface) {
 		width: calc(100% - 6px) !important;
 	}
 
 	@media (max-width: 1280px) {
-		:global(.theme-cip-slender) .news-archive__grid {
+		:global(.theme-classic) .news-archive__grid {
 			--archive-time-column: max(247.5px, calc(100% * 0.324691358));
 			grid-template-columns:
 				var(--archive-time-column)
@@ -391,7 +391,7 @@
 		}
 	}
 
-	:global(.theme-cip-slender) .news-archive__grid::after {
+	:global(.theme-classic) .news-archive__grid::after {
 		position: absolute;
 		top: 20px;
 		left: 0;
@@ -403,22 +403,22 @@
 		pointer-events: none;
 	}
 
-	:global(.theme-cip-slender) .news-archive__column {
+	:global(.theme-classic) .news-archive__column {
 		box-sizing: border-box;
 		min-width: 0;
 		padding: 2px 5px;
 		border-right: 1px solid rgb(250 240 215);
 	}
 
-	:global(.theme-cip-slender) .news-archive__column:last-child {
+	:global(.theme-classic) .news-archive__column:last-child {
 		border-right: 0;
 	}
 
-	:global(.theme-cip-slender) .news-archive__column--time {
+	:global(.theme-classic) .news-archive__column--time {
 		padding-left: 7px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__column h2 {
+	:global(.theme-classic) .news-archive__column h2 {
 		position: relative;
 		top: -1px;
 		height: 18px;
@@ -430,42 +430,40 @@
 		line-height: 18px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__column--time h2 {
+	:global(.theme-classic) .news-archive__column--time h2 {
 		margin-bottom: 7px;
 		transform: translateX(-2px);
 	}
 
-	:global(.theme-cip-slender) .news-archive__date-grid {
+	:global(.theme-classic) .news-archive__date-grid {
 		display: grid;
 		grid-template-columns: 52.5px 49px 59.5px 62px;
 		align-items: center;
 		height: 23px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__date-grid--labels {
+	:global(.theme-classic) .news-archive__date-grid--labels {
 		height: 20px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__date-grid span,
-	:global(.theme-cip-slender) .news-archive__date-grid label {
+	:global(.theme-classic) .news-archive__date-grid span,
+	:global(.theme-classic) .news-archive__date-grid label {
 		padding: 2px 5px;
 		font-size: 10pt;
 		line-height: 16px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__date-grid--labels span {
+	:global(.theme-classic) .news-archive__date-grid--labels span {
 		position: relative;
 		top: -2px;
 	}
 
-	:global(.theme-cip-slender)
-		.news-archive__date-grid
-		label[for='filter-end-day'] {
+	:global(.theme-classic) .news-archive__date-grid label[for='filter-end-day'] {
 		text-align: right;
 		transform: translateX(-2px);
 	}
 
-	:global(.theme-cip-slender) .news-archive select {
+	:global(.theme-classic) .news-archive select {
 		width: 37px;
 		height: 19px;
 		margin-left: 5px;
@@ -482,26 +480,26 @@
 			sans-serif;
 	}
 
-	:global(.theme-cip-slender) .news-archive select.year {
+	:global(.theme-classic) .news-archive select.year {
 		width: 52px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__spacer {
+	:global(.theme-classic) .news-archive__spacer {
 		height: 10px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__checks {
+	:global(.theme-classic) .news-archive__checks {
 		display: flex;
 		flex-direction: column;
 		gap: 3px;
 		padding-top: 3px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__checks--type {
+	:global(.theme-classic) .news-archive__checks--type {
 		padding-top: 22px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__checks label {
+	:global(.theme-classic) .news-archive__checks label {
 		display: flex;
 		align-items: center;
 		height: 16px;
@@ -511,12 +509,12 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-cip-slender) .news-archive__checks label span {
+	:global(.theme-classic) .news-archive__checks label span {
 		position: relative;
 		top: 1.5px;
 	}
 
-	:global(.theme-cip-slender) .news-archive input[type='checkbox'] {
+	:global(.theme-classic) .news-archive input[type='checkbox'] {
 		width: 13px;
 		height: 13px;
 		margin: 3px 3px 3px 4px;
@@ -528,7 +526,7 @@
 		accent-color: auto;
 	}
 
-	:global(.theme-cip-slender) .news-archive__checks img {
+	:global(.theme-classic) .news-archive__checks img {
 		position: relative;
 		top: 0.5px;
 		width: 16px;
@@ -538,7 +536,7 @@
 		image-rendering: pixelated;
 	}
 
-	:global(.theme-cip-slender) .news-archive__submit {
+	:global(.theme-classic) .news-archive__submit {
 		position: relative;
 		left: -1px;
 		display: block;
@@ -548,7 +546,7 @@
 		padding: 0;
 		border: 0;
 		background: var(
-				--cip-news-archive-button,
+				--classic-news-archive-button,
 				linear-gradient(180deg, rgb(36 39 255), rgb(42 0 181))
 			)
 			center / 135px 25px no-repeat;
@@ -573,18 +571,18 @@
 		image-rendering: pixelated;
 	}
 
-	:global(.theme-cip-slender) .news-archive__results {
+	:global(.theme-classic) .news-archive__results {
 		margin-top: 14px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__results-list {
+	:global(.theme-classic) .news-archive__results-list {
 		padding: 8px 10px;
 		border-top: 1px solid rgb(121 61 3);
 		background: rgb(255 242 219);
 		font-size: 12px;
 	}
 
-	:global(.theme-cip-slender) .news-archive__results-list a {
+	:global(.theme-classic) .news-archive__results-list a {
 		display: block;
 		padding: 2px 0;
 		color: rgb(0 58 133);
@@ -592,18 +590,18 @@
 		text-decoration: none;
 	}
 
-	:global(.theme-cip-slender) .news-archive__results-list a:hover {
+	:global(.theme-classic) .news-archive__results-list a:hover {
 		text-decoration: underline;
 	}
 
-	:global(.theme-cip-slender) .news-archive__results-list span {
+	:global(.theme-classic) .news-archive__results-list span {
 		display: inline-block;
 		min-width: 78px;
 		color: rgb(90 40 0);
 		font-weight: 400;
 	}
 
-	:global(.theme-cip-slender) .news-archive__results-list p {
+	:global(.theme-classic) .news-archive__results-list p {
 		margin: 0;
 		color: rgb(90 40 0);
 	}

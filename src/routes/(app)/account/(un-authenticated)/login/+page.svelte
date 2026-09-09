@@ -6,7 +6,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import { enhance } from '$lib/enchance';
-	import CipLogin from '$lib/themes/cip-slender/Login.svelte';
+	import ClassicLogin from '$lib/themes/classic/Login.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData } from './$types';
@@ -14,7 +14,7 @@
 	export let form: ActionData;
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}<CipLogin {form} />{:else}
+{#if $page.data.selectedTheme === 'classic'}<ClassicLogin {form} />{:else}
 	<form class="flex flex-col gap-4" method="post" use:enhance>
 		{#if form?.errors?.global}
 			<p class="text-error-500">{form.errors.global}</p>

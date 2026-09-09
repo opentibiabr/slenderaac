@@ -11,7 +11,7 @@
 	export let data: LayoutData;
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}<slot />{/if}
+{#if $page.data.selectedTheme === 'classic'}<slot />{/if}
 <div class="flex flex-col gap-2">
 	<PagePanel title="Account Information" surface
 		><AccountInfoBox account={data.account} /></PagePanel>
@@ -25,4 +25,4 @@
 		><AccountCharacters characters={data.characters} /></PagePanel>
 </div>
 
-{#if $page.data.selectedTheme !== 'cip-slender'}<slot />{/if}
+{#if $page.data.selectedTheme !== 'classic'}<slot />{/if}

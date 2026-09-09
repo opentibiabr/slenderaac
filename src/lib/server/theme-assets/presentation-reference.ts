@@ -1,24 +1,24 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { CipPresentation } from '$lib/themes/cip-slender/reference-types';
+import type { ClassicPresentation } from '$lib/themes/classic/reference-types';
 
 import { env } from '$env/dynamic/private';
 
 export async function loadPresentationReference(
 	theme: string,
-): Promise<CipPresentation | null> {
-	if (theme !== 'cip-slender' || !env.THEME_ASSETS_ROOT) return null;
+): Promise<ClassicPresentation | null> {
+	if (theme !== 'classic' || !env.THEME_ASSETS_ROOT) return null;
 	try {
 		const file = path.join(
 			env.THEME_ASSETS_ROOT,
-			'cip-slender',
+			'classic',
 			'reference',
 			'presentation.json',
 		);
 		const value = JSON.parse(
 			await fs.readFile(file, 'utf8'),
-		) as CipPresentation;
+		) as ClassicPresentation;
 		const safeHref = (href: unknown) =>
 			typeof href === 'string' && /^(https?:\/\/|\/(?!\/)|#)/.test(href);
 		if (

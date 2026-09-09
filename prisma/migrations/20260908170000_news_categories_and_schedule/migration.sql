@@ -1,6 +1,6 @@
 ALTER TABLE `slender_news`
     ADD COLUMN `type` ENUM('news', 'ticker', 'article') NOT NULL DEFAULT 'news',
-    ADD COLUMN `category` ENUM('cipsoft', 'community', 'development', 'support', 'technical') NOT NULL DEFAULT 'community',
+    ADD COLUMN `category` ENUM('server', 'community', 'development', 'support', 'technical') NOT NULL DEFAULT 'community',
     ADD COLUMN `presentation` JSON NULL;
 
 CREATE INDEX `slender_news_archive_idx` ON `slender_news`(`published`, `type`, `category`, `created_at`);

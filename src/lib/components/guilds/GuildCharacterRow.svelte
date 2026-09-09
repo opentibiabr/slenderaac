@@ -44,7 +44,7 @@
 		y: -20,
 		easing: cubicInOut,
 	}}>
-	{#if $page.data.selectedTheme !== 'cip-slender'}<td>
+	{#if $page.data.selectedTheme !== 'classic'}<td>
 			<AnimatedOutfit outfit={character} alt={character.name} />
 		</td>{/if}
 	<td class=" w-fit">

@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
 
 const TYPE_KEYS = ['ticker', 'article', 'news'] as const;
 const CATEGORY_KEYS = [
-	'cipsoft',
+	'server',
 	'community',
 	'development',
 	'support',
@@ -102,7 +102,7 @@ export const load = (async ({ url }) => {
 					category: a.category,
 				})),
 				...reference.ticker.map((a, i) => ({
-					id: `cip-ticker-${i}`,
+					id: `classic-ticker-${i}`,
 					title: a.text,
 					created_at: referenceDate(a.date),
 					type: 'ticker' as const,

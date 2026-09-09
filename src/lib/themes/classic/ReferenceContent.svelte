@@ -26,8 +26,7 @@
 	function attributes(attrs: Record<string, string>, url: URL, image = false) {
 		const safe = Object.fromEntries(
 			Object.entries(attrs).filter(([key, value]) => {
-				if (key === 'src')
-					return value.startsWith('/theme-assets/cip-slender/');
+				if (key === 'src') return value.startsWith('/theme-assets/classic/');
 				if (key === 'href') return /^(https?:\/\/|\/(?!\/)|#)/.test(value);
 				return ['align', 'hspace', 'vspace', 'width', 'height', 'alt'].includes(
 					key,
@@ -55,11 +54,11 @@
 		return safe;
 	}
 	function imageLink(value: string | undefined) {
-		return value?.startsWith('/theme-assets/cip-slender/') ? value : null;
+		return value?.startsWith('/theme-assets/classic/') ? value : null;
 	}
 	function elementNode(value: unknown) {
 		return value as Exclude<ReferenceNode, string>;
 	}
 </script>
 
-<!-- prettier-ignore -->{#each nodes as node}{#if typeof node === 'string'}{node}{:else}{#if allowedTags.has(elementNode(node).tag)}{#if elementNode(node).tag === 'img' && imageLink(elementNode(node).imageHref)}<a href={imageLink(elementNode(node).imageHref)} data-cip-media="image" target="_blank" rel="noreferrer" aria-label="Open full-size image"><img {...attributes(elementNode(node).attrs, $page.url, true)} alt={elementNode(node).attrs.alt ?? ''} /></a>{:else if elementNode(node).tag === 'img' || elementNode(node).tag === 'br'}<svelte:element this={elementNode(node).tag} {...attributes(elementNode(node).attrs, $page.url, elementNode(node).tag === 'img')} />{:else}<svelte:element this={elementNode(node).tag} {...attributes(elementNode(node).attrs, $page.url)}><svelte:self nodes={elementNode(node).children} /></svelte:element>{/if}{/if}{/if}{/each}
+<!-- prettier-ignore -->{#each nodes as node}{#if typeof node === 'string'}{node}{:else}{#if allowedTags.has(elementNode(node).tag)}{#if elementNode(node).tag === 'img' && imageLink(elementNode(node).imageHref)}<a href={imageLink(elementNode(node).imageHref)} data-classic-media="image" target="_blank" rel="noreferrer" aria-label="Open full-size image"><img {...attributes(elementNode(node).attrs, $page.url, true)} alt={elementNode(node).attrs.alt ?? ''} /></a>{:else if elementNode(node).tag === 'img' || elementNode(node).tag === 'br'}<svelte:element this={elementNode(node).tag} {...attributes(elementNode(node).attrs, $page.url, elementNode(node).tag === 'img')} />{:else}<svelte:element this={elementNode(node).tag} {...attributes(elementNode(node).attrs, $page.url)}><svelte:self nodes={elementNode(node).children} /></svelte:element>{/if}{/if}{/if}{/each}

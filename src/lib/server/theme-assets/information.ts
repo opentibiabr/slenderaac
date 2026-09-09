@@ -7,15 +7,13 @@ import { env } from '$env/dynamic/private';
 
 export async function loadInformationPresentation(theme: string, id: string) {
 	if (
-		theme !== 'cip-slender' ||
+		theme !== 'classic' ||
 		!env.THEME_ASSETS_ROOT ||
 		!/^[a-z]+(?:-[a-z_]+)?$/.test(id)
 	)
 		return null;
 	try {
-		const root = await fs.realpath(
-			path.join(env.THEME_ASSETS_ROOT, 'cip-slender'),
-		);
+		const root = await fs.realpath(path.join(env.THEME_ASSETS_ROOT, 'classic'));
 		const file = await fs.realpath(
 			path.join(root, 'reference', 'pages', `${id}.json`),
 		);

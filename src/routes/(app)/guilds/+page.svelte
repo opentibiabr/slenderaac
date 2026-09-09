@@ -11,7 +11,7 @@
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
-	import CipGuildList from '$lib/themes/cip-slender/GuildList.svelte';
+	import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
 	import { debounce } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -44,8 +44,8 @@
 	$: results = data.results ?? [];
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
-	<CipGuildList {data} />
+{#if $page.data.selectedTheme === 'classic'}
+	<ClassicGuildList {data} />
 {:else}
 	<div class="flex flex-col items-center gap-2">
 		<label class="label flex flex-row gap-2 items-center">

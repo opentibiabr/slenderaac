@@ -13,7 +13,7 @@
 </script>
 
 <PagePanel title="Search Guild">
-	<form method="get" class="cip-filter-grid">
+	<form method="get" class="classic-filter-grid">
 		{#each Array.from(parameters) as [name, value]}<input
 				type="hidden"
 				{name}
@@ -23,11 +23,13 @@
 			id="guild-name"
 			name="search"
 			value={$page.url.searchParams.get('search') ?? ''} />
-		<div class="cip-filter-submit"><Button type="submit">Submit</Button></div>
+		<div class="classic-filter-submit">
+			<Button type="submit">Submit</Button>
+		</div>
 	</form>
 </PagePanel>
 <PagePanel title="Guilds" surface>
-	<table class="cip-data-table">
+	<table class="classic-data-table">
 		<thead
 			><tr><th>Guild</th><th>Leader</th><th>Members</th><th>Online</th></tr
 			></thead
@@ -39,7 +41,7 @@
 								$page.url,
 								'/guilds/' + encodeURIComponent(guild.name),
 							)}>{guild.name}</a
-						>{#if guild.description}<div class="cip-preserve-lines">
+						>{#if guild.description}<div class="classic-preserve-lines">
 								{guild.description}
 							</div>{/if}</td>
 					<td

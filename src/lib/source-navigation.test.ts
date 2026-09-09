@@ -6,7 +6,7 @@ import { isReferenceWebsite } from './source-navigation';
 import { themePreviewHref } from './themes/preview';
 
 const current = new URL(
-	'https://aac.example/guides/quickstart?themePreview=cip-slender&cipReference=1&cipGrid=1&cipDemo=1',
+	'https://aac.example/guides/quickstart?themePreview=classic&classicReference=1&classicGrid=1&classicDemo=1',
 );
 
 void test('creature list and detail links stay local with their selected race and preview', () => {
@@ -120,7 +120,7 @@ void test('downloads use configured services and never fall back to the official
 
 void test('social, configured external and ordinary local navigation preserve their destinations', () => {
 	for (const href of [
-		'https://www.youtube.com/@cipsoft',
+		'https://www.youtube.com/',
 		'https://www.facebook.com/tibia',
 		'https://downloads.example/client.zip',
 	])
@@ -145,7 +145,7 @@ void test('source host detection handles aliases without matching unrelated host
 		false,
 	);
 	assert.equal(
-		informationDestination('https://www.cipsoft.com/en/'),
-		'/about/cipsoft',
+		informationDestination('https://www.tibia.com/abouttibia/'),
+		'/about/company',
 	);
 });

@@ -5,13 +5,13 @@
 	import { mergeCalendarTooltipSections } from '$lib/components/information/tooltip-content';
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
-	import { cipAsset } from '$lib/themes/cip-slender/theme';
+	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: isCipTheme = $page.data.selectedTheme === 'cip-slender';
+	$: isClassicTheme = $page.data.selectedTheme === 'classic';
 
 	const weekdays = [
 		'Monday',
@@ -27,7 +27,7 @@
 		| Record<string, string | undefined>
 		| null
 		| undefined;
-	$: seasonalIcon = cipAsset(themeAssets, 'eventScheduleIconSeasonal');
+	$: seasonalIcon = classicAsset(themeAssets, 'eventScheduleIconSeasonal');
 	function tooltipAttrs(title: string, description: string) {
 		return {
 			title,
@@ -50,7 +50,7 @@
 	}
 </script>
 
-<div class="event-schedule" class:event-schedule--default={!isCipTheme}>
+<div class="event-schedule" class:event-schedule--default={!isClassicTheme}>
 	<TableFrame assets={themeAssets} minWidth={883} minHeight={590}>
 		<svelte:fragment slot="caption">
 			<div class="event-schedule__caption-row">
@@ -104,10 +104,10 @@
 											{#if cell.hasSeasonalIcon}
 												<span
 													class="event-schedule__seasonal"
-													title={isCipTheme
+													title={isClassicTheme
 														? undefined
 														: cell.seasonalDescription}>
-													{#if isCipTheme}<Tooltip
+													{#if isClassicTheme}<Tooltip
 															calendar
 															calendarSections={cell.seasonalTooltipSections}
 															id={`calendar-tooltip-${cell.isoDate}-seasonal`}
@@ -132,10 +132,10 @@
 											<div
 												class="event-schedule__event"
 												style:background-color={event.color}
-												title={isCipTheme
+												title={isClassicTheme
 													? undefined
 													: event.description || event.label}>
-												{#if isCipTheme}<Tooltip
+												{#if isClassicTheme}<Tooltip
 														calendar
 														calendarSections={eventTooltipSections}
 														block
@@ -251,7 +251,7 @@
 		font-size: 0.875rem;
 	}
 
-	:global(.theme-cip-slender) .event-schedule {
+	:global(.theme-classic) .event-schedule {
 		width: calc(100% + 2px);
 		margin: 0;
 		color: rgb(90 40 0);
@@ -260,13 +260,13 @@
 		line-height: normal;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__caption-row {
+	:global(.theme-classic) .event-schedule__caption-row {
 		position: relative;
 		width: 864px;
 		height: 16px;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__month-nav {
+	:global(.theme-classic) .event-schedule__month-nav {
 		position: absolute;
 		top: 0;
 		left: 340px;
@@ -276,21 +276,21 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__month-arrow {
+	:global(.theme-classic) .event-schedule__month-arrow {
 		color: white;
 		font-weight: 700;
 		text-decoration: none;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__month-arrow--previous {
+	:global(.theme-classic) .event-schedule__month-arrow--previous {
 		float: left;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__month-arrow--next {
+	:global(.theme-classic) .event-schedule__month-arrow--next {
 		float: right;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__timestamp {
+	:global(.theme-classic) .event-schedule__timestamp {
 		position: absolute;
 		top: 0;
 		right: 5px;
@@ -300,7 +300,7 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__inner {
+	:global(.theme-classic) .event-schedule__inner {
 		box-sizing: content-box;
 		position: relative;
 		width: 862px;
@@ -310,7 +310,7 @@
 		font-size: 10pt;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__calendar {
+	:global(.theme-classic) .event-schedule__calendar {
 		position: relative;
 		z-index: 1;
 		width: 862px;
@@ -323,15 +323,15 @@
 		line-height: normal;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__calendar th,
-	:global(.theme-cip-slender) .event-schedule__calendar td {
+	:global(.theme-classic) .event-schedule__calendar th,
+	:global(.theme-classic) .event-schedule__calendar td {
 		box-sizing: border-box;
 		width: 123px;
 		border: 1px solid rgb(250 240 215);
 		padding: 1px;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__calendar th {
+	:global(.theme-classic) .event-schedule__calendar th {
 		height: 27px;
 		background: rgb(95 77 65);
 		color: white;
@@ -341,7 +341,7 @@
 		vertical-align: middle;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__calendar td {
+	:global(.theme-classic) .event-schedule__calendar td {
 		height: 85px;
 		background: rgb(231 209 175);
 		color: rgb(90 40 0);
@@ -352,33 +352,33 @@
 		background-clip: padding-box;
 	}
 
-	:global(.theme-cip-slender)
+	:global(.theme-classic)
 		.event-schedule__calendar
 		td.event-schedule__day--outside {
 		background: rgb(212 192 161);
 	}
 
-	:global(.theme-cip-slender)
+	:global(.theme-classic)
 		.event-schedule__calendar
 		td.event-schedule__day--today {
 		background: rgb(243 229 208);
 	}
 
-	:global(.theme-cip-slender) .event-schedule__day-line {
+	:global(.theme-classic) .event-schedule__day-line {
 		margin: 0 0 2px 3px;
 		font-weight: 700;
 		line-height: normal;
 		white-space: nowrap;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__day-number {
+	:global(.theme-classic) .event-schedule__day-number {
 		vertical-align: text-bottom;
 	}
-	:global(.theme-cip-slender) .event-schedule__seasonal {
+	:global(.theme-classic) .event-schedule__seasonal {
 		vertical-align: middle;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__day-line img {
+	:global(.theme-classic) .event-schedule__day-line img {
 		display: inline;
 		vertical-align: baseline;
 		width: 11px;
@@ -386,7 +386,7 @@
 		image-rendering: pixelated;
 	}
 
-	:global(.theme-cip-slender) .event-schedule__event {
+	:global(.theme-classic) .event-schedule__event {
 		height: auto;
 		box-sizing: content-box;
 		width: 100%;
@@ -401,13 +401,11 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-cip-slender)
-		.event-schedule__day--outside
-		.event-schedule__event {
+	:global(.theme-classic) .event-schedule__day--outside .event-schedule__event {
 		color: rgb(212 192 161);
 	}
 
-	:global(.theme-cip-slender) .event-schedule__note {
+	:global(.theme-classic) .event-schedule__note {
 		margin: 15px 0 0;
 		color: rgb(90 40 0);
 		font-size: 12px;

@@ -45,7 +45,7 @@
 	onDestroy(hide);
 	function mountPanel(node: HTMLElement) {
 		if (calendar) {
-			const root = trigger.closest<HTMLElement>('.theme-cip-slender');
+			const root = trigger.closest<HTMLElement>('.theme-classic');
 			if (root) return portal(node, root);
 		}
 	}
@@ -122,11 +122,11 @@
 </span>
 
 <style>
-	:global(.theme-cip-slender) .information-tooltip {
+	:global(.theme-classic) .information-tooltip {
 		position: relative;
 		display: inline;
 	}
-	:global(.theme-cip-slender) .information-tooltip button {
+	:global(.theme-classic) .information-tooltip button {
 		display: inline;
 		margin: 0;
 		padding: 0;
@@ -137,18 +137,18 @@
 		vertical-align: baseline;
 		cursor: help;
 	}
-	:global(.theme-cip-slender) .information-tooltip--block,
-	:global(.theme-cip-slender) .information-tooltip--block button {
+	:global(.theme-classic) .information-tooltip--block,
+	:global(.theme-classic) .information-tooltip--block button {
 		display: block;
 		width: 100%;
 		text-align: inherit;
 	}
-	:global(.theme-cip-slender) .information-tooltip--block button {
+	:global(.theme-classic) .information-tooltip--block button {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
-	:global(.theme-cip-slender) .information-tooltip__panel {
+	:global(.theme-classic) .information-tooltip__panel {
 		position: absolute;
 		z-index: 100;
 		display: block;
@@ -164,7 +164,7 @@
 			sans-serif;
 		text-align: left;
 	}
-	:global(.theme-cip-slender) .information-tooltip__panel::before {
+	:global(.theme-classic) .information-tooltip__panel::before {
 		position: absolute;
 		top: -1px;
 		left: -8px;
@@ -173,43 +173,43 @@
 		background-image: var(--tooltip-arrow);
 		content: '';
 	}
-	:global(.theme-cip-slender) .information-tooltip__panel--left::before {
+	:global(.theme-classic) .information-tooltip__panel--left::before {
 		left: auto;
 		right: -8px;
 		transform: rotate(180deg);
 	}
-	:global(.theme-cip-slender) .information-tooltip__panel strong {
+	:global(.theme-classic) .information-tooltip__panel strong {
 		display: block;
 		margin-bottom: 15px;
 		font-size: 16px;
 		font-weight: bold;
 	}
-	:global(.theme-cip-slender) .information-tooltip__text {
+	:global(.theme-classic) .information-tooltip__text {
 		display: block;
 		white-space: pre-line;
 	}
-	:global(.theme-cip-slender) .information-tooltip__section-title {
+	:global(.theme-classic) .information-tooltip__section-title {
 		display: block;
 		font-size: 16px;
 		font-weight: bold;
 		word-break: break-word;
 	}
-	:global(.theme-cip-slender) .information-tooltip__section-text {
+	:global(.theme-classic) .information-tooltip__section-text {
 		display: block;
 		margin-bottom: 20px;
 		text-align: justify;
 		white-space: pre-line;
 	}
-	:global(.theme-cip-slender) .information-tooltip__ornament {
+	:global(.theme-classic) .information-tooltip__ornament {
 		display: block;
 		text-align: center;
 	}
-	:global(.theme-cip-slender) .information-tooltip__ornament img {
+	:global(.theme-classic) .information-tooltip__ornament img {
 		width: 220px;
 		max-width: 100%;
 		height: auto;
 	}
-	:global(.theme-cip-slender)
+	:global(.theme-classic)
 		.information-tooltip__panel--calendar
 		.information-tooltip__ornament
 		img {

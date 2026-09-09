@@ -14,7 +14,7 @@
 	export let account: AccountInfo;
 </script>
 
-<div class="cip-account-section flex flex-col gap-2">
+<div class="classic-account-section flex flex-col gap-2">
 	<h3 class="h3">{$_('general-information')}</h3>
 
 	<div class="data-table">

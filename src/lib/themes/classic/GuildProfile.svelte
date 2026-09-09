@@ -23,10 +23,10 @@
 <slot />
 {#if guild && owner}
 	<PagePanel title={guild.name} surface>
-		{#if guild.description}<p class="cip-preserve-lines">
+		{#if guild.description}<p class="classic-preserve-lines">
 				{guild.description}
 			</p>{/if}
-		<table class="cip-data-table cip-data-table--details">
+		<table class="classic-data-table classic-data-table--details">
 			<tbody>
 				<tr
 					><td>Leader:</td><td
@@ -47,7 +47,7 @@
 		<GuildOperations name={guild.name} {isOwner} {isLeader} {isVice} />
 	</PagePanel>
 	<PagePanel title="Guild Members" surface>
-		<table class="cip-data-table">
+		<table class="classic-data-table">
 			<thead><tr><th>Name</th><th>Vocation</th><th>Level</th></tr></thead>
 			{#each guild.ranks as rank}<tbody>
 					<tr><th colspan="3">{rank.name}</th></tr>
@@ -62,7 +62,7 @@
 		</table>
 	</PagePanel>
 	<PagePanel title="Invited Characters" surface>
-		<table class="cip-data-table">
+		<table class="classic-data-table">
 			<thead><tr><th>Name</th><th>Vocation</th><th>Level</th></tr></thead
 			><tbody>
 				{#each guild.invited as character}<GuildCharacterRow

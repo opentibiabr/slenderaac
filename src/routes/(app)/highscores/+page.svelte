@@ -7,7 +7,7 @@
 
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import Select from '$lib/components/ui/forms/Select.svelte';
-	import CipHighscores from '$lib/themes/cip-slender/Highscores.svelte';
+	import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
@@ -53,8 +53,8 @@
 	let form: HTMLFormElement;
 </script>
 
-{#if $currentPage.data.selectedTheme === 'cip-slender'}
-	<CipHighscores {data} />
+{#if $currentPage.data.selectedTheme === 'classic'}
+	<ClassicHighscores {data} />
 {:else}
 	<div class="flex flex-col gap-2">
 		<form bind:this={form} class="flex flex-row gap-2" method="get">

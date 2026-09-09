@@ -15,7 +15,7 @@
 	let showPassword = false;
 </script>
 
-<div class="cip-login-panel">
+<div class="classic-login-panel">
 	<PagePanel title="Account Login" surface>
 		<form method="post" use:enhance>
 			{#if form?.errors?.global}<p class="text-error-500">
@@ -35,18 +35,18 @@
 					errors={form?.errors?.token} />
 				<Button type="submit">Login</Button>
 			{:else}
-				<div class="cip-login-grid">
+				<div class="classic-login-grid">
 					<label for="login-email">Email Address:</label><input
 						id="login-email"
 						name="email"
 						type="email"
 						autocomplete="email"
 						required />
-					<div class="cip-login-button">
+					<div class="classic-login-button">
 						<Button type="submit">Login</Button>
 					</div>
 					<label for="login-password">Password:</label>
-					<div class="cip-password-field">
+					<div class="classic-password-field">
 						<input
 							id="login-password"
 							name="password"
@@ -55,15 +55,15 @@
 							required />
 						<button
 							type="button"
-							class="cip-password-toggle"
+							class="classic-password-toggle"
 							aria-label={showPassword ? 'Hide password' : 'Show password'}
 							aria-pressed={showPassword}
 							on:click={() => (showPassword = !showPassword)}
 							><Fa icon={showPassword ? faEyeSlash : faEye} /></button>
 					</div>
 					<div
-						class="cip-login-button"
-						style={`--cip-native-button: url("${$page.data.themeAssets?.redButtonBackground ?? ''}"); --cip-native-button-hover: url("${$page.data.themeAssets?.redButtonHover ?? ''}")`}>
+						class="classic-login-button"
+						style={`--classic-native-button: url("${$page.data.themeAssets?.redButtonBackground ?? ''}"); --classic-native-button-hover: url("${$page.data.themeAssets?.redButtonHover ?? ''}")`}>
 						<Button href="/account/lost">Account Lost?</Button>
 					</div>
 				</div>
@@ -71,16 +71,16 @@
 		</form>
 	</PagePanel>
 </div>
-<h2 class="cip-new-player-heading">New Player?</h2>
+<h2 class="classic-new-player-heading">New Player?</h2>
 <PagePanel title="New Player" surface>
-	<div class="cip-new-player">
+	<div class="classic-new-player">
 		<p>
 			Create an account and your first character to start playing on this
 			server.
 		</p>
 		<div
-			class="cip-create-account"
-			style={`--cip-native-button: url("${$page.data.themeAssets?.mediumButtonBackground ?? ''}"); --cip-native-button-hover: url("${$page.data.themeAssets?.mediumButtonHover ?? ''}")`}>
+			class="classic-create-account"
+			style={`--classic-native-button: url("${$page.data.themeAssets?.mediumButtonBackground ?? ''}"); --classic-native-button-hover: url("${$page.data.themeAssets?.mediumButtonHover ?? ''}")`}>
 			<Button href="/account/signup"
 				>{#if $page.data.themeAssets?.mediumButtonCreateAccount}<img
 						src={$page.data.themeAssets.mediumButtonCreateAccount}
@@ -90,30 +90,32 @@
 </PagePanel>
 
 <style>
-	:global(.theme-cip-slender) .cip-login-panel :global(.cip-page-panel__body) {
+	:global(.theme-classic)
+		.classic-login-panel
+		:global(.classic-page-panel__body) {
 		padding-top: 7px;
 		padding-bottom: 10px;
 	}
-	:global(.theme-cip-slender) .cip-login-grid > label {
+	:global(.theme-classic) .classic-login-grid > label {
 		align-self: start;
 	}
-	:global(.theme-cip-slender) .cip-login-grid > :is(label:first-child, input) {
+	:global(.theme-classic) .classic-login-grid > :is(label:first-child, input) {
 		align-self: start;
 		margin-top: 3px;
 	}
-	:global(.theme-cip-slender) .cip-login-panel .cip-login-grid > input,
-	:global(.theme-cip-slender) .cip-login-grid > .cip-password-field {
+	:global(.theme-classic) .classic-login-panel .classic-login-grid > input,
+	:global(.theme-classic) .classic-login-grid > .classic-password-field {
 		width: calc(100% - 4px);
 	}
-	:global(.theme-cip-slender) .cip-login-grid > .cip-password-field {
+	:global(.theme-classic) .classic-login-grid > .classic-password-field {
 		align-self: start;
 	}
-	:global(.theme-cip-slender) .cip-create-account :global(.btn) {
+	:global(.theme-classic) .classic-create-account :global(.btn) {
 		width: 150px;
 		height: 37px;
 		background-size: 150px 37px;
 	}
-	:global(.theme-cip-slender) .cip-login-grid {
+	:global(.theme-classic) .classic-login-grid {
 		display: grid;
 		grid-template-columns: 140px minmax(80px, 1fr) 135px;
 		align-items: center;
@@ -121,19 +123,19 @@
 		padding: 2px 5px 5px;
 		border: 1px solid #faf0d7;
 	}
-	:global(.theme-cip-slender) .cip-login-grid label {
+	:global(.theme-classic) .classic-login-grid label {
 		font-weight: bold;
 	}
-	:global(.theme-cip-slender) .cip-login-grid input {
+	:global(.theme-classic) .classic-login-grid input {
 		width: 100%;
 	}
-	:global(.theme-cip-slender) .cip-password-field {
+	:global(.theme-classic) .classic-password-field {
 		position: relative;
 	}
-	:global(.theme-cip-slender) .cip-password-field input {
+	:global(.theme-classic) .classic-password-field input {
 		padding-right: 30px;
 	}
-	:global(.theme-cip-slender) .cip-password-toggle {
+	:global(.theme-classic) .classic-password-toggle {
 		position: absolute;
 		right: 8px;
 		top: 2px;
@@ -144,14 +146,14 @@
 		align-items: center;
 		justify-content: center;
 	}
-	:global(.theme-cip-slender) .cip-new-player-heading {
+	:global(.theme-classic) .classic-new-player-heading {
 		text-align: center;
 		font:
 			bold 24px Verdana,
 			sans-serif;
 		margin: 25px 0 18px;
 	}
-	:global(.theme-cip-slender) .cip-new-player {
+	:global(.theme-classic) .classic-new-player {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -160,10 +162,10 @@
 		padding: 5px;
 	}
 	@media (max-width: 767px) {
-		:global(.theme-cip-slender) .cip-login-grid {
+		:global(.theme-classic) .classic-login-grid {
 			grid-template-columns: 1fr;
 		}
-		:global(.theme-cip-slender) .cip-new-player {
+		:global(.theme-classic) .classic-new-player {
 			flex-wrap: wrap;
 		}
 	}

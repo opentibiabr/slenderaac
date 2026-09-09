@@ -6,7 +6,7 @@ export type NativePage = {
 	paperMinHeight: number;
 };
 
-export function cipNativePage(pathname: string): NativePage | null {
+export function classicNativePage(pathname: string): NativePage | null {
 	if (pathname === '/account' || pathname.startsWith('/account/'))
 		return {
 			headline:

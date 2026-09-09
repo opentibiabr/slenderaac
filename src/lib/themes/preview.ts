@@ -1,4 +1,9 @@
-const previewKeys = ['themePreview', 'cipReference', 'cipGrid', 'cipDemo'];
+const previewKeys = [
+	'themePreview',
+	'classicReference',
+	'classicGrid',
+	'classicDemo',
+];
 
 export function themePreviewLoginHref(current: URL): string {
 	if (!current.searchParams.has('themePreview')) return '/account/login';

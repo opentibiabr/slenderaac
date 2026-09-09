@@ -1,7 +1,7 @@
 import type { ComponentType } from 'svelte';
 
 import type { ThemeId } from '$lib/themes/theme-ids';
-import CipSlenderShell from '$lib/themes/cip-slender/Shell.svelte';
+import ClassicShell from '$lib/themes/classic/Shell.svelte';
 import LegboneShell from '$lib/themes/legbone/Shell.svelte';
 
 type ThemeDefinition = {
@@ -12,7 +12,7 @@ export const themeRegistry = {
 	legbone: {
 		Shell: LegboneShell,
 	},
-	'cip-slender': {
-		Shell: CipSlenderShell,
+	classic: {
+		Shell: ClassicShell,
 	},
 } satisfies Record<ThemeId, ThemeDefinition>;

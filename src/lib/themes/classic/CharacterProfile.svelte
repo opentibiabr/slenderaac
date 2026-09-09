@@ -20,7 +20,7 @@
 
 {#if character}
 	<PagePanel title="Character Information" surface>
-		<table class="cip-data-table cip-data-table--details">
+		<table class="classic-data-table classic-data-table--details">
 			<tbody>
 				<tr><td>Name:</td><td>{character.name}</td></tr>
 				<tr><td>Sex:</td><td>{sexString(character.sex)}</td></tr>
@@ -52,7 +52,7 @@
 	</PagePanel>
 	{#if data.skills}
 		<PagePanel title="Skills" surface
-			><table class="cip-data-table cip-data-table--details">
+			><table class="classic-data-table classic-data-table--details">
 				<tbody>
 					{#each Object.entries(data.skills) as [skill, level]}<tr
 							><td>{skill}:</td><td>{level}</td></tr
@@ -66,7 +66,7 @@
 	{/if}
 	{#if data.deaths?.length}
 		<PagePanel title="Character Deaths" surface
-			><table class="cip-data-table">
+			><table class="classic-data-table">
 				<tbody>
 					{#each data.deaths as death}<tr
 							><td>{formatDate(death.time)}</td><td>

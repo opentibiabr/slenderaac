@@ -18,7 +18,7 @@ export function mediaPreview(
 	if (
 		kind === 'image' &&
 		url.origin === origin &&
-		url.pathname.startsWith('/theme-assets/cip-slender/')
+		url.pathname.startsWith('/theme-assets/classic/')
 	) {
 		return {
 			kind,

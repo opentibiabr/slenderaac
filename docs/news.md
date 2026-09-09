@@ -2,7 +2,7 @@
 
 Latest News (`/`), News Archive (`/news/archive`) and Event Schedule
 (`/news/event-schedule`) are application routes included in every installation.
-Both the default `legbone` theme and `cip-slender` expose them in their news menu.
+Both the default `legbone` theme and `classic` expose them in their news menu.
 They do not require creating Static Pages, installing a theme pack, enabling a
 preview flag or importing sample content.
 
@@ -18,7 +18,7 @@ bun generate
 
 The migration adds news types, categories, archive indexes and the event table.
 Existing news keep their content and publication state, with type `news` and
-category `community`. No public CipSoft content, sample events or administrator
+category `community`. No public Server content, sample events or administrator
 credentials are seeded. An installation without published content shows an empty
 news page, empty search results and a working calendar without events.
 
@@ -43,8 +43,8 @@ history preserve the selected search or month.
 The routes, server loads, Prisma models and administrative actions are shared.
 `src/lib/components/news/TableFrame.svelte` and `TableSurface.svelte` select the
 theme's presentation. The default presentation uses the existing application
-colors and responsive controls; the Cip presentation delegates to the calibrated
+colors and responsive controls; the Classic presentation delegates to the calibrated
 frames without changing their geometry.
 
-The external Cip asset ZIP and optional public-content importer are only needed
-for that presentation and visual comparison. See [Cip Slender news layouts](cip-slender.md).
+The external Classic asset ZIP and optional public-content importer are only needed
+for that presentation and visual comparison. See [Classic news layouts](classic.md).

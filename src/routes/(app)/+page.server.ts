@@ -12,27 +12,27 @@ import type { PageServerLoad } from './$types';
 export const load = (async ({ url, parent }) => {
 	const requestedId = url.searchParams.get('news') || null;
 	const requestedTicker = url.searchParams.get('ticker');
-	const cipReference =
-		!requestedId || requestedId.startsWith('cip-reference-')
+	const classicReference =
+		!requestedId || requestedId.startsWith('classic-reference-')
 			? await loadNewsReference(url)
 			: null;
-	if (cipReference) {
+	if (classicReference) {
 		if (requestedId) {
-			cipReference.articles = cipReference.articles.filter(
+			classicReference.articles = classicReference.articles.filter(
 				(article) => article.id === requestedId,
 			);
-			if (!cipReference.articles.length) throw error(404, 'News not found');
+			if (!classicReference.articles.length) throw error(404, 'News not found');
 		}
 		return {
 			title: 'Latest News',
-			cipReference,
+			classicReference,
 			tickers: [],
-			articles: cipReference.articles.map((article) => ({
+			articles: classicReference.articles.map((article) => ({
 				id: article.id,
 				title: article.title,
 				created_at: referenceDate(article.date),
 				content: '',
-				author: { name: 'CipSoft' },
+				author: { name: 'Server' },
 				category: article.category ?? 'community',
 				presentation: {
 					icon: article.icon,
@@ -53,7 +53,7 @@ export const load = (async ({ url, parent }) => {
 			},
 			include: { author: { select: { name: true } } },
 			orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-			take: requestedId ? 1 : layout.selectedTheme === 'cip-slender' ? 8 : 5,
+			take: requestedId ? 1 : layout.selectedTheme === 'classic' ? 8 : 5,
 		}),
 		prisma.news.findMany({
 			where: { published: true, type: 'ticker' },
@@ -90,7 +90,7 @@ export const load = (async ({ url, parent }) => {
 	}
 	return {
 		title: 'Latest News',
-		cipReference: null,
+		classicReference: null,
 		tickers,
 		articles: news.map((article) => ({
 			...article,

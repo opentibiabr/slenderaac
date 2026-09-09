@@ -90,13 +90,13 @@
 </dialog>
 
 <style>
-	:global(.theme-cip-slender) .screenshot-gallery {
+	:global(.theme-classic) .screenshot-gallery {
 		display: table;
 		width: 100%;
 		border-collapse: separate;
 		border-spacing: 2px;
 	}
-	:global(.theme-cip-slender) .screenshot-gallery__cell {
+	:global(.theme-classic) .screenshot-gallery__cell {
 		display: table-cell;
 		padding: 1px;
 		text-align: center;
@@ -105,7 +105,7 @@
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-cip-slender) .screenshot-gallery__card {
+	:global(.theme-classic) .screenshot-gallery__card {
 		display: inline-block;
 		box-sizing: content-box;
 		width: 232px;
@@ -115,7 +115,7 @@
 		background: var(--gallery-background);
 		vertical-align: baseline;
 	}
-	:global(.theme-cip-slender) .screenshot-gallery__card img {
+	:global(.theme-classic) .screenshot-gallery__card img {
 		display: inline;
 		box-sizing: content-box;
 		width: 230px;
@@ -124,7 +124,7 @@
 		border: 1px solid rgb(123 110 76);
 		vertical-align: baseline;
 	}
-	:global(.theme-cip-slender) .screenshot-gallery__caption {
+	:global(.theme-classic) .screenshot-gallery__caption {
 		display: table;
 		border-spacing: 2px;
 		width: 230px;
@@ -132,13 +132,13 @@
 		margin: auto;
 		color: rgb(201 189 171);
 	}
-	:global(.theme-cip-slender) .screenshot-gallery__caption > span {
+	:global(.theme-classic) .screenshot-gallery__caption > span {
 		display: table-cell;
 		vertical-align: middle;
 		text-align: center;
 		font-weight: normal;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog {
+	:global(.theme-classic) .screenshot-dialog {
 		position: fixed;
 		top: 0;
 		width: 100%;
@@ -154,10 +154,10 @@
 			16px 'Times New Roman',
 			serif;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog::backdrop {
+	:global(.theme-classic) .screenshot-dialog::backdrop {
 		background: rgb(0 0 0 / 0.75);
 	}
-	:global(.theme-cip-slender) .screenshot-dialog__navigation {
+	:global(.theme-classic) .screenshot-dialog__navigation {
 		display: flex;
 		width: 615px;
 		max-width: calc(100% - 24px);
@@ -166,7 +166,7 @@
 			16px Arial,
 			sans-serif;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog__navigation button {
+	:global(.theme-classic) .screenshot-dialog__navigation button {
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
@@ -179,18 +179,16 @@
 		color: rgb(242 175 78);
 		font: inherit;
 	}
-	:global(.theme-cip-slender)
-		.screenshot-dialog__navigation
-		button:nth-child(2) {
+	:global(.theme-classic) .screenshot-dialog__navigation button:nth-child(2) {
 		margin: 0 2px;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog__picture {
+	:global(.theme-classic) .screenshot-dialog__picture {
 		position: relative;
 		width: 680px;
 		max-width: 100%;
 		margin: 0 auto;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog__caption {
+	:global(.theme-classic) .screenshot-dialog__caption {
 		box-sizing: content-box;
 		width: 611px;
 		max-width: calc(100% - 24px);
@@ -203,7 +201,7 @@
 			16px/25px Arial,
 			sans-serif;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog__picture img {
+	:global(.theme-classic) .screenshot-dialog__picture img {
 		display: inline;
 		box-sizing: content-box;
 		max-width: calc(100% - 24px);
@@ -212,7 +210,7 @@
 		border: 1px solid rgb(123 110 76);
 		vertical-align: baseline;
 	}
-	:global(.theme-cip-slender) .screenshot-dialog__cross {
+	:global(.theme-classic) .screenshot-dialog__cross {
 		position: absolute;
 		z-index: 1;
 		right: -40px;
@@ -229,12 +227,12 @@
 			25px/60px Arial,
 			sans-serif;
 	}
-	:global(.theme-cip-slender) .screenshot-gallery__card {
+	:global(.theme-classic) .screenshot-gallery__card {
 		text-decoration: none;
 		font-weight: normal;
 	}
 	@media (max-width: 800px) {
-		:global(.theme-cip-slender) .screenshot-dialog__cross {
+		:global(.theme-classic) .screenshot-dialog__cross {
 			display: none;
 		}
 	}

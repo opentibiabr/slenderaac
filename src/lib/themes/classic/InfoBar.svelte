@@ -17,12 +17,12 @@
 
 <!-- Inline spacing is provided by the icon and channel margins. -->
 <!-- prettier-ignore -->
-<div class="cip-info-bar">
-	{#each channels as channel}<a class="cip-info-channel" href={channel.href} target="_blank" rel="noreferrer">{#if channel.icon}<img src={channel.icon} alt={channel.label} />{:else}{channel.label}{/if}<span class="cip-info-numbers">{#if signal}<img class="cip-info-small" src={signal} alt="Channels" />{/if}<span class="cip-info-small">{channel.channels}</span>{#if eye}<img class="cip-info-small" src={eye} alt="Viewers" />{/if}<span class="cip-info-small">{channel.viewers}</span></span></a>{/each}<a href={downloadHref}>{#if downloadIcon}<img src={downloadIcon} alt="" />{/if}<span class="cip-info-numbers"><span class="cip-info-small">Fankit</span></span></a><a class="cip-info-online" href={onlineHref}>{#if onlineIcon}<img src={onlineIcon} alt="" />{/if}<span class="cip-info-numbers"><span class="cip-info-small">{onlineCount} Players Online</span></span></a>
+<div class="classic-info-bar">
+	{#each channels as channel}<a class="classic-info-channel" href={channel.href} target="_blank" rel="noreferrer">{#if channel.icon}<img src={channel.icon} alt={channel.label} />{:else}{channel.label}{/if}<span class="classic-info-numbers">{#if signal}<img class="classic-info-small" src={signal} alt="Channels" />{/if}<span class="classic-info-small">{channel.channels}</span>{#if eye}<img class="classic-info-small" src={eye} alt="Viewers" />{/if}<span class="classic-info-small">{channel.viewers}</span></span></a>{/each}<a href={downloadHref}>{#if downloadIcon}<img src={downloadIcon} alt="" />{/if}<span class="classic-info-numbers"><span class="classic-info-small">Fankit</span></span></a><a class="classic-info-online" href={onlineHref}>{#if onlineIcon}<img src={onlineIcon} alt="" />{/if}<span class="classic-info-numbers"><span class="classic-info-small">{onlineCount} Players Online</span></span></a>
 </div>
 
 <style>
-	.cip-info-bar {
+	.classic-info-bar {
 		position: relative;
 		z-index: 2;
 		width: 100%;
@@ -49,30 +49,30 @@
 		vertical-align: baseline;
 		max-width: none;
 	}
-	.cip-info-channel {
+	.classic-info-channel {
 		margin-right: 15px;
 	}
-	.cip-info-small {
+	.classic-info-small {
 		margin-left: 5px;
 	}
-	.cip-info-numbers {
+	.classic-info-numbers {
 		position: relative;
 		top: -4px;
 	}
-	.cip-info-online {
+	.classic-info-online {
 		float: right;
 	}
 	@media (max-width: 980px) {
-		.cip-info-bar {
+		.classic-info-bar {
 			white-space: normal;
 			height: auto;
 			line-height: 22px;
 		}
-		.cip-info-online {
+		.classic-info-online {
 			float: none;
 			display: inline-block;
 		}
-		.cip-info-channel {
+		.classic-info-channel {
 			display: inline-block;
 		}
 	}

@@ -8,14 +8,14 @@
 	export let value: string | number;
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
-	<label class="cip-radio-choice"
+{#if $page.data.selectedTheme === 'classic'}
+	<label class="classic-radio-choice"
 		><input type="radio" {name} {value} bind:group /><span><slot /></span
 		></label>
 {:else}<RadioItem bind:group {name} {value}><slot /></RadioItem>{/if}
 
 <style>
-	:global(.theme-cip-slender) .cip-radio-choice {
+	:global(.theme-classic) .classic-radio-choice {
 		display: inline-flex;
 		align-items: center;
 		gap: 5px;
@@ -23,7 +23,7 @@
 		font-weight: normal;
 		cursor: pointer;
 	}
-	:global(.theme-cip-slender) .cip-radio-choice input {
+	:global(.theme-classic) .classic-radio-choice input {
 		appearance: auto;
 		width: 13px;
 		height: 13px;

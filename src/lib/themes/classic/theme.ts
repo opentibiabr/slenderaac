@@ -1,4 +1,4 @@
-export type CipSlenderAssetKey =
+export type ClassicAssetKey =
 	| 'logo'
 	| 'background'
 	| 'menuOrnament'
@@ -60,7 +60,7 @@ export type CipSlenderAssetKey =
 	| 'headlineEventSchedule'
 	| 'newsTickerIconCommunity'
 	| 'newsTickerIconDevelopment'
-	| 'newsArchiveIconCipsoft'
+	| 'newsArchiveIconServer'
 	| 'newsArchiveIconCommunity'
 	| 'newsArchiveIconDevelopment'
 	| 'newsArchiveIconSupport'
@@ -124,12 +124,12 @@ export type CipSlenderAssetKey =
 	| 'rightCreature'
 	| 'rightBoss';
 
-export type CipSlenderAssets = Partial<Record<CipSlenderAssetKey, string>> &
+export type ClassicAssets = Partial<Record<ClassicAssetKey, string>> &
 	Record<string, string | undefined>;
 
-export function cipAsset(
+export function classicAsset(
 	assets: Record<string, string | undefined> | null | undefined,
-	key: CipSlenderAssetKey,
+	key: ClassicAssetKey,
 ): string | null {
 	return assets?.[key] ?? null;
 }

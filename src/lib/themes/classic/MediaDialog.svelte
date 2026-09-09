@@ -30,10 +30,12 @@
 			!(event.target instanceof Element)
 		)
 			return;
-		const link = event.target.closest<HTMLAnchorElement>('a[data-cip-media]');
+		const link = event.target.closest<HTMLAnchorElement>(
+			'a[data-classic-media]',
+		);
 		if (!link || link.hasAttribute('download')) return;
 		const media = mediaPreview(
-			link.dataset.cipMedia,
+			link.dataset.classicMedia,
 			link.href,
 			window.location.origin,
 		);
@@ -51,7 +53,7 @@
 
 	afterNavigate(close);
 	onMount(() => {
-		const shell = dialog.closest('.theme-cip-slender');
+		const shell = dialog.closest('.theme-classic');
 		const click = (event: Event) => void activate(event as MouseEvent);
 		shell?.addEventListener('click', click);
 		dialog.addEventListener('click', backdrop);
@@ -63,30 +65,30 @@
 </script>
 
 <dialog
-	class="cip-media-dialog"
-	class:cip-media-dialog--video={selected?.kind === 'video'}
+	class="classic-media-dialog"
+	class:classic-media-dialog--video={selected?.kind === 'video'}
 	bind:this={dialog}
 	aria-label={selected?.label ?? 'Media preview'}
 	on:cancel|preventDefault={close}
 	on:close={close}>
 	{#if selected?.kind === 'image'}
-		<div class="cip-media-dialog__image">
+		<div class="classic-media-dialog__image">
 			<button
 				type="button"
-				class="cip-media-dialog__image-close"
+				class="classic-media-dialog__image-close"
 				aria-label="Close popup with large image"
 				on:click={close}>X</button>
 			<img src={selected.src} alt="Enlarged news illustration" />
 		</div>
 	{:else if selected?.kind === 'video'}
 		<div
-			class="cip-media-dialog__video"
+			class="classic-media-dialog__video"
 			style:background-image={trailerFrame
 				? `url("${trailerFrame}")`
 				: undefined}>
 			<button
 				type="button"
-				class="cip-media-dialog__video-close"
+				class="classic-media-dialog__video-close"
 				aria-label="Close Tibia trailer"
 				on:click={close}>
 				{#if trailerClose}<img src={trailerClose} alt="" />{/if}
@@ -103,7 +105,7 @@
 </dialog>
 
 <style>
-	:global(.theme-cip-slender) .cip-media-dialog {
+	:global(.theme-classic) .classic-media-dialog {
 		position: fixed;
 		inset: 0;
 		box-sizing: border-box;
@@ -123,20 +125,20 @@
 			sans-serif;
 		overflow: auto;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog[open] {
+	:global(.theme-classic) .classic-media-dialog[open] {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog::backdrop {
+	:global(.theme-classic) .classic-media-dialog::backdrop {
 		background: rgb(0 0 0 / 0.75);
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__image {
+	:global(.theme-classic) .classic-media-dialog__image {
 		position: relative;
 		margin: 0 25px;
 		line-height: normal;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__image img {
+	:global(.theme-classic) .classic-media-dialog__image img {
 		display: inline;
 		width: auto;
 		height: auto;
@@ -146,7 +148,7 @@
 		border: 0;
 		vertical-align: baseline;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__image-close {
+	:global(.theme-classic) .classic-media-dialog__image-close {
 		position: absolute;
 		display: block;
 		top: -12px;
@@ -165,12 +167,12 @@
 			sans-serif;
 		cursor: pointer;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog--video[open] {
+	:global(.theme-classic) .classic-media-dialog--video[open] {
 		align-items: flex-start;
 		width: 100%;
 		padding-top: 160px;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__video {
+	:global(.theme-classic) .classic-media-dialog__video {
 		position: relative;
 		width: 775px;
 		max-width: calc(100% - 48px);
@@ -179,7 +181,7 @@
 		background-size: 100% 100%;
 		background-repeat: no-repeat;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__video iframe {
+	:global(.theme-classic) .classic-media-dialog__video iframe {
 		position: absolute;
 		top: calc(100% * 13 / 447);
 		left: calc(100% * 12.5 / 775);
@@ -187,7 +189,7 @@
 		height: calc(100% * 421 / 447);
 		border: 0;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__video-close {
+	:global(.theme-classic) .classic-media-dialog__video-close {
 		position: absolute;
 		z-index: 1;
 		display: block;
@@ -207,20 +209,20 @@
 			sans-serif;
 		cursor: pointer;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__video-close img {
+	:global(.theme-classic) .classic-media-dialog__video-close img {
 		display: inline;
 		width: 45px;
 		height: 45px;
 		max-width: none;
 		vertical-align: baseline;
 	}
-	:global(.theme-cip-slender) .cip-media-dialog__video-close span {
+	:global(.theme-classic) .classic-media-dialog__video-close span {
 		position: absolute;
 		top: 12px;
 		left: 17px;
 	}
 	@media (max-width: 800px), (max-height: 650px) {
-		:global(.theme-cip-slender) .cip-media-dialog--video[open] {
+		:global(.theme-classic) .classic-media-dialog--video[open] {
 			padding-top: 40px;
 		}
 	}

@@ -28,9 +28,9 @@
 	}
 </script>
 
-<div class="cip-native-content">
+<div class="classic-native-content">
 	<PagePanel {title} surface>
-		<table class="cip-data-table">
+		<table class="classic-data-table">
 			<thead
 				><tr>
 					{#if ranked}<th>Rank</th>{/if}

@@ -33,7 +33,7 @@
 </script>
 
 <PagePanel title="Highscores Filter">
-	<form method="get" class="cip-filter-grid">
+	<form method="get" class="classic-filter-grid">
 		{#each Array.from(parameters) as [name, value]}<input
 				type="hidden"
 				{name}
@@ -60,7 +60,9 @@
 					value={amount}
 					selected={data.limit === amount}>{amount}</option
 				>{/each}</select>
-		<div class="cip-filter-submit"><Button type="submit">Submit</Button></div>
+		<div class="classic-filter-submit">
+			<Button type="submit">Submit</Button>
+		</div>
 	</form>
 </PagePanel>
 <CharactersTable
@@ -68,7 +70,7 @@
 	skill={data.skill}
 	ranked
 	title="Highscores" />
-<nav class="cip-pagination" aria-label="Highscores pages">
+<nav class="classic-pagination" aria-label="Highscores pages">
 	<span
 		>{#if data.page > 1}<a href={pageHref(1)}>First</a> ·
 			<a href={pageHref(data.page - 1)}>Previous</a>{/if}</span>

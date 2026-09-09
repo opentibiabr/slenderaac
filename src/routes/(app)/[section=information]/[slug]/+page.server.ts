@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 	if (section && !manualSections.includes(section))
 		throw error(404, 'Manual section not found');
 	const presentation = await loadInformationPresentation(
-		informationPage.section === 'library' ? 'cip-slender' : selectedTheme,
+		informationPage.section === 'library' ? 'classic' : selectedTheme,
 		section ? `manual-${section}` : informationPage.id,
 	);
 	const entries =

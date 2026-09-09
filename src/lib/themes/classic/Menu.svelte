@@ -20,7 +20,7 @@
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
-	import { cipAsset } from './theme';
+	import { classicAsset } from './theme';
 
 	type StaticPage = {
 		title: string;
@@ -34,10 +34,14 @@
 
 	$: presentation = (
 		$page.data as {
-			cipPresentation?: import('./reference-types').CipPresentation | null;
+			classicPresentation?:
+				| import('./reference-types').ClassicPresentation
+				| null;
 		}
-	).cipPresentation;
-	$: menuIdPrefix = showAccountActions ? 'cip-menu-drawer' : 'cip-menu-main';
+	).classicPresentation;
+	$: menuIdPrefix = showAccountActions
+		? 'classic-menu-drawer'
+		: 'classic-menu-main';
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
 	$: aboutLinks =
 		presentation?.navigation.about ??
@@ -72,100 +76,102 @@
 	$: isNewsArchiveActive = currentPath === '/news/archive';
 	$: isEventScheduleActive = currentPath === '/news/event-schedule';
 
-	$: menuButtonBackground = cipAsset(assets, 'menuButtonBackground');
-	$: menuButtonHover = cipAsset(assets, 'menuButtonHover');
+	$: menuButtonBackground = classicAsset(assets, 'menuButtonBackground');
+	$: menuButtonHover = classicAsset(assets, 'menuButtonHover');
 	$: menuStyle = [
 		menuButtonBackground
-			? `--cip-menu-button: url("${menuButtonBackground}")`
+			? `--classic-menu-button: url("${menuButtonBackground}")`
 			: '',
-		menuButtonHover ? `--cip-menu-button-hover: url("${menuButtonHover}")` : '',
+		menuButtonHover
+			? `--classic-menu-button-hover: url("${menuButtonHover}")`
+			: '',
 	]
 		.filter(Boolean)
 		.join('; ');
 
 	$: menuIcons = {
-		news: cipAsset(assets, 'menuIconNews'),
-		community: cipAsset(assets, 'menuIconCommunity'),
-		library: cipAsset(assets, 'menuIconLibrary'),
-		shop: cipAsset(assets, 'menuIconShop'),
-		about: cipAsset(assets, 'menuIconAbout'),
-		guides: cipAsset(assets, 'menuIconGameGuides'),
-		characterTrade: cipAsset(assets, 'menuIconCharacterTrade'),
-		account: cipAsset(assets, 'menuIconAccount'),
-		forum: cipAsset(assets, 'menuIconForum'),
-		support: cipAsset(assets, 'menuIconSupport'),
+		news: classicAsset(assets, 'menuIconNews'),
+		community: classicAsset(assets, 'menuIconCommunity'),
+		library: classicAsset(assets, 'menuIconLibrary'),
+		shop: classicAsset(assets, 'menuIconShop'),
+		about: classicAsset(assets, 'menuIconAbout'),
+		guides: classicAsset(assets, 'menuIconGameGuides'),
+		characterTrade: classicAsset(assets, 'menuIconCharacterTrade'),
+		account: classicAsset(assets, 'menuIconAccount'),
+		forum: classicAsset(assets, 'menuIconForum'),
+		support: classicAsset(assets, 'menuIconSupport'),
 	};
 
-	$: activeSubmenuIcon = cipAsset(assets, 'menuIconActiveSubmenu');
-	$: expandPlus = cipAsset(assets, 'menuExpandPlus');
-	$: expandMinus = cipAsset(assets, 'menuExpandMinus');
-	$: greenLight = cipAsset(assets, 'menuGreenLight');
-	$: boxTop = cipAsset(assets, 'boxTop');
-	$: boxBottom = cipAsset(assets, 'boxBottom');
-	$: chain = cipAsset(assets, 'chain');
+	$: activeSubmenuIcon = classicAsset(assets, 'menuIconActiveSubmenu');
+	$: expandPlus = classicAsset(assets, 'menuExpandPlus');
+	$: expandMinus = classicAsset(assets, 'menuExpandMinus');
+	$: greenLight = classicAsset(assets, 'menuGreenLight');
+	$: boxTop = classicAsset(assets, 'boxTop');
+	$: boxBottom = classicAsset(assets, 'boxBottom');
+	$: chain = classicAsset(assets, 'chain');
 
 	$: menuLabels = {
-		news: cipAsset(assets, 'menuLabelNews'),
-		community: cipAsset(assets, 'menuLabelCommunity'),
-		library: cipAsset(assets, 'menuLabelLibrary'),
-		shop: cipAsset(assets, 'menuLabelShop'),
-		about: cipAsset(assets, 'menuLabelAbout'),
-		guides: cipAsset(assets, 'menuLabelGameGuides'),
-		characterTrade: cipAsset(assets, 'menuLabelCharacterTrade'),
-		account: cipAsset(assets, 'menuLabelAccount'),
-		forum: cipAsset(assets, 'menuLabelForum'),
-		support: cipAsset(assets, 'menuLabelSupport'),
+		news: classicAsset(assets, 'menuLabelNews'),
+		community: classicAsset(assets, 'menuLabelCommunity'),
+		library: classicAsset(assets, 'menuLabelLibrary'),
+		shop: classicAsset(assets, 'menuLabelShop'),
+		about: classicAsset(assets, 'menuLabelAbout'),
+		guides: classicAsset(assets, 'menuLabelGameGuides'),
+		characterTrade: classicAsset(assets, 'menuLabelCharacterTrade'),
+		account: classicAsset(assets, 'menuLabelAccount'),
+		forum: classicAsset(assets, 'menuLabelForum'),
+		support: classicAsset(assets, 'menuLabelSupport'),
 	};
 
 	$: menuChromeStyle = [
 		menuStyle,
 		activeSubmenuIcon
-			? `--cip-active-submenu: url("${activeSubmenuIcon}")`
+			? `--classic-active-submenu: url("${activeSubmenuIcon}")`
 			: '',
-		expandPlus ? `--cip-expand-plus: url("${expandPlus}")` : '',
-		expandMinus ? `--cip-expand-minus: url("${expandMinus}")` : '',
-		greenLight ? `--cip-green-light: url("${greenLight}")` : '',
-		boxTop ? `--cip-menu-box-top: url("${boxTop}")` : '',
-		boxBottom ? `--cip-menu-box-bottom: url("${boxBottom}")` : '',
-		chain ? `--cip-menu-chain: url("${chain}")` : '',
+		expandPlus ? `--classic-expand-plus: url("${expandPlus}")` : '',
+		expandMinus ? `--classic-expand-minus: url("${expandMinus}")` : '',
+		greenLight ? `--classic-green-light: url("${greenLight}")` : '',
+		boxTop ? `--classic-menu-box-top: url("${boxTop}")` : '',
+		boxBottom ? `--classic-menu-box-bottom: url("${boxBottom}")` : '',
+		chain ? `--classic-menu-chain: url("${chain}")` : '',
 	]
 		.filter(Boolean)
 		.join('; ');
 </script>
 
 <nav
-	class={`theme-cip-slender-menu${
-		!showAccountActions ? ' theme-cip-slender-menu--main' : ''
+	class={`theme-classic-menu${
+		!showAccountActions ? ' theme-classic-menu--main' : ''
 	}`}
 	aria-label="Main navigation"
 	style={menuChromeStyle}>
 	{#if showAccountActions}
-		<section class="theme-cip-slender-menu__account">
+		<section class="theme-classic-menu__account">
 			{#if isLoggedIn}
-				<a class="theme-cip-slender-menu__action" href={accountPageHref}>
+				<a class="theme-classic-menu__action" href={accountPageHref}>
 					<Fa icon={faUser} />
 					{$_('my-account')}
 				</a>
 				<form
 					action={withThemePreview($page.url, '/account/logout')}
 					method="post">
-					<button class="theme-cip-slender-menu__action" type="submit">
+					<button class="theme-classic-menu__action" type="submit">
 						<Fa icon={faRightFromBracket} />
 						{$_('logout')}
 					</button>
 				</form>
 			{:else}
-				<a class="theme-cip-slender-menu__action" href={accountLoginHref}>
+				<a class="theme-classic-menu__action" href={accountLoginHref}>
 					<Fa icon={faRightToBracket} />
 					{$_('login')}
 				</a>
-				<a class="theme-cip-slender-menu__link-action" href={accountSignupHref}>
+				<a class="theme-classic-menu__link-action" href={accountSignupHref}>
 					<Fa icon={faUserPlus} />
 					{$_('create-account')}
 				</a>
 			{/if}
 			<a
-				class="theme-cip-slender-menu__action"
+				class="theme-classic-menu__action"
 				href={withThemePreview($page.url, PUBLIC_DOWNLOAD_URL)}>
 				<Fa icon={faDownload} />
 				{$_('download')}
@@ -175,7 +181,7 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-news-toggle`}
 			checked />
@@ -187,35 +193,35 @@
 			{/if}
 			{#if menuLabels.news}
 				<img
-					class="theme-cip-slender-menu__label"
+					class="theme-classic-menu__label"
 					src={menuLabels.news}
 					alt={$_('news')} />
 			{:else}
 				<span>{$_('news')}</span>
 			{/if}
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-news-toggle`}
 				aria-label="Toggle News"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-news-toggle`}
 				aria-label="Toggle News"></label>
 		</h2>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-news`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-news`}>
 			<a
 				class={isLatestNewsActive
-					? 'theme-cip-slender-menu__submenu-link--active'
+					? 'theme-classic-menu__submenu-link--active'
 					: undefined}
 				href={latestNewsHref}>Latest News</a>
 			<a
 				class={isNewsArchiveActive
-					? 'theme-cip-slender-menu__submenu-link--active'
+					? 'theme-classic-menu__submenu-link--active'
 					: undefined}
 				href={newsArchiveHref}>News Archive</a>
 			<a
 				class={isEventScheduleActive
-					? 'theme-cip-slender-menu__submenu-link--active'
+					? 'theme-classic-menu__submenu-link--active'
 					: undefined}
 				href={eventScheduleHref}>Event Schedule</a>
 		</div>
@@ -223,12 +229,12 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-about-toggle`}
 			checked={currentPath.startsWith('/about/')} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.about}
 					<img src={menuIcons.about} alt="" aria-hidden="true" />
 				{:else}
@@ -236,28 +242,26 @@
 				{/if}
 				{#if menuLabels.about}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.about}
 						alt="About Tibia" />
 				{:else}
-					<span class="theme-cip-slender-menu__text-label">About Tibia</span>
+					<span class="theme-classic-menu__text-label">About Tibia</span>
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-about-toggle`}
 				aria-label="Toggle About Tibia"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-about-toggle`}
 				aria-label="Toggle About Tibia"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-about`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-about`}>
 			{#each aboutLinks as link}
 				<a
-					class:theme-cip-slender-menu__submenu-link--active={isActive(
-						link.href,
-					)}
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
 					href={withThemePreview($page.url, link.href)}>{link.label}</a>
 			{/each}
 		</div>
@@ -265,12 +269,12 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-guides-toggle`}
 			checked={currentPath.startsWith('/guides/')} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.guides}
 					<img src={menuIcons.guides} alt="" aria-hidden="true" />
 				{:else}
@@ -278,28 +282,26 @@
 				{/if}
 				{#if menuLabels.guides}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.guides}
 						alt="Game Guides" />
 				{:else}
-					<span class="theme-cip-slender-menu__text-label">Game Guides</span>
+					<span class="theme-classic-menu__text-label">Game Guides</span>
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-guides-toggle`}
 				aria-label="Toggle Game Guides"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-guides-toggle`}
 				aria-label="Toggle Game Guides"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-guides`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-guides`}>
 			{#each guideLinks as link}
 				<a
-					class:theme-cip-slender-menu__submenu-link--active={isActive(
-						link.href,
-					)}
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
 					href={withThemePreview($page.url, link.href)}>{link.label}</a>
 			{/each}
 		</div>
@@ -307,12 +309,12 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-library-toggle`}
 			checked={currentPath.startsWith('/library/')} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.library}
 					<img src={menuIcons.library} alt="" aria-hidden="true" />
 				{:else}
@@ -320,7 +322,7 @@
 				{/if}
 				{#if menuLabels.library}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.library}
 						alt={$_('library')} />
 				{:else}
@@ -328,31 +330,29 @@
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-library-toggle`}
 				aria-label="Toggle Library"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-library-toggle`}
 				aria-label="Toggle Library"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-library`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-library`}>
 			{#if presentation?.navigation.library}
 				{#each presentation.navigation.library as link}
 					<a
-						class:theme-cip-slender-menu__submenu-link--active={isActive(
-							link.href,
-						)}
+						class:theme-classic-menu__submenu-link--active={isActive(link.href)}
 						href={withThemePreview($page.url, link.href)}>{link.label}</a>
 				{/each}
 			{:else}
 				<a
-					class:theme-cip-slender-menu__submenu-link--active={isActive(
+					class:theme-classic-menu__submenu-link--active={isActive(
 						'/library/creatures',
 					)}
 					href={withThemePreview($page.url, '/library/creatures')}>Creatures</a>
 				<a
-					class:theme-cip-slender-menu__submenu-link--active={isActive(
+					class:theme-classic-menu__submenu-link--active={isActive(
 						'/library/boostable-bosses',
 					)}
 					href={withThemePreview($page.url, '/library/boostable-bosses')}
@@ -370,11 +370,11 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-community-toggle`} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.community}
 					<img src={menuIcons.community} alt="" aria-hidden="true" />
 				{:else}
@@ -382,7 +382,7 @@
 				{/if}
 				{#if menuLabels.community}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.community}
 						alt={$_('community')} />
 				{:else}
@@ -390,17 +390,15 @@
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-community-toggle`}
 				aria-label="Toggle Community"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-community-toggle`}
 				aria-label="Toggle Community"></label>
 		</div>
-		<div
-			class="theme-cip-slender-menu__submenu"
-			id={`${menuIdPrefix}-community`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-community`}>
 			{#if presentation?.navigation.community}
 				{#each presentation.navigation.community as link}
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
@@ -416,11 +414,11 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-forum-toggle`} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.forum}
 					<img src={menuIcons.forum} alt="" aria-hidden="true" />
 				{:else}
@@ -428,7 +426,7 @@
 				{/if}
 				{#if menuLabels.forum}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.forum}
 						alt="Forum" />
 				{:else}
@@ -436,15 +434,15 @@
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-forum-toggle`}
 				aria-label="Toggle Forum"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-forum-toggle`}
 				aria-label="Toggle Forum"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-forum`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-forum`}>
 			{#if presentation?.navigation.forum}
 				{#each presentation.navigation.forum as link}
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
@@ -464,11 +462,11 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-account-toggle`} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.account}
 					<img src={menuIcons.account} alt="" aria-hidden="true" />
 				{:else}
@@ -476,7 +474,7 @@
 				{/if}
 				{#if menuLabels.account}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.account}
 						alt={$_('my-account')} />
 				{:else}
@@ -484,15 +482,15 @@
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-account-toggle`}
 				aria-label="Toggle Account"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-account-toggle`}
 				aria-label="Toggle Account"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-account`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-account`}>
 			{#if presentation?.navigation.account}
 				{#each presentation.navigation.account as link}
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
@@ -509,11 +507,11 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-character-trade-toggle`} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.characterTrade}
 					<img src={menuIcons.characterTrade} alt="" aria-hidden="true" />
 				{:else}
@@ -521,24 +519,24 @@
 				{/if}
 				{#if menuLabels.characterTrade}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.characterTrade}
 						alt="Char Bazaar" />
 				{:else}
-					<span class="theme-cip-slender-menu__text-label">Char Bazaar</span>
+					<span class="theme-classic-menu__text-label">Char Bazaar</span>
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-character-trade-toggle`}
 				aria-label="Toggle Char Bazaar"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-character-trade-toggle`}
 				aria-label="Toggle Char Bazaar"></label>
 		</div>
 		<div
-			class="theme-cip-slender-menu__submenu"
+			class="theme-classic-menu__submenu"
 			id={`${menuIdPrefix}-character-trade`}>
 			{#if presentation?.navigation.characterTrade}
 				{#each presentation.navigation.characterTrade as link}
@@ -561,11 +559,11 @@
 
 	<section>
 		<input
-			class="theme-cip-slender-menu__toggle-input"
+			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-support-toggle`} />
-		<div class="theme-cip-slender-menu__category">
-			<span class="theme-cip-slender-menu__category-link">
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.support}
 					<img src={menuIcons.support} alt="" aria-hidden="true" />
 				{:else}
@@ -573,7 +571,7 @@
 				{/if}
 				{#if menuLabels.support}
 					<img
-						class="theme-cip-slender-menu__label"
+						class="theme-classic-menu__label"
 						src={menuLabels.support}
 						alt="Support" />
 				{:else}
@@ -581,15 +579,15 @@
 				{/if}
 			</span>
 			<label
-				class="theme-cip-slender-menu__header-hitbox"
+				class="theme-classic-menu__header-hitbox"
 				for={`${menuIdPrefix}-support-toggle`}
 				aria-label="Toggle Support"></label>
 			<label
-				class="theme-cip-slender-menu__toggle"
+				class="theme-classic-menu__toggle"
 				for={`${menuIdPrefix}-support-toggle`}
 				aria-label="Toggle Support"></label>
 		</div>
-		<div class="theme-cip-slender-menu__submenu" id={`${menuIdPrefix}-support`}>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-support`}>
 			{#if presentation?.navigation.support}
 				{#each presentation.navigation.support as link}
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
@@ -609,7 +607,7 @@
 </nav>
 
 <style>
-	:global(.theme-cip-slender) .theme-cip-slender-menu {
+	:global(.theme-classic) .theme-classic-menu {
 		display: flex;
 		flex-direction: column;
 		gap: 5px;
@@ -617,15 +615,15 @@
 		font-family: Verdana, Arial, sans-serif;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu--main {
+	:global(.theme-classic) .theme-classic-menu--main {
 		position: relative;
 		width: 180px;
 		gap: 0;
 		transform: translateY(11px);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu--main::before,
-	:global(.theme-cip-slender) .theme-cip-slender-menu--main::after {
+	:global(.theme-classic) .theme-classic-menu--main::before,
+	:global(.theme-classic) .theme-classic-menu--main::after {
 		position: absolute;
 		left: 1px;
 		z-index: 6;
@@ -637,36 +635,36 @@
 		pointer-events: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu--main::before {
+	:global(.theme-classic) .theme-classic-menu--main::before {
 		top: -12px;
-		background-image: var(--cip-menu-box-top, none);
+		background-image: var(--classic-menu-box-top, none);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu--main::after {
+	:global(.theme-classic) .theme-classic-menu--main::after {
 		bottom: -12px;
-		background-image: var(--cip-menu-box-bottom, none);
+		background-image: var(--classic-menu-box-bottom, none);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu section {
+	:global(.theme-classic) .theme-classic-menu section {
 		position: relative;
 		border: 0;
 		background: transparent;
 		box-shadow: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__account {
+	:global(.theme-classic) .theme-classic-menu__account {
 		padding: 8px 8px 10px;
 		border-color: rgb(75 69 60);
 		background:
 			linear-gradient(rgb(37 35 31 / 0.92), rgb(22 21 19 / 0.96)), rgb(22 21 19);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__account form {
+	:global(.theme-classic) .theme-classic-menu__account form {
 		margin: 5px 0;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__action,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__link-action {
+	:global(.theme-classic) .theme-classic-menu__action,
+	:global(.theme-classic) .theme-classic-menu__link-action {
 		display: flex;
 		width: 100%;
 		min-height: 32px;
@@ -675,7 +673,7 @@
 		gap: 5px;
 		border: 0;
 		background: var(
-				--cip-menu-button,
+				--classic-menu-button,
 				linear-gradient(180deg, rgb(21 42 207), rgb(14 8 137))
 			)
 			center / 100% 100% no-repeat;
@@ -691,7 +689,7 @@
 			-1px -1px 0 rgb(0 0 0);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__link-action {
+	:global(.theme-classic) .theme-classic-menu__link-action {
 		min-height: 26px;
 		background:
 			linear-gradient(rgb(43 34 30 / 0.86), rgb(33 24 21 / 0.92)), rgb(38 27 23);
@@ -701,18 +699,18 @@
 		text-shadow: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__action:hover,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__action:focus {
+	:global(.theme-classic) .theme-classic-menu__action:hover,
+	:global(.theme-classic) .theme-classic-menu__action:focus {
 		background: var(
-				--cip-menu-button-hover,
+				--classic-menu-button-hover,
 				linear-gradient(180deg, rgb(36 73 255), rgb(15 8 160))
 			)
 			center / 100% 100% no-repeat;
 		color: white;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu h2,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category {
+	:global(.theme-classic) .theme-classic-menu h2,
+	:global(.theme-classic) .theme-classic-menu__category {
 		position: relative;
 		z-index: 1;
 		display: flex;
@@ -722,7 +720,7 @@
 		padding: 0 17px 0 14px;
 		border: 0;
 		background: var(
-				--cip-menu-button,
+				--classic-menu-button,
 				linear-gradient(90deg, rgb(67 22 14), rgb(137 31 20), rgb(50 19 15))
 			)
 			6px 0 / 170px 32px no-repeat;
@@ -734,16 +732,16 @@
 		text-decoration: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu h2 {
+	:global(.theme-classic) .theme-classic-menu h2 {
 		min-height: 32px;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category {
+	:global(.theme-classic) .theme-classic-menu__category {
 		min-height: 32px;
 		gap: 0;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category-link {
+	:global(.theme-classic) .theme-classic-menu__category-link {
 		display: flex;
 		min-width: 0;
 		flex: 1 1 auto;
@@ -753,41 +751,44 @@
 		text-decoration: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu h2::before,
-	:global(.theme-cip-slender) .theme-cip-slender-menu h2::after,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category::before,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category::after {
+	:global(.theme-classic) .theme-classic-menu h2::before,
+	:global(.theme-classic) .theme-classic-menu h2::after,
+	:global(.theme-classic) .theme-classic-menu__category::before,
+	:global(.theme-classic) .theme-classic-menu__category::after {
 		position: absolute;
 		display: none;
 		width: 8px;
 		height: 32px;
 		top: 0;
-		background: var(--cip-green-light, none) center / 8px 32px no-repeat;
+		background: var(--classic-green-light, none) center / 8px 32px no-repeat;
 		content: '';
 		pointer-events: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu h2::before {
+	:global(.theme-classic) .theme-classic-menu h2::before {
 		left: -5px;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu h2::after,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category::after {
+	:global(.theme-classic) .theme-classic-menu h2::after,
+	:global(.theme-classic) .theme-classic-menu__category::after {
 		right: -5px;
 		transform: scaleX(-1);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category::before {
+	:global(.theme-classic) .theme-classic-menu__category::before {
 		left: -5px;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category:hover,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__category:focus-within {
-		background-image: var(--cip-menu-button-hover, var(--cip-menu-button));
+	:global(.theme-classic) .theme-classic-menu__category:hover,
+	:global(.theme-classic) .theme-classic-menu__category:focus-within {
+		background-image: var(
+			--classic-menu-button-hover,
+			var(--classic-menu-button)
+		);
 		filter: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__text-label {
+	:global(.theme-classic) .theme-classic-menu__text-label {
 		font-family: Georgia, 'Times New Roman', serif;
 		font-size: 17px;
 		font-weight: 800;
@@ -797,27 +798,27 @@
 			0 0 4px rgb(0 0 0 / 0.72);
 	}
 
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu
+	:global(.theme-classic)
+		.theme-classic-menu
 		h2
-		> img:not(.theme-cip-slender-menu__label),
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__category-link
-		> img:not(.theme-cip-slender-menu__label) {
+		> img:not(.theme-classic-menu__label),
+	:global(.theme-classic)
+		.theme-classic-menu__category-link
+		> img:not(.theme-classic-menu__label) {
 		width: 32px;
 		height: 32px;
 		flex: 0 0 32px;
 		object-fit: contain;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__label {
+	:global(.theme-classic) .theme-classic-menu__label {
 		width: 116px;
 		height: 22px;
 		object-fit: contain;
 		transform: translateY(1px);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__toggle-input {
+	:global(.theme-classic) .theme-classic-menu__toggle-input {
 		position: absolute;
 		width: 1px;
 		height: 1px;
@@ -826,18 +827,18 @@
 		pointer-events: none;
 	}
 
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__toggle-input:not(:checked)
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:not(:checked)
 		+ h2
-		+ .theme-cip-slender-menu__submenu,
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__toggle-input:not(:checked)
-		+ .theme-cip-slender-menu__category
-		+ .theme-cip-slender-menu__submenu {
+		+ .theme-classic-menu__submenu,
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:not(:checked)
+		+ .theme-classic-menu__category
+		+ .theme-classic-menu__submenu {
 		display: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__header-hitbox {
+	:global(.theme-classic) .theme-classic-menu__header-hitbox {
 		position: absolute;
 		inset: 0;
 		z-index: 5;
@@ -845,26 +846,26 @@
 		cursor: pointer;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu {
+	:global(.theme-classic) .theme-classic-menu__submenu {
 		position: relative;
 		z-index: 2;
 		overflow: hidden;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu::before,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu::after {
+	:global(.theme-classic) .theme-classic-menu__submenu::before,
+	:global(.theme-classic) .theme-classic-menu__submenu::after {
 		display: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu::before {
+	:global(.theme-classic) .theme-classic-menu__submenu::before {
 		left: 6px;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu::after {
+	:global(.theme-classic) .theme-classic-menu__submenu::after {
 		right: 5px;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__toggle {
+	:global(.theme-classic) .theme-classic-menu__toggle {
 		position: absolute;
 		top: 20px;
 		right: 2px;
@@ -875,24 +876,27 @@
 		padding: 0;
 		border: 0;
 		background-color: transparent;
-		background: var(--cip-expand-plus, none) center / 12px 12px no-repeat;
+		background: var(--classic-expand-plus, none) center / 12px 12px no-repeat;
 		cursor: pointer;
 		font-size: 0;
 		image-rendering: pixelated;
 	}
 
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__toggle-input:checked
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:checked
 		+ h2
-		.theme-cip-slender-menu__toggle,
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__toggle-input:checked
-		+ .theme-cip-slender-menu__category
-		.theme-cip-slender-menu__toggle {
-		background-image: var(--cip-expand-minus, var(--cip-expand-plus, none));
+		.theme-classic-menu__toggle,
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:checked
+		+ .theme-classic-menu__category
+		.theme-classic-menu__toggle {
+		background-image: var(
+			--classic-expand-minus,
+			var(--classic-expand-plus, none)
+		);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu > a {
+	:global(.theme-classic) .theme-classic-menu__submenu > a {
 		position: relative;
 		display: block;
 		box-sizing: border-box;
@@ -911,47 +915,47 @@
 		text-shadow: 1px 1px 0 rgb(0 0 0);
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu > a::before {
+	:global(.theme-classic) .theme-classic-menu__submenu > a::before {
 		position: absolute;
 		top: 0;
 		left: -5px;
 		z-index: 2;
 		width: 18px;
 		height: 33px;
-		background: var(--cip-menu-chain, none) left top / 7px 10px repeat-y;
+		background: var(--classic-menu-chain, none) left top / 7px 10px repeat-y;
 		content: '';
 		pointer-events: none;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu > a::after {
+	:global(.theme-classic) .theme-classic-menu__submenu > a::after {
 		position: absolute;
 		top: 0;
 		right: -4px;
 		z-index: 2;
 		width: 7px;
 		height: 33px;
-		background: var(--cip-menu-chain, none) left top / 7px 10px repeat-y;
+		background: var(--classic-menu-chain, none) left top / 7px 10px repeat-y;
 		content: '';
 		pointer-events: none;
 	}
 
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__submenu
-		> a.theme-cip-slender-menu__submenu-link--active::before {
+	:global(.theme-classic)
+		.theme-classic-menu__submenu
+		> a.theme-classic-menu__submenu-link--active::before {
 		background:
-			var(--cip-menu-chain, none) left top / 7px 10px repeat-y,
-			var(--cip-active-submenu, none) 8px 5px / 10px 10px no-repeat;
+			var(--classic-menu-chain, none) left top / 7px 10px repeat-y,
+			var(--classic-active-submenu, none) 8px 5px / 10px 10px no-repeat;
 	}
 
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu > a:hover,
-	:global(.theme-cip-slender) .theme-cip-slender-menu__submenu > a:focus {
+	:global(.theme-classic) .theme-classic-menu__submenu > a:hover,
+	:global(.theme-classic) .theme-classic-menu__submenu > a:focus {
 		background: rgb(48 58 42 / 0.88);
 		color: white;
 	}
 
-	:global(.theme-cip-slender)
-		.theme-cip-slender-menu__submenu
-		> a.theme-cip-slender-menu__submenu-link--active {
+	:global(.theme-classic)
+		.theme-classic-menu__submenu
+		> a.theme-classic-menu__submenu-link--active {
 		color: rgb(255 255 255);
 	}
 </style>

@@ -6,7 +6,7 @@
 	import GuildCharacterRow from '$lib/components/guilds/GuildCharacterRow.svelte';
 	import GuildInfoBox from '$lib/components/guilds/GuildInfoBox.svelte';
 	import GuildOperations from '$lib/components/guilds/GuildOperations.svelte';
-	import CipGuildProfile from '$lib/themes/cip-slender/GuildProfile.svelte';
+	import ClassicGuildProfile from '$lib/themes/classic/GuildProfile.svelte';
 
 	import type { LayoutData } from './$types';
 
@@ -29,8 +29,8 @@
 	}
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
-	<CipGuildProfile {data}><slot /></CipGuildProfile>
+{#if $page.data.selectedTheme === 'classic'}
+	<ClassicGuildProfile {data}><slot /></ClassicGuildProfile>
 {:else}
 	<slot />
 

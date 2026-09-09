@@ -4,7 +4,7 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 </script>
 
-{#if !$page.data.isLoggedIn && !($page.data.selectedTheme === 'cip-slender' && $page.url.pathname === '/account/login')}
+{#if !$page.data.isLoggedIn && !($page.data.selectedTheme === 'classic' && $page.url.pathname === '/account/login')}
 	<PagePanel
 		title={$page.url.pathname === '/account/signup'
 			? 'Create New Account'

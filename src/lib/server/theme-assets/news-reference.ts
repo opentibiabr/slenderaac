@@ -4,10 +4,10 @@ import path from 'node:path';
 import { dev } from '$app/environment';
 
 import type {
-	CipArticlePresentation,
-	CipNewsReference,
+	ClassicArticlePresentation,
+	ClassicNewsReference,
 	ReferenceNode,
-} from '$lib/themes/cip-slender/reference-types';
+} from '$lib/themes/classic/reference-types';
 import { referenceDate } from '$lib/server/news/dates';
 
 import { env } from '$env/dynamic/private';
@@ -32,11 +32,11 @@ function validNodes(nodes: ReferenceNode[], depth = 0): boolean {
 
 export function readArticlePresentation(
 	value: unknown,
-): CipArticlePresentation | null {
+): ClassicArticlePresentation | null {
 	if (!value || typeof value !== 'object') return null;
-	const presentation = value as CipArticlePresentation;
+	const presentation = value as ClassicArticlePresentation;
 	return typeof presentation.icon === 'string' &&
-		presentation.icon.startsWith('/theme-assets/cip-slender/') &&
+		presentation.icon.startsWith('/theme-assets/classic/') &&
 		(presentation.commentHref === null ||
 			(typeof presentation.commentHref === 'string' &&
 				/^https?:\/\//.test(presentation.commentHref))) &&
@@ -47,11 +47,11 @@ export function readArticlePresentation(
 
 export async function loadNewsReference(
 	url: URL,
-): Promise<CipNewsReference | null> {
+): Promise<ClassicNewsReference | null> {
 	if (
 		!dev ||
-		url.searchParams.get('themePreview') !== 'cip-slender' ||
-		url.searchParams.get('cipReference') !== '1' ||
+		url.searchParams.get('themePreview') !== 'classic' ||
+		url.searchParams.get('classicReference') !== '1' ||
 		!env.THEME_ASSETS_ROOT
 	) {
 		return null;
@@ -60,13 +60,13 @@ export async function loadNewsReference(
 	try {
 		const file = path.join(
 			env.THEME_ASSETS_ROOT,
-			'cip-slender',
+			'classic',
 			'reference',
 			'latest-news.json',
 		);
 		const reference = JSON.parse(
 			await fs.readFile(file, 'utf8'),
-		) as CipNewsReference;
+		) as ClassicNewsReference;
 		if (
 			!reference ||
 			!Array.isArray(reference.articles) ||
@@ -75,7 +75,7 @@ export async function loadNewsReference(
 			!Object.values(reference.assets).every(
 				(value) =>
 					typeof value === 'string' &&
-					value.startsWith('/theme-assets/cip-slender/'),
+					value.startsWith('/theme-assets/classic/'),
 			) ||
 			!Array.isArray(reference.topbarStats) ||
 			reference.topbarStats.length !== 2 ||

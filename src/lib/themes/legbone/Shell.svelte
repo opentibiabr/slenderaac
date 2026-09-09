@@ -51,9 +51,9 @@
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: staticPages = data.staticPages;
 	$: previewTheme = $page.url.searchParams.get('themePreview');
-	$: cipPreviewHref = (() => {
+	$: classicPreviewHref = (() => {
 		const nextUrl = new URL($page.url.href);
-		nextUrl.searchParams.set('themePreview', 'cip-slender');
+		nextUrl.searchParams.set('themePreview', 'classic');
 
 		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 	})();
@@ -86,9 +86,9 @@
 		{#if previewTheme === 'legbone'}
 			<a
 				class="theme-legbone-preview-switch"
-				href={cipPreviewHref}
-				aria-label="Preview Cip layout">
-				Cip
+				href={classicPreviewHref}
+				aria-label="Preview Classic layout">
+				Classic
 			</a>
 		{/if}
 

@@ -1,13 +1,17 @@
+import { redirect } from '@sveltejs/kit';
 import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
 import { PlayerGroup } from '$lib/players';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
-import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
+import {
+	loadThemeAssetMetadata,
+	resolveThemeId,
+} from '$lib/server/theme-assets/manifest';
 import { loadPresentationReference } from '$lib/server/theme-assets/presentation-reference';
 import { parseTimeString } from '$lib/server/utils';
-import { isThemeId, normalizeTheme } from '$lib/themes/theme-ids';
+import { normalizeTheme } from '$lib/themes/theme-ids';
 
 import { env } from '$env/dynamic/private';
 import { SERVER_SAVE_TIME } from '$env/static/private';
@@ -37,19 +41,25 @@ export const load = loadFlashMessage(async ({ locals, url }) => {
 		: null;
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
-	const configuredTheme = normalizeTheme(env.SLENDER_THEME);
+	const configuredTheme =
+		(await resolveThemeId(env.SLENDER_THEME)) ??
+		normalizeTheme(env.SLENDER_THEME);
 	const previewTheme = url.searchParams.get('themePreview');
-	const selectedTheme = isThemeId(previewTheme)
-		? previewTheme
-		: configuredTheme;
+	const resolvedPreview = await resolveThemeId(previewTheme);
+	const selectedTheme = resolvedPreview ?? configuredTheme;
+	if (resolvedPreview && previewTheme !== resolvedPreview) {
+		const canonical = new URL(url);
+		canonical.searchParams.set('themePreview', selectedTheme);
+		throw redirect(307, canonical.pathname + canonical.search);
+	}
 	const isAdmin = locals.session?.type === AccountType.God;
 	const themeAssetMetadata =
-		selectedTheme === 'cip-slender'
+		selectedTheme === 'classic'
 			? await loadThemeAssetMetadata(selectedTheme)
 			: { assets: {}, version: null, warning: null };
 
 	return {
-		cipPresentation: await loadPresentationReference(selectedTheme),
+		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,
 		boostedCreature,

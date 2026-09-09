@@ -35,7 +35,7 @@ function berlinTimestamp(date: Date) {
 
 export const load = (async ({ url, parent }) => {
 	const layout = await parent();
-	const palette = layout.cipPresentation?.calendarColors ?? {};
+	const palette = layout.classicPresentation?.calendarColors ?? {};
 	const now = new Date();
 	const currentYear = now.getUTCFullYear();
 	const maxYear = currentYear + 1;

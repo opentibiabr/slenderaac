@@ -1,7 +1,7 @@
 /** Reference websites supply presentation data, never application destinations. */
 export function isReferenceWebsite(url: URL): boolean {
 	const hostname = url.hostname.replace(/\.$/, '');
-	return ['tibia.com', 'cipsoft.com'].some(
+	return ['tibia.com'].some(
 		(domain) => hostname === domain || hostname.endsWith(`.${domain}`),
 	);
 }
@@ -51,9 +51,6 @@ export function referenceSiteDestination(
 	url: URL,
 	downloadHref?: string,
 ): string {
-	const hostname = url.hostname.replace(/\.$/, '');
-	if (hostname === 'cipsoft.com' || hostname.endsWith('.cipsoft.com'))
-		return '/about/cipsoft';
 	const section = url.pathname.split('/').filter(Boolean)[0] ?? '';
 	const subtopic = url.searchParams.get('subtopic') ?? '';
 	const path = (pathname: string, keys: string[] = []) => {

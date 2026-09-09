@@ -25,15 +25,15 @@ export async function loadCalendarReference(
 ): Promise<CalendarReference | null> {
 	if (
 		!dev ||
-		url.searchParams.get('themePreview') !== 'cip-slender' ||
-		url.searchParams.get('cipDemo') !== '1' ||
+		url.searchParams.get('themePreview') !== 'classic' ||
+		url.searchParams.get('classicDemo') !== '1' ||
 		!env.THEME_ASSETS_ROOT
 	)
 		return null;
 	try {
 		const file = path.join(
 			env.THEME_ASSETS_ROOT,
-			'cip-slender',
+			'classic',
 			'reference',
 			'event-calendar.json',
 		);

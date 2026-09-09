@@ -9,7 +9,7 @@
 	import GuildMembership from '$lib/components/ui/GuildMembership.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
-	import CipCharacterProfile from '$lib/themes/cip-slender/CharacterProfile.svelte';
+	import ClassicCharacterProfile from '$lib/themes/classic/CharacterProfile.svelte';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -27,8 +27,8 @@
 	$: inventory = data.inventory;
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
-	<CipCharacterProfile {data} />
+{#if $page.data.selectedTheme === 'classic'}
+	<ClassicCharacterProfile {data} />
 {:else if character}
 	<div class="flex flex-col gap-2">
 		<div class="data-table">

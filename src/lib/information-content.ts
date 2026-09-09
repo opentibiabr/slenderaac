@@ -88,7 +88,7 @@ const classes = new Set([
 export function informationAsset(value: unknown): value is string {
 	return (
 		typeof value === 'string' &&
-		/^\/theme-assets\/cip-slender\/(?:[\w-]+\/)*[\w.-]+\.(?:gif|png|jpe?g|webp)(?:\?v=[\w-]+)?$/i.test(
+		/^\/theme-assets\/classic\/(?:[\w-]+\/)*[\w.-]+\.(?:gif|png|jpe?g|webp)(?:\?v=[\w-]+)?$/i.test(
 			value,
 		) &&
 		!value.includes('..')

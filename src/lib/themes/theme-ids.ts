@@ -1,4 +1,4 @@
-export const themeIds = ['legbone', 'cip-slender'] as const;
+export const themeIds = ['legbone', 'classic'] as const;
 
 export type ThemeId = (typeof themeIds)[number];
 

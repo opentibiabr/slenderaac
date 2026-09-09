@@ -12,9 +12,9 @@
 	$: ({ characters, sort, order } = data);
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
+{#if $page.data.selectedTheme === 'classic'}
 	<PagePanel title="World Information">
-		<table class="cip-data-table cip-data-table--details">
+		<table class="classic-data-table classic-data-table--details">
 			<tbody
 				><tr><td>Players Online:</td><td>{characters.length}</td></tr></tbody>
 		</table>

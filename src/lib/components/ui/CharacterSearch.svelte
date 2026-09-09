@@ -11,7 +11,7 @@
 </script>
 
 <PagePanel title="Search Character" compact>
-	<form method="get" action="/characters" class="cip-character-search">
+	<form method="get" action="/characters" class="classic-character-search">
 		{#each Array.from(parameters) as [name, value]}
 			<input type="hidden" {name} {value} />
 		{/each}
@@ -27,29 +27,29 @@
 </PagePanel>
 
 <style>
-	.cip-character-search {
+	.classic-character-search {
 		display: flex;
 		gap: 5px;
 		padding: 5px 5px 5px 0;
 		align-items: flex-start;
 	}
-	.cip-character-search label {
+	.classic-character-search label {
 		flex: 0 0 130px;
 		min-width: 0;
 		padding-right: 10px;
 		font-weight: bold;
 		white-space: nowrap;
 	}
-	.cip-character-search > input:not([type='hidden']) {
+	.classic-character-search > input:not([type='hidden']) {
 		flex: 1;
 		width: 0;
 		min-width: 0;
 	}
 	@media (max-width: 767px) {
-		.cip-character-search {
+		.classic-character-search {
 			flex-wrap: wrap;
 		}
-		.cip-character-search label {
+		.classic-character-search label {
 			flex-basis: 100%;
 		}
 	}

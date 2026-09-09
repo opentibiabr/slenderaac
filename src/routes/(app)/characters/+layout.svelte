@@ -17,7 +17,7 @@
 	$: results = data.results ?? [];
 </script>
 
-{#if $page.data.selectedTheme === 'cip-slender'}
+{#if $page.data.selectedTheme === 'classic'}
 	<slot />
 	<CharacterSearch />
 	{#if results.length > 0}<CharactersTable characters={results} />{/if}

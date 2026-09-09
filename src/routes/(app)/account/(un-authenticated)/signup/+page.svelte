@@ -12,7 +12,10 @@
 	export let form: ActionData;
 </script>
 
-<form class="cip-stacked-form flex flex-col gap-4" method="post" use:enhance>
+<form
+	class="classic-stacked-form flex flex-col gap-4"
+	method="post"
+	use:enhance>
 	{#if form?.errors?.global}
 		<p class="text-xs text-error-500">{form.errors.global}</p>
 	{/if}

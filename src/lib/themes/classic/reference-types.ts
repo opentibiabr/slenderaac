@@ -7,7 +7,7 @@ export type ReferenceNode =
 			imageHref?: string;
 	  };
 
-export type CipNewsReference = {
+export type ClassicNewsReference = {
 	sourceUrl: string;
 	capturedAt: string;
 	articles: {
@@ -28,7 +28,7 @@ export type CipNewsReference = {
 	pollText: string;
 };
 
-export type CipPresentation = {
+export type ClassicPresentation = {
 	sourceUrl: string;
 	capturedAt: string;
 	links: Record<string, string>;
@@ -40,7 +40,7 @@ export type CipPresentation = {
 	calendarColors?: Record<string, string>;
 };
 
-export type CipArticlePresentation = {
+export type ClassicArticlePresentation = {
 	icon: string;
 	commentHref: string | null;
 	body: ReferenceNode[];

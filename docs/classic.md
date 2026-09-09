@@ -1,7 +1,7 @@
-# Cip Slender layouts
+# Classic layouts
 
 These are [built-in SlenderAAC pages](news.md), available in the default theme
-without an external pack. The pack supplies Cip presentation assets and optional
+without an external pack. The pack supplies Classic presentation assets and optional
 comparison content; it does not install routes or database features.
 
 The theme renders Latest News (`/`), News Archive (`/news/archive`) and Event
@@ -9,14 +9,14 @@ Schedule (`/news/event-schedule`) through the same shell and content-frame famil
 `layout.ts` chooses the news, compact and wider compact variants. `TableFrame`
 owns caption rails and corners; `TableSurface` owns the table shadows. New pages
 with the same structure should reuse these components before adding page CSS.
-The shared wrappers in `src/lib/components/news/` select the default or Cip
+The shared wrappers in `src/lib/components/news/` select the default or Classic
 presentation while keeping the same route data and controls.
 
-Numeric frame/surface dimensions and the sprite border switch are Cip-only
+Numeric frame/surface dimensions and the sprite border switch are Classic-only
 calibration inputs. The default theme intentionally uses fluid cards and an
 internally scrollable table surface instead of inheriting those pixel widths.
 
-The Cip presentation keeps the reference's English navigation and article-action
+The Classic presentation keeps the reference's English navigation and article-action
 labels alongside its English headline sprites and imported documents. Application
 locale selection does not translate this source presentation; translating the
 theme and its content pack together is a separate adaptation.
@@ -41,7 +41,7 @@ All adapted reference links pass through the shared destination resolver, includ
 pack navigation, article links, footer links and boosted sprites. Known features
 use their Slender routes; unsupported features use `/unavailable`. `/download`
 uses the server's configured client download. This also applies to old asset packs:
-updating a pack cannot restore navigation to Tibia/CipSoft application services.
+updating a pack cannot restore navigation to reference application services.
 Explicit external services such as configured downloads and social networks keep
 their intended destinations.
 
@@ -69,6 +69,19 @@ retain a fixed height from an older asset pack.
 
 ## Local setup
 
+The registered theme ID, preview value, asset folder and CSS namespace are all
+`classic`. Set `SLENDER_THEME=classic` to select it by default. An external
+manifest may declare up to 16 optional `aliases` (for example `legacy-classic`)
+for saved preview links or server configuration. Aliases cannot shadow registered
+themes or resolve ambiguously. Preview aliases redirect to the canonical URL;
+missing or invalid aliases retain normal fallback behavior.
+
+The category-upgrade migration preserves the previous first news category as
+`server`. Fresh installations create the neutral category directly. Existing
+comparison content should be refreshed with the matching pack importer so image
+paths use the active pack. Keep the external import identity prefix when upgrading
+to update existing fixture records rather than create duplicates.
+
 Apply the repository migrations and generate the Prisma client through the usual
 application setup. The news migration adds types, categories and optional imported
 presentation to `News`, and introduces `ScheduleEvent` with inclusive UTC dates.
@@ -76,8 +89,8 @@ Existing news default to type `news` and category `community`.
 
 Extract the separately distributed theme ZIP outside the checkout. Set
 `THEME_ASSETS_ROOT` in the server environment to the directory containing
-`cip-slender/manifest.json`, then start the normal dev server. Verify an actual
-asset such as `/theme-assets/cip-slender/content/cip-border-1.gif`; the manifest
+`classic/manifest.json`, then start the normal dev server. Verify an actual
+asset such as `/theme-assets/classic/content/classic-border-1.gif`; the manifest
 itself is intentionally not a public endpoint.
 
 Normal routes read published content from the database. `/admin/news` edits news,
@@ -85,8 +98,8 @@ ticker and featured articles, categories, dates and publication status.
 `/admin/events` edits event ranges, descriptions, colors, seasonal display, order
 and publication. Both use the existing administrator authentication hook.
 
-The external ZIP includes `tools/update-cip-assets.py`, a PowerShell wrapper,
-`export-cip-source.js`, `import-cip-content.mjs`, focused tests and their README. Assets, captured
+The external ZIP includes `tools/update-classic-assets.py`, a PowerShell wrapper,
+`export-classic-source.js`, `import-classic-content.mjs`, focused tests and their README. Assets, captured
 public content and source maps stay in that pack. The updater prepares a ZIP,
 SHA-256 checksum and change report. The optional importer uses stable IDs and the
 application's existing Prisma client against a local test database. Follow the
@@ -112,8 +125,8 @@ obsolete unreferenced images are excluded from the ZIP.
 From the extracted pack root, the focused tool checks are:
 
 ```sh
-python tools/test-update-cip-assets.py
-node --test tools/test-export-cip-source.mjs
+python tools/test-update-classic-assets.py
+node --test tools/test-export-classic-source.mjs
 ```
 
 These use temporary fixtures without accessing the application database or
@@ -144,8 +157,8 @@ return destination. Highscore filters and pagination retain skill, vocation,
 page size and preview parameters. Clearing a guild search removes only `search`,
 preserving other query parameters and the fragment.
 
-The development-only `cipReference=1` flag explicitly loads external Home/Archive
-fixtures; `cipDemo=1` loads the captured calendar month. Without those flags, both
+The development-only `classicReference=1` flag explicitly loads external Home/Archive
+fixtures; `classicDemo=1` loads the captured calendar month. Without those flags, both
 pages exercise the database. Calendar dates use UTC; its timestamp uses Berlin
 time with the correct daylight-saving abbreviation. Archive defaults cover the
 last 30 days, normalize invalid day/month combinations and swap inverted ranges.
@@ -181,8 +194,8 @@ separate from the query-driven Screenshots gallery and its previous/next control
 
 `/about/what-is-tibia` uses the compact content frame with its own intrinsic
 minimum content width. The route is available on a fresh installation without
-database seeding. The default theme renders the built-in introduction; the Cip
-theme can load `cip-slender/reference/pages/whatistibia.json` from the external
+database seeding. The default theme renders the built-in introduction; the Classic
+theme can load `classic/reference/pages/whatistibia.json` from the external
 pack. Missing or invalid documents fall back to the built-in content.
 
 `src/lib/information.ts` registers native destinations. The shared link helper
@@ -207,7 +220,7 @@ the benefit comparison. The external converter turns known helper text into
 native tooltips with mouse, focus and Escape support; original handlers are never
 executed. The green Premium action navigates to the local shop.
 
-`/about/cipsoft` reuses the contact and compact table variants. Member actions
+`/about/company` reuses the contact and compact table variants. Member actions
 open local character queries, and institutional links keep their external
 destinations. Company text and member lists remain external reference content;
 the built-in fallback uses a short introduction without copied company details.
@@ -232,7 +245,7 @@ or border-box sizing changes wrapping despite identical outer table bounds.
 `/guides/security-hints` reuses the common headings and sprite-based lists.
 Inline image alignment retains the source line height instead of accumulating
 extra spacing between hints. External security-provider links remain external;
-Tibia/CipSoft account recovery uses the local account flow.
+Reference account recovery uses the local account flow.
 
 The external document format is version 1: page ID, local headline image with
 native dimensions, and a bounded tree of supported text/presentation elements.
@@ -276,7 +289,7 @@ moves the visible text. Normalizing the label string does not trim its DOM Range
 Review all three news layouts after a shared change. Check desktop widths and the
 mobile menu, article images and horizontally scrollable tables. Treat live
 counters, rotating promotions, fansite logos and timestamps separately from their
-frame geometry. Use `cipGrid=1` to show the non-interactive alignment grid.
+frame geometry. Use `classicGrid=1` to show the non-interactive alignment grid.
 
 Exercise archive filters, draft visibility, old article/ticker links, ticker
 expansion, browser back/forward, calendar month/year boundaries and admin edits.
@@ -292,7 +305,7 @@ labels and excludes ambiguous duplicates; equal boxes alone are not a claim of
 complete pixel identity.
 
 Seven representative states were also compared at 1145x945: Latest News, News
-Archive, About CipSoft, Quickstart, Premium Features, Manual Interface and
+Archive, About Server, Quickstart, Premium Features, Manual Interface and
 Controls. The final archive pass rechecked both widths after correcting its inner
 surface and category spacing. A later official calendar capture encountered a
 Cloudflare challenge and was excluded from parity evidence; valid earlier
