@@ -20,6 +20,17 @@ Section links work with keyboard navigation and saved fragments; the section
 menu stays visible when scrolling, and each caption links back to the page top.
 Older unavailable-menu links automatically upgrade to this local page.
 
+`/worlds` lists the configured game world and opens its local details with
+`?world=<name>`. It uses the application's database for online players and the
+native `server_config.players_record` value. The detail page includes status,
+available world settings, sortable players, letter anchors and character search.
+Unknown world selections return 404. The application currently has one database
+and one configured world; it does not aggregate unrelated servers.
+Vocations sort by their displayed names, with higher-level players first inside
+each group. Sorting toggles the direction across column changes; older combined
+`order=name_desc` links remain valid. Other player-list routes keep their
+existing sorting defaults.
+
 ## Import and update
 
 Install the repository dependencies, then export the server definitions to a file
@@ -41,6 +52,15 @@ that selection. It combines the shared and selected datapack spell/rune scripts
 with the shared vocation definitions. Promotions resolve to their base vocation.
 Disabled files, monster script directories and internal command formulas are
 excluded from the player catalog.
+
+The same import projects `serverName`, `location`, `worldType` and `maxPlayers`
+from local `config.lua` into an optional `world` object. These settings remain
+local even when `--ref` selects another revision of the game definitions. Only
+unconditional literal values are accepted, and no other configuration fields or
+credentials enter the export. `SERVER_NAME` takes precedence over the imported
+name for website and client-login identity; `PVP_TYPE` overrides the public
+world's imported PvP label. Keep these environment values aligned with the game
+configuration and repeat the import after changing server settings.
 
 Creature definitions come from the shared and selected datapack `monster`
 directories; loot item names come from `data/items/items.xml`. An unnamed item
@@ -106,7 +126,8 @@ outside the checkout and pass it on every refresh that needs those substitutions
 ## Data and presentation
 
 The snapshot uses `schemaVersion: 1`, an import timestamp, an optional source
-revision, and `spells`, `creatures` and `achievements` arrays. Older snapshots
+revision, an optional `world` object, and `spells`, `creatures` and `achievements`
+arrays. Older snapshots
 continue to serve their existing sections and show an empty state for a missing
 section until refreshed.
 Requirements, formula, vocations, premium status,
@@ -116,6 +137,15 @@ or exposes it through the public asset endpoint. A missing configuration gives
 the library an empty state. An invalid configured file is an error, not an empty
 successful import. This workflow does not switch the application database or
 modify server files.
+
+Worlds without imported metadata still use the configured name and PvP mode.
+Missing location and player-limit values are left unspecified. A zero player
+limit means unlimited; missing or malformed historical records are shown as
+unrecorded. No creation date, record timestamp, third-party protection status or
+world-quest result is inferred. Online lists and counters share the same public
+player filter, excluding deleted characters and staff. Connection status probes
+only `SERVER_ADDRESS`/`SERVER_PORT` and finishes within 1.5 seconds; database
+failures remain errors rather than appearing as an empty server.
 
 The optional external theme pack supplies `headlineSpells` and
 `spellIcon-<canonical-id>` assets. Missing artwork leaves the native information
@@ -150,6 +180,19 @@ components. The list uses 21px table rows, while the filter uses native radio
 controls with a 19px cadence and container-based reflow. Additional server
 vocations or rows naturally change the resulting panel height. Existing native
 page panels retain their default variant.
+
+World selection and character search share `LabeledForm`; unstriped properties
+use the plain `CatalogDetails` variant. `PagePanel` has plain and flush variants
+for these compact details and player tables, with a 15px gap between panels.
+Online lists share `AlphabetNavigation`, sorting URLs and the configured preview.
+The `headlineWorlds` asset is optional. Older menu packs that label `/online` as
+Worlds are upgraded to `/worlds`, while direct online-player links keep working.
+Optional `worldLocation-<region>` and `worldPvp-<mode>` assets retain their native
+48x48px slots; region names use lowercase words separated by hyphens. The
+10x10px `sortAscending`/`sortDescending` assets indicate the next sort direction.
+The plain panel sets a shared rail-color variable on `TableFrame`, so component
+stylesheet loading order cannot replace its background. Decorative icons sit
+above the rail, do not cover values, and are omitted from narrow layouts.
 
 Description panels reuse the same table frame and native shadow layers, with
 stacked title/description cards. Section navigation uses a shared small frame;

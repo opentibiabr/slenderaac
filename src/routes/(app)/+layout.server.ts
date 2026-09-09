@@ -11,6 +11,7 @@ import {
 } from '$lib/server/theme-assets/manifest';
 import { loadPresentationReference } from '$lib/server/theme-assets/presentation-reference';
 import { parseTimeString } from '$lib/server/utils';
+import { serverName } from '$lib/server/worlds';
 import { normalizeTheme } from '$lib/themes/theme-ids';
 
 import { env } from '$env/dynamic/private';
@@ -59,7 +60,7 @@ export const load = loadFlashMessage(async ({ locals, url }) => {
 			: { assets: {}, version: null, warning: null };
 
 	return {
-		serverName: env.SERVER_NAME?.trim() || 'OpenTibia',
+		serverName: await serverName(),
 		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,

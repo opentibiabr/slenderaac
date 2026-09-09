@@ -39,3 +39,17 @@ void test('repeated column selection toggles direction while another column star
 		'asc',
 	);
 });
+void test('a table can choose the next direction when switching columns without changing other tables', () => {
+	const url = new URL(
+		'https://aac.example/worlds?world=Realm&themePreview=classic',
+	);
+	const target = new URL(sortHref(url, 'level', 'name', 'asc', 'desc'), url);
+	assert.equal(target.searchParams.get('order'), 'desc');
+	assert.equal(target.searchParams.get('world'), 'Realm');
+	assert.equal(
+		new URL(sortHref(url, 'level', 'name', 'asc'), url).searchParams.get(
+			'order',
+		),
+		'asc',
+	);
+});

@@ -107,7 +107,6 @@ export function referenceSiteDestination(
 			const name = url.searchParams.get('name');
 			return name ? `/characters/${encodeURIComponent(name)}` : '/characters';
 		}
-		if (subtopic === 'worlds') return '/online';
 		if (subtopic === 'highscores') return '/highscores';
 		if (subtopic === 'guilds') return '/guilds';
 	}

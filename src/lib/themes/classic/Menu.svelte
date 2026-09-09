@@ -17,7 +17,7 @@
 
 	import { informationPages, informationPath } from '$lib/information';
 	import { serverText } from '$lib/site-identity';
-	import { featurePages } from '$lib/site-pages';
+	import { featureMenuHref, featurePages } from '$lib/site-pages';
 	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -66,19 +66,40 @@
 		informationPages
 			.filter((entry) => entry.section === 'guides')
 			.map((entry) => ({ label: entry.title, href: informationPath(entry) }));
-	function isActive(href: string) {
+	function isActive(href: string, current = $page.url) {
+		const target = new URL(withThemePreview(current, href), current);
+		const pathname = current.pathname.replace(/\/$/, '') || '/';
+		if (target.pathname === '/unavailable')
+			return (
+				pathname === target.pathname &&
+				target.searchParams.get('feature') ===
+					current.searchParams.get('feature')
+			);
 		return (
-			new URL(withThemePreview($page.url, href), $page.url).pathname ===
-			currentPath
+			target.pathname === pathname ||
+			(target.pathname !== '/' && pathname.startsWith(`${target.pathname}/`))
 		);
 	}
 	$: latestNewsHref = withThemePreview($page.url, '/');
 	$: newsArchiveHref = withThemePreview($page.url, '/news/archive');
 	$: eventScheduleHref = withThemePreview($page.url, '/news/event-schedule');
-	$: charactersHref = withThemePreview($page.url, '/characters');
-	$: onlineHref = withThemePreview($page.url, '/online');
-	$: highscoresHref = withThemePreview($page.url, '/highscores');
-	$: guildsHref = withThemePreview($page.url, '/guilds');
+	$: communityLinks = (
+		presentation?.navigation.community ?? [
+			{ label: 'Characters', href: '/characters' },
+			...Object.values(featurePages)
+				.filter((entry) => entry.section === 'community')
+				.map((entry) => ({ label: entry.title, href: entry.path })),
+			{ label: 'Who Is Online?', href: '/online' },
+			{ label: 'Highscores', href: '/highscores' },
+			{ label: 'Guilds', href: '/guilds' },
+		]
+	).map((entry) => ({
+		...entry,
+		href: featureMenuHref('community', entry.label, entry.href),
+	}));
+	$: communityActive = communityLinks.some((entry) =>
+		isActive(entry.href, $page.url),
+	);
 	$: accountPageHref = withThemePreview($page.url, '/account');
 	$: accountLoginHref = withThemePreview($page.url, '/account/login');
 	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
@@ -390,7 +411,8 @@
 		<input
 			class="theme-classic-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-community-toggle`} />
+			id={`${menuIdPrefix}-community-toggle`}
+			checked={communityActive} />
 		<div class="theme-classic-menu__category">
 			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.community}
@@ -417,17 +439,15 @@
 				aria-label="Toggle Community"></label>
 		</div>
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-community`}>
-			{#if presentation?.navigation.community}
-				{#each presentation.navigation.community as link}
-					<a href={withThemePreview($page.url, link.href)}
-						>{serverText(link.label, identity)}</a>
-				{/each}
-			{:else}
-				<a href={charactersHref}>Characters</a>
-				<a href={onlineHref}>Who Is Online?</a>
-				<a href={highscoresHref}>Highscores</a>
-				<a href={guildsHref}>Guilds</a>
-			{/if}
+			{#each communityLinks as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(
+						link.href,
+						$page.url,
+					)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
 		</div>
 	</section>
 

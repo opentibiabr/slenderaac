@@ -212,6 +212,9 @@ pages exercise the database. Calendar dates use UTC; its timestamp uses Berlin
 time with the correct daylight-saving abbreviation. Archive defaults cover the
 last 30 days, normalize invalid day/month combinations and swap inverted ranges.
 
+Selecting the Classic preview keeps live online counters enabled. Only explicit
+reference fixtures replace those values; choosing a theme does not select demo data.
+
 Historical calendar navigation is an intentional Slender capability: January
 2000 through December of the following year remain addressable. The official
 current-month view may omit its previous-month link. Preserve local history
@@ -309,6 +312,14 @@ checkout use existing Slender data and actions. `PagePanel` selects shared Class
 `TableFrame`/`TableSurface` presentation, while the default theme retains its own
 layout. Extend those wrappers for future pages with the same structure before
 adding route-specific CSS. Theme-specific native controls are scoped to Classic.
+
+World overview and detail pages use the shared native panels, controls and
+tables described in [Server library](server-library.md). At the desktop content
+width, the selection panel is 833x85px, with a 531x19px selector and a 135x25px
+submit button. Plain property rows have a 20px cadence; bordered online-player
+rows have a 21px cadence. Additional local properties and player counts determine
+panel height. Compare matching frame origins when scrollbars change the usable
+viewport width; do not move the background to compensate for content length.
 
 Experience Table is a native Library page in both themes. It calculates levels
 1–3500 from the server's integer experience progression and renders four groups

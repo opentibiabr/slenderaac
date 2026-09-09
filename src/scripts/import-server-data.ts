@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { parseArgs } from 'node:util';
 
+import type { WorldConfig } from '$lib/worlds';
 import { parseAchievementRecords } from '$lib/achievements';
 import { importAchievementCatalog } from '$lib/server/catalog/achievement-import';
 import {
@@ -16,6 +17,7 @@ import { catalogDisplayText } from '$lib/server/catalog/display-text';
 import { luaLiteral, parseLua } from '$lib/server/catalog/lua';
 import { readServerFiles, readVocations } from '$lib/server/catalog/source';
 import { importSpellCatalog } from '$lib/server/catalog/spell-import';
+import { importWorldConfig } from '$lib/server/catalog/world-import';
 
 const { values } = parseArgs({
 	options: {
@@ -36,11 +38,12 @@ async function main() {
 		);
 	const root = await fs.realpath(values['server-dir']);
 	let datapack = values.datapack;
+	let world: WorldConfig = {};
 	const resistance = { min: -200, max: 200 };
 	try {
-		const config = parseLua(
-			await fs.readFile(path.join(root, 'config.lua'), 'utf8'),
-		);
+		const source = await fs.readFile(path.join(root, 'config.lua'), 'utf8');
+		const config = parseLua(source);
+		world = importWorldConfig(source);
 		for (const statement of config.body) {
 			if (statement.type !== 'AssignmentStatement') continue;
 			const index = statement.variables.findIndex(
@@ -167,6 +170,7 @@ async function main() {
 					schemaVersion: 1,
 					importedAt: new Date().toISOString(),
 					revision,
+					world,
 					spells,
 					creatures,
 					achievements,

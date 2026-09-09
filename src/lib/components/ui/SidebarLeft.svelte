@@ -139,6 +139,12 @@
 								<a href={themePreviewHref($page.url, '/online')}
 									>{$_('whos-online')}</a>
 							</li>
+							{#each Object.values(featurePages).filter((entry) => entry.section === 'community') as entry}
+								<li>
+									<a href={themePreviewHref($page.url, entry.path)}
+										>{entry.title}</a>
+								</li>
+							{/each}
 							<li>
 								<a href={themePreviewHref($page.url, '/highscores')}
 									>{$_('highscores')}</a>

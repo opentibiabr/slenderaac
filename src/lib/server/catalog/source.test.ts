@@ -137,16 +137,35 @@ void test('an empty or malformed import leaves the installed server catalog unch
 		const achievementSource =
 			'ACHIEVEMENTS = {[3] = {name = "Explorer", description = "Explore a cave", grade = 1, points = 2}}\nfor id, item in pairs(ACHIEVEMENTS) do Game.registerAchievement(id, item.name, item.description, item.secret, item.grade, item.points) end';
 		await fs.writeFile(achievementFile, achievementSource);
+		const configFile = path.join(root, 'config.lua');
+		await fs.writeFile(
+			configFile,
+			'serverName = "Test Realm"\nworldType = "pvp"\nmaxPlayers = 0\nmysqlPass = "private fixture"',
+		);
 		await execute(process.execPath, args);
 		const installed = await fs.readFile(output, 'utf8');
 		const value = JSON.parse(installed) as {
 			spells: unknown[];
 			creatures: unknown[];
 			achievements: unknown[];
+			world: { name: string; pvpType: string; maxPlayers: number };
 		};
 		assert.equal(value.spells.length, 1);
 		assert.equal(value.creatures.length, 1);
 		assert.equal(value.achievements.length, 1);
+		assert.deepEqual(value.world, {
+			name: 'Test Realm',
+			pvpType: 'pvp',
+			maxPlayers: 0,
+		});
+		assert.equal(installed.includes('private fixture'), false);
+		await fs.writeFile(configFile, 'worldType = dynamicType');
+		await assert.rejects(execute(process.execPath, args), /literal expression/);
+		assert.equal(await fs.readFile(output, 'utf8'), installed);
+		await fs.writeFile(
+			configFile,
+			'serverName = "Test Realm"\nworldType = "pvp"\nmaxPlayers = 0',
+		);
 		await fs.writeFile(
 			achievementFile,
 			achievementSource.replace('points = 2', 'points = dynamicPoints'),

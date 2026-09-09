@@ -158,6 +158,6 @@
 		width: 100%;
 		min-height: var(--classic-table-rail-min-height);
 		border: 2px solid rgb(85 99 108);
-		background: rgb(241 224 197);
+		background: var(--classic-table-rail-background, rgb(241 224 197));
 	}
 </style>

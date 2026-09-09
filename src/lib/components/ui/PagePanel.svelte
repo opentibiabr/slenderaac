@@ -7,7 +7,8 @@
 	export let title: string;
 	export let compact = false;
 	export let surface = false;
-	export let variant: 'native' | 'list' | 'form' | 'stack' = 'native';
+	export let variant: 'native' | 'list' | 'form' | 'stack' | 'plain' | 'flush' =
+		'native';
 </script>
 
 {#if $page.data.selectedTheme === 'classic'}
@@ -16,6 +17,8 @@
 		class:classic-page-panel--list={variant === 'list'}
 		class:classic-page-panel--form={variant === 'form'}
 		class:classic-page-panel--stack={variant === 'stack'}
+		class:classic-page-panel--plain={variant === 'plain'}
+		class:classic-page-panel--flush={variant === 'flush'}
 		class:classic-page-panel--compact={compact}
 		class:classic-page-panel--surface={surface}>
 		<TableFrame assets={$page.data.themeAssets}>
@@ -29,12 +32,19 @@
 					>{:else}<slot />{/if}
 			</div>
 		</TableFrame>
+		<slot name="decoration" />
 	</section>
 {:else}
 	<slot />
 {/if}
 
 <style>
+	:global(.theme-classic) .classic-page-panel--plain .classic-page-panel__body {
+		padding: 5px;
+	}
+	:global(.theme-classic) .classic-page-panel--flush .classic-page-panel__body {
+		padding: 1px 0 0;
+	}
 	:global(.theme-classic) .classic-page-panel--list,
 	:global(.theme-classic) .classic-page-panel--form {
 		display: flow-root;
@@ -103,6 +113,20 @@
 	}
 	:global(
 		.theme-classic .classic-page-panel--stack .classic-table-frame__rail
+	) {
+		background: rgb(241 224 197);
+	}
+	:global(.theme-classic) .classic-page-panel--plain,
+	:global(.theme-classic) .classic-page-panel--flush {
+		display: flow-root;
+		margin-bottom: 15px;
+	}
+	:global(.theme-classic) .classic-page-panel--plain {
+		position: relative;
+		--classic-table-rail-background: rgb(212 192 161);
+	}
+	:global(
+		.theme-classic .classic-page-panel--flush .classic-table-frame__rail
 	) {
 		background: rgb(241 224 197);
 	}

@@ -6,15 +6,19 @@
 
 	export let title: string;
 	export let rows: readonly (readonly string[])[];
+	export let variant: 'form' | 'plain' = 'form';
+	export let illustrations: { src: string; alt: string }[] = [];
 	$: classic = $page.data.selectedTheme === 'classic';
 </script>
 
 {#if !classic}<h3 class="h3">{title}</h3>{/if}
-<PagePanel {title} surface variant="form">
+<PagePanel {title} surface={variant !== 'plain'} {variant}>
 	<CatalogTable>
 		<table
 			aria-label={title}
 			class="classic-data-table classic-data-table--grid classic-data-table--properties"
+			class:catalog-details--plain={variant === 'plain'}
+			class:catalog-details--illustrated={illustrations.length > 0}
 			class:table={!classic}>
 			<tbody
 				>{#each rows as [label, value]}<tr
@@ -22,4 +26,74 @@
 					>{/each}</tbody>
 		</table>
 	</CatalogTable>
+	<svelte:fragment slot="decoration"
+		>{#if illustrations.length}<div class="catalog-details__illustrations">
+				{#each illustrations as illustration}<img
+						src={illustration.src}
+						alt={illustration.alt}
+						width="48"
+						height="48" />{/each}
+			</div>{/if}</svelte:fragment>
 </PagePanel>
+
+<style>
+	.catalog-details__illustrations {
+		position: absolute;
+		z-index: 2;
+		top: 41px;
+		right: 11px;
+		display: grid;
+		gap: 12px;
+	}
+	.catalog-details__illustrations img {
+		width: 48px;
+		height: 48px;
+	}
+	:global(.theme-classic .classic-native-content)
+		.catalog-details--plain.catalog-details--illustrated
+		td {
+		padding-right: 66px;
+	}
+	:global(.theme-classic .classic-native-content) .catalog-details--plain {
+		border: 0;
+		border-collapse: separate;
+		border-spacing: 2px;
+	}
+	:global(.theme-classic .classic-native-content)
+		.catalog-details--plain
+		:is(th, td) {
+		border: 0;
+		padding: 1px;
+		line-height: 16px;
+		background: transparent;
+	}
+	:global(.theme-classic .classic-native-content)
+		.catalog-details--plain
+		tbody
+		tr:nth-child(n) {
+		background: transparent;
+	}
+	:global(.theme-classic .classic-native-content)
+		.catalog-details--plain
+		th[scope='row'] {
+		box-sizing: content-box;
+		width: 200px;
+		padding-right: 10px;
+		font-weight: bold;
+	}
+	@media (max-width: 767px) {
+		.catalog-details__illustrations {
+			display: none;
+		}
+		:global(.theme-classic .classic-native-content)
+			.catalog-details--plain.catalog-details--illustrated
+			td {
+			padding-right: 1px;
+		}
+		:global(.theme-classic .classic-native-content)
+			.catalog-details--plain
+			th[scope='row'] {
+			width: 35%;
+		}
+	}
+</style>

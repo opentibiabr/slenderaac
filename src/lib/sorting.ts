@@ -10,12 +10,18 @@ export function isOrder(value: unknown): value is Order {
 	return ['asc', 'desc'].includes(value);
 }
 
-export function sortHref(url: URL, column: Sort, sort: Sort, order: Order) {
+export function sortHref(
+	url: URL,
+	column: Sort,
+	sort: Sort,
+	order: Order,
+	initialOrder: Order = 'asc',
+) {
 	const target = new URL(url);
 	target.searchParams.set('sort', column);
 	target.searchParams.set(
 		'order',
-		sort === column && order === 'asc' ? 'desc' : 'asc',
+		sort === column ? (order === 'asc' ? 'desc' : 'asc') : initialOrder,
 	);
 	return target.pathname + target.search + target.hash;
 }

@@ -7,6 +7,7 @@ import {
 } from '$lib/achievements';
 import { type CreatureRecord, parseCreatureRecords } from '$lib/creatures';
 import { parseSpellRecords } from '$lib/spells';
+import { parseWorldConfig, type WorldConfig } from '$lib/worlds';
 
 import { env } from '$env/dynamic/private';
 
@@ -17,6 +18,7 @@ let cache: {
 	spells: SpellRecord[];
 	creatures: CreatureRecord[];
 	achievements: AchievementRecord[];
+	world: WorldConfig;
 } | null = null;
 
 export async function loadSpells(): Promise<SpellRecord[]> {
@@ -31,9 +33,13 @@ export async function loadAchievements(): Promise<AchievementRecord[]> {
 	return (await loadCatalog()).achievements;
 }
 
+export async function loadWorldConfig(): Promise<WorldConfig> {
+	return (await loadCatalog()).world;
+}
+
 async function loadCatalog() {
 	if (!env.SERVER_DATA_FILE)
-		return { spells: [], creatures: [], achievements: [] };
+		return { spells: [], creatures: [], achievements: [], world: {} };
 	const file = await fs.realpath(env.SERVER_DATA_FILE);
 	const stat = await fs.stat(file);
 	if (!stat.isFile() || stat.size > 20_000_000)
@@ -58,6 +64,7 @@ async function loadCatalog() {
 		'creatures' in value ? parseCreatureRecords(value.creatures) : [];
 	const achievements =
 		'achievements' in value ? parseAchievementRecords(value.achievements) : [];
+	const world = 'world' in value ? parseWorldConfig(value.world) : {};
 	cache = {
 		path: file,
 		stamp: stat.mtimeMs,
@@ -65,6 +72,7 @@ async function loadCatalog() {
 		spells,
 		creatures,
 		achievements,
+		world,
 	};
 	return cache;
 }
