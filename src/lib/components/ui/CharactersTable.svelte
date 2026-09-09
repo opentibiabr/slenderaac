@@ -19,6 +19,7 @@
 		vocationString,
 	} from '$lib/players';
 	import ClassicCharacterList from '$lib/themes/classic/CharacterList.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 	import { toProperCase } from '$lib/utils';
 
 	import GuildMembership from './GuildMembership.svelte';
@@ -75,7 +76,10 @@
 			<tbody class="transition-all duration-300 ease-in-out">
 				{#each characters as character}
 					<a
-						href="/characters/{character.name}"
+						href={themePreviewHref(
+							$page.url,
+							'/characters/' + encodeURIComponent(character.name),
+						)}
 						class="table-row [&>td]:!align-middle cursor-pointer"
 						on:click={selected}
 						transition:fly|local={{

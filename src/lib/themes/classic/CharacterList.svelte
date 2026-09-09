@@ -7,6 +7,7 @@
 	import type { Order, Sort } from '$lib/sorting';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { vocationString } from '$lib/players';
+	import { sortHref } from '$lib/sorting';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let characters: (Player | PlayerWithRank)[];
@@ -16,16 +17,6 @@
 	export let order: Order = 'asc';
 	export let title = 'Characters';
 	const dispatch = createEventDispatcher();
-
-	function sortHref(column: string) {
-		const target = new URL($page.url);
-		target.searchParams.set('sort', column);
-		target.searchParams.set(
-			'order',
-			sort === column && order === 'asc' ? 'desc' : 'asc',
-		);
-		return themePreviewHref($page.url, target.pathname + target.search);
-	}
 </script>
 
 <div class="classic-native-content">
@@ -35,12 +26,16 @@
 				><tr>
 					{#if ranked}<th>Rank</th>{/if}
 					<th
-						>{#if sort}<a href={sortHref('name')}>Name</a>{:else}Name{/if}</th>
+						>{#if sort}<a href={sortHref($page.url, 'name', sort, order)}
+								>Name</a
+							>{:else}Name{/if}</th>
 					<th
-						>{#if sort}<a href={sortHref('vocation')}>Vocation</a
+						>{#if sort}<a href={sortHref($page.url, 'vocation', sort, order)}
+								>Vocation</a
 							>{:else}Vocation{/if}</th>
 					<th
-						>{#if sort}<a href={sortHref('level')}>Level</a
+						>{#if sort}<a href={sortHref($page.url, 'level', sort, order)}
+								>Level</a
 							>{:else}Level{/if}</th>
 					{#if skill}<th>{skill === 'experience' ? 'Experience' : skill}</th
 						>{/if}
