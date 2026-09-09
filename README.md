@@ -146,11 +146,20 @@ The renderer reads the requested outfit's PNG files directly. No generated metad
 <details>
 <summary><h2>Inventory Items</h2></summary>
 
-You'll need to download the spritesheet from
-[here](https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#animated-items-and-outfits)
-the items in `items`. These assets are not included in the repository
+Install a matching sprite pack from the [item image provider](https://item-images.ots.me/)
+in `items`, or set `ITEM_ASSETS_ROOT` to an external directory containing
+numbered GIF files and the inventory placeholder images. Restart the app after
+changing this setting. These assets are not included in the repository
 because they can cause the repo to bloat, and are also not release under the same license
 as the code.
+
+Item requests accept numeric identities and the existing empty-slot names. Missing
+or invalid optional images return a non-cacheable `404`; malformed identities
+return `400`. Successful responses revalidate their complete image and title, so
+replacing artwork or item names takes effect without restarting the app.
+The optional `appearances.dat` and `appearances.proto` files provide item titles.
+Missing or malformed title data leaves the image available with the client's
+numeric fallback label.
 
 </details>
 
