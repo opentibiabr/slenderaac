@@ -109,6 +109,12 @@ server-owned `serverLogo` asset can replace that text, and `serverShopButton` ca
 supply a custom shop button label. Without these assets, the shared components
 render the current server name as text, so artwork cannot override its identity.
 
+New application routes inherit the compact Classic frame and shared native form
+styles by default. Only the home page uses the news layout. News tools and adapted
+information pages retain their dedicated inner components. Add an optional native
+headline mapping when a matching raster asset is available; otherwise new titles
+use the shared dynamic heading treatment.
+
 The category-upgrade migration preserves the previous first news category as
 `server`. Fresh installations create the neutral category directly. Existing
 comparison content should be refreshed with the matching pack importer so image

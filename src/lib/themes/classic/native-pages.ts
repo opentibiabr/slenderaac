@@ -7,6 +7,12 @@ export type NativePage = {
 };
 
 export function classicNativePage(pathname: string): NativePage | null {
+	pathname = pathname.replace(/\/$/, '') || '/';
+	if (
+		['/', '/news/archive', '/news/event-schedule'].includes(pathname) ||
+		informationPageForPath(pathname)
+	)
+		return null;
 	if (pathname === '/account' || pathname.startsWith('/account/'))
 		return {
 			headline:
@@ -44,5 +50,6 @@ export function classicNativePage(pathname: string): NativePage | null {
 			headlineHeight: 32,
 			paperMinHeight: 387,
 		};
-	return null;
+	return { headline: '', paperMinHeight: 387 };
 }
+import { informationPageForPath } from '$lib/information';
