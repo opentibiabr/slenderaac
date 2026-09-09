@@ -4,6 +4,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { vocationFilters as vocations } from '$lib/players';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from '../../../routes/(app)/highscores/$types';
@@ -21,7 +22,6 @@
 		['fishing', 'Fishing'],
 		['balance', 'Balance'],
 	];
-	const vocations = ['all', 'none', 'knight', 'paladin', 'sorcerer', 'druid'];
 	$: parameters = new URL(themePreviewHref($page.url, '/highscores'), $page.url)
 		.searchParams;
 	$: lastPage = Math.max(1, Math.ceil(data.count / data.limit));

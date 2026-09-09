@@ -68,7 +68,19 @@ export enum PlayerVocation {
 	ElderDruid,
 	RoyalPaladin,
 	EliteKnight,
+	Monk,
+	ExaltedMonk,
 }
+
+export const vocationFilters = [
+	'all',
+	'none',
+	'knight',
+	'paladin',
+	'sorcerer',
+	'druid',
+	'monk',
+] as const;
 
 export function vocationIds(vocation: string): PlayerVocation[] {
 	switch (vocation.toLowerCase()) {
@@ -82,6 +94,8 @@ export function vocationIds(vocation: string): PlayerVocation[] {
 			return [PlayerVocation.Paladin, PlayerVocation.RoyalPaladin];
 		case 'knight':
 			return [PlayerVocation.Knight, PlayerVocation.EliteKnight];
+		case 'monk':
+			return [PlayerVocation.Monk, PlayerVocation.ExaltedMonk];
 		default:
 			return [];
 	}
@@ -162,7 +176,9 @@ export function isPlayerVocation(value: unknown): value is PlayerVocation {
 		vocation === PlayerVocation.MasterSorcerer ||
 		vocation === PlayerVocation.ElderDruid ||
 		vocation === PlayerVocation.RoyalPaladin ||
-		vocation === PlayerVocation.EliteKnight
+		vocation === PlayerVocation.EliteKnight ||
+		vocation === PlayerVocation.Monk ||
+		vocation === PlayerVocation.ExaltedMonk
 	);
 }
 
@@ -195,6 +211,8 @@ export function vocationString(playerVocation: PlayerVocation): string {
 		[PlayerVocation.ElderDruid]: $_('vocations.elder-druid'),
 		[PlayerVocation.RoyalPaladin]: $_('vocations.royal-paladin'),
 		[PlayerVocation.EliteKnight]: $_('vocations.elite-knight'),
+		[PlayerVocation.Monk]: $_('vocations.monk'),
+		[PlayerVocation.ExaltedMonk]: $_('vocations.exalted-monk'),
 	}[playerVocation];
 }
 
@@ -247,7 +265,7 @@ export function getPronoun(character: {
 		character.pronoun != PlayerPronoun.Unset
 			? character.pronoun
 			: character.sex === PlayerSex.Female
-			? PlayerPronoun.She
-			: PlayerPronoun.He;
+				? PlayerPronoun.She
+				: PlayerPronoun.He;
 	return pronounString(pronoun);
 }

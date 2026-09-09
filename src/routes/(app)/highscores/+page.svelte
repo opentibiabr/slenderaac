@@ -7,6 +7,7 @@
 
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import Select from '$lib/components/ui/forms/Select.svelte';
+	import { vocationFilters as vocations } from '$lib/players';
 	import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
@@ -47,8 +48,6 @@
 		'fishing',
 		'balance',
 	].map((skill) => ({ value: skill, label: $_(`skills.${skill}`) }));
-
-	const vocations = ['all', 'none', 'knight', 'paladin', 'sorcerer', 'druid'];
 
 	let form: HTMLFormElement;
 </script>
