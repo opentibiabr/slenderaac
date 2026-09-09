@@ -7,7 +7,11 @@
 
 	export let assets: Record<string, string | undefined> | null | undefined;
 	export let boss = false;
-	export let boosted: { name: string | null; entry: LibraryEntry | null };
+	export let boosted: {
+		name: string | null;
+		entry: LibraryEntry | null;
+		image: string | null;
+	};
 </script>
 
 <div class="library-boosted">
@@ -16,16 +20,16 @@
 			>Boosted {boss ? 'Boss' : 'Creature'}</svelte:fragment>
 		<div class="library-boosted__content">
 			<p>
-				{#if boosted.entry}<img
-						src={boosted.entry.image}
+				{#if boosted.image}<img
+						src={boosted.image}
 						alt=""
 						width="64"
 						height="64" />{/if}
 				Today's boosted {boss ? 'boss' : 'creature'}:
-				{#if boosted.entry}<a
+				{#if boosted.entry && !boss}<a
 						href={themePreviewHref(
 							$page.url,
-							`/library/creatures?race=${boosted.entry.race}`,
+							`/library/creatures?race=${encodeURIComponent(boosted.entry.race)}`,
 						)}>{boosted.name}</a
 					>{:else}{boosted.name ?? 'None'}{/if}
 			</p>

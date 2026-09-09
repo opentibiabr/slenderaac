@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 
 import { informationPageForPath, manualSections } from '$lib/information';
-import { libraryEntries } from '$lib/library';
+import { libraryEntries, libraryPortraitForName } from '$lib/library';
 import { loadInformationPresentation } from '$lib/server/theme-assets/information';
 
 import type { PageServerLoad } from './$types';
@@ -55,6 +55,10 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 				? {
 						name: boosted?.boostname ?? null,
 						entry: boostedEntry ?? null,
+						image:
+							presentation && boosted?.boostname
+								? libraryPortraitForName(presentation, boosted.boostname)
+								: null,
 					}
 				: null,
 		libraryDetail:

@@ -46,6 +46,8 @@ portraits open local detail views with previous/back/next navigation. Those view
 currently show the catalog identity and portrait; additional creature descriptions
 and combat data have not been imported. Boss portraits remain noninteractive,
 matching the source catalog. Daily boosted selections come from the server database.
+Portrait lookup also accepts noninteractive boss cards, so a local boosted boss
+can display its artwork without acquiring a creature-detail link.
 Without catalog data, these routes retain an honest local empty state.
 
 All adapted reference links pass through the shared destination resolver, including

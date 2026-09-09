@@ -5,10 +5,10 @@ import type {
 
 export type LibraryEntry = { race: string; name: string; image: string };
 
-export function libraryEntries(
-	presentation: InformationPresentation,
-): LibraryEntry[] {
-	const entries: LibraryEntry[] = [];
+type LibraryCard = Omit<LibraryEntry, 'race'> & { race: string | null };
+
+function libraryCards(presentation: InformationPresentation): LibraryCard[] {
+	const entries: LibraryCard[] = [];
 	const text = (nodes: InformationNode[]): string =>
 		nodes
 			.map((node) => (typeof node === 'string' ? node : text(node.children)))
@@ -21,25 +21,22 @@ export function libraryEntries(
 				const link = node.children.find(
 					(child) => typeof child !== 'string' && child.tag === 'a',
 				);
-				if (!link || typeof link === 'string') continue;
-				const image = link.children.find(
-					(child) => typeof child !== 'string' && child.tag === 'img',
-				);
-				let race: string | null;
-				try {
-					race = new URL(
-						link.attrs.href,
-						'https://slender.invalid',
-					).searchParams.get('race');
-				} catch {
-					continue;
+				const image = (
+					link && typeof link !== 'string' ? link.children : node.children
+				).find((child) => typeof child !== 'string' && child.tag === 'img');
+				let race: string | null = null;
+				if (link && typeof link !== 'string') {
+					try {
+						race = new URL(
+							link.attrs.href,
+							'https://slender.invalid',
+						).searchParams.get('race');
+					} catch {
+						continue;
+					}
+					if (!race || !/^[a-z0-9_]{1,80}$/.test(race)) continue;
 				}
-				if (
-					race &&
-					/^[a-z0-9_]{1,80}$/.test(race) &&
-					image &&
-					typeof image !== 'string'
-				)
+				if (image && typeof image !== 'string')
 					entries.push({
 						race,
 						name: text(node.children),
@@ -50,4 +47,23 @@ export function libraryEntries(
 	}
 	visit(presentation.body);
 	return entries;
+}
+
+export function libraryEntries(
+	presentation: InformationPresentation,
+): LibraryEntry[] {
+	return libraryCards(presentation).filter(
+		(entry): entry is LibraryEntry => entry.race !== null,
+	);
+}
+
+export function libraryPortraitForName(
+	presentation: InformationPresentation,
+	name: string,
+): string | null {
+	return (
+		libraryCards(presentation).find(
+			(entry) => entry.name.toLowerCase() === name.toLowerCase(),
+		)?.image ?? null
+	);
 }
