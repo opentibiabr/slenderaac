@@ -27,12 +27,16 @@
 	let position = '';
 	let side = 'right';
 	let stopPositioning: (() => void) | undefined;
+	$: title = attrs.title ?? '';
 	$: tooltipId =
 		id ||
-		`information-tooltip-${attrs.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
+		`information-tooltip-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
 	$: sections =
 		calendarSections ??
-		calendarTooltipSections(attrs['tooltip-text'] ?? '', attrs.title);
+		calendarTooltipSections(attrs['tooltip-text'] ?? '', title);
+	function backgroundImage(src: string | undefined) {
+		return src ? `url("${src}")` : 'none';
+	}
 	function hide() {
 		open = false;
 		stopPositioning?.();
@@ -76,7 +80,7 @@
 	<button
 		bind:this={trigger}
 		type="button"
-		aria-label={attrs.title}
+		aria-label={title || undefined}
 		aria-expanded={open}
 		aria-describedby={open ? tooltipId : undefined}
 		on:mouseenter={show}
@@ -95,9 +99,9 @@
 			class="information-tooltip__panel"
 			class:information-tooltip__panel--calendar={calendar}
 			class:information-tooltip__panel--left={side === 'left'}
-			style={`${position}; --tooltip-paper: url("${$page.data.themeAssets?.paperTexture}"); --tooltip-arrow: url("${attrs['arrow-src']}")`}>
+			style={`${position}; --tooltip-paper: ${backgroundImage($page.data.themeAssets?.paperTexture)}; --tooltip-arrow: ${backgroundImage(attrs['arrow-src'])}`}>
 			<strong aria-hidden={calendar ? true : undefined}
-				>{calendar ? '' : attrs.title}</strong>
+				>{calendar ? '' : title}</strong>
 			{#if calendar}
 				{#each sections as section}
 					<span class="information-tooltip__section-title"
@@ -109,7 +113,9 @@
 			{:else}<span class="information-tooltip__text"
 					>{attrs['tooltip-text']}</span
 				>{/if}<span class="information-tooltip__ornament"
-				><img src={attrs['ornament-src']} alt="" /></span
+				>{#if attrs['ornament-src']}<img
+						src={attrs['ornament-src']}
+						alt="" />{/if}</span
 			><br />
 		</span>
 	{/if}

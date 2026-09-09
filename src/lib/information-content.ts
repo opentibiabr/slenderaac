@@ -183,9 +183,14 @@ export function parseInformationPresentation(
 				typeof node.attrs !== 'object'
 			)
 				throw new Error('Unsupported information element');
+			const attrs = informationAttributes(
+				node.attrs as Record<string, unknown>,
+			);
+			if (node.tag === 'tooltip' && !attrs.title?.trim())
+				throw new Error('Information tooltip requires a title');
 			return {
 				tag: node.tag,
-				attrs: informationAttributes(node.attrs as Record<string, unknown>),
+				attrs,
 				children: nodes(node.children, depth + 1),
 			};
 		});
