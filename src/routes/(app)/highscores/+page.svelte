@@ -20,7 +20,7 @@
 	).searchParams;
 
 	$: page = {
-		page: data.page,
+		page: data.offset,
 		offset: data.offset,
 		limit: data.limit,
 		size: data.count,
@@ -31,7 +31,7 @@
 		void goto(
 			themePreviewHref(
 				$currentPage.url,
-				`/highscores?skill=${data.skill}&vocation=${data.vocation}&page=${page.page}&limit=${page.limit}`,
+				`/highscores?skill=${data.skill}&vocation=${data.vocation}&page=${page.page + 1}&limit=${page.limit}`,
 			),
 		);
 	}
