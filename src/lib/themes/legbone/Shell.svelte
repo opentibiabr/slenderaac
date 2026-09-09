@@ -11,6 +11,7 @@
 	} from '@fortawesome/free-solid-svg-icons';
 	import { AppBar, AppShell, LightSwitch } from '@skeletonlabs/skeleton';
 	import { Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 	import { portal } from 'svelte-portal';
@@ -70,9 +71,12 @@
 
 	let nextServerSave = formatSeconds(secondsUntil(data.nextServerSave));
 
-	setInterval(() => {
-		nextServerSave = formatSeconds(secondsUntil(data.nextServerSave));
-	}, 1000);
+	onMount(() => {
+		const interval = setInterval(() => {
+			nextServerSave = formatSeconds(secondsUntil(data.nextServerSave));
+		}, 1000);
+		return () => clearInterval(interval);
+	});
 </script>
 
 <div class="theme-legbone">
