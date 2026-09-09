@@ -66,10 +66,7 @@
 	$: accountLoginHref = withThemePreview($page.url, '/account/login');
 	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
 	$: accountLostHref = withThemePreview($page.url, '/account/lost');
-	$: firstStaticPageHref = withThemePreview(
-		$page.url,
-		staticPages.length > 0 ? `/pages/${staticPages[0].slug}` : '/pages/rules',
-	);
+	$: rulesPage = staticPages.find((entry) => entry.slug === 'rules');
 	$: accountHref = isLoggedIn ? accountPageHref : accountLoginHref;
 	$: isLatestNewsActive = currentPath === '/';
 	$: isNewsArchiveActive = currentPath === '/news/archive';
@@ -344,8 +341,16 @@
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
 				{/each}
 			{:else}
-				<a href={firstStaticPageHref}>Rules</a>
-				<a href={firstStaticPageHref}>Server Info</a>
+				{#each staticPages as entry}
+					<a
+						href={withThemePreview(
+							$page.url,
+							`/pages/${encodeURIComponent(entry.slug)}`,
+						)}>{entry.title}</a>
+				{:else}
+					<a href="https://www.tibia.com/library/?subtopic=creatures"
+						>Creatures</a>
+				{/each}
 			{/if}
 		</div>
 	</section>
@@ -432,8 +437,10 @@
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
 				{/each}
 			{:else}
-				<a href={guildsHref}>Guild Boards</a>
-				<a href={charactersHref}>Character Discussions</a>
+				<a href="https://www.tibia.com/forum/?subtopic=guildboards"
+					>Guild Boards</a>
+				<a href="https://www.tibia.com/forum/?subtopic=communityboards"
+					>Community Boards</a>
 			{/if}
 		</div>
 	</section>
@@ -521,8 +528,12 @@
 					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
 				{/each}
 			{:else}
-				<a href={charactersHref}>Current Auctions</a>
-				<a href={charactersHref}>Create Auction</a>
+				<a
+					href="https://www.tibia.com/charactertrade/?subtopic=currentcharactertrades"
+					>Current Auctions</a>
+				<a
+					href="https://www.tibia.com/charactertrade/?subtopic=pastcharactertrades"
+					>Auction History</a>
 			{/if}
 		</div>
 	</section>
@@ -564,7 +575,12 @@
 				{/each}
 			{:else}
 				<a href={accountLostHref}>Lost Account?</a>
-				<a href={firstStaticPageHref}>Rules</a>
+				{#if rulesPage}
+					<a href={withThemePreview($page.url, '/pages/rules')}
+						>{rulesPage.title}</a>
+				{:else}
+					<a href="https://www.tibia.com/support/?subtopic=gethelp">Get Help</a>
+				{/if}
 			{/if}
 		</div>
 	</section>
