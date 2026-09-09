@@ -114,6 +114,9 @@ Classic renders the configured name in the existing logo slot by default. A
 server-owned `serverLogo` asset can replace that text, and `serverShopButton` can
 supply a custom shop button label. Without these assets, the shared components
 render the current server name as text, so artwork cannot override its identity.
+The default theme's desktop and mobile headers use the same configured name and
+optional `serverLogo` from its own pack. Both headers link home and preserve the
+active theme preview.
 
 New application routes inherit the compact Classic frame and shared native form
 styles by default. Only the home page uses the news layout. News tools and adapted

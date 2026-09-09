@@ -23,13 +23,12 @@
 	import ServerStatus from '$lib/components/ui/ServerStatus.svelte';
 	import SidebarLeft from '$lib/components/ui/SidebarLeft.svelte';
 	import SidebarRight from '$lib/components/ui/SidebarRight.svelte';
-	import { theme } from '$lib/config';
+	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatSeconds, secondsUntil } from '$lib/utils';
 
 	import {
 		PUBLIC_DISCORD_URL,
 		PUBLIC_INSTAGRAM_URL,
-		PUBLIC_TITLE,
 		PUBLIC_WHATSAPP_URL,
 		PUBLIC_WIKI_URL,
 	} from '$env/static/public';
@@ -51,6 +50,7 @@
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: staticPages = data.staticPages;
 	$: previewTheme = $page.url.searchParams.get('themePreview');
+	$: serverLogo = data.themeAssets?.serverLogo;
 	$: classicPreviewHref = (() => {
 		const nextUrl = new URL($page.url.href);
 		nextUrl.searchParams.set('themePreview', 'classic');
@@ -136,15 +136,27 @@
 						</button>
 						<div
 							class="w-full h-full -mb-6 hidden md:flex flex-col items-center justify-end">
-							<img
-								src="/images/logo-{theme}.png"
-								alt="logo"
-								class="hidden md:block w-36 h-32 object-cover" />
+							<a
+								class="server-brand server-brand--desktop"
+								href={themePreviewHref($page.url, '/')}
+								aria-label={data.serverName}>
+								{#if serverLogo}<img
+										src={serverLogo}
+										alt={data.serverName} />{:else}<span>{data.serverName}</span
+									>{/if}
+							</a>
 						</div>
 					</svelte:fragment>
 					<div class="flex md:hidden items-center gap-2">
-						<img src="/images/logo-{theme}.png" alt="logo" class="h-12 -my-4" />
-						{PUBLIC_TITLE}
+						<a
+							class="server-brand server-brand--mobile"
+							href={themePreviewHref($page.url, '/')}
+							aria-label={data.serverName}>
+							{#if serverLogo}<img
+									src={serverLogo}
+									alt={data.serverName} />{:else}<span>{data.serverName}</span
+								>{/if}
+						</a>
 					</div>
 					<svelte:fragment slot="trail">
 						<div class="hidden md:block w-48">
@@ -251,6 +263,32 @@
 </div>
 
 <style>
+	.server-brand {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		font-weight: bold;
+		overflow-wrap: anywhere;
+	}
+	.server-brand--desktop {
+		width: 144px;
+		height: 128px;
+		font-size: 28px;
+		color: rgb(255 233 172);
+		text-shadow: 1px 2px 3px black;
+	}
+	.server-brand--mobile {
+		min-width: 0;
+		max-width: 100%;
+		height: 48px;
+		font-size: 18px;
+	}
+	.server-brand img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
 	.theme-legbone .theme-legbone-preview-switch {
 		position: fixed;
 		top: 14px;
