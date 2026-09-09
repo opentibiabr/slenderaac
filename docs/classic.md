@@ -89,11 +89,25 @@ for saved preview links or server configuration. Aliases cannot shadow registere
 themes or resolve ambiguously. Preview aliases redirect to the canonical URL;
 missing or invalid aliases retain normal fallback behavior.
 
-`SERVER_NAME` supplies the About menu label and `/about/server` title and welcome
-text. It uses the same server-side configuration as the rest of SlenderAAC, with
+`SERVER_NAME` supplies the server identity in navigation, headings, guides,
+promotions and accessible labels. It uses the same server-side configuration as the rest of SlenderAAC, with
 `OpenTibia` as a fallback for an empty value. `/about/company` describes OpenTibiaBR
 and links to its projects. Both pages are built in; external packs cannot replace
 their content. Older introduction URLs redirect locally and preserve the query.
+
+The matching external updater prepares display text with `{{serverName}}` and
+`{{serverWebsite}}` placeholders. Slender resolves them from `SERVER_NAME` and the
+current website origin at render time. This also covers manual sections, table
+captions, tooltips, gallery captions and imported news. Identifiers, image paths,
+link destinations and fragment anchors remain unchanged. Configuration values
+are escaped before insertion into rendered Markdown. Keep the application and
+asset pack versions together when upgrading; refresh local comparison fixtures
+with the matching importer, which preserves their IDs across text normalization.
+
+Classic renders the configured name in the existing logo slot by default. A
+server-owned `serverLogo` asset can replace that text, and `serverShopButton` can
+supply a custom shop button label. Without these assets, the shared components
+render the current server name as text, so artwork cannot override its identity.
 
 The category-upgrade migration preserves the previous first news category as
 `server`. Fresh installations create the neutral category directly. Existing

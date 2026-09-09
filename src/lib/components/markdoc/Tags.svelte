@@ -8,14 +8,28 @@
 
 	import { page } from '$app/stores';
 
+	import { serverMarkupText, serverText } from '$lib/site-identity';
 	import { themePreviewHref } from '$lib/themes/preview';
+
+	import { PUBLIC_TITLE } from '$env/static/public';
 
 	export let node: RenderableTreeNode;
 	export let components: Map<string, ComponentType>;
 	export let isRoot = false;
+	$: identity = {
+		name: $page.data.serverName ?? PUBLIC_TITLE,
+		website: $page.url.origin,
+	};
 
 	function previewAttributes(value: unknown, url: URL) {
-		const attributes = value as Record<string, unknown>;
+		const attributes = Object.fromEntries(
+			Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+				key,
+				typeof item === 'string' && ['alt', 'title', 'aria-label'].includes(key)
+					? serverText(item, identity)
+					: item,
+			]),
+		);
 		if (
 			!url.searchParams.has('themePreview') ||
 			typeof attributes.href !== 'string'
@@ -41,7 +55,10 @@
 </script>
 
 {#if typeof node === 'string' || typeof node === 'number'}
-	{@html node}
+	{@html serverMarkupText(String(node), {
+		name: $page.data.serverName ?? PUBLIC_TITLE,
+		website: $page.url.origin,
+	})}
 {:else if Array.isArray(node)}
 	{#each node as child}
 		<svelte:self node={child} {components} />

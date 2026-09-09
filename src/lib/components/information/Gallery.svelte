@@ -4,10 +4,18 @@
 	import { page } from '$app/stores';
 
 	import type { InformationGallery } from '$lib/information-content';
+	import { serverText } from '$lib/site-identity';
 
 	export let gallery: InformationGallery;
+	$: items = gallery.items.map((item) => ({
+		...item,
+		caption: serverText(item.caption, {
+			name: $page.data.serverName,
+			website: $page.url.origin,
+		}),
+	}));
 	let dialog: HTMLDialogElement;
-	$: selected = gallery.items.find(
+	$: selected = items.find(
 		(item) =>
 			String(item.id) === $page.url.searchParams.get('currentscreenshot'),
 	);
@@ -57,7 +65,7 @@
 	<div class="screenshot-gallery__cell">
 		<!-- Keep adjacent inline cards free of extra inter-element spaces. -->
 		<!-- prettier-ignore -->
-		{#each gallery.items as item}<a class="screenshot-gallery__card" href={href(item.id)} on:click|preventDefault={() => show(item.id)} aria-label={`Open screenshot ${item.id}: ${item.caption}`}><img src={item.thumbnail} alt="" width="230" height="147" /><span class="screenshot-gallery__caption"><span>{item.caption}</span></span></a>{/each}
+		{#each items as item}<a class="screenshot-gallery__card" href={href(item.id)} on:click|preventDefault={() => show(item.id)} aria-label={`Open screenshot ${item.id}: ${item.caption}`}><img src={item.thumbnail} alt="" width="230" height="147" /><span class="screenshot-gallery__caption"><span>{item.caption}</span></span></a>{/each}
 	</div>
 </div>
 

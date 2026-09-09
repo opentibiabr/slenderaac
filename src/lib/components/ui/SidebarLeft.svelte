@@ -74,7 +74,7 @@
 							><Fa icon={faBookBookmark} /></svelte:fragment>
 						<svelte:fragment slot="summary"
 							>{section === 'about'
-								? 'About Tibia'
+								? `About ${$page.data.serverName}`
 								: 'Game Guides'}</svelte:fragment>
 						<svelte:fragment slot="content"
 							><nav class="list-nav">
@@ -85,7 +85,10 @@
 												href={themePreviewHref(
 													$page.url,
 													informationPath(entry),
-												)}>{entry.title}</a>
+												)}
+												>{entry.id === 'server'
+													? `About ${$page.data.serverName}`
+													: entry.title}</a>
 										</li>
 									{/each}
 								</ul>

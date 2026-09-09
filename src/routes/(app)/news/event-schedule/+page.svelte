@@ -5,12 +5,14 @@
 	import { mergeCalendarTooltipSections } from '$lib/components/information/tooltip-content';
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
+	import { serverText } from '$lib/site-identity';
 	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	$: identity = { name: data.serverName, website: $page.url.origin };
 	$: isClassicTheme = $page.data.selectedTheme === 'classic';
 
 	const weekdays = [
@@ -134,7 +136,10 @@
 												style:background-color={event.color}
 												title={isClassicTheme
 													? undefined
-													: event.description || event.label}>
+													: serverText(
+															event.description || event.label,
+															identity,
+														)}>
 												{#if isClassicTheme}<Tooltip
 														calendar
 														calendarSections={eventTooltipSections}
@@ -143,8 +148,8 @@
 														attrs={tooltipAttrs(
 															event.label.replace(/^\*/, ''),
 															event.description ?? '',
-														)}>{event.label}</Tooltip
-													>{:else}{event.label}{/if}
+														)}>{serverText(event.label, identity)}</Tooltip
+													>{:else}{serverText(event.label, identity)}{/if}
 											</div>
 										{/each}
 									</td>
@@ -159,7 +164,7 @@
 
 	<p class="event-schedule__note">
 		{#if data.demo && data.capturedMonth}* Events start/end at server save.
-			Preview: Tibia.com reference events.
+			Preview: reference events for layout comparison.
 		{:else if data.demo}Preview: no reference events captured for this month.
 		{:else}* Event starts/ends at server save of this day.{/if}
 	</p>

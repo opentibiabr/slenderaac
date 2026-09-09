@@ -6,6 +6,7 @@
 	import { page } from '$app/stores';
 
 	import Markdoc from '$lib/components/markdoc/Markdoc.svelte';
+	import { serverText } from '$lib/site-identity';
 	import NewsArticle from '$lib/themes/classic/NewsArticle.svelte';
 	import ReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
 	import { classicAsset } from '$lib/themes/classic/theme';
@@ -15,6 +16,7 @@
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	$: identity = { name: data.serverName, website: $page.url.origin };
 	$: isClassicTheme = $page.data.selectedTheme === 'classic';
 	$: themeAssets = $page.data.themeAssets as
 		| Record<string, string | undefined>
@@ -65,7 +67,7 @@
 							class="text-sm"
 							datetime={new Date(ticker.created_at).toISOString()}
 							>{formatDate(ticker.created_at)}</time>
-						<strong>{ticker.title}</strong>
+						<strong>{serverText(ticker.title, identity)}</strong>
 					</summary>
 					<Markdoc content={ticker.content} />
 				</details>
@@ -108,7 +110,7 @@
 					<Fa icon={faCalendar} size="xs" />
 					<span class="text-sm text-secondary-50"
 						>{formatDate(article.created_at)}</span>
-					<strong>{article.title}</strong>
+					<strong>{serverText(article.title, identity)}</strong>
 				</span>
 				<em class="text-sm">
 					{$_('published-by')}

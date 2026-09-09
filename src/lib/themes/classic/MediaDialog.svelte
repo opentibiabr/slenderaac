@@ -6,6 +6,7 @@
 	import type { MediaPreview } from './media-preview';
 	import { mediaPreview } from './media-preview';
 
+	export let serverName: string;
 	export let trailerFrame: string | null = null;
 	export let trailerClose: string | null = null;
 	let dialog: HTMLDialogElement;
@@ -38,6 +39,7 @@
 			link.dataset.classicMedia,
 			link.href,
 			window.location.origin,
+			serverName,
 		);
 		if (!media) return;
 		event.preventDefault();
@@ -89,7 +91,7 @@
 			<button
 				type="button"
 				class="classic-media-dialog__video-close"
-				aria-label="Close Tibia trailer"
+				aria-label={`Close ${serverName} trailer`}
 				on:click={close}>
 				{#if trailerClose}<img src={trailerClose} alt="" />{/if}
 				<span>X</span>

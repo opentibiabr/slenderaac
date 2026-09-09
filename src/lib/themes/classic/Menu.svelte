@@ -16,6 +16,7 @@
 	import { page } from '$app/stores';
 
 	import { informationPages, informationPath } from '$lib/information';
+	import { serverText } from '$lib/site-identity';
 	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -43,6 +44,7 @@
 		? 'classic-menu-drawer'
 		: 'classic-menu-main';
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
+	$: identity = { name: $page.data.serverName, website: $page.url.origin };
 	$: aboutLabel = `About ${$page.data.serverName}`;
 	$: aboutLinks = (
 		presentation?.navigation.about ??
@@ -267,7 +269,8 @@
 			{#each aboutLinks as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -307,7 +310,8 @@
 			{#each guideLinks as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -348,7 +352,8 @@
 				{#each presentation.navigation.library as link}
 					<a
 						class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-						href={withThemePreview($page.url, link.href)}>{link.label}</a>
+						href={withThemePreview($page.url, link.href)}
+						>{serverText(link.label, identity)}</a>
 				{/each}
 			{:else}
 				<a
@@ -406,7 +411,8 @@
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-community`}>
 			{#if presentation?.navigation.community}
 				{#each presentation.navigation.community as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					<a href={withThemePreview($page.url, link.href)}
+						>{serverText(link.label, identity)}</a>
 				{/each}
 			{:else}
 				<a href={charactersHref}>Characters</a>
@@ -450,7 +456,8 @@
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-forum`}>
 			{#if presentation?.navigation.forum}
 				{#each presentation.navigation.forum as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					<a href={withThemePreview($page.url, link.href)}
+						>{serverText(link.label, identity)}</a>
 				{/each}
 			{:else}
 				<a
@@ -498,7 +505,8 @@
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-account`}>
 			{#if presentation?.navigation.account}
 				{#each presentation.navigation.account as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					<a href={withThemePreview($page.url, link.href)}
+						>{serverText(link.label, identity)}</a>
 				{/each}
 			{:else}
 				<a href={accountHref}>{isLoggedIn ? $_('my-account') : $_('login')}</a>
@@ -545,7 +553,8 @@
 			id={`${menuIdPrefix}-character-trade`}>
 			{#if presentation?.navigation.characterTrade}
 				{#each presentation.navigation.characterTrade as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					<a href={withThemePreview($page.url, link.href)}
+						>{serverText(link.label, identity)}</a>
 				{/each}
 			{:else}
 				<a
@@ -595,7 +604,8 @@
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-support`}>
 			{#if presentation?.navigation.support}
 				{#each presentation.navigation.support as link}
-					<a href={withThemePreview($page.url, link.href)}>{link.label}</a>
+					<a href={withThemePreview($page.url, link.href)}
+						>{serverText(link.label, identity)}</a>
 				{/each}
 			{:else}
 				<a href={accountLostHref}>Lost Account?</a>

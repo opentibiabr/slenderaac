@@ -3,6 +3,7 @@
 
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
+	import { serverText } from '$lib/site-identity';
 	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 
@@ -241,7 +242,11 @@
 						{#each data.articles as article}
 							<a href={newsHref($page.url, article.id, article.type)}>
 								<span>{formatClassicDate(article.created_at)}</span>
-								<strong>{article.title}</strong>
+								<strong
+									>{serverText(article.title, {
+										name: data.serverName,
+										website: $page.url.origin,
+									})}</strong>
 							</a>
 						{/each}
 					{:else}

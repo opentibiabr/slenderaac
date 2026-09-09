@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import { serverText } from '$lib/site-identity';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let id: number | string;
@@ -15,7 +16,12 @@
 	<header class="classic-news-headline">
 		{#if icon}<img class="classic-news-icon" src={icon} alt="" />{/if}
 		<div class="classic-news-date">{date.replaceAll(' ', '\u00a0')} -</div>
-		<h2>{title}</h2>
+		<h2>
+			{serverText(title, {
+				name: $page.data.serverName,
+				website: $page.url.origin,
+			})}
+		</h2>
 	</header>
 	<div class="classic-news-body" class:classic-news-body--reference={reference}>
 		<slot />

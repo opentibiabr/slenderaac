@@ -8,6 +8,7 @@ export function mediaPreview(
 	kind: string | undefined,
 	href: string,
 	origin: string,
+	serverName: string,
 ): MediaPreview | null {
 	let url: URL;
 	try {
@@ -40,6 +41,6 @@ export function mediaPreview(
 	return {
 		kind,
 		src: `https://www.youtube.com/embed/${id}?enablejsapi=1`,
-		label: 'Tibia - Official Trailer',
+		label: `${serverName} - Trailer`,
 	};
 }

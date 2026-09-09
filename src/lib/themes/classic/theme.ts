@@ -1,5 +1,7 @@
 export type ClassicAssetKey =
 	| 'logo'
+	| 'serverLogo'
+	| 'serverShopButton'
 	| 'background'
 	| 'menuOrnament'
 	| 'contentOrnament'

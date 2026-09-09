@@ -123,7 +123,7 @@ export const load = (async ({ url }) => {
 						a.created_at <= to,
 				)
 				.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
-			notice = 'Preview: public Tibia.com news captured for layout comparison.';
+			notice = 'Preview: public news captured for layout comparison.';
 		} else {
 			articles = await prisma.news.findMany({
 				where: {

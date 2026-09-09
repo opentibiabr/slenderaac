@@ -11,6 +11,8 @@
 
 	import { page } from '$app/stores';
 
+	import { serverText } from '$lib/site-identity';
+
 	import {
 		calendarTooltipSections,
 		type TooltipSection,
@@ -27,13 +29,18 @@
 	let position = '';
 	let side = 'right';
 	let stopPositioning: (() => void) | undefined;
-	$: title = attrs.title ?? '';
+	$: identity = { name: $page.data.serverName, website: $page.url.origin };
+	$: title = serverText(attrs.title ?? '', identity);
 	$: tooltipId =
 		id ||
 		`information-tooltip-${title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
-	$: sections =
+	$: sections = (
 		calendarSections ??
-		calendarTooltipSections(attrs['tooltip-text'] ?? '', title);
+		calendarTooltipSections(attrs['tooltip-text'] ?? '', attrs.title ?? '')
+	).map((section) => ({
+		title: serverText(section.title, identity),
+		text: serverText(section.text, identity),
+	}));
 	function backgroundImage(src: unknown) {
 		return typeof src === 'string' && src ? `url("${src}")` : 'none';
 	}

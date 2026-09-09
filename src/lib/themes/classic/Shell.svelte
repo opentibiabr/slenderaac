@@ -16,9 +16,10 @@
 	import { page } from '$app/stores';
 
 	import type { InformationPresentation } from '$lib/information-content';
+	import { serverText } from '$lib/site-identity';
 	import { themePreviewHref } from '$lib/themes/preview';
 
-	import { PUBLIC_DOWNLOAD_URL, PUBLIC_TITLE } from '$env/static/public';
+	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
 	import type { LayoutData } from '../../../routes/(app)/$types';
 	import type { ClassicNewsReference } from './reference-types';
@@ -121,6 +122,7 @@
 	$: onlineHref = makeClassicPreviewHref($page.url, '/online');
 	$: shopHref = makeClassicPreviewHref($page.url, '/shop');
 	$: presentation = data.classicPresentation;
+	$: identity = { name: data.serverName, website: $page.url.origin };
 	$: fansitesHref = presentationHref(
 		'fansites',
 		'https://www.tibia.com/community/?subtopic=fansites',
@@ -171,7 +173,7 @@
 		);
 	}
 	$: staticPages = data.staticPages;
-	$: logo = classicAsset(data.themeAssets, 'logo');
+	$: logo = classicAsset(data.themeAssets, 'serverLogo');
 	$: background = classicAsset(data.themeAssets, 'background');
 	$: menuOrnament = classicAsset(data.themeAssets, 'menuOrnament');
 	$: contentOrnament = classicAsset(data.themeAssets, 'contentOrnament');
@@ -350,7 +352,7 @@
 		classicReference?.assets.premiumCrown ??
 		classicAsset(data.themeAssets, 'premiumCrown');
 	$: premiumOverlay = classicAsset(data.themeAssets, 'premiumOverlay');
-	$: premiumButtonLabel = classicAsset(data.themeAssets, 'shopButton');
+	$: premiumButtonLabel = classicAsset(data.themeAssets, 'serverShopButton');
 	$: premiumButtonDecor =
 		classicAsset(data.themeAssets, 'premiumButtonDecor') ??
 		classicAsset(data.themeAssets, 'premiumButtonPremiumTime');
@@ -361,7 +363,7 @@
 	$: premiumButtonText =
 		classicReference?.premiumButtonText ??
 		presentation?.premiumButtonText ??
-		(isNewsArchivePage ? 'Get Premium' : 'Get Tibia Coins');
+		(isNewsArchivePage ? 'Get Premium' : `Get ${data.serverName} Coins`);
 	$: premiumButtonBackground = classicAsset(
 		data.themeAssets,
 		'premiumButtonBackground',
@@ -759,11 +761,14 @@
 
 	<div class="theme-classic__shell">
 		<aside class="theme-classic__left">
-			<a href={homeHref} class="theme-classic__logo" aria-label={PUBLIC_TITLE}>
+			<a
+				href={homeHref}
+				class="theme-classic__logo"
+				aria-label={data.serverName}>
 				{#if logo}
-					<img src={logo} alt={PUBLIC_TITLE} />
+					<img src={logo} alt={data.serverName} />
 				{:else}
-					<span>{PUBLIC_TITLE}</span>
+					<span>{data.serverName}</span>
 				{/if}
 			</a>
 			{#if menuOrnament}
@@ -935,7 +940,7 @@
 								{/if}
 								<span class="theme-classic__ticker-date">{item.date}</span>
 								<!-- prettier-ignore -->
-								<span class="theme-classic__ticker-copy">{#each item.copySegments as segment}{#if segment.href}<a class="theme-classic__ticker-link" href={themePreviewHref($page.url, segment.href)}>{segment.text}</a>{:else}{segment.text}{/if}{/each}</span>
+								<span class="theme-classic__ticker-copy">{#each item.copySegments as segment}{#if segment.href}<a class="theme-classic__ticker-link" href={themePreviewHref($page.url, segment.href)}>{serverText(segment.text, identity)}</a>{:else}{serverText(segment.text, identity)}{/if}{/each}</span>
 								<span class="theme-classic__ticker-control" aria-hidden="true"
 								></span>
 							</label>
@@ -1050,7 +1055,7 @@
 				<a
 					class="theme-classic__official-box theme-classic__official-box--premium"
 					style={premiumButtonStyle}
-					aria-label={`${premiumOfferText} ${premiumButtonText}`}
+					aria-label={`${serverText(premiumOfferText, identity)} ${serverText(premiumButtonText, identity)}`}
 					href={shopHref}>
 					<img src={promoPremiumBox} alt="Webshop" />
 					{#if premiumCrown}
@@ -1073,7 +1078,7 @@
 							aria-hidden="true" />
 					{/if}
 					<strong class="theme-classic__premium-offer">
-						{premiumOfferText}
+						{serverText(premiumOfferText, identity)}
 					</strong>
 					<span class="theme-classic__premium-button">
 						{#if premiumButtonLabel}
@@ -1084,7 +1089,7 @@
 								aria-hidden="true" />
 						{/if}
 						<span class:sr-only={!!premiumButtonLabel}
-							>{premiumButtonText}</span>
+							>{serverText(premiumButtonText, identity)}</span>
 						{#if premiumButtonDecor}<img
 								class="theme-classic__premium-button-decor"
 								src={premiumButtonDecor}
@@ -1137,7 +1142,7 @@
 						'trailer',
 						'https://www.youtube.com/watch?v=OpAaLT_PTCU',
 					)}
-					aria-label="Play Tibia trailer">
+					aria-label={`Play ${data.serverName} trailer`}>
 					<img src={promoTrailerBox} alt="Trailer" />
 					{#if trailerPreview}
 						<img
@@ -1180,9 +1185,10 @@
 					<img src={promoPollBox} alt="Current Poll" />
 					<strong class="theme-classic__poll-question">
 						<span
-							>{#if classicReference?.pollText ?? presentation?.pollText}{classicReference?.pollText ??
-									presentation?.pollText}{:else}Guess the Date of<br />the
-								Update!{/if}</span>
+							>{#if classicReference?.pollText ?? presentation?.pollText}{serverText(
+									classicReference?.pollText ?? presentation?.pollText,
+									identity,
+								)}{:else}Guess the Date of<br />the Update!{/if}</span>
 					</strong>
 					<a
 						class="theme-classic__poll-button"
@@ -1215,7 +1221,7 @@
 			{/if}
 		</aside>
 	</div>
-	<MediaDialog {trailerFrame} {trailerClose} />
+	<MediaDialog serverName={data.serverName} {trailerFrame} {trailerClose} />
 </div>
 
 <style>
@@ -1352,8 +1358,11 @@
 		border: 0;
 		background: transparent;
 		color: rgb(252 231 177);
-		font-size: 22px;
-		font-weight: 800;
+		font-family: ClassicHeadline, Georgia, serif;
+		font-size: 30px;
+		font-weight: 400;
+		overflow-wrap: anywhere;
+		text-shadow: 2px 2px 0 #000;
 		text-align: center;
 		text-decoration: none;
 	}

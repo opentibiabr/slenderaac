@@ -6,6 +6,7 @@
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { informationDestination } from '$lib/information';
 	import { informationAttributes } from '$lib/information-content';
+	import { serverText, serverTextAttributes } from '$lib/site-identity';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -14,11 +15,12 @@
 	import Tooltip from './Tooltip.svelte';
 
 	export let nodes: InformationNode[];
+	$: identity = { name: $page.data.serverName, website: $page.url.origin };
 	function element(value: unknown) {
 		return value as Exclude<InformationNode, string>;
 	}
 	function attributes(attrs: Record<string, string>) {
-		const safe = informationAttributes(attrs);
+		const safe = serverTextAttributes(informationAttributes(attrs), identity);
 		if (safe.href)
 			safe.href = themePreviewHref(
 				$page.url,
@@ -28,7 +30,7 @@
 	}
 </script>
 
-<!-- prettier-ignore -->{#each nodes as node}{#if typeof node === 'string'}{node}{:else if element(node).tag === 'table-frame'}<div class="information-table" class:ShallowTable={element(node).attrs.class === 'ShallowTable'}><TableFrame assets={$page.data.themeAssets}><svelte:fragment slot="caption">{element(node).attrs.title}</svelte:fragment><div class="information-table__stack"><svelte:self nodes={element(node).children} /></div></TableFrame></div>{:else if element(node).tag === 'table-surface'}<TableSurface assets={$page.data.themeAssets} width="100%"><svelte:self nodes={element(node).children} /></TableSurface>{:else if element(node).tag === 'tooltip'}<Tooltip attrs={attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></Tooltip>{:else if element(node).tag === 'action'}<ActionLink attrs={attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></ActionLink>{:else if element(node).tag === 'img'}<img {...attributes(element(node).attrs)} alt={element(node).attrs.alt ?? ''} />{:else if element(node).tag === 'br'}<br {...attributes(element(node).attrs)} />{:else}<svelte:element this={element(node).tag} {...attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></svelte:element>{/if}{/each}
+<!-- prettier-ignore -->{#each nodes as node}{#if typeof node === 'string'}{serverText(node, identity)}{:else if element(node).tag === 'table-frame'}<div class="information-table" class:ShallowTable={element(node).attrs.class === 'ShallowTable'}><TableFrame assets={$page.data.themeAssets}><svelte:fragment slot="caption">{serverText(element(node).attrs.title, identity)}</svelte:fragment><div class="information-table__stack"><svelte:self nodes={element(node).children} /></div></TableFrame></div>{:else if element(node).tag === 'table-surface'}<TableSurface assets={$page.data.themeAssets} width="100%"><svelte:self nodes={element(node).children} /></TableSurface>{:else if element(node).tag === 'tooltip'}<Tooltip attrs={attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></Tooltip>{:else if element(node).tag === 'action'}<ActionLink attrs={attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></ActionLink>{:else if element(node).tag === 'img'}<img {...attributes(element(node).attrs)} alt={serverText(element(node).attrs.alt ?? '', identity)} />{:else if element(node).tag === 'br'}<br {...attributes(element(node).attrs)} />{:else}<svelte:element this={element(node).tag} {...attributes(element(node).attrs)}><svelte:self nodes={element(node).children} /></svelte:element>{/if}{/each}
 
 <style>
 	:global(.theme-classic)
