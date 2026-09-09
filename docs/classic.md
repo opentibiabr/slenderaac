@@ -282,6 +282,14 @@ copies. Test opening the menu and switching both ways as part of geometry checks
 Keep data preloading disabled on switcher links: preview loads save the session
 choice, so hovering an unselected option must not change the active preference.
 
+Share selection behavior while adapting the control's appearance to the active
+theme. Classic uses the existing 135x25 blue button assets and the common
+`.classic-native-button` rules, with paper texture in its options. Legbone uses
+the normal rounded primary button and theme color tokens. Keep the Classic
+highlight image layered over the base button: the highlight's transparent edge
+does not contain the gold frame. On mobile, increase the touch target without
+stretching the 135x25 image or changing the shared header row height.
+
 Classic reserves vertical scrollbar space at the document root with
 `html:has(.theme-classic) { scrollbar-gutter: stable; }`. This is a shared runtime
 guard: short pages, long pages and future routes using the shell retain the same

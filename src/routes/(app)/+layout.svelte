@@ -85,7 +85,7 @@
 <div id="top" aria-hidden="true"></div>
 
 {#if data.themeSwitcherEnabled}
-	<ThemeSwitcher {selectedTheme} />
+	<ThemeSwitcher {selectedTheme} themeAssets={data.themeAssets} />
 {/if}
 
 {#if browser}

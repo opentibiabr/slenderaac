@@ -65,7 +65,8 @@
 	) {
 	height: 21px;
 }
-.theme-classic .classic-native-content .btn:not(.btn-icon) {
+.theme-classic .classic-native-content .btn:not(.btn-icon),
+.classic-native-button {
 	display: inline-flex;
 	box-sizing: border-box;
 	align-items: center;
@@ -96,8 +97,11 @@
 	cursor: pointer;
 	box-shadow: none;
 }
-.theme-classic .classic-native-content .btn:not(.btn-icon):hover {
-	background-image: var(--classic-native-button-hover);
+.theme-classic .classic-native-content .btn:not(.btn-icon):hover,
+.classic-native-button:hover {
+	/* The highlight sprite is transparent around the frame. Keep its base layer. */
+	background-image:
+		var(--classic-native-button-hover), var(--classic-native-button);
 }
 .theme-classic .classic-native-content .btn[disabled],
 .theme-classic .classic-native-content .btn[aria-disabled='true'] {
