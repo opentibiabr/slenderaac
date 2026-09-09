@@ -2,8 +2,11 @@
 	import { formatDuration } from 'date-fns';
 	import { _ } from 'svelte-i18n';
 
+	import { page } from '$app/stores';
+
 	import type { AccountInfo } from '$lib/accounts';
 	import Button from '$lib/components/ui/Button.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
 	import { PUBLIC_TITLE } from '$env/static/public';
@@ -11,7 +14,7 @@
 	export let account: AccountInfo;
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="cip-account-section flex flex-col gap-2">
 	<h3 class="h3">{$_('general-information')}</h3>
 
 	<div class="data-table">
@@ -28,7 +31,9 @@
 						{$_('account.change-pending', {
 							values: { email: account.newEmail },
 						})}
-						<form action="/account/resend" method="post">
+						<form
+							action={themePreviewHref($page.url, `/account/resend`)}
+							method="post">
 							<button class="anchor" type="submit"
 								>{$_('account.resend')}</button>
 						</form>
@@ -61,8 +66,11 @@
 			<dt>{$_('game-coins-trasferable', { values: { PUBLIC_TITLE } })}</dt>
 			<dd class="flex flex-row items-center gap-2">
 				{account.coinsTransferable}
-				<Button href="/shop/coins" size="sm" color="success" class="py-0.5 px-2"
-					>{$_('get-coins')}</Button>
+				<Button
+					href={themePreviewHref($page.url, `/shop/coins`)}
+					size="sm"
+					color="success"
+					class="py-0.5 px-2">{$_('get-coins')}</Button>
 			</dd>
 		</div>
 	</div>

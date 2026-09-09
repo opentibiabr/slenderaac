@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -9,7 +11,7 @@
 	export let form: ActionData;
 
 	async function close() {
-		await goto('/account', { noScroll: true });
+		await goto(themePreviewHref($page.url, '/account'), { noScroll: true });
 	}
 	import { _ } from 'svelte-i18n';
 
@@ -23,7 +25,8 @@
 		<p>{$_('disable-2fa.success')}</p>
 		<p />
 		<div class="flex flex-col items-center gap-4">
-			<Button href="/account" color="secondary">{$_('close')}</Button>
+			<Button href={themePreviewHref($page.url, `/account`)} color="secondary"
+				>{$_('close')}</Button>
 		</div>
 	{:else}
 		<Disable2FaForm errors={form?.errors} />

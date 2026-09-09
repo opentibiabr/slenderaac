@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 	import Enable2FAForm from '../../../../../lib/components/ui/forms/Enable2FAForm.svelte';
@@ -10,7 +12,7 @@
 	export let form: ActionData;
 
 	async function close() {
-		await goto('/account', { noScroll: true });
+		await goto(themePreviewHref($page.url, '/account'), { noScroll: true });
 	}
 	import { _ } from 'svelte-i18n';
 
@@ -37,7 +39,8 @@
 					{/each}
 				</code>
 			{/if}
-			<Button href="/account" color="secondary">{$_('close')}</Button>
+			<Button href={themePreviewHref($page.url, `/account`)} color="secondary"
+				>{$_('close')}</Button>
 		</div>
 	{:else if data.qrCodeURL}
 		<Enable2FAForm
