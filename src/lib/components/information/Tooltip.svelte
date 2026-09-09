@@ -34,8 +34,8 @@
 	$: sections =
 		calendarSections ??
 		calendarTooltipSections(attrs['tooltip-text'] ?? '', title);
-	function backgroundImage(src: string | undefined) {
-		return src ? `url("${src}")` : 'none';
+	function backgroundImage(src: unknown) {
+		return typeof src === 'string' && src ? `url("${src}")` : 'none';
 	}
 	function hide() {
 		open = false;
