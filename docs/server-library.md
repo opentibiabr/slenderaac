@@ -100,6 +100,21 @@ Unmatched artwork remains optional; missing images never hide an entry or its
 detail link. The pack's captured page content does not define the creature or
 boss catalogs.
 
+The pack's optional `render-server-art.py` helper fills missing portraits from
+the running local app after `OUTFIT_ASSETS_ROOT` is configured. It uses native
+outfit colors, addons and mount animation; creatures with item appearances use
+numbered GIFs from a matching local item pack. It requires Pillow and accepts
+`--server-data`, `--renderer-url` and `--item-assets-root`. The renderer origin
+must be local. The helper validates every animation before activating the
+manifest and keeps only the resulting 64px images and hashes in the theme pack.
+
+Repeat the helper after changing server appearances to refresh generated
+portraits, then package the result with `--package-only`. Existing mapped art is
+preserved unless `--all` is supplied. The normal reference updater preserves
+generated portraits. Missing or invalid native sprites abort the refresh without
+changing the active manifest. See the helper README shipped in the external ZIP
+for installation and refresh commands.
+
 Classic list panels, detail panels, catalog headings and radio filters share
 components. The list uses 21px table rows, while the filter uses native radio
 controls with a 19px cadence and container-based reflow. Additional server
