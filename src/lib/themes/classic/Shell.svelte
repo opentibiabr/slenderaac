@@ -800,7 +800,7 @@
 							channels: formattedYoutubeChannels,
 							viewers: formattedYoutubeViewers,
 						},
-					].filter((channel) => !!channel.href)}
+					]}
 					signal={topIconSignal}
 					eye={topIconEye}
 					downloadIcon={topIconDownload}

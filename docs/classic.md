@@ -238,7 +238,16 @@ and the active comparison flags.
 
 Set `PUBLIC_TWITCH_URL`, `PUBLIC_YOUTUBE_URL`, `PUBLIC_FACEBOOK_URL` and
 `PUBLIC_TRAILER_URL` in the global environment configuration to show the server's
-channels and trailer. Empty or invalid values hide those optional links and boxes.
+channels and trailer. The information bar always retains its two channel slots:
+empty or invalid URLs render the icons and available counters as text, with a
+channel-not-configured tooltip. Only configured destinations become links. Never
+filter these slots out or restore captured channel URLs as defaults. Empty values
+still hide the optional Networks and trailer boxes.
+Run `src/lib/themes/classic/info-bar.integration.test.ts` against an already
+running local app by setting `CLASSIC_TEST_ORIGIN` and using `bun test`.
+Give the test process the same channel URL settings as the app. Cover both blank
+and configured destinations; this checks the slots on News, Characters, Houses
+and Quickstart without starting or building the app.
 Only HTTP(S) websites without embedded credentials are accepted. Refreshing a
 presentation pack cannot replace these configured destinations. Table frames and
 the foreground shell keep their geometry when optional boxes are absent.
