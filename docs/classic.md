@@ -304,11 +304,13 @@ separate from the query-driven Screenshots gallery and its previous/next control
 
 ### Viewport and scrollbar invariant
 
-The shared layout switcher sits outside the desktop shell and does not add flow
-height or alter background/column offsets. Its mobile treatment provides a
-separate row above the theme header so it does not cover navigation controls.
+The shared layout switcher stays fixed to the desktop viewport, outside the shell,
+and does not add flow height or alter background/column offsets. Its mobile
+treatment provides a sticky row above the theme header so it remains available
+while scrolling without covering the initial navigation controls.
 Keep one shared switcher for all present and future themes; do not add per-theme
-copies. Test opening the menu and switching both ways as part of geometry checks.
+copies. Test opening the menu and switching both ways after scrolling, at desktop
+and mobile widths, as part of geometry checks. Preserve the mobile row height.
 Keep data preloading disabled on switcher links: preview loads save the session
 choice, so hovering an unselected option must not change the active preference.
 

@@ -82,7 +82,7 @@
 		display: contents;
 	}
 	.layout-switcher {
-		position: absolute;
+		position: fixed;
 		top: 8px;
 		right: 12px;
 		z-index: 40;
@@ -188,6 +188,9 @@
 		/* Give touch controls their own row above either theme's mobile header. */
 		.layout-switcher-row {
 			display: flow-root;
+			position: sticky;
+			top: 0;
+			z-index: 40;
 			background: rgb(var(--color-tertiary-900));
 		}
 		.layout-switcher-row--classic {
