@@ -224,6 +224,15 @@ source scripts, handlers and arbitrary inline CSS are not executed. Title/date
 edits preserve the presentation and same-day ordering. Editing the body replaces
 the imported presentation with the normal Markdoc renderer.
 
+Imported Markdown must contain complete words independently of theme artwork.
+The external content importer converts decorative initial-letter sprites to text
+in Markdown while retaining those images in the Classic presentation tree. Do
+not compensate for split initials by changing shared image margins or making all
+article illustrations inline. The pack's `--repair-initials` import option repairs
+existing imported Markdown without replacing editorial text, other images, authors,
+publication dates or Classic presentation. Check the same article in both layouts after
+changing content conversion.
+
 The pack's presentation data supplies current promo assets/text and calendar
 colors. The application owns its built-in menu, shared actions, footer destinations and
 boosted-library links are owned by the application. A screenshot selection may
