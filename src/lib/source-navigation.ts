@@ -29,6 +29,7 @@ export const unavailableFeatures: Record<string, string> = {
 	communityboards: 'Community Boards',
 	supportboards: 'Support Boards',
 	guildboards: 'Guild Boards',
+	cmpostarchive: 'CM Post Archive',
 	fankit: 'Fankit',
 	currentcharactertrades: 'Current Auctions',
 	pastcharactertrades: 'Auction History',
@@ -115,5 +116,10 @@ export function referenceSiteDestination(
 		return unavailableHref(url.searchParams.get('page') ?? subtopic);
 	if (section === 'forum' && url.searchParams.get('announcementid') === '87')
 		return unavailableHref('fankit');
+	if (
+		section === 'forum' &&
+		url.searchParams.get('action') === 'cm_post_archive'
+	)
+		return unavailableHref('cmpostarchive');
 	return unavailableHref(subtopic || section);
 }

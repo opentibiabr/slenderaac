@@ -224,12 +224,24 @@ source scripts, handlers and arbitrary inline CSS are not executed. Title/date
 edits preserve the presentation and same-day ordering. Editing the body replaces
 the imported presentation with the normal Markdoc renderer.
 
-The pack's presentation data supplies current promo assets/text, menu destinations,
-sidebar links and calendar colors. The footer identifies SlenderAAC and OpenTibiaBR.
+The pack's presentation data supplies current promo assets/text and calendar
+colors. The application owns its built-in menu, shared actions, footer destinations and
+boosted-library links are owned by the application. A screenshot selection may
+choose an image index, but never changes its local destination. The footer
+identifies SlenderAAC and OpenTibiaBR. Updating or removing a presentation pack
+cannot replace menu destinations or remove built-in sections. Visible custom pages
+are appended to the Library; the rules page keeps its Support entry.
 Routes with local equivalents remain
 local; public modules without an equivalent use the local unavailable page.
 When layout switching is enabled, internal preview links preserve `themePreview`
 and the active comparison flags.
+
+Set `PUBLIC_TWITCH_URL`, `PUBLIC_YOUTUBE_URL`, `PUBLIC_FACEBOOK_URL` and
+`PUBLIC_TRAILER_URL` in the global environment configuration to show the server's
+channels and trailer. Empty or invalid values hide those optional links and boxes.
+Only HTTP(S) websites without embedded credentials are accepted. Refreshing a
+presentation pack cannot replace these configured destinations. Table frames and
+the foreground shell keep their geometry when optional boxes are absent.
 Keep that state across server redirects and submitted forms as well as anchors.
 Account authentication redirects retain the preview on the login URL and local
 return destination. Highscore filters and pagination retain skill, vocation,

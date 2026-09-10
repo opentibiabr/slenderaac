@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import type { ClassicPresentation } from '$lib/themes/classic/reference-types';
+import { screenshotPageHref } from '$lib/site-links';
 
 import { env } from '$env/dynamic/private';
 
@@ -47,7 +48,11 @@ export async function loadPresentationReference(
 			)
 		)
 			return null;
-		return value;
+		return {
+			...value,
+			links: { screenshot: screenshotPageHref(value.links.screenshot) },
+			navigation: {},
+		};
 	} catch {
 		return null;
 	}

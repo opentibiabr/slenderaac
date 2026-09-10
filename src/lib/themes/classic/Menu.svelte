@@ -15,9 +15,8 @@
 
 	import { page } from '$app/stores';
 
-	import { informationPages, informationPath } from '$lib/information';
 	import { serverText } from '$lib/site-identity';
-	import { featureMenuHref, featurePages } from '$lib/site-pages';
+	import { siteNavigation } from '$lib/site-navigation';
 	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -35,38 +34,20 @@
 	export let assets: Record<string, string | undefined> | null | undefined = {};
 	export let showAccountActions = true;
 
-	$: presentation = (
-		$page.data as {
-			classicPresentation?:
-				| import('./reference-types').ClassicPresentation
-				| null;
-		}
-	).classicPresentation;
 	$: menuIdPrefix = showAccountActions
 		? 'classic-menu-drawer'
 		: 'classic-menu-main';
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };
 	$: aboutLabel = `About ${$page.data.serverName}`;
-	$: aboutLinks = (
-		presentation?.navigation.about ??
-		informationPages
-			.filter((entry) => entry.section === 'about')
-			.map((entry) => ({ label: entry.title, href: informationPath(entry) }))
-	).map((entry) => {
-		const pathname = new URL(withThemePreview($page.url, entry.href), $page.url)
-			.pathname;
-		if (pathname === '/about/company')
-			return { label: 'About OpenTibiaBR', href: '/about/company' };
-		if (['/about/server', '/about/what-is-tibia'].includes(pathname))
-			return { label: aboutLabel, href: '/about/server' };
-		return entry;
-	});
-	$: guideLinks =
-		presentation?.navigation.guides ??
-		informationPages
-			.filter((entry) => entry.section === 'guides')
-			.map((entry) => ({ label: entry.title, href: informationPath(entry) }));
+	$: navigation = siteNavigation(
+		typeof $page.data.serverName === 'string'
+			? $page.data.serverName
+			: 'Server',
+		PUBLIC_DOWNLOAD_URL,
+	);
+	$: aboutLinks = navigation.about;
+	$: guideLinks = navigation.guides;
 	function isActive(href: string, current = $page.url) {
 		const target = new URL(withThemePreview(current, href), current);
 		const pathname = current.pathname.replace(/\/$/, '') || '/';
@@ -84,29 +65,13 @@
 	$: latestNewsHref = withThemePreview($page.url, '/');
 	$: newsArchiveHref = withThemePreview($page.url, '/news/archive');
 	$: eventScheduleHref = withThemePreview($page.url, '/news/event-schedule');
-	$: communityLinks = (
-		presentation?.navigation.community ?? [
-			{ label: 'Characters', href: '/characters' },
-			...Object.values(featurePages)
-				.filter((entry) => entry.section === 'community')
-				.map((entry) => ({ label: entry.title, href: entry.path })),
-			{ label: 'Who Is Online?', href: '/online' },
-			{ label: 'Highscores', href: '/highscores' },
-			{ label: 'Guilds', href: '/guilds' },
-		]
-	).map((entry) => ({
-		...entry,
-		href: featureMenuHref('community', entry.label, entry.href),
-	}));
+	$: communityLinks = navigation.community;
 	$: communityActive = communityLinks.some((entry) =>
 		isActive(entry.href, $page.url),
 	);
 	$: accountPageHref = withThemePreview($page.url, '/account');
 	$: accountLoginHref = withThemePreview($page.url, '/account/login');
 	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
-	$: accountLostHref = withThemePreview($page.url, '/account/lost');
-	$: rulesPage = staticPages.find((entry) => entry.slug === 'rules');
-	$: accountHref = isLoggedIn ? accountPageHref : accountLoginHref;
 	$: isLatestNewsActive = currentPath === '/';
 	$: isNewsArchiveActive = currentPath === '/news/archive';
 	$: isEventScheduleActive = currentPath === '/news/event-schedule';
@@ -327,7 +292,9 @@
 			class="theme-classic-menu__toggle-input"
 			type="checkbox"
 			id={`${menuIdPrefix}-library-toggle`}
-			checked={currentPath.startsWith('/library/')} />
+			checked={navigation.library.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
 		<div class="theme-classic-menu__category">
 			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.library}
@@ -347,40 +314,18 @@
 				aria-label="Toggle Library"></label>
 		</div>
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-library`}>
-			{#if presentation?.navigation.library}
-				{#each presentation.navigation.library as link}
-					<a
-						class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-						href={withThemePreview($page.url, link.href)}
-						>{serverText(link.label, identity)}</a>
-				{/each}
-			{:else}
+			{#each navigation.library as link}
 				<a
-					class:theme-classic-menu__submenu-link--active={isActive(
-						'/library/creatures',
-					)}
-					href={withThemePreview($page.url, '/library/creatures')}>Creatures</a>
-				<a
-					class:theme-classic-menu__submenu-link--active={isActive(
-						'/library/boostable-bosses',
-					)}
-					href={withThemePreview($page.url, '/library/boostable-bosses')}
-					>Boostable Bosses</a>
-				{#each Object.values(featurePages).filter((entry) => entry.section === 'library') as entry}
-					<a
-						class:theme-classic-menu__submenu-link--active={isActive(
-							entry.path,
-						)}
-						href={withThemePreview($page.url, entry.path)}>{entry.title}</a>
-				{/each}
-				{#each staticPages as entry}
-					<a
-						href={withThemePreview(
-							$page.url,
-							`/pages/${encodeURIComponent(entry.slug)}`,
-						)}>{entry.title}</a>
-				{/each}
-			{/if}
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+			{#each staticPages.filter((entry) => entry.slug !== 'rules') as entry}<a
+					href={withThemePreview(
+						$page.url,
+						`/pages/${encodeURIComponent(entry.slug)}`,
+					)}>{entry.title}</a
+				>{/each}
 		</div>
 	</section>
 
@@ -425,7 +370,10 @@
 		<input
 			class="theme-classic-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-forum-toggle`} />
+			id={`${menuIdPrefix}-forum-toggle`}
+			checked={navigation.forum.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
 		<div class="theme-classic-menu__category">
 			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.forum}
@@ -445,21 +393,12 @@
 				aria-label="Toggle Forum"></label>
 		</div>
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-forum`}>
-			{#if presentation?.navigation.forum}
-				{#each presentation.navigation.forum as link}
-					<a href={withThemePreview($page.url, link.href)}
-						>{serverText(link.label, identity)}</a>
-				{/each}
-			{:else}
+			{#each navigation.forum as link}
 				<a
-					href={withThemePreview($page.url, '/unavailable?feature=guildboards')}
-					>Guild Boards</a>
-				<a
-					href={withThemePreview(
-						$page.url,
-						'/unavailable?feature=communityboards',
-					)}>Community Boards</a>
-			{/if}
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
 		</div>
 	</section>
 
@@ -467,7 +406,10 @@
 		<input
 			class="theme-classic-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-account-toggle`} />
+			id={`${menuIdPrefix}-account-toggle`}
+			checked={navigation.account.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
 		<div class="theme-classic-menu__category">
 			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.account}
@@ -487,18 +429,12 @@
 				aria-label="Toggle Account"></label>
 		</div>
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-account`}>
-			{#if presentation?.navigation.account}
-				{#each presentation.navigation.account as link}
-					<a href={withThemePreview($page.url, link.href)}
-						>{serverText(link.label, identity)}</a>
-				{/each}
-			{:else}
-				<a href={accountHref}>{isLoggedIn ? $_('my-account') : $_('login')}</a>
-				{#if !isLoggedIn}
-					<a href={accountSignupHref}>{$_('create-account')}</a>
-				{/if}
-				<a href={accountLostHref}>Lost Account?</a>
-			{/if}
+			{#each navigation.account as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
 		</div>
 	</section>
 
@@ -506,7 +442,10 @@
 		<input
 			class="theme-classic-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-character-trade-toggle`} />
+			id={`${menuIdPrefix}-character-trade-toggle`}
+			checked={navigation.characterTrade.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
 		<div class="theme-classic-menu__category">
 			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.characterTrade}
@@ -528,23 +467,12 @@
 		<div
 			class="theme-classic-menu__submenu"
 			id={`${menuIdPrefix}-character-trade`}>
-			{#if presentation?.navigation.characterTrade}
-				{#each presentation.navigation.characterTrade as link}
-					<a href={withThemePreview($page.url, link.href)}
-						>{serverText(link.label, identity)}</a>
-				{/each}
-			{:else}
+			{#each navigation.characterTrade as link}
 				<a
-					href={withThemePreview(
-						$page.url,
-						'/unavailable?feature=currentcharactertrades',
-					)}>Current Auctions</a>
-				<a
-					href={withThemePreview(
-						$page.url,
-						'/unavailable?feature=pastcharactertrades',
-					)}>Auction History</a>
-			{/if}
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
 		</div>
 	</section>
 
@@ -552,7 +480,10 @@
 		<input
 			class="theme-classic-menu__toggle-input"
 			type="checkbox"
-			id={`${menuIdPrefix}-support-toggle`} />
+			id={`${menuIdPrefix}-support-toggle`}
+			checked={navigation.support.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
 		<div class="theme-classic-menu__category">
 			<span class="theme-classic-menu__category-link">
 				{#if menuIcons.support}
@@ -572,21 +503,12 @@
 				aria-label="Toggle Support"></label>
 		</div>
 		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-support`}>
-			{#if presentation?.navigation.support}
-				{#each presentation.navigation.support as link}
-					<a href={withThemePreview($page.url, link.href)}
-						>{serverText(link.label, identity)}</a>
-				{/each}
-			{:else}
-				<a href={accountLostHref}>Lost Account?</a>
-				{#if rulesPage}
-					<a href={withThemePreview($page.url, '/pages/rules')}
-						>{rulesPage.title}</a>
-				{:else}
-					<a href={withThemePreview($page.url, '/unavailable?feature=gethelp')}
-						>Get Help</a>
-				{/if}
-			{/if}
+			{#each navigation.support as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
 		</div>
 	</section>
 </nav>

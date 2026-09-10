@@ -3,7 +3,7 @@ import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
 import { PlayerGroup } from '$lib/players';
-import { themeSwitcherEnabled } from '$lib/server/config';
+import { siteLinks, themeSwitcherEnabled } from '$lib/server/config';
 import { featuredFansite } from '$lib/server/directories';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { currentPoll } from '$lib/server/polls';
@@ -76,6 +76,7 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 			: { assets: {}, version: null, warning: null };
 
 	return {
+		siteLinks,
 		featuredFansite: await featuredFansite(),
 		currentPoll: await currentPoll(),
 		serverName: await serverName(),

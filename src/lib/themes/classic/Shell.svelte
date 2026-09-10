@@ -1,12 +1,8 @@
 <script lang="ts">
 	import './native.css';
 
-	import { faDiscord } from '@fortawesome/free-brands-svg-icons';
-	import {
-		faBars,
-		faBookBookmark,
-		faToolbox,
-	} from '@fortawesome/free-solid-svg-icons';
+	import { faFacebookF, faYoutube } from '@fortawesome/free-brands-svg-icons';
+	import { faBars, faToolbox } from '@fortawesome/free-solid-svg-icons';
 	import { Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
@@ -23,6 +19,7 @@
 		pollOnlineStatus,
 	} from '$lib/online-status';
 	import { serverText } from '$lib/site-identity';
+	import { screenshotPageHref } from '$lib/site-links';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -117,9 +114,6 @@
 	$: identity = { name: data.serverName, website: $page.url.origin };
 	$: fansitesHref = themePreviewHref($page.url, '/community/fansites');
 
-	function presentationHref(key: string, fallback: string): string {
-		return themePreviewHref($page.url, presentation?.links[key] ?? fallback);
-	}
 	$: tickerPageArticles = getTickerArticles($page.data.tickers);
 	$: tickerItems = (
 		classicReference
@@ -793,32 +787,26 @@
 				<InfoBar
 					channels={[
 						{
-							href: presentationHref(
-								'twitch',
-								'https://www.twitch.tv/directory/game/Tibia',
-							),
+							href: data.siteLinks.twitch ?? '',
 							label: 'Twitch',
 							icon: topIconTwitch,
 							channels: formattedTwitchChannels,
 							viewers: formattedTwitchViewers,
 						},
 						{
-							href: presentationHref(
-								'youtube',
-								'https://www.youtube.com/channel/UCg5vFOB3tN8KGcJDyk6QQzQ/home',
-							),
+							href: data.siteLinks.youtube ?? '',
 							label: 'YouTube',
 							icon: topIconYoutube,
 							channels: formattedYoutubeChannels,
 							viewers: formattedYoutubeViewers,
 						},
-					]}
+					].filter((channel) => !!channel.href)}
 					signal={topIconSignal}
 					eye={topIconEye}
 					downloadIcon={topIconDownload}
-					downloadHref={presentationHref(
-						'fankit',
-						'https://www.tibia.com/forum/?action=announcement&announcementid=87&boardid=89516',
+					downloadHref={themePreviewHref(
+						$page.url,
+						'/unavailable?feature=fankit',
 					)}
 					onlineIcon={topIconOnline}
 					{onlineHref}
@@ -935,10 +923,11 @@
 					<a href={themePreviewHref($page.url, '/about/company')}
 						>About OpenTibiaBR</a>
 					|
-					<a href={presentationHref('agreement', '/pages/rules')}
+					<a
+						href={themePreviewHref($page.url, '/unavailable?feature=agreement')}
 						>Service Agreement</a>
 					|
-					<a href={presentationHref('privacy', '/pages/privacy')}
+					<a href={themePreviewHref($page.url, '/unavailable?feature=privacy')}
 						>Privacy Policy</a>
 				</div>
 			</footer>
@@ -955,10 +944,7 @@
 				{/if}
 				<a
 					class="theme-classic__right-boost theme-classic__right-boost--creature"
-					href={presentationHref(
-						'creature',
-						'https://www.tibia.com/library/?subtopic=creatures',
-					)}
+					href={themePreviewHref($page.url, '/library/creatures')}
 					aria-label="Today's boosted creature">
 					{#if rightCreature}
 						<img src={rightCreature} alt="" aria-hidden="true" />
@@ -966,10 +952,7 @@
 				</a>
 				<a
 					class="theme-classic__right-boost theme-classic__right-boost--boss"
-					href={presentationHref(
-						'boss',
-						'https://www.tibia.com/library/?subtopic=boostablebosses',
-					)}
+					href={themePreviewHref($page.url, '/library/boostable-bosses')}
 					aria-label="Today's boosted boss">
 					{#if rightBoss}
 						<img src={rightBoss} alt="" aria-hidden="true" />
@@ -1025,49 +1008,40 @@
 				</a>
 			{/if}
 
-			{#if promoNetworksBox}
+			{#if promoNetworksBox && (data.siteLinks.facebook || data.siteLinks.youtube)}
 				<div
 					class="theme-classic__official-box theme-classic__official-box--network">
 					<img src={promoNetworksBox} alt="Networks" />
 					<div class="theme-classic__network-links">
-						<a
-							href={presentationHref(
-								'facebook',
-								'https://www.facebook.com/tibia',
-							)}
-							target="_blank"
-							rel="noreferrer">
-							{#if networkFacebook}
-								<img src={networkFacebook} alt="Facebook" />
-							{:else}
-								<Fa icon={faDiscord} />
-							{/if}
-						</a>
-						<a
-							href={presentationHref(
-								'networkYoutube',
-								'https://www.youtube.com/',
-							)}
-							target="_blank"
-							rel="noreferrer">
-							{#if networkYoutube}
-								<img src={networkYoutube} alt="YouTube" />
-							{:else}
-								<Fa icon={faBookBookmark} />
-							{/if}
-						</a>
+						{#if data.siteLinks.facebook}<a
+								href={data.siteLinks.facebook}
+								target="_blank"
+								rel="noreferrer">
+								{#if networkFacebook}
+									<img src={networkFacebook} alt="Facebook" />
+								{:else}
+									<Fa icon={faFacebookF} />
+								{/if}
+							</a>{/if}
+						{#if data.siteLinks.youtube}<a
+								href={data.siteLinks.youtube}
+								target="_blank"
+								rel="noreferrer">
+								{#if networkYoutube}
+									<img src={networkYoutube} alt="YouTube" />
+								{:else}
+									<Fa icon={faYoutube} />
+								{/if}
+							</a>{/if}
 					</div>
 				</div>
 			{/if}
 
-			{#if showAuxiliaryThemeboxes && promoTrailerBox}
+			{#if showAuxiliaryThemeboxes && promoTrailerBox && data.siteLinks.trailer}
 				<a
 					class="theme-classic__official-box theme-classic__official-box--trailer"
 					data-classic-media="video"
-					href={presentationHref(
-						'trailer',
-						'https://www.youtube.com/watch?v=OpAaLT_PTCU',
-					)}
+					href={data.siteLinks.trailer}
 					aria-label={`Play ${data.serverName} trailer`}>
 					<img src={promoTrailerBox} alt="Trailer" />
 					{#if trailerPreview}
@@ -1082,9 +1056,9 @@
 			{#if showAuxiliaryThemeboxes && promoScreenshotBox}
 				<a
 					class="theme-classic__official-box theme-classic__official-box--screenshot"
-					href={presentationHref(
-						'screenshot',
-						'https://www.tibia.com/abouttibia/?subtopic=screenshots',
+					href={themePreviewHref(
+						$page.url,
+						screenshotPageHref(presentation?.links.screenshot),
 					)}
 					aria-label="Screenshot of the day">
 					<img src={promoScreenshotBox} alt="Screenshots" />

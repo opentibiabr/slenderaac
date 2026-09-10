@@ -1,3 +1,5 @@
+import { websiteHref } from '$lib/site-links';
+
 export const directoryLanguages = {
 	ar: 'Arabic',
 	nl: 'Dutch',
@@ -58,19 +60,7 @@ export type DirectoryRecord = {
 };
 
 export function directoryUrl(value: string) {
-	try {
-		const url = new URL(value);
-		if (
-			!['https:', 'http:'].includes(url.protocol) ||
-			url.username ||
-			url.password ||
-			value.length > 2048
-		)
-			return null;
-		return url.href;
-	} catch {
-		return null;
-	}
+	return websiteHref(value);
 }
 
 export function directoryCountry(code: string) {
