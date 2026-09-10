@@ -6,5 +6,5 @@
 	export let form: ActionData;
 </script>
 
-<h1 class="h1">Create feedback form</h1>
-<CommunityFormEditor errors={form?.errors} values={form?.values} />
+<h1 class="h1">Create poll</h1>
+<CommunityFormEditor kind="poll" errors={form?.errors} values={form?.values} />

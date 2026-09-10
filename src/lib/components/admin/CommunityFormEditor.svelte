@@ -1,21 +1,36 @@
 <script lang="ts">
-	import type { FeedbackForm } from '@prisma/client';
-
 	import Button from '$lib/components/ui/Button.svelte';
 	import { enhance } from '$lib/enchance';
 	import { feedbackQuestions } from '$lib/feedback';
+	import { pollOptions } from '$lib/polls';
 
-	export let feedback: FeedbackForm | null = null;
+	type CommunityForm = {
+		title: string;
+		description: string;
+		starts_at: Date;
+		ends_at: Date | null;
+		published: boolean;
+		questions?: unknown;
+		options?: unknown;
+	};
+	export let feedback: CommunityForm | null = null;
+	export let kind: 'feedback' | 'poll' = 'feedback';
 	export let hasResponses = false;
 	export let errors: Record<string, string[]> | null = null;
 	export let values: Record<string, string> | null = null;
 	const date = (value: Date | null | undefined) =>
 		value?.toISOString().slice(0, 10) ?? '';
 	$: questions = feedback
-		? feedbackQuestions(feedback.questions)
+		? (kind === 'poll'
+				? pollOptions(feedback.options)
+				: feedbackQuestions(feedback.questions)
+			)
 				.map((q) => q.label)
 				.join('\n')
-		: 'What do you enjoy about the server?\nWhat would you like us to improve?';
+		: kind === 'poll'
+			? 'Yes\nNo'
+			: 'What do you enjoy about the server?\nWhat would you like us to improve?';
+	$: optionKey = kind === 'poll' ? 'options' : 'questions';
 </script>
 
 <form
@@ -29,31 +44,41 @@
 	<label class="label"
 		><span>Title</span><input
 			name="title"
+			readonly={kind === 'poll' && hasResponses}
 			class="input"
 			maxlength="255"
 			required
-			value={values?.title ?? feedback?.title ?? ''} /></label>
+			value={kind === 'poll' && hasResponses
+				? (feedback?.title ?? '')
+				: (values?.title ?? feedback?.title ?? '')} /></label>
 	<label class="label"
 		><span>Description</span><textarea
 			name="description"
+			readonly={kind === 'poll' && hasResponses}
 			class="textarea"
 			maxlength="16000"
 			rows="4"
-			value={values?.description ?? feedback?.description ?? ''}></textarea
+			value={kind === 'poll' && hasResponses
+				? (feedback?.description ?? '')
+				: (values?.description ?? feedback?.description ?? '')}></textarea
 		></label>
 	<label class="label"
-		><span>Questions</span><textarea
-			name="questions"
+		><span>{kind === 'poll' ? 'Options' : 'Questions'}</span><textarea
+			name={optionKey}
 			class="textarea"
 			rows="6"
 			maxlength="5120"
 			required
 			readonly={hasResponses}
-			value={hasResponses ? questions : (values?.questions ?? questions)}
+			value={hasResponses ? questions : (values?.[optionKey] ?? questions)}
 		></textarea
 		><small
-			>One question per line, up to 20. All questions are required.{#if hasResponses}
-				Questions are locked because this form has responses.{/if}</small
+			>{kind === 'poll'
+				? 'One option per line, between 2 and 20. Players choose one option.'
+				: 'One question per line, up to 20. All questions are required.'}{#if hasResponses}
+				{kind === 'poll'
+					? 'Options are locked because this poll has votes.'
+					: 'Questions are locked because this form has responses.'}{/if}</small
 		></label>
 	<label class="label"
 		><span>Opening date (00:00 UTC)</span><input
@@ -80,7 +105,8 @@
 				? values.published === 'on'
 				: (feedback?.published ?? false)} />Published</label>
 	<div class="flex gap-2">
-		<Button type="submit">Save form</Button><Button href="/admin/feedback"
+		<Button type="submit">{kind === 'poll' ? 'Save poll' : 'Save form'}</Button
+		><Button href={kind === 'poll' ? '/admin/polls' : '/admin/feedback'}
 			>Back</Button>
 	</div>
 </form>

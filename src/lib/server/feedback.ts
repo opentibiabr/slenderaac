@@ -1,18 +1,15 @@
 import { Prisma } from '@prisma/client';
-import { error, fail } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 
 import {
 	feedbackAnswers,
 	feedbackOpen,
 	feedbackQuestions,
 } from '$lib/feedback';
+import { communityFormFailure as feedbackFailure } from '$lib/server/community-forms';
 import { prisma } from '$lib/server/prisma';
 
-export const feedbackFailure = (
-	status: number,
-	errors: Record<string, string[]>,
-	values: Record<string, string> = {},
-) => fail(status, { errors, values });
+export { communityFormFailure as feedbackFailure } from '$lib/server/community-forms';
 
 export async function submitFeedback(
 	formId: string,

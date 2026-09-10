@@ -83,6 +83,7 @@
 				<li>
 					<a href="/admin/feedback"><Fa icon={faBookBookmark} />Feedback</a>
 				</li>
+				<li><a href="/admin/polls"><Fa icon={faBookBookmark} />Polls</a></li>
 				<li>
 					<a href="/admin/static-pages"
 						><Fa icon={faBookBookmark} />Static Pages</a>

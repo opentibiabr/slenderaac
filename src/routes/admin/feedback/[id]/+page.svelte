@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FeedbackFormEditor from '$lib/components/admin/FeedbackFormEditor.svelte';
+	import CommunityFormEditor from '$lib/components/admin/CommunityFormEditor.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 
 	import type { ActionData, PageData } from './$types';
@@ -17,7 +17,7 @@
 {#if form && 'saved' in form && form.saved}<p role="status">
 		Feedback form saved.
 	</p>{/if}
-<FeedbackFormEditor
+<CommunityFormEditor
 	feedback={data.feedback}
 	hasResponses={data.feedback._count.responses > 0}
 	values={form && 'values' in form ? form.values : null}

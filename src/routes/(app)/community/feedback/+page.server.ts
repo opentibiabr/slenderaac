@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 
 import { feedbackOpen, feedbackQuestions } from '$lib/feedback';
+import { communityLoginHref as loginHref } from '$lib/server/community-forms';
 import { submitFeedback } from '$lib/server/feedback';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
@@ -8,11 +9,6 @@ import { serverName } from '$lib/server/worlds';
 import { themePreviewHref } from '$lib/themes/preview';
 
 import type { Actions, PageServerLoad } from './$types';
-
-function loginHref(url: URL) {
-	const query = new URLSearchParams({ returnTo: url.pathname + url.search });
-	return themePreviewHref(url, `/account/login?${query.toString()}`);
-}
 
 export const load = (async ({ url, locals }) => {
 	const id = url.searchParams.get('form');

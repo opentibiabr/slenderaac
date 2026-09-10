@@ -10,6 +10,13 @@ type FeaturePage = {
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	polls: {
+		path: '/community/polls',
+		title: 'Polls',
+		section: 'community',
+		headline: 'headlinePolls',
+		queryKeys: ['poll', 'page'],
+	},
 	feedbackform: {
 		path: '/community/feedback',
 		title: 'Feedback Form',

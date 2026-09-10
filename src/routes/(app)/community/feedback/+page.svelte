@@ -2,10 +2,9 @@
 	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
-	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
+	import CommunityTopics from '$lib/components/ui/CommunityTopics.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { enhance } from '$lib/enchance';
-	import { feedbackDate } from '$lib/feedback';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
@@ -79,40 +78,15 @@
 			</p>
 			<p>Select a topic below to see the questions and submit your feedback.</p>
 		</div>
-		{#if !classic}<h2 class="h2">Active Feedback Forms</h2>{/if}
-		<PagePanel title="Active Feedback Forms" variant="list" surface>
-			<CatalogTable>
-				<table
-					class="classic-data-table classic-data-table--grid"
-					class:table={!classic}
-					aria-label="Active feedback forms">
-					<colgroup
-						><col style="width:70%" /><col style="width:30%" /></colgroup>
-					<thead
-						><tr
-							><th scope="col">Topic</th><th
-								scope="col"
-								class="classic-data-cell--numeric">End</th
-							></tr
-						></thead>
-					<tbody
-						>{#each data.forms as feedback}<tr
-								><td
-									><a
-										href={themePreviewHref(
-											$page.url,
-											`/community/feedback?${new URLSearchParams({ form: feedback.id }).toString()}`,
-										)}>{feedback.title}</a
-									></td
-								><td class="classic-data-cell--numeric"
-									>{feedbackDate(feedback.ends_at)}</td
-								></tr
-							>{:else}<tr
-								><td colspan="2">There are no active feedback forms.</td></tr
-							>{/each}</tbody>
-				</table>
-			</CatalogTable>
-		</PagePanel>
+		<CommunityTopics
+			title="Active Feedback Forms"
+			topics={data.forms}
+			href={(id) =>
+				themePreviewHref(
+					$page.url,
+					`/community/feedback?${new URLSearchParams({ form: id }).toString()}`,
+				)}
+			empty="There are no active feedback forms." />
 	{/if}
 </div>
 

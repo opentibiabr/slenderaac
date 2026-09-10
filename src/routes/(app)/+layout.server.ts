@@ -5,6 +5,7 @@ import { AccountType } from '$lib/accounts';
 import { PlayerGroup } from '$lib/players';
 import { themeSwitcherEnabled } from '$lib/server/config';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
+import { currentPoll } from '$lib/server/polls';
 import { prisma } from '$lib/server/prisma';
 import {
 	loadThemeAssetMetadata,
@@ -74,6 +75,7 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 			: { assets: {}, version: null, warning: null };
 
 	return {
+		currentPoll: await currentPoll(),
 		serverName: await serverName(),
 		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),

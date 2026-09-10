@@ -49,7 +49,9 @@
 		<slot name="decoration" />
 	</section>
 {:else}
+	<slot name="before-surface" />
 	<slot />
+	<slot name="after-surface" />
 {/if}
 
 <style>

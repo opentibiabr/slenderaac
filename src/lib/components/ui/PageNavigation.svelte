@@ -7,7 +7,16 @@
 	export let href: (page: number) => string;
 	export let label = 'Result pages';
 	export let position: 'top' | 'bottom' = 'top';
+	export let bookends = false;
 	$: pages = paginationPages(page, Math.ceil(count / limit));
+	$: lastPage = Math.max(1, Math.ceil(count / limit));
+	function pageLabel(number: number) {
+		return bookends && number === 1
+			? 'First Page'
+			: bookends && number === lastPage
+				? 'Last Page'
+				: number;
+	}
 </script>
 
 <nav
@@ -15,11 +24,11 @@
 	class="page-navigation"
 	class:page-navigation--bottom={position === 'bottom'}>
 	<div>
-		» Pages:
+		» {#if !bookends}Pages:{/if}
 		{#each pages as number}
 			{#if number === null}<span>…</span>{:else if number === page}<span
-					aria-current="page">{number}</span
-				>{:else}<a href={href(number)}>{number}</a>{/if}{' '}
+					aria-current="page">{pageLabel(number)}</span
+				>{:else}<a href={href(number)}>{pageLabel(number)}</a>{/if}{' '}
 		{/each}
 	</div>
 	<div>» Results: {count.toLocaleString('en-US')}</div>

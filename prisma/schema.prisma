@@ -80,6 +80,7 @@ model Accounts {
   accountSessions     AccountSessions[]
   store_history       StoreHistory[]
   feedback_responses  FeedbackResponse[]
+  poll_votes          PollVote[]
 
   @@map("accounts")
 }
@@ -1045,4 +1046,35 @@ enum CoinOrderStatus {
   CANCELED
 
   @@map("slender_coin_order_status")
+}
+
+model Poll {
+  id          String     @id @default(cuid())
+  title       String     @db.VarChar(255)
+  description String     @db.Text
+  options     Json
+  published   Boolean    @default(false)
+  starts_at   DateTime   @db.Date
+  ends_at     DateTime?  @db.Date
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @default(now()) @updatedAt
+  votes       PollVote[]
+
+  @@index([published, starts_at, ends_at], map: "slender_polls_public_idx")
+  @@map("slender_polls")
+}
+
+model PollVote {
+  id           String    @id @default(cuid())
+  poll_id      String
+  account_id   Int?      @db.UnsignedInt
+  option_id    String    @db.VarChar(32)
+  submitted_at DateTime  @default(now())
+  poll         Poll      @relation(fields: [poll_id], references: [id], onDelete: Cascade, map: "slender_poll_votes_poll_fk")
+  account      Accounts? @relation(fields: [account_id], references: [id], onDelete: SetNull, map: "slender_poll_votes_account_fk")
+
+  @@unique([poll_id, account_id], map: "slender_poll_votes_account_unique")
+  @@index([poll_id, option_id], map: "slender_poll_votes_result_idx")
+  @@index([account_id], map: "slender_poll_votes_account_idx")
+  @@map("slender_poll_votes")
 }

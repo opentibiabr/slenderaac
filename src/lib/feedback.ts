@@ -1,3 +1,11 @@
+import { communityFormDateInput } from './community-forms';
+
+export {
+	communityFormDate as feedbackDate,
+	communityEditorValues as feedbackEditorValues,
+	communityFormOpen as feedbackOpen,
+} from './community-forms';
+
 export type FeedbackQuestion = { id: string; label: string; required: boolean };
 
 export function feedbackQuestions(value: unknown): FeedbackQuestion[] {
@@ -21,17 +29,6 @@ export function feedbackQuestions(value: unknown): FeedbackQuestion[] {
 		ids.add(q.id);
 		return { id: q.id, label: q.label.trim(), required: q.required };
 	});
-}
-
-export function feedbackOpen(
-	form: { published: boolean; starts_at: Date; ends_at: Date | null },
-	now = new Date(),
-) {
-	return (
-		form.published &&
-		form.starts_at <= now &&
-		(!form.ends_at || form.ends_at > now)
-	);
 }
 
 export function feedbackAnswers(data: FormData, questions: FeedbackQuestion[]) {
@@ -67,17 +64,9 @@ export function feedbackInput(data: FormData) {
 	};
 	const title = text('title');
 	const description = text('description');
-	const date = (value: string) => {
-		if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value < '1970-01-01') return null;
-		const result = new Date(`${value}T00:00:00Z`);
-		return Number.isFinite(result.getTime()) &&
-			result.toISOString().slice(0, 10) === value
-			? result
-			: null;
-	};
-	const starts_at = date(text('starts_at'));
+	const starts_at = communityFormDateInput(text('starts_at'));
 	const endText = text('ends_at');
-	const ends_at = endText ? date(endText) : null;
+	const ends_at = endText ? communityFormDateInput(endText) : null;
 	if (
 		!title ||
 		title.length > 255 ||
@@ -109,34 +98,4 @@ export function feedbackInput(data: FormData) {
 	} catch {
 		return null;
 	}
-}
-
-export function feedbackEditorValues(data: FormData) {
-	const limits = {
-		title: 255,
-		description: 16000,
-		questions: 5120,
-		starts_at: 10,
-		ends_at: 10,
-		published: 2,
-	};
-	return Object.fromEntries(
-		Object.entries(limits).map(([key, limit]) => {
-			const value = data.get(key);
-			return [key, typeof value === 'string' ? value.slice(0, limit) : ''];
-		}),
-	);
-}
-
-export function feedbackDate(date: Date | null) {
-	return date
-		? date
-				.toLocaleDateString('en-US', {
-					timeZone: 'UTC',
-					year: 'numeric',
-					month: 'short',
-					day: '2-digit',
-				})
-				.replace(',', '')
-		: 'Ongoing';
 }

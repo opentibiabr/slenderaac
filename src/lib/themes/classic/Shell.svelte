@@ -1104,23 +1104,19 @@
 				</a>
 			{/if}
 
-			{#if !isCompactNewsToolPage && promoPollBox}
+			{#if !isCompactNewsToolPage && promoPollBox && data.currentPoll}
 				<div
 					class="theme-classic__official-box theme-classic__official-box--poll"
 					style={pollBoxStyle}>
 					<img src={promoPollBox} alt="Current Poll" />
-					<strong class="theme-classic__poll-question">
-						<span
-							>{#if classicReference?.pollText ?? presentation?.pollText}{serverText(
-									classicReference?.pollText ?? presentation?.pollText,
-									identity,
-								)}{:else}Guess the Date of<br />the Update!{/if}</span>
-					</strong>
+					<strong class="theme-classic__poll-question"
+						><span title={data.currentPoll.title}>{data.currentPoll.title}</span
+						></strong>
 					<a
 						class="theme-classic__poll-button"
-						href={presentationHref(
-							'poll',
-							'https://www.tibia.com/community/?subtopic=polls',
+						href={themePreviewHref(
+							$page.url,
+							`/community/polls?${new URLSearchParams({ poll: data.currentPoll.id }).toString()}`,
 						)}>Vote Now</a>
 					<span class="theme-classic__poll-bottom" aria-hidden="true"></span>
 				</div>
