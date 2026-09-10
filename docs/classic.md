@@ -549,6 +549,12 @@ and payment radios use separate names; currency changes clear an offer that is
 no longer available. Missing or invalid item artwork keeps a readable item
 identifier and cannot interrupt hydration or display a stale response.
 
+Order confirmation polling is shared by both themes. Wait for each invalidation
+to settle before scheduling the next one-second delay, count failed refreshes
+toward the ten-attempt limit, and preserve the last server-reported status.
+Final orders do not poll. Leaving confirmation cancels its timer and ignores
+late attempt callbacks; a different order token starts a fresh component.
+
 The subsequent native-page pass checked the shared heading wrapper against an
 unchanged Characters central-region capture; its pixels were identical. New
 server and organization titles were checked separately with the loaded shared
