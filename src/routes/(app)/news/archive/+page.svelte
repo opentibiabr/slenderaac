@@ -4,6 +4,7 @@
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { serverText } from '$lib/site-identity';
+	import { classicNewsCategories } from '$lib/themes/classic/news-icons';
 	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 
@@ -27,25 +28,6 @@
 		{ key: 'article', label: 'Featured Article' },
 		{ key: 'news', label: 'News' },
 	] as const;
-	const categoryOptionDefs = [
-		{ key: 'server', label: 'Server', iconKey: 'newsArchiveIconServer' },
-		{
-			key: 'community',
-			label: 'Community',
-			iconKey: 'newsArchiveIconCommunity',
-		},
-		{
-			key: 'development',
-			label: 'Development',
-			iconKey: 'newsArchiveIconDevelopment',
-		},
-		{ key: 'support', label: 'Support', iconKey: 'newsArchiveIconSupport' },
-		{
-			key: 'technical',
-			label: 'Technical Issues',
-			iconKey: 'newsArchiveIconTechnical',
-		},
-	] as const;
 
 	$: previewTheme = $page.url.searchParams.get('themePreview');
 	$: themeAssets = $page.data.themeAssets as
@@ -58,9 +40,9 @@
 	$: archiveStyle = archiveButtonBackground
 		? `--classic-news-archive-button: url("${archiveButtonBackground}")`
 		: '';
-	$: categoryOptions = categoryOptionDefs.map((option) => ({
+	$: categoryOptions = classicNewsCategories.map((option) => ({
 		...option,
-		icon: classicAsset(themeAssets, option.iconKey),
+		icon: themeAssets?.[option.iconKey] ?? null,
 	}));
 
 	function formatClassicDate(value: Date | string) {

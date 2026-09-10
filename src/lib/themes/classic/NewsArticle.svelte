@@ -14,7 +14,8 @@
 
 <article class="classic-news-article" id="news-{id}">
 	<header class="classic-news-headline">
-		{#if icon}<img class="classic-news-icon" src={icon} alt="" />{/if}
+		{#if icon}<span class="classic-news-icon"><img src={icon} alt="" /></span
+			>{/if}
 		<div class="classic-news-date">{date.replaceAll(' ', '\u00a0')} -</div>
 		<h2>
 			{serverText(title, {
@@ -57,6 +58,14 @@
 		left: 5px;
 		width: 32px;
 		height: 32px;
+		display: grid;
+		place-items: center;
+	}
+	.classic-news-icon img {
+		max-width: 32px;
+		max-height: 32px;
+		width: auto;
+		height: auto;
 	}
 	.classic-news-date {
 		float: left;

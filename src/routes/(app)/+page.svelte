@@ -7,9 +7,9 @@
 
 	import Markdoc from '$lib/components/markdoc/Markdoc.svelte';
 	import { serverText } from '$lib/site-identity';
+	import { classicNewsIcon } from '$lib/themes/classic/news-icons';
 	import NewsArticle from '$lib/themes/classic/NewsArticle.svelte';
 	import ReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
-	import { classicAsset } from '$lib/themes/classic/theme';
 	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
@@ -92,8 +92,9 @@
 				id={article.id}
 				title={article.title}
 				date={formatClassicNewsDate(article.created_at)}
-				icon={article.presentation?.icon ??
-					classicAsset(themeAssets, 'newsHeadlineIcon')}
+				icon={data.classicReference
+					? article.presentation?.icon
+					: classicNewsIcon(themeAssets, article.category, true)}
 				commentHref={article.presentation?.commentHref ?? null}
 				reference={!!article.presentation}>
 				{#if article.presentation}

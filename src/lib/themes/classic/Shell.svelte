@@ -35,6 +35,7 @@
 	import MediaDialog from './MediaDialog.svelte';
 	import Menu from './Menu.svelte';
 	import { classicNativePage } from './native-pages';
+	import { classicNewsIcon } from './news-icons';
 	import { classicAsset } from './theme';
 
 	type ClassicLayoutData = LayoutData & {
@@ -145,28 +146,13 @@
 					date: `${formatClassicTickerDate(article.created_at)} -`,
 					title: '',
 					copySegments: makeTickerSummarySegments(article),
-					icon: tickerCategoryIcon(article.category),
+					icon: classicNewsIcon(data.themeAssets, article.category) ?? '',
 				}))
 	) satisfies ClassicTickerItem[];
 	$: if (tickerUrl !== $page.url.href) {
 		tickerUrl = $page.url.href;
 		expandedTickers = tickerItems.map(
 			(item) => $page.url.searchParams.get('ticker') === item.id,
-		);
-	}
-	function tickerCategoryIcon(category?: string): string {
-		const keys = {
-			server: 'newsArchiveIconServer',
-			community: 'newsArchiveIconCommunity',
-			development: 'newsArchiveIconDevelopment',
-			support: 'newsArchiveIconSupport',
-			technical: 'newsArchiveIconTechnical',
-		} as const;
-		return (
-			classicAsset(
-				data.themeAssets,
-				keys[category as keyof typeof keys] ?? keys.community,
-			) ?? ''
 		);
 	}
 	$: staticPages = data.staticPages;

@@ -266,6 +266,13 @@ Svelte components. Only the supported tags and presentation attributes survive;
 source scripts, handlers and arbitrary inline CSS are not executed. Title/date
 edits preserve the presentation and same-day ordering. Editing the body replaces
 the imported presentation with the normal Markdoc renderer.
+Headline, ticker and archive icons share the current database category. A saved
+presentation icon cannot override a category edit. The optional
+`newsHeadlineIconServer`, `newsHeadlineIconCommunity`, `newsHeadlineIconDevelopment`,
+`newsHeadlineIconSupport` and `newsHeadlineIconTechnical` assets provide large
+icons. Without one, use the same category's small icon at its native size inside
+the fixed 32px slot. The legacy `newsHeadlineIcon` applies only to Development.
+Explicit reference fixtures retain their own presentation.
 
 Imported Markdown must contain complete words independently of theme artwork.
 The external content importer converts decorative initial-letter sprites to text
