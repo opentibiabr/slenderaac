@@ -73,6 +73,8 @@
 	.classic-menu-label--text {
 		overflow: hidden;
 		color: rgb(217 180 152);
+		/* Composite text like raster labels, avoiding colored subpixel fringes. */
+		opacity: 0.999;
 		font-family: ClassicHeadline, Georgia, serif;
 		font-size: 16px;
 		font-weight: 400;

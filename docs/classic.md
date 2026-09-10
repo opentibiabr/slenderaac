@@ -31,6 +31,11 @@ resizing the row or moving its icon and toggle. Keep the complete name in the
 accessible toggle label. Source images retain their original glyphs; the dynamic
 font is the pack's existing adaptation described above.
 
+Keep dynamic label text on its nearly opaque compositing layer. The base ink
+already matches the raster labels; subpixel font rendering can add colored edges
+that make the same ink appear more orange. Preserve the shared color, shadow and
+metrics when correcting this rendering difference.
+
 An optional `menuFont` TTF asset supplies a separate typeface for dynamic menu
 labels. It uses the shared `ClassicMenu` face at 20px with compact tracking;
 page headlines keep `headlineFont`. The menu switches to these metrics only after
