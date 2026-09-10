@@ -231,6 +231,22 @@
 </div>
 
 <style>
+	@media (min-width: 768px) {
+		:global(.theme-legbone .theme-legbone-content),
+		:global(.theme-legbone #appShell),
+		:global(.theme-legbone #appShell > div) {
+			overflow: visible;
+		}
+		:global(.theme-legbone #sidebar-left) {
+			position: sticky;
+			top: 8px;
+			align-self: flex-start;
+			/* Reserve the 144px desktop header and 16px of vertical clearance. */
+			max-height: calc(100dvh - 160px);
+			overscroll-behavior-y: contain;
+			scrollbar-width: thin;
+		}
+	}
 	/* Section navigation follows the document, so intermediate shells cannot own scrolling. */
 	:global(.theme-legbone:has(.section-navigation) .theme-legbone-content),
 	:global(.theme-legbone:has(.section-navigation) #appShell),

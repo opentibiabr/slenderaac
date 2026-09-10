@@ -326,6 +326,16 @@ separate from the query-driven Screenshots gallery and its previous/next control
 
 ### Viewport and scrollbar invariant
 
+At desktop widths (768px and above), Legbone's left sidebar owns its scrolling
+inside a sticky, viewport-bounded panel. Keep ancestor shell overflow visible so
+the panel can follow the document on long pages. Reserve the desktop header and
+vertical clearance when calculating its maximum height. Internal navigation
+preserves the menu's scroll position while the new page starts at the top; do not
+disable document scroll handling globally, which can leave short-page content
+above the viewport. Verify consecutive links near the bottom of an expanded menu,
+keyboard activation and long-to-short page navigation. Keep these rules scoped to
+Legbone desktop; mobile retains its drawer, which closes after navigation.
+
 The shared layout switcher stays fixed to the desktop viewport, outside the shell,
 and does not add flow height or alter background/column offsets. Its mobile
 treatment provides a sticky row above the theme header so it remains available
