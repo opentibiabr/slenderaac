@@ -1078,3 +1078,20 @@ model PollVote {
   @@index([account_id], map: "slender_poll_votes_account_idx")
   @@map("slender_poll_votes")
 }
+
+model DirectoryEntry {
+  id          String   @id @default(cuid())
+  kind        String   @db.VarChar(16)
+  name        String   @db.VarChar(255)
+  url         String   @db.Text
+  description String   @db.Text
+  details     Json
+  promoted    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  published   Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  @@index([kind, published, promoted, name], map: "slender_directory_public_idx")
+  @@map("slender_directory_entries")
+}

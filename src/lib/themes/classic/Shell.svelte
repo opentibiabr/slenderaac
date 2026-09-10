@@ -16,6 +16,7 @@
 	import { page } from '$app/stores';
 
 	import type { InformationPresentation } from '$lib/information-content';
+	import DirectoryLogo from '$lib/components/ui/DirectoryLogo.svelte';
 	import {
 		onlineCounter,
 		type OnlineCounters,
@@ -114,10 +115,7 @@
 	$: shopHref = makeClassicPreviewHref($page.url, '/shop');
 	$: presentation = data.classicPresentation;
 	$: identity = { name: data.serverName, website: $page.url.origin };
-	$: fansitesHref = presentationHref(
-		'fansites',
-		'https://www.tibia.com/community/?subtopic=fansites',
-	);
+	$: fansitesHref = themePreviewHref($page.url, '/community/fansites');
 
 	function presentationHref(key: string, fallback: string): string {
 		return themePreviewHref($page.url, presentation?.links[key] ?? fallback);
@@ -362,7 +360,9 @@
 	$: premiumButtonHover = classicAsset(data.themeAssets, 'premiumButtonHover');
 	$: promoFansitesBox = classicAsset(data.themeAssets, 'promoFansitesBox');
 	$: fansiteLogoFrame = classicAsset(data.themeAssets, 'fansiteLogoFrame');
-	$: fansiteLogo = classicAsset(data.themeAssets, 'fansiteLogo');
+	$: fansiteLogo = data.featuredFansite?.logoAsset
+		? classicAsset(data.themeAssets, data.featuredFansite.logoAsset)
+		: null;
 	$: fansiteButtonBackground = classicAsset(
 		data.themeAssets,
 		'fansiteButtonBackground',
@@ -1121,20 +1121,18 @@
 					<span class="theme-classic__poll-bottom" aria-hidden="true"></span>
 				</div>
 			{/if}
-			{#if promoFansitesBox}
+			{#if promoFansitesBox && data.featuredFansite}
 				<div
 					class="theme-classic__official-box theme-classic__official-box--fansites"
 					style={fansitesBoxStyle}>
 					<img src={promoFansitesBox} alt="Fansites" />
 					<a
 						class="theme-classic__fansite-logo-frame"
-						href={presentationHref('fansite', fansitesHref)}
+						href={data.featuredFansite.url}
 						target="_blank"
 						rel="noreferrer"
-						aria-label="Featured fansite">
-						{#if fansiteLogo}
-							<img src={fansiteLogo} alt="" aria-hidden="true" />
-						{/if}
+						aria-label={data.featuredFansite.name}>
+						<DirectoryLogo src={fansiteLogo} name={data.featuredFansite.name} />
 					</a>
 					<a class="theme-classic__fansite-button" href={fansitesHref}>
 						View all Fansites
@@ -2036,15 +2034,10 @@
 			145px no-repeat;
 	}
 
-	.theme-classic .theme-classic__fansite-logo-frame img {
+	:global(.theme-classic .theme-classic__fansite-logo-frame .directory-logo) {
 		position: absolute;
 		top: 8px;
 		left: 15px;
-		display: block;
-		width: 150px;
-		height: 100px;
-		max-width: none;
-		object-fit: cover;
 	}
 
 	.theme-classic .theme-classic__fansite-button {

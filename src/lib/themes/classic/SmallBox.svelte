@@ -1,5 +1,6 @@
 <script lang="ts">
 	export let assets: Record<string, string | undefined> | null | undefined;
+	export let dense = false;
 	$: frame = [
 		['horizontal', 'contentFrameHorizontal'],
 		['vertical', 'contentFrameVertical'],
@@ -12,7 +13,7 @@
 		.join(';');
 </script>
 
-<div class="small-box" style={frame}>
+<div class="small-box" class:small-box--dense={dense} style={frame}>
 	<span class="small-box__edge small-box__edge--tl" aria-hidden="true"></span>
 	<span class="small-box__edge small-box__edge--tr" aria-hidden="true"></span>
 	<div class="small-box__body"><slot /></div>
@@ -42,6 +43,9 @@
 		height: 5px;
 		background: var(--small-box-edge);
 		pointer-events: none;
+	}
+	.small-box--dense .small-box__body {
+		padding: 3px;
 	}
 	.small-box__edge--tl {
 		top: -1px;

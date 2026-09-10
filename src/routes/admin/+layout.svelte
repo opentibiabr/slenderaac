@@ -85,6 +85,10 @@
 				</li>
 				<li><a href="/admin/polls"><Fa icon={faBookBookmark} />Polls</a></li>
 				<li>
+					<a href="/admin/directories"
+						><Fa icon={faBookBookmark} />Directories</a>
+				</li>
+				<li>
 					<a href="/admin/static-pages"
 						><Fa icon={faBookBookmark} />Static Pages</a>
 				</li>

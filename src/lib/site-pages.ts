@@ -10,6 +10,13 @@ type FeaturePage = {
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	fansites: {
+		path: '/community/fansites',
+		title: 'Fansites',
+		section: 'community',
+		headline: 'headlineFansites',
+		queryKeys: ['language', 'social', 'content'],
+	},
 	polls: {
 		path: '/community/polls',
 		title: 'Polls',
