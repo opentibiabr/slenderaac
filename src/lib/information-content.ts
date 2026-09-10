@@ -202,11 +202,13 @@ export function parseInformationPresentation(
 			data.gallery &&
 			(!informationAsset(data.gallery.background) ||
 				!Array.isArray(data.gallery.items) ||
-				!data.gallery.items.length ||
 				data.gallery.items.length > 200 ||
+				new Set(data.gallery.items.map((item) => item.id)).size !==
+					data.gallery.items.length ||
 				!data.gallery.items.every(
-					(item, index) =>
-						item.id === index + 1 &&
+					(item) =>
+						Number.isSafeInteger(item.id) &&
+						item.id > 0 &&
 						informationAsset(item.thumbnail) &&
 						informationAsset(item.src) &&
 						typeof item.caption === 'string',

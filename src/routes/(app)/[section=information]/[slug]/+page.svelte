@@ -29,6 +29,12 @@
 		<CreatureLibrary
 			{...data.library}
 			boss={data.informationPage.id === 'boostablebosses'} />
+	{:else if data.informationPage.id === 'screenshots'}
+		{#if data.gallery?.items.length}
+			<Gallery gallery={data.gallery} />
+		{:else}
+			<p>No screenshots have been published yet.</p>
+		{/if}
 	{:else if data.informationPresentation}
 		<Content nodes={data.informationPresentation.body} />
 		{#if data.informationPresentation.gallery}

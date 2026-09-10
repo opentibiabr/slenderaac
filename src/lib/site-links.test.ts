@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import {
-	configuredSiteLinks,
-	screenshotPageHref,
-	websiteHref,
-} from './site-links';
+import { configuredSiteLinks, websiteHref } from './site-links';
 
 void test('server-owned destinations have no implicit third-party defaults', () => {
 	assert.deepEqual(configuredSiteLinks({}), {
@@ -37,20 +33,4 @@ void test('website destinations reject credentials and executable schemes', () =
 		websiteHref('https://example.org/path?q=1#section'),
 		'https://example.org/path?q=1#section',
 	);
-});
-
-void test('presentation metadata can select a screenshot but cannot change its destination', () => {
-	assert.equal(
-		screenshotPageHref(
-			'https://external.example/wrong?currentscreenshot=11&other=ignored',
-		),
-		'/about/screenshots?currentscreenshot=11',
-	);
-	for (const value of [
-		undefined,
-		'https://external.example/wrong',
-		'//external.example?currentscreenshot=script',
-		'/?currentscreenshot=1234567',
-	])
-		assert.equal(screenshotPageHref(value), '/about/screenshots');
 });

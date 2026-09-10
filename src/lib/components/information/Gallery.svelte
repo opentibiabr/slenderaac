@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 
 	import type { InformationGallery } from '$lib/information-content';
+	import { adjacentScreenshot } from '$lib/gallery';
 	import { serverText } from '$lib/site-identity';
 
 	export let gallery: InformationGallery;
@@ -32,13 +33,9 @@
 	function show(id?: number) {
 		void goto(href(id), { noScroll: true, keepFocus: true });
 	}
-	function step(delta: number) {
-		if (selected)
-			show(
-				((selected.id - 1 + delta + gallery.items.length) %
-					gallery.items.length) +
-					1,
-			);
+	function step(delta: -1 | 1) {
+		const next = selected && adjacentScreenshot(items, selected.id, delta);
+		if (next) show(next.id);
 	}
 	function keydown(event: KeyboardEvent) {
 		if (!selected) return;
@@ -98,6 +95,65 @@
 </dialog>
 
 <style>
+	:global(.theme-legbone) .screenshot-gallery__cell {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 1rem;
+	}
+	:global(.theme-legbone) .screenshot-gallery__card {
+		width: 230px;
+		max-width: 100%;
+		overflow: hidden;
+		border-radius: var(--theme-rounded-base);
+		background: rgb(var(--color-surface-800));
+		color: rgb(var(--color-surface-50));
+	}
+	:global(.theme-legbone) .screenshot-gallery__card img {
+		width: 100%;
+		height: 147px;
+		object-fit: cover;
+	}
+	:global(.theme-legbone) .screenshot-gallery__caption {
+		display: block;
+		padding: 0.5rem;
+	}
+	:global(.theme-legbone) .screenshot-dialog {
+		width: min(900px, calc(100% - 2rem));
+		max-height: calc(100dvh - 2rem);
+		padding: 1rem;
+		border-radius: var(--theme-rounded-base);
+		background: rgb(var(--color-surface-800));
+		color: rgb(var(--color-surface-50));
+	}
+	:global(.theme-legbone) .screenshot-dialog::backdrop {
+		background: rgb(0 0 0 / 0.75);
+	}
+	:global(.theme-legbone) .screenshot-dialog__navigation {
+		display: flex;
+		justify-content: space-between;
+		gap: 0.5rem;
+		margin: 0.5rem 0;
+	}
+	:global(.theme-legbone) .screenshot-dialog__navigation button {
+		border-radius: var(--theme-rounded-base);
+		padding: 0.5rem 1rem;
+		background: rgb(var(--color-primary-500));
+		color: rgb(var(--color-primary-50));
+	}
+	:global(.theme-legbone) .screenshot-dialog__picture img {
+		display: block;
+		margin: 1rem auto;
+		max-width: 100%;
+		height: auto;
+	}
+	:global(.theme-legbone) .screenshot-dialog__caption {
+		text-align: center;
+	}
+	:global(.theme-legbone) .screenshot-dialog__cross {
+		display: none;
+	}
+
 	:global(.theme-classic) .screenshot-gallery {
 		display: table;
 		width: 100%;

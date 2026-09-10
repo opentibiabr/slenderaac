@@ -21,7 +21,6 @@
 		pollOnlineStatus,
 	} from '$lib/online-status';
 	import { serverText } from '$lib/site-identity';
-	import { screenshotPageHref } from '$lib/site-links';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -113,7 +112,6 @@
 	$: accountSignupHref = makeClassicPreviewHref($page.url, '/account/signup');
 	$: onlineHref = makeClassicPreviewHref($page.url, '/online');
 	$: shopHref = makeClassicPreviewHref($page.url, '/shop');
-	$: presentation = data.classicPresentation;
 	$: identity = { name: data.serverName, website: $page.url.origin };
 	$: fansitesHref = themePreviewHref($page.url, '/community/fansites');
 	$: boostedEntries = [
@@ -450,9 +448,7 @@
 		data.themeAssets,
 		'promoScreenshotFrame',
 	);
-	$: promoScreenshotImage =
-		classicReference?.assets.promoScreenshotImage ??
-		classicAsset(data.themeAssets, 'promoScreenshotImage');
+	$: promoScreenshotImage = data.featuredScreenshot?.src ?? null;
 	$: promoPollBox = classicAsset(data.themeAssets, 'promoPollBox');
 	$: rightTopper = classicAsset(data.themeAssets, 'rightTopper');
 
@@ -1042,14 +1038,14 @@
 				</a>
 			{/if}
 
-			{#if showAuxiliaryThemeboxes && promoScreenshotBox}
+			{#if showAuxiliaryThemeboxes && promoScreenshotBox && data.featuredScreenshot}
 				<a
 					class="theme-classic__official-box theme-classic__official-box--screenshot"
 					href={themePreviewHref(
 						$page.url,
-						screenshotPageHref(presentation?.links.screenshot),
+						`/about/screenshots?currentscreenshot=${data.featuredScreenshot.id}`,
 					)}
-					aria-label="Screenshot of the day">
+					aria-label={`Screenshot of the day: ${serverText(data.featuredScreenshot.caption, identity)}`}>
 					<img src={promoScreenshotBox} alt="Screenshots" />
 					{#if promoScreenshotFrame && promoScreenshotImage}
 						<div class="theme-classic__screenshot-image-clip">

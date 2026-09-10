@@ -24,17 +24,3 @@ export function configuredSiteLinks(
 		trailer: websiteHref(values.PUBLIC_TRAILER_URL),
 	};
 }
-
-export function screenshotPageHref(presentationHref: string | undefined) {
-	try {
-		const index = new URL(
-			presentationHref ?? '',
-			'https://slender.invalid',
-		).searchParams.get('currentscreenshot');
-		if (index && /^[0-9]{1,6}$/.test(index))
-			return `/about/screenshots?currentscreenshot=${index}`;
-	} catch {
-		/* An optional image selection never changes the local destination. */
-	}
-	return '/about/screenshots';
-}

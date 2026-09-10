@@ -29,14 +29,6 @@ export type ClassicNewsReference = {
 };
 
 export type ClassicPresentation = {
-	sourceUrl: string;
-	capturedAt: string;
-	links: Record<string, string>;
-	navigation: Record<string, { label: string; href: string }[]>;
-	footer: string;
-	premiumText?: string;
-	premiumButtonText?: string;
-	pollText?: string;
 	calendarColors?: Record<string, string>;
 };
 

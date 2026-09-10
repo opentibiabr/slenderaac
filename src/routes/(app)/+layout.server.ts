@@ -2,12 +2,14 @@ import { redirect } from '@sveltejs/kit';
 import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
+import { dailyScreenshot } from '$lib/gallery';
 import { PlayerGroup } from '$lib/players';
 import { siteLinks, themeSwitcherEnabled } from '$lib/server/config';
 import { featuredFansite } from '$lib/server/directories';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { currentPoll } from '$lib/server/polls';
 import { prisma } from '$lib/server/prisma';
+import { loadInformationPresentation } from '$lib/server/theme-assets/information';
 import {
 	loadThemeAssetMetadata,
 	resolveThemeId,
@@ -71,6 +73,9 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
 	const isAdmin = locals.session?.type === AccountType.God;
 	const classicAssetMetadata = await loadThemeAssetMetadata('classic');
+	const screenshotGallery =
+		(await loadInformationPresentation('classic', 'screenshots'))?.gallery ??
+		null;
 	const themeAssetMetadata =
 		selectedTheme === 'classic'
 			? classicAssetMetadata
@@ -82,6 +87,8 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		currentPoll: await currentPoll(),
 		serverName: await serverName(),
 		serverLogo: classicAssetMetadata.assets.serverLogo ?? null,
+		screenshotGallery,
+		featuredScreenshot: dailyScreenshot(screenshotGallery?.items ?? []),
 		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,

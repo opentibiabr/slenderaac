@@ -276,8 +276,9 @@ changing content conversion.
 The pack supplies decorative promo artwork and calendar colors. The shop card
 uses the configured server name and the local coin-shop action. Captured offer
 text and image-based button labels cannot override its product or server identity. The application owns its built-in menu, shared actions, footer destinations and
-boosted-library links are owned by the application. A screenshot selection may
-choose an image index, but never changes its local destination. The footer
+boosted-library links are owned by the application. Screenshot destinations are selected from the published gallery, never from
+a captured sidebar link. Only calendar color tokens are loaded from legacy
+presentation metadata. The footer
 identifies SlenderAAC and OpenTibiaBR. Updating or removing a presentation pack
 cannot replace menu destinations or remove built-in sections. Visible custom pages
 are appended to the Library; the rules page keeps its Support entry.
@@ -470,7 +471,14 @@ frame rather than add parallel loaders or copy source HTML into the repository.
 captions, thumbnails, full images and the card texture. Native Svelte controls
 open a dialog, wrap previous/next navigation and support arrow keys and Escape.
 `currentscreenshot=<id>` opens a selected image directly, including links from
-the right sidebar. Gallery navigation preserves the preview and browser history.
+the right sidebar. Both layouts load the same published gallery from
+`classic/reference/pages/screenshots.json`. The sidebar selects one of its entries
+per UTC day, using that entry's image, caption and local detail link together.
+No gallery means no screenshot teaser. IDs are positive, unique and stable:
+removing or reordering an entry must not require renumbering the rest. Previous/next
+uses list order, including wraparound, and preserves the preview and browser history.
+Gallery images and captions are operator-published content, not live game state;
+replace the sample collection with your server's screenshots.
 
 `/about/game-features` reuses the compact document frame, native heading rhythm
 and sprite-based bullet list. Captured account-creation buttons become local

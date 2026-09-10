@@ -13,8 +13,13 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 		throw redirect(308, `/about/server${url.search}`);
 	const informationPage = informationPageForPath(url.pathname);
 	if (!informationPage) throw error(404, 'Page not found');
-	const { selectedTheme, boostedCreature, boostedBoss, serverName } =
-		await parent();
+	const {
+		selectedTheme,
+		boostedCreature,
+		boostedBoss,
+		serverName,
+		screenshotGallery,
+	} = await parent();
 	const title =
 		informationPage.id === 'server'
 			? `About ${serverName}`
@@ -60,6 +65,7 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 			: null;
 	return {
 		title,
+		gallery: informationPage.id === 'screenshots' ? screenshotGallery : null,
 		informationPage: {
 			...informationPage,
 			title,
