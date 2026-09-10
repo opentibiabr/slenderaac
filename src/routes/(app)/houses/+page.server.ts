@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 
 import { houseFilters, selectHouses } from '$lib/houses';
 import { loadHouses } from '$lib/server/houses';
+import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
 import { serverName } from '$lib/server/worlds';
 
 import type { PageServerLoad } from './$types';
@@ -21,6 +22,11 @@ export const load = (async ({ url }) => {
 			? houses.find((house) => house.id === Number(id))
 			: undefined;
 	if (id !== null && !house) throw error(404, 'House not found');
+	const picture = house?.definition?.clientId
+		? (await loadThemeAssetMetadata('classic')).assets[
+				`house-${house.definition.clientId}`
+			]
+		: undefined;
 	return {
 		title: 'Houses',
 		world,
@@ -29,5 +35,6 @@ export const load = (async ({ url }) => {
 		searched: Boolean(selectedWorld),
 		houses: selectedWorld && !house ? selectHouses(houses, filters) : [],
 		house: house ?? null,
+		picture,
 	};
 }) satisfies PageServerLoad;

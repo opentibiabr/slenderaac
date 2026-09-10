@@ -14,6 +14,7 @@ type HouseRow = {
 	beds: number;
 	ownerId: number;
 	owner: string | null;
+	paidUntil: number | bigint;
 	bid: number;
 	bidEnd: number;
 };
@@ -34,7 +35,8 @@ export async function loadHouses(): Promise<PublicHouse[]> {
 		: Prisma.sql`h.bid AS bid, h.bid_end AS bidEnd`;
 	const rows = await prisma.$queryRaw<HouseRow[]>(Prisma.sql`
 		SELECT h.id, h.name, h.town_id AS townId, t.name AS town,
-			h.size, h.rent, h.beds, h.owner AS ownerId, p.name AS owner, ${auction}
+			h.size, h.rent, h.beds, h.owner AS ownerId, p.name AS owner,
+			${fields.has('paid') ? Prisma.sql`h.paid` : Prisma.sql`0`} AS paidUntil, ${auction}
 		FROM houses h LEFT JOIN towns t ON t.id = h.town_id
 		LEFT JOIN players p ON p.id = h.owner AND p.deletion = 0
 		ORDER BY h.name, h.id`);
@@ -51,6 +53,7 @@ export async function loadHouses(): Promise<PublicHouse[]> {
 			beds: house.beds,
 			owner: house.owner,
 			rented: house.ownerId > 0,
+			paidUntil: house.ownerId > 0 ? Number(house.paidUntil) : 0,
 			bid: house.ownerId > 0 ? 0 : house.bid,
 			bidEnd: house.ownerId > 0 ? 0 : house.bidEnd,
 			...(metadata.has(house.id)

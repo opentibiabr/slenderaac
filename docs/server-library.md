@@ -59,11 +59,27 @@ absent from that map are excluded without deleting or changing them. Bed capacit
 is distinct from the number of beds currently installed. Optional operator-supplied
 150x150 illustrations use the external asset key `house-<clientId>`.
 
+The external pack includes `tools/update-house-art.py`. Run it with
+`--server-data <catalog-file>` to install illustrations for all client identities
+in that catalog; use `--refresh` to update existing files. The tool validates image
+dimensions before activating the mappings, records hashes and sources for the
+normal pack refresh, and reports missing artwork without substituting map IDs.
+Distribute the result through the usual external asset ZIP.
+
+`IllustratedDetail` keeps the 150x150 illustration slot, description spacing and
+mobile stacking shared. Missing or failed artwork retains the slot and an honest
+fallback instead of collapsing the text to the left. House details use the native
+body font, rather than the smaller introduction style. Rent-paid dates come from
+the database when available; unknown dates are omitted. Never copy ownership,
+measurements, rent periods or auction values from presentation captures.
+
 This page provides search and inspection. Web bidding, transfers and move-out
 actions still require a game-server integration and are not implemented here.
 The current game server owns these actions in memory; writing auction columns
 from the website would race its save cycle. The page directs players to the
 client's house controls while that integration remains pending.
+The corresponding buttons are visibly disabled, with an explanation and a local
+manual link; Back stays active and preserves the search filters and theme.
 
 Install the repository dependencies, then export the server definitions to a file
 outside the checkout and outside the public asset directory:

@@ -16,6 +16,7 @@ export type PublicHouse = {
 	beds: number;
 	owner: string | null;
 	rented: boolean;
+	paidUntil: number;
 	bid: number;
 	bidEnd: number;
 	definition?: HouseDefinition;

@@ -3,6 +3,7 @@
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
+	import IllustratedDetail from '$lib/components/ui/IllustratedDetail.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { houseHref, houseOrders } from '$lib/houses';
 	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
@@ -15,9 +16,6 @@
 	$: house = data.house;
 	$: preview = new URL(themePreviewHref($page.url, '/houses'), $page.url)
 		.searchParams;
-	$: picture = house?.definition?.clientId
-		? $page.data.themeAssets?.[`house-${house.definition.clientId}`]
-		: undefined;
 	$: resultTitle = `Available ${data.filters.type === 'guildhalls' ? 'Guildhalls' : 'Houses and Flats'} in ${data.filters.town} on ${data.world}`;
 	const gold = (amount: number) =>
 		`${amount >= 1000 && amount % 1000 === 0 ? `${amount / 1000}k` : amount.toLocaleString('en-US')} gold`;
@@ -27,55 +25,67 @@
 
 <div class="houses-page">
 	{#if house}
-		<div class="houses-page__detail">
-			{#if picture}<img
-					class="houses-page__picture"
-					src={picture}
-					alt={house.name}
-					width="150"
-					height="150" />{/if}
-			<div class="page-intro">
-				<strong>{house.name}</strong><br />
-				{#if house.definition?.bedCapacity !== undefined}
-					This {house.definition.guildhall ? 'guildhall' : 'house'} can have up to
-					{house.definition.bedCapacity} beds.
-				{:else}This house currently contains {house.beds} beds.{/if}
+		<IllustratedDetail picture={data.picture} name={house.name}>
+			<strong>{house.name}</strong><br />
+			{#if house.definition?.bedCapacity !== undefined}
+				This {house.definition.guildhall ? 'guildhall' : 'house'} can have up to
+				{house.definition.bedCapacity} beds.
+			{:else}This house currently contains {house.beds} beds.{/if}
+			<p>
+				The house has a size of <strong>{house.size} square meters</strong>. Its
+				listed rent is <strong>{gold(house.rent)}</strong> on
+				<strong>{data.world}</strong>.
+			</p>
+			{#if house.rented}
 				<p>
-					The house has a size of <strong>{house.size} square meters</strong>.
-					Its listed rent is <strong>{gold(house.rent)}</strong> on
-					<strong>{data.world}</strong>.
+					The house has been rented{#if house.owner}
+						by <a
+							href={themePreviewHref(
+								$page.url,
+								`/characters/${encodeURIComponent(house.owner)}`,
+							)}>{house.owner}</a
+						>{/if}.
+					{#if house.paidUntil}The rent has been paid until <strong
+							>{deadline(house.paidUntil)}</strong
+						>.{/if}
 				</p>
-				{#if house.rented}
-					<p>
-						The house has been rented{#if house.owner}
-							by <a
-								href={themePreviewHref(
-									$page.url,
-									`/characters/${encodeURIComponent(house.owner)}`,
-								)}>{house.owner}</a
-							>{/if}.
-					</p>
-				{:else}
-					<p>
-						This house is available. The current highest bid is <strong
+			{:else}
+				<p>
+					This house is being auctioned.
+					{#if house.bid > 0}The current highest bid is <strong
 							>{gold(house.bid)}</strong
-						>.{#if house.bidEnd}
-							The auction ends on <strong>{deadline(house.bidEnd)}</strong
-							>.{/if}
-					</p>
-				{/if}
-				{#if house.definition}<p>
-						Entrance in {house.town}: {house.definition.entry.x}, {house
-							.definition.entry.y}, floor {house.definition.entry.z}.
-					</p>{/if}
-			</div>
-		</div>
-		<p class="houses-page__management">
-			Use the game client's house controls to bid, transfer a house or move out.
-		</p>
-		<div class="houses-page__actions">
+						>.{:else}No bid has been submitted so far.{/if}
+					{#if house.bidEnd}The auction ends on <strong
+							>{deadline(house.bidEnd)}</strong
+						>.{/if}
+				</p>
+			{/if}
+		</IllustratedDetail>
+		<div class="houses-page__detail-actions">
+			{#if house.rented}
+				<Button
+					type="button"
+					disabled
+					tooltip="Move out using the game client's house controls"
+					>Move Out</Button>
+				<Button
+					type="button"
+					disabled
+					tooltip="Transfer using the game client's house controls"
+					>Transfer</Button>
+			{:else}
+				<Button
+					type="button"
+					disabled
+					tooltip="Bid using the game client's house controls">Bid</Button>
+			{/if}
 			<Button href={houseHref($page.url.searchParams)}>Back</Button>
 		</div>
+		<p class="houses-page__management">
+			Bids, transfers and move-outs are managed in the game client.
+			<a href={themePreviewHref($page.url, '/guides/manual?section=houses')}
+				>House controls</a>
+		</p>
 	{:else}
 		<p class="page-intro page-intro--section">
 			Here you can see the list of available houses, flats and guildhalls on {data.world}.
@@ -277,21 +287,17 @@
 		justify-content: center;
 		margin-top: 15px;
 	}
-	.houses-page__detail {
+	.houses-page__detail-actions {
 		display: flex;
-		align-items: flex-start;
-		gap: 9px;
-		padding: 5px;
-	}
-	.houses-page__picture {
-		flex: 0 0 150px;
-		object-fit: contain;
-	}
-	.houses-page__detail p {
-		margin-top: 15px;
+		justify-content: space-around;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin: 40px 0 25px;
+		padding-bottom: 5px;
 	}
 	.houses-page__management {
-		margin-top: 15px;
+		margin: 15px 0 0;
+		font-size: 12px;
 	}
 	.houses-page__results td:last-child {
 		width: 145px;
@@ -350,9 +356,6 @@
 		}
 		.houses-page__filters label {
 			white-space: normal;
-		}
-		.houses-page__detail {
-			flex-wrap: wrap;
 		}
 	}
 </style>

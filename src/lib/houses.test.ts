@@ -22,6 +22,7 @@ const house: PublicHouse = {
 	beds: 1,
 	owner: null,
 	rented: false,
+	paidUntil: 0,
 	bid: 0,
 	bidEnd: 0,
 	definition,
