@@ -136,8 +136,12 @@ class InstallerTests(unittest.TestCase):
             with patch.object(assets, "download", return_value=json.dumps({**valid, "url": url}).encode()):
                 with self.assertRaises(ValueError):
                     assets.read_channel()
-        with patch.object(assets, "download", return_value=json.dumps(valid).encode()):
+        with patch.object(assets, "download", return_value=json.dumps(valid).encode()) as download:
             self.assertEqual(assets.read_channel(), valid)
+            self.assertEqual(assets.read_channel(), valid)
+            urls = [call.args[0] for call in download.call_args_list]
+            self.assertTrue(all(url.startswith(assets.CHANNEL_URL + "?check=") for url in urls))
+            self.assertNotEqual(urls[0], urls[1])
 
     def test_installs_do_not_run_concurrently_on_one_root(self):
         self.destination.mkdir()

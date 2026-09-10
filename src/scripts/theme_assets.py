@@ -55,7 +55,8 @@ def release_url(url: str) -> str:
 
 
 def read_channel() -> dict:
-    channel = json.loads(download(CHANNEL_URL, 64 * 1024))
+    # A cached GitHub redirect can still identify the previous channel attachment.
+    channel = json.loads(download(CHANNEL_URL + "?check=" + uuid.uuid4().hex, 64 * 1024))
     if (not isinstance(channel, dict) or channel.get("schemaVersion") != 1
             or channel.get("name") != "classic"
             or not isinstance(channel.get("sha256"), str)
