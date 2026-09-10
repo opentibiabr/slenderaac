@@ -113,16 +113,16 @@
 		background-repeat: no-repeat;
 	}
 	.directory-filters__selected {
-		background: rgb(var(--color-primary-500) / 0.3);
+		background-color: rgb(var(--color-primary-500) / 0.3);
 	}
 	.directory-filters__choices a:hover {
 		text-decoration: underline;
 	}
 	:global(.theme-classic) .directory-filters__selected {
-		background: #bc9a83;
+		background-color: #bc9a83;
 	}
 	:global(.theme-classic) .directory-filters__choices a:hover {
-		background: #e6d3b5;
+		background-color: #e6d3b5;
 	}
 	@media (max-width: 767px) {
 		.directory-filters__group {
