@@ -148,6 +148,9 @@ class InstallerTests(unittest.TestCase):
         self.assertFalse((self.app / '.env').exists())
 
     def test_environment_defaults_duplicates_and_quoted_paths(self):
+        blank = 'THEME_ASSETS_ROOT=\nOUTFIT_ASSETS_ROOT=\nITEM_ASSETS_ROOT=\n'
+        self.assertEqual(assets.env_value(blank, "THEME_ASSETS_ROOT"), "")
+        self.assertEqual(assets.env_value(blank, "OUTFIT_ASSETS_ROOT"), "")
         text = 'SECRET="do not change"\nexport THEME_ASSETS_ROOT="old path" # comment\nTHEME_ASSETS_ROOT=other\n'
         updated = assets.configure_env(text, self.destination)
         self.assertIn('SECRET="do not change"', updated)

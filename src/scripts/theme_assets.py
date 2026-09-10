@@ -129,7 +129,7 @@ def unpack(archive: Path, staging: Path) -> dict:
 
 
 def env_value(text: str, name: str) -> str | None:
-    matches = re.findall(rf"(?m)^\s*(?:export\s+)?{re.escape(name)}\s*=\s*(.*)$", text)
+    matches = re.findall(rf"(?m)^[ \t]*(?:export[ \t]+)?{re.escape(name)}[ \t]*=[ \t]*(.*)$", text)
     if not matches:
         return None
     value = matches[-1].strip()
