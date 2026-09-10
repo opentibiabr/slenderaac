@@ -233,8 +233,28 @@
 .theme-classic .classic-native-content .classic-data-table tr:nth-child(even) {
 	background: rgb(241 224 198);
 }
-.theme-classic .classic-native-content .classic-data-table thead tr {
+.theme-classic
+	.classic-native-content
+	.classic-data-table
+	thead
+	tr:nth-child(n) {
 	background: rgb(212 192 161);
+}
+.theme-classic .classic-native-content .classic-data-table--grouped thead th {
+	text-align: center;
+}
+.theme-classic
+	.classic-native-content
+	.classic-data-table--grouped
+	thead
+	tr:nth-child(n) {
+	background: rgb(213 192 161);
+}
+.theme-classic
+	.classic-native-content
+	.classic-data-table--numeric
+	td:not(:first-child) {
+	text-align: right;
 }
 .theme-classic
 	.classic-native-content

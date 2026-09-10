@@ -576,6 +576,12 @@ optional portraits supplied by the external pack in both themes. Their captured
 presentation documents no longer determine the available entries or details.
 See [Server library](server-library.md) for import, identity and data contracts.
 
+For native world statistics, collector installation and grouped numeric tables,
+see [Kill statistics](kill-statistics.md). Multi-row table headings keep a uniform
+background instead of inheriting body-row striping. Filter controls with sprite
+backgrounds change only `background-color` for selection and hover so their icon
+position and repetition remain intact.
+
 The shared `CatalogHeading` has a portrait variant for this family: a 64px slot
 on the left, a title aligned right, and 18px text under Classic's 12px body font.
 `CatalogNavigation` supplies local previous/back/next links. The heading starts

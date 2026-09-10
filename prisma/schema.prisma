@@ -1095,3 +1095,27 @@ model DirectoryEntry {
   @@index([kind, published, promoted, name], map: "slender_directory_public_idx")
   @@map("slender_directory_entries")
 }
+
+model KillCollector {
+  id             String          @id @db.VarChar(36)
+  started_at     Int             @db.UnsignedInt
+  updated_at     Int             @db.UnsignedInt
+  dropped_events Int             @default(0) @db.UnsignedInt
+  statistics     KillStatistic[]
+
+  @@index([updated_at], map: "slender_kill_collectors_updated_idx")
+  @@map("slender_kill_collectors")
+}
+
+model KillStatistic {
+  collector_id      String        @db.VarChar(36)
+  minute            Int           @db.UnsignedInt
+  race              String        @db.VarChar(255)
+  players_killed    Int           @default(0) @db.UnsignedInt
+  killed_by_players Int           @default(0) @db.UnsignedInt
+  collector         KillCollector @relation(fields: [collector_id], references: [id], onDelete: Cascade, map: "slender_kill_statistics_collector_fk")
+
+  @@id([collector_id, minute, race])
+  @@index([minute], map: "slender_kill_statistics_minute_idx")
+  @@map("slender_kill_statistics")
+}

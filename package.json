@@ -3,6 +3,7 @@
 	"version": "0.2.0",
 	"private": true,
 	"scripts": {
+		"install:server-integration": "bun src/scripts/install-server-integration.ts",
 		"import:server-data": "bun src/scripts/import-server-data.ts",
 		"dev": "bun --env-file=.env vite dev",
 		"build": "vite build",
