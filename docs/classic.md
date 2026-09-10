@@ -328,6 +328,9 @@ endpoint currently has no audience provider and returns `topbarStats: null`;
 the information bar displays `—` with an unavailable tooltip, keeping the channel
 icons and configured links. Invalid or missing counters never become zero. The
 player count remains database-backed and also starts unknown until its first poll.
+The shared server-status badge also starts unavailable. Only an explicit offline
+response may show Offline; a pending first request must not invent that state.
+Later failed refreshes retain the last valid status.
 
 Selecting the Classic preview keeps live online counters enabled. Only explicit
 reference fixtures replace those values; choosing a theme does not select demo data.
