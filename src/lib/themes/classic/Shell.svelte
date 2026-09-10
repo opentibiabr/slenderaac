@@ -104,7 +104,9 @@
 	$: showAuxiliaryThemeboxes =
 		!isCompactNewsToolPage || !!nativePage?.auxiliaryThemeboxes;
 	$: showClassicGrid = $page.url.searchParams.get('classicGrid') === '1';
-	$: fontStyle = headlineFontStyle(data.themeAssets?.headlineFont);
+	$: fontStyle =
+		headlineFontStyle(data.themeAssets?.headlineFont) +
+		headlineFontStyle(data.themeAssets?.menuFont, 'ClassicMenu');
 	$: homeHref = makeClassicPreviewHref($page.url, '/');
 	$: accountHref = makeClassicPreviewHref($page.url, '/account');
 	$: accountLoginHref = makeClassicPreviewHref($page.url, '/account/login');

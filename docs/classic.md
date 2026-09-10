@@ -31,6 +31,21 @@ resizing the row or moving its icon and toggle. Keep the complete name in the
 accessible toggle label. Source images retain their original glyphs; the dynamic
 font is the pack's existing adaptation described above.
 
+An optional `menuFont` TTF asset supplies a separate typeface for dynamic menu
+labels. It uses the shared `ClassicMenu` face at 20px with compact tracking;
+page headlines keep `headlineFont`. The menu switches to these metrics only after
+the font loads successfully. Missing or failed fonts retain the existing fallback
+treatment, and fixed label images keep their original pixels. Comparing only the
+slot size cannot detect a different typeface: compare the same words and individual
+letterforms before accepting a replacement. Keep the configured name as real text.
+
+Font files remain external. Include only fonts licensed for web use and distribution
+in a public pack. The external packaging tool supports `localOnlyAssets` (a list of
+manifest asset keys) for local experiments: their files, aliases, hashes and source
+entries are omitted from the ZIP, while the active local manifest stays intact.
+Public document references to an excluded asset stop packaging. Such a local preview
+does not establish that the public pack contains the same font.
+
 New categories must use this component instead of a raw text span, a page
 headline or category-specific typography. In particular, `About <server name>`
 must not acquire a smaller font or separate offset to fit a sample server name.

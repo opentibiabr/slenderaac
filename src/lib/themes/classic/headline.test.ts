@@ -8,6 +8,13 @@ void test('headline fonts accept only encoded local font assets', () => {
 		headlineFontStyle('/theme-assets/classic/fonts/headline.ttf?v=abc123'),
 		/font-family:ClassicHeadline/,
 	);
+	assert.match(
+		headlineFontStyle(
+			'/theme-assets/classic/fonts/menu.ttf?v=abc123',
+			'ClassicMenu',
+		),
+		/font-family:ClassicMenu/,
+	);
 	for (const value of [
 		undefined,
 		'https://example.org/font.ttf',
