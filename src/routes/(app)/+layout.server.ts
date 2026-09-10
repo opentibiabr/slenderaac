@@ -70,9 +70,10 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
 	const isAdmin = locals.session?.type === AccountType.God;
+	const classicAssetMetadata = await loadThemeAssetMetadata('classic');
 	const themeAssetMetadata =
 		selectedTheme === 'classic'
-			? await loadThemeAssetMetadata(selectedTheme)
+			? classicAssetMetadata
 			: { assets: {}, version: null, warning: null };
 
 	return {
@@ -80,6 +81,7 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		featuredFansite: await featuredFansite(),
 		currentPoll: await currentPoll(),
 		serverName: await serverName(),
+		serverLogo: classicAssetMetadata.assets.serverLogo ?? null,
 		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,

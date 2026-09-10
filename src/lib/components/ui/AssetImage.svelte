@@ -3,8 +3,8 @@
 
 	export let src: string | null | undefined;
 	export let alt: string;
-	export let width: number;
-	export let height: number;
+	export let width: number | undefined = undefined;
+	export let height: number | undefined = undefined;
 	export let fit: 'contain' | 'cover' = 'contain';
 	let image: HTMLImageElement | undefined;
 	let failed = false;
@@ -23,8 +23,8 @@
 		{alt}
 		{width}
 		{height}
-		style:width={`${width}px`}
-		style:height={`${height}px`}
+		style:width={width === undefined ? undefined : `${width}px`}
+		style:height={height === undefined ? undefined : `${height}px`}
 		style:object-fit={fit}
 		on:error={() => (failed = true)} />{:else}<slot>{alt}</slot>{/if}
 

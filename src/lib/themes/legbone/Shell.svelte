@@ -20,10 +20,10 @@
 	import { page } from '$app/stores';
 
 	import BoostedSection from '$lib/components/ui/BoostedSection.svelte';
+	import ServerBrand from '$lib/components/ui/ServerBrand.svelte';
 	import ServerStatus from '$lib/components/ui/ServerStatus.svelte';
 	import SidebarLeft from '$lib/components/ui/SidebarLeft.svelte';
 	import SidebarRight from '$lib/components/ui/SidebarRight.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatSeconds, secondsUntil } from '$lib/utils';
 
 	import {
@@ -49,7 +49,6 @@
 	} = data);
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: staticPages = data.staticPages;
-	$: serverLogo = data.themeAssets?.serverLogo;
 
 	function drawerOpen(): void {
 		drawerStore.open({});
@@ -120,27 +119,11 @@
 						</button>
 						<div
 							class="w-full h-full -mb-6 hidden md:flex flex-col items-center justify-end">
-							<a
-								class="server-brand server-brand--desktop"
-								href={themePreviewHref($page.url, '/')}
-								aria-label={data.serverName}>
-								{#if serverLogo}<img
-										src={serverLogo}
-										alt={data.serverName} />{:else}<span>{data.serverName}</span
-									>{/if}
-							</a>
+							<ServerBrand className="server-brand server-brand--desktop" />
 						</div>
 					</svelte:fragment>
 					<div class="flex md:hidden items-center gap-2">
-						<a
-							class="server-brand server-brand--mobile"
-							href={themePreviewHref($page.url, '/')}
-							aria-label={data.serverName}>
-							{#if serverLogo}<img
-									src={serverLogo}
-									alt={data.serverName} />{:else}<span>{data.serverName}</span
-								>{/if}
-						</a>
+						<ServerBrand className="server-brand server-brand--mobile" />
 					</div>
 					<svelte:fragment slot="trail">
 						<div class="hidden md:block w-48">
@@ -257,7 +240,7 @@
 		overflow: visible;
 		min-width: 0;
 	}
-	.server-brand {
+	:global(.theme-legbone .server-brand) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -265,20 +248,20 @@
 		font-weight: bold;
 		overflow-wrap: anywhere;
 	}
-	.server-brand--desktop {
+	:global(.theme-legbone .server-brand--desktop) {
 		width: 144px;
 		height: 128px;
 		font-size: 28px;
 		color: rgb(255 233 172);
 		text-shadow: 1px 2px 3px black;
 	}
-	.server-brand--mobile {
+	:global(.theme-legbone .server-brand--mobile) {
 		min-width: 0;
 		max-width: 100%;
 		height: 48px;
 		font-size: 18px;
 	}
-	.server-brand img {
+	:global(.theme-legbone .server-brand img) {
 		width: 100%;
 		height: 100%;
 		object-fit: contain;

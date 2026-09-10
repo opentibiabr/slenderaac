@@ -139,13 +139,20 @@ are escaped before insertion into rendered Markdown. Keep the application and
 asset pack versions together when upgrading; refresh local comparison fixtures
 with the matching importer, which preserves their IDs across text normalization.
 
-Classic renders the configured name in the existing logo slot by default. A
-server-owned `serverLogo` asset can replace that text, and `serverShopButton` can
-supply a custom shop button label. Without these assets, the shared components
-render the current server name as text, so artwork cannot override its identity.
-The default theme's desktop and mobile headers use the same configured name and
-optional `serverLogo` from its own pack. Both headers link home and preserve the
-active theme preview.
+Server identity is global. The application loads the operator-owned `serverLogo`
+asset from the external Classic pack independently of the selected layout and
+exposes one `serverLogo` value beside `serverName` in shared layout data. Installing
+or updating that asset updates both themes; do not copy the file into each theme
+or load a different identity based on the visitor's layout selection.
+
+Both themes render their logo slots through `ServerBrand`, including the default
+theme's desktop and mobile headers. It owns the home link, preview retention,
+accessible name and configured-name fallback when the logo is absent or fails to
+load. `AssetImage` shares the failure handling and preserves explicit dimensions
+for other callers; logo dimensions come from the theme's existing slot rules.
+Themes own only presentation such as size, alignment and fallback typography.
+New themes must reuse this data and component rather than duplicate branding
+logic. Classic's optional `serverShopButton` remains presentation-specific.
 
 New application routes inherit the compact Classic frame and shared native form
 styles by default. Only the home page uses the news layout. News tools and adapted

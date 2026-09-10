@@ -13,6 +13,7 @@
 
 	import type { InformationPresentation } from '$lib/information-content';
 	import DirectoryLogo from '$lib/components/ui/DirectoryLogo.svelte';
+	import ServerBrand from '$lib/components/ui/ServerBrand.svelte';
 	import {
 		onlineCounter,
 		type OnlineCounters,
@@ -156,7 +157,6 @@
 		);
 	}
 	$: staticPages = data.staticPages;
-	$: logo = classicAsset(data.themeAssets, 'serverLogo');
 	$: background = classicAsset(data.themeAssets, 'background');
 	$: menuOrnament = classicAsset(data.themeAssets, 'menuOrnament');
 	$: contentOrnament = classicAsset(data.themeAssets, 'contentOrnament');
@@ -687,16 +687,7 @@
 
 	<div class="theme-classic__shell">
 		<aside class="theme-classic__left">
-			<a
-				href={homeHref}
-				class="theme-classic__logo"
-				aria-label={data.serverName}>
-				{#if logo}
-					<img src={logo} alt={data.serverName} />
-				{:else}
-					<span>{data.serverName}</span>
-				{/if}
-			</a>
+			<ServerBrand className="theme-classic__logo" />
 			{#if menuOrnament}
 				<img class="theme-classic__ornament" src={menuOrnament} alt="" />
 			{/if}
@@ -1246,7 +1237,7 @@
 		flex: 0 0 146px;
 	}
 
-	.theme-classic .theme-classic__logo {
+	:global(.theme-classic .theme-classic__logo) {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1263,7 +1254,7 @@
 		text-decoration: none;
 	}
 
-	.theme-classic .theme-classic__logo img {
+	:global(.theme-classic .theme-classic__logo img) {
 		max-width: 196px;
 		max-height: 158px;
 		object-fit: contain;
