@@ -84,3 +84,24 @@ animation frame will remain still. Check the sprite pack when these portraits
 are missing but the theme borders and background load correctly.
 
 Maintainers: see [publishing and refreshing packages](classic.md#publishing-the-fixed-asset-channel).
+
+## Server-owned sidebar content
+
+The pack supplies frames and decorative artwork. Boosted selections and online
+players come from the server database; polls and fansites use their admin records.
+Captured counts, shop labels, poll questions and sidebar destinations never replace
+these values. Twitch/YouTube audience counts show unavailable until an audience
+provider supplies data; this does not hide the channel icons or configured links.
+
+The screenshot page and daily teaser share `classic/reference/pages/screenshots.json`.
+Replace sample images/captions with your own collection; keep each entry's positive
+unique `id` stable when removing or reordering entries. Both layouts use the same
+collection, and an empty collection hides the teaser.
+
+For a server trailer, set `PUBLIC_TRAILER_URL` in `.env`. You can add an image such as
+`classic/custom/server-trailer.png` outside the checkout and map the manifest's
+`assets.serverTrailerPreview` to `custom/server-trailer.png`. Update the corresponding
+manifest hash/version using the existing asset-pack workflow. Without that optional
+image, or if it fails to load, the card shows a Play trailer action. Captured trailer
+thumbnails are not a fallback. Keep this poster in sync with the configured video
+and reapply operator customizations after a package upgrade.

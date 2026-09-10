@@ -13,6 +13,7 @@
 
 	import type { InformationPresentation } from '$lib/information-content';
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
+	import AssetImage from '$lib/components/ui/AssetImage.svelte';
 	import DirectoryLogo from '$lib/components/ui/DirectoryLogo.svelte';
 	import ServerBrand from '$lib/components/ui/ServerBrand.svelte';
 	import {
@@ -440,7 +441,7 @@
 	$: networkFacebook = classicAsset(data.themeAssets, 'networkFacebook');
 	$: networkYoutube = classicAsset(data.themeAssets, 'networkYoutube');
 	$: promoTrailerBox = classicAsset(data.themeAssets, 'promoTrailerBox');
-	$: trailerPreview = classicAsset(data.themeAssets, 'trailerPreview');
+	$: trailerPreview = classicAsset(data.themeAssets, 'serverTrailerPreview');
 	$: trailerFrame = classicAsset(data.themeAssets, 'trailerFrame');
 	$: trailerClose = classicAsset(data.themeAssets, 'trailerClose');
 	$: promoScreenshotBox = classicAsset(data.themeAssets, 'promoScreenshotBox');
@@ -1029,12 +1030,17 @@
 					href={data.siteLinks.trailer}
 					aria-label={`Play ${data.serverName} trailer`}>
 					<img src={promoTrailerBox} alt="Trailer" />
-					{#if trailerPreview}
-						<img
-							class="theme-classic__trailer-preview"
+					<span class="theme-classic__trailer-preview">
+						<AssetImage
 							src={trailerPreview}
-							alt="" />
-					{/if}
+							alt=""
+							width={170}
+							height={110}
+							fit="cover">
+							<span class="theme-classic__trailer-play"
+								><span aria-hidden="true">&#9654;</span> Play trailer</span>
+						</AssetImage>
+					</span>
 				</a>
 			{/if}
 
@@ -2232,6 +2238,21 @@
 		left: 5px;
 		width: 170px !important;
 		height: 110px !important;
+	}
+
+	.theme-classic .theme-classic__trailer-play {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		background: rgb(15 22 25);
+		color: white;
+		font:
+			12px Verdana,
+			Arial,
+			sans-serif;
 	}
 
 	.theme-classic .theme-classic__screenshot-image-clip {

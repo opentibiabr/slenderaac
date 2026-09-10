@@ -275,9 +275,10 @@ changing content conversion.
 
 The pack supplies decorative promo artwork and calendar colors. The shop card
 uses the configured server name and the local coin-shop action. Captured offer
-text and image-based button labels cannot override its product or server identity. The application owns its built-in menu, shared actions, footer destinations and
-boosted-library links are owned by the application. Screenshot destinations are selected from the published gallery, never from
-a captured sidebar link. Only calendar color tokens are loaded from legacy
+text and image-based button labels cannot override its product or server identity.
+The application owns built-in menus, shared actions, footer destinations and
+boosted-library links. Screenshot destinations come from the published gallery,
+never from a captured sidebar link. Only calendar color tokens are loaded from legacy
 presentation metadata. The footer
 identifies SlenderAAC and OpenTibiaBR. Updating or removing a presentation pack
 cannot replace menu destinations or remove built-in sections. Visible custom pages
@@ -294,6 +295,11 @@ empty or invalid URLs render the icons and available counters as text, with a
 channel-not-configured tooltip. Only configured destinations become links. Never
 filter these slots out or restore captured channel URLs as defaults. Empty values
 still hide the optional Networks and trailer boxes.
+The trailer card never reuses a captured video's thumbnail. Its optional
+`serverTrailerPreview` manifest asset is explicitly maintained by the server
+operator for `PUBLIC_TRAILER_URL`. Missing or failed artwork shows a native Play
+trailer action in the same frame. Updating the video requires updating its poster
+as well; legacy `trailerPreview` assets are ignored.
 Run `src/lib/themes/classic/info-bar.integration.test.ts` against an already
 running local app by setting `CLASSIC_TEST_ORIGIN` and using `bun test`.
 Give the test process the same channel URL settings as the app. Cover both blank

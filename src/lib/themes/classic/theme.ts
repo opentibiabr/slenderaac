@@ -114,6 +114,7 @@ export type ClassicAssetKey =
 	| 'promoNewcomerBox'
 	| 'promoTrailerBox'
 	| 'trailerPreview'
+	| 'serverTrailerPreview'
 	| 'trailerPreviewHover'
 	| 'trailerFrame'
 	| 'trailerClose'
