@@ -10,6 +10,8 @@ import {
 	type DirectoryRecord,
 	directoryUrl,
 	filterFansites,
+	resellerDirectory,
+	resellerProperties,
 } from './directories';
 
 const form = (values: Record<string, string | string[]>) => {
@@ -162,4 +164,52 @@ void test('failed editor input keeps checked values without retaining unbounded 
 	assert.equal(values.languages, 'en,pt');
 	assert.equal(values.content, 'tools');
 	assert.equal(values.published, 'on');
+});
+
+void test('resellers list configured countries and return only partners serving the selection', () => {
+	const entry: DirectoryRecord = {
+		id: 'one',
+		kind: 'reseller',
+		name: 'Partner',
+		url: 'https://example.org',
+		description: '',
+		promoted: false,
+		featured: false,
+		contactExists: false,
+		details: directoryDetails({ countries: ['US', 'BR'] }),
+	};
+	assert.deepEqual(
+		resellerDirectory([entry], '').countries.map((c) => c.value),
+		['BR', 'US'],
+	);
+	assert.equal(resellerDirectory([entry], '').entries.length, 0);
+	assert.equal(resellerDirectory([entry], 'BR').entries.length, 1);
+	const empty = resellerDirectory([entry], 'PT');
+	assert.equal(empty.entries.length, 0);
+	assert.ok(empty.countries.some((c) => c.value === 'PT'));
+});
+
+void test('reseller contact rows omit empty fields and mark partner websites as external', () => {
+	const entry: DirectoryRecord = {
+		id: 'one',
+		kind: 'reseller',
+		name: 'Partner',
+		url: 'https://example.org',
+		description: '',
+		promoted: false,
+		featured: false,
+		contactExists: false,
+		details: directoryDetails({
+			email: 'support@example.org',
+			contact: 'Service team',
+		}),
+	};
+	const rows = resellerProperties(entry);
+	assert.deepEqual(
+		rows.map((row) => row.label),
+		['Name:', 'Website:', 'E-Mail Address:', 'Contact:'],
+	);
+	assert.equal(rows[1].external, true);
+	assert.equal(rows[1].href, entry.url);
+	assert.equal(rows[2].href, 'mailto:support@example.org');
 });

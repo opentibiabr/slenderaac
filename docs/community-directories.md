@@ -39,8 +39,23 @@ accessible labels when these optional assets are unavailable. Shared table frame
 surfaces and small panels own their borders and spacing. On narrow screens only
 the wide directory tables scroll horizontally.
 
-The shared directory editor also stores reseller entries with country codes and
-contact details. It does not create payment orders or grant server currency.
+## Resellers
+
+`/community/resellers` lists published partners for the selected country. The
+country selector is built from configured partners, uses English country names
+and preserves its selection and layout in the URL. A valid country without
+partners shows an empty result. Draft entries do not add countries to the menu.
+
+Choose the Resellers directory in the shared editor and provide at least one
+two-letter country code. Address, telephone, mobile phone, email and contact text
+are optional. Empty fields are omitted. Websites open the partner's site; email
+addresses provide a mail link. No commercial partners are seeded automatically.
+The directory does not create payment orders or grant server currency.
+
+`AutoSelectForm` submits when the selection changes and keeps an explicit submit
+button available without JavaScript. `PropertyTable` renders the contact rows,
+while `PagePanel`'s `details` variant owns the compact stack spacing. The optional
+`headlineResellers` image uses its native 192 × 32 title slot.
 
 ## Installation and validation
 

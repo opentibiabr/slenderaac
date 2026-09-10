@@ -14,6 +14,7 @@
 		| 'form'
 		| 'stack'
 		| 'paged'
+		| 'details'
 		| 'plain'
 		| 'flush'
 		| 'message' = 'native';
@@ -24,7 +25,10 @@
 		class="classic-page-panel"
 		class:classic-page-panel--list={variant === 'list'}
 		class:classic-page-panel--form={variant === 'form'}
-		class:classic-page-panel--stack={variant === 'stack' || variant === 'paged'}
+		class:classic-page-panel--stack={variant === 'stack' ||
+			variant === 'paged' ||
+			variant === 'details'}
+		class:classic-page-panel--details={variant === 'details'}
 		class:classic-page-panel--paged={variant === 'paged'}
 		class:classic-page-panel--plain={variant === 'plain'}
 		class:classic-page-panel--flush={variant === 'flush'}
@@ -129,6 +133,14 @@
 	}
 	:global(.theme-classic) .classic-page-panel--paged .classic-page-panel__body {
 		padding-bottom: 2px;
+	}
+	:global(.theme-classic)
+		.classic-page-panel--details
+		.classic-page-panel__body {
+		padding-top: 6px;
+	}
+	:global(.theme-classic) .classic-page-panel--details {
+		margin-bottom: 15px;
 	}
 	:global(
 		.theme-classic .classic-page-panel--stack .classic-table-frame__rail

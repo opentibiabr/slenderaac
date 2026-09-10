@@ -10,6 +10,15 @@ type FeaturePage = {
 };
 
 export const featurePages: Record<string, FeaturePage> = {
+	resellers: {
+		path: '/community/resellers',
+		title: 'Resellers',
+		section: 'community',
+		headline: 'headlineResellers',
+		headlineWidth: 192,
+		headlineHeight: 32,
+		queryKeys: ['country'],
+	},
 	fansites: {
 		path: '/community/fansites',
 		title: 'Fansites',

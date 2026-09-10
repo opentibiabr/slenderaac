@@ -261,3 +261,35 @@ export function directoryEditorValues(data: FormData) {
 			.slice(0, 200);
 	return values;
 }
+
+export function resellerDirectory(entries: DirectoryRecord[], country: string) {
+	const available = new Set(
+		entries.flatMap((entry) => entry.details.countries),
+	);
+	if (country && directoryCountry(country)) available.add(country);
+	return {
+		countries: [...available]
+			.map((value) => ({ value, label: directoryCountry(value)! }))
+			.sort((a, b) => a.label.localeCompare(b.label, 'en')),
+		entries: country
+			? entries.filter((entry) => entry.details.countries.includes(country))
+			: [],
+	};
+}
+
+export function resellerProperties(entry: DirectoryRecord) {
+	return [
+		{ label: 'Name:', value: entry.name, strong: true },
+		{ label: 'Address:', value: entry.details.address },
+		{ label: 'Telephone Number:', value: entry.details.telephone },
+		{ label: 'Mobile Phone Number:', value: entry.details.mobile },
+		{ label: 'Website:', value: entry.url, href: entry.url, external: true },
+		{
+			label: 'E-Mail Address:',
+			value: entry.details.email,
+			href: entry.details.email ? `mailto:${entry.details.email}` : undefined,
+		},
+		{ label: 'Contact:', value: entry.details.contact },
+		{ label: 'Description:', value: entry.description },
+	].filter((row) => row.value);
+}
