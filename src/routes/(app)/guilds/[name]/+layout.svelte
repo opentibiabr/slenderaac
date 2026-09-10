@@ -71,7 +71,7 @@
 							<th class="w-24">{$_('level')}</th>
 						</tr>
 					</thead>
-					{#each guild.ranks as rank}
+					{#each guild.ranks as rank (rank.id)}
 						<tr
 							class="text-white border-4"
 							class:bg-primary-500={rank.level === 3}
@@ -90,7 +90,7 @@
 							class:border-primary-500={rank.level === 3}
 							class:border-secondary-500={rank.level === 2}
 							class:border-tertiary-500={rank.level < 2}>
-							{#each rank.members as character}
+							{#each rank.members as character (character.id)}
 								<GuildCharacterRow
 									{character}
 									rankLevel={rank.level}
@@ -116,7 +116,7 @@
 						</tr>
 					</thead>
 					<tbody class="transition-all duration-300 ease-in-out border-x-4">
-						{#each guild.invited as character}
+						{#each guild.invited as character (character.id)}
 							<GuildCharacterRow
 								{character}
 								rankLevel={-1}

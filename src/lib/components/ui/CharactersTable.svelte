@@ -88,7 +88,7 @@
 				</tr>
 			</thead>
 			<tbody class="transition-all duration-300 ease-in-out">
-				{#each characters as character}
+				{#each characters as character (character.id)}
 					<tr
 						class="[&>td]:!align-middle"
 						transition:fly|local={{

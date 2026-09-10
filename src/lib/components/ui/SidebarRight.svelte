@@ -23,7 +23,7 @@
 	</header>
 	<hr class="opacity-5" />
 	<article class="py-2 px-4 flex flex-col gap-2">
-		{#each highscores as character, i}
+		{#each highscores as character, i (character.id)}
 			<a
 				href={themePreviewHref(
 					$page.url,
@@ -82,7 +82,7 @@
 		</header>
 		<hr class="opacity-5" />
 		<article class="py-2 px-4 flex flex-col gap-2">
-			{#each accountCharacters as character}
+			{#each accountCharacters as character (character.id)}
 				<a
 					href={themePreviewHref(
 						$page.url,

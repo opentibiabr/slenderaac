@@ -32,7 +32,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each characters as character, i}
+				{#each characters as character, i (character.id)}
 					<tr class="[&>td]:!align-middle">
 						<td>{i + 1}</td>
 						{#if $page.data.selectedTheme !== 'classic'}<td>

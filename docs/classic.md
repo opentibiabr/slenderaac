@@ -348,6 +348,11 @@ discard decoded frames. Keep pending-load indicators centered within the portrai
 slot, independent of the larger artwork's offset. A real appearance change still
 cancels stale work, and missing optional artwork must leave the page usable.
 
+Character lists that own animated portraits must key rows by the stable player
+ID, and guild rank groups by their rank ID. Sorting, filtering, or refreshing
+records must keep each retained character attached to its existing portrait
+instance; using row positions reloads images when only their order changes.
+
 Automatic search belongs to the visible search control. Legbone's character and
 guild searches share `SearchQuerier`, which cancels pending input on navigation
 and synchronizes from the current URL. Do not mount an automatic search behind
