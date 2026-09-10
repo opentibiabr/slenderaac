@@ -286,6 +286,10 @@ changing content conversion.
 The pack supplies decorative promo artwork and calendar colors. The shop card
 uses the configured server name and the local coin-shop action. Captured offer
 text and image-based button labels cannot override its product or server identity.
+Account coin labels and both checkout product descriptions use the same server
+identity (`SERVER_NAME`, then the imported server configuration). Both supported
+languages distinguish transferable balances. `PUBLIC_TITLE` still identifies the
+website and merchant statement descriptor; it does not name the in-game product.
 The application owns built-in menus, shared actions, footer destinations and
 boosted-library links. Screenshot destinations come from the published gallery,
 never from a captured sidebar link. Only calendar color tokens are loaded from legacy

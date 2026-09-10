@@ -9,8 +9,6 @@
 	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
-	import { PUBLIC_TITLE } from '$env/static/public';
-
 	export let account: AccountInfo;
 </script>
 
@@ -57,13 +55,19 @@
 			<dd>{formatDate(account.lastLogin)}</dd>
 		</div>
 		<div class="data-row">
-			<dt>{$_('game-coins', { values: { PUBLIC_TITLE } })}</dt>
+			<dt>
+				{$_('game-coins', { values: { PUBLIC_TITLE: $page.data.serverName } })}
+			</dt>
 			<dd class="flex flex-row items-center gap-2">
 				{account.coins}
 			</dd>
 		</div>
 		<div class="data-row">
-			<dt>{$_('game-coins-trasferable', { values: { PUBLIC_TITLE } })}</dt>
+			<dt>
+				{$_('game-coins-trasferable', {
+					values: { PUBLIC_TITLE: $page.data.serverName },
+				})}
+			</dt>
 			<dd class="flex flex-row items-center gap-2">
 				{account.coinsTransferable}
 				<Button

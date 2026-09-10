@@ -53,7 +53,7 @@
 	"email": "Email",
 	"enable-2fa": "Ativar 2FA",
 	"enable-2fa-description": "Use seu aplicativo de autenticação para escanear o código QR abaixo.",
-	"game-coins": "Pontos Online",
+	"game-coins": "Moedas {PUBLIC_TITLE}",
 	"general-information": "Informações Gerais",
 	"generic-error": "Algo deu errado, por favor tente novamente.",
 	"get-coins": "Obter coins",
@@ -282,7 +282,7 @@
 	"starting-town": "Cidade Inicial",
 	"play-tutorial": "Jogar Tutorial",
 	"premium-days": "Tempo VIP restante",
-	"game-coins-trasferable": "{PUBLIC_TITLE} coins",
+	"game-coins-trasferable": "Moedas {PUBLIC_TITLE} (transferíveis)",
 	"roadmap": {
 		"title": "Roadmap",
 		"in-progress": "Em andamento",
