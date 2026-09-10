@@ -81,6 +81,7 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 					boosted: {
 						name: boosted?.boostname ?? null,
 						id: boostedEntry?.id ?? null,
+						outfit: boosted,
 					},
 				}
 			: null,

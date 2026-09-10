@@ -84,10 +84,13 @@ the catalog layout and the installed external catalog data in both themes. Creat
 portraits open local detail views with previous/back/next navigation. Those views
 currently show the catalog identity and portrait; additional creature descriptions
 and combat data have not been imported. Boss portraits remain noninteractive,
-matching the source catalog. Daily boosted selections come from the server database.
-Portrait lookup also accepts noninteractive boss cards, so a local boosted boss
-can display its artwork without acquiring a creature-detail link.
-Without catalog data, these routes retain an honest local empty state.
+matching the source catalog. Daily boosted selections and appearances come from
+the server database. The shared library card uses `AnimatedOutfit` in both themes,
+including selections that have no matching catalog entry. A matching creature ID
+adds a local detail link; boss cards remain noninteractive. Catalog portraits
+must not override a daily selection or fill an empty one. Missing sprites stop
+loading and leave the selected name visible. Without catalog data, these routes
+retain an honest local empty state.
 
 The Classic header also reads the daily selections from the shared layout load.
 It uses `AnimatedOutfit` and `/api/outfits`, just like Legbone, while the external

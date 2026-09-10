@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import type { BoostedProps } from '$lib/boosted';
 	import CatalogHeading from '$lib/components/ui/CatalogHeading.svelte';
 	import CatalogNavigation from '$lib/components/ui/CatalogNavigation.svelte';
 	import { type CreatureRecord, creatureSentences } from '$lib/creatures';
@@ -11,15 +12,16 @@
 	export let entries: { id: string; name: string }[];
 	export let selected: CreatureRecord | null = null;
 	export let boss = false;
-	export let boosted: { name: string | null; id: string | null };
+	export let boosted: {
+		name: string | null;
+		id: string | null;
+		outfit: BoostedProps | null;
+	};
 	export let artwork: Record<string, string> | null = null;
 	$: assets = artwork ?? $page.data.themeAssets;
 	$: index = selected
 		? entries.findIndex((entry) => entry.id === selected?.id)
 		: -1;
-	$: boostedImage = boosted.id
-		? (assets?.[`creatureIcon-${boosted.id}`] ?? null)
-		: null;
 	const href = (id: string) =>
 		`${$page.url.pathname}?race=${encodeURIComponent(id)}`;
 </script>
@@ -42,17 +44,7 @@
 		</div>
 	</div>
 {:else}
-	<LibraryBoosted
-		{assets}
-		{boss}
-		boosted={{
-			name: boosted.name,
-			image: boostedImage,
-			entry:
-				boosted.id && boosted.name
-					? { race: boosted.id, name: boosted.name, image: boostedImage ?? '' }
-					: null,
-		}} />
+	<LibraryBoosted {assets} {boss} {boosted} />
 	{#if entries.length}
 		<div class="creature-catalog">
 			{#each entries as entry}
