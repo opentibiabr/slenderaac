@@ -32,7 +32,20 @@
 	let frames: Frame[] = [];
 	$: context = canvas?.getContext('2d', {});
 
-	$: void sourceChanged(outfit);
+	// Parent data can be replaced during navigation without changing the portrait.
+	$: source = outfit?.looktype
+		? outfitURL({
+				looktype: outfit.looktype,
+				lookaddons: outfit.lookaddons ?? 0,
+				lookhead: outfit.lookhead ?? 0,
+				lookbody: outfit.lookbody ?? 0,
+				looklegs: outfit.looklegs ?? 0,
+				lookfeet: outfit.lookfeet ?? 0,
+				mount: outfit.mount ?? outfit.lookmount ?? 0,
+				resize: true,
+			})
+		: '';
+	$: void sourceChanged(source);
 
 	let controller: AbortController | null = null;
 	let requestId = 0;
@@ -43,7 +56,7 @@
 	let actualMount: boolean | null = null;
 	$: hasMount = actualMount ?? Boolean(outfit?.lookmount || outfit?.mount);
 
-	async function sourceChanged(outfit: Outfit) {
+	async function sourceChanged(source: string) {
 		controller?.abort();
 		const current = ++requestId;
 		frames = [];
@@ -52,18 +65,11 @@
 		shownFor = 0;
 		actualMount = null;
 		loading = false;
-		if (!outfit?.looktype || !browser) return;
+		if (!source || !browser) return;
 		controller = new AbortController();
 		loading = true;
 		try {
-			const response = await fetch(
-				outfitURL({
-					...outfit,
-					mount: outfit.mount ?? outfit.lookmount ?? 0,
-					resize: true,
-				}),
-				{ signal: controller.signal },
-			);
+			const response = await fetch(source, { signal: controller.signal });
 			if (!response.ok) return;
 			const data: unknown = await response.json();
 			const next = await Promise.all(
@@ -130,11 +136,11 @@
 
 <div class="relative w-12 h-12 {klass} overflow-visible">
 	<slot />
-	<div
-		class="absolute {hasMount
-			? '-left-7 -bottom-1'
-			: '-left-10 bottom-1'} {innerClass}">
-		{#if frames.length && outfit?.looktype > 0}
+	{#if frames.length && outfit?.looktype > 0}
+		<div
+			class="absolute {hasMount
+				? '-left-7 -bottom-1'
+				: '-left-10 bottom-1'} {innerClass}">
 			<canvas
 				bind:this={canvas}
 				width={frames[0].image.naturalWidth}
@@ -142,8 +148,10 @@
 				class="w-20 h-20"
 				role="img"
 				aria-label={alt} />
-		{:else if loading}
-			<ProgressRadial />
-		{/if}
-	</div>
+		</div>
+	{:else if loading}
+		<div class="absolute inset-0 grid place-items-center" aria-hidden="true">
+			<ProgressRadial width="w-6" />
+		</div>
+	{/if}
 </div>

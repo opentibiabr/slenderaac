@@ -341,6 +341,13 @@ above the viewport. Verify consecutive links near the bottom of an expanded menu
 keyboard activation and long-to-short page navigation. Keep these rules scoped to
 Legbone desktop; mobile retains its drawer, which closes after navigation.
 
+Shared animated portraits reload only when their appearance URL changes, not when
+navigation replaces a character or boosted-selection object. Build that URL from
+normalized appearance fields in a fixed order; names and ranking changes must not
+discard decoded frames. Keep pending-load indicators centered within the portrait
+slot, independent of the larger artwork's offset. A real appearance change still
+cancels stale work, and missing optional artwork must leave the page usable.
+
 The shared layout switcher stays fixed to the desktop viewport, outside the shell,
 and does not add flow height or alter background/column offsets. Its mobile
 treatment provides a sticky row above the theme header so it remains available
