@@ -17,11 +17,6 @@ export const GET: RequestHandler = async () => {
 	return json({
 		serverOnline,
 		onlinePlayerCount,
-		topbarStats: {
-			twitchChannels: 0,
-			twitchViewers: 0,
-			youtubeChannels: 0,
-			youtubeViewers: 0,
-		},
+		topbarStats: null,
 	});
 };

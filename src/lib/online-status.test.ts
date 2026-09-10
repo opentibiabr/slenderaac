@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { type OnlineStatus, pollOnlineStatus } from './online-status';
+import {
+	onlineCounter,
+	type OnlineStatus,
+	pollOnlineStatus,
+} from './online-status';
 
 async function withPollingFixture(
 	run: (fixture: {
@@ -77,10 +81,10 @@ void test('status polling validates responses, preserves the last value on failu
 				serverOnline: true,
 				onlinePlayerCount: 12,
 				topbarStats: {
-					twitchChannels: 2,
-					twitchViewers: 0,
-					youtubeChannels: 0,
-					youtubeViewers: 0,
+					twitchChannels: null,
+					twitchViewers: null,
+					youtubeChannels: null,
+					youtubeViewers: null,
 				},
 			},
 		]);
@@ -132,5 +136,52 @@ void test('a slow status request is aborted without overlapping or publishing it
 		await advance(10000);
 		assert.equal(updates.length, 0);
 		assert.equal(requests.length, 2);
+	});
+});
+
+void test('missing or invalid audience metrics remain unknown while measured zero is preserved', () => {
+	for (const value of [
+		undefined,
+		null,
+		'',
+		'0',
+		-1,
+		1.5,
+		NaN,
+		Infinity,
+		Number.MAX_SAFE_INTEGER + 1,
+	])
+		assert.equal(onlineCounter(value), null);
+	for (const value of [0, 1, 5728]) assert.equal(onlineCounter(value), value);
+});
+
+void test('audience metrics can move from unknown to measured and back without inventing zero', async () => {
+	await withPollingFixture(async ({ advance, requests, updates }) => {
+		const stats = {
+			twitchChannels: 0,
+			twitchViewers: 12,
+			youtubeChannels: 1,
+			youtubeViewers: 42,
+		};
+		for (const topbarStats of [null, stats, null]) {
+			requests[requests.length - 1].resolve(
+				Response.json({
+					serverOnline: true,
+					onlinePlayerCount: 0,
+					topbarStats,
+				}),
+			);
+			await advance(0);
+			assert.deepEqual(
+				updates.at(-1)?.topbarStats,
+				topbarStats ?? {
+					twitchChannels: null,
+					twitchViewers: null,
+					youtubeChannels: null,
+					youtubeViewers: null,
+				},
+			);
+			await advance(5000);
+		}
 	});
 });

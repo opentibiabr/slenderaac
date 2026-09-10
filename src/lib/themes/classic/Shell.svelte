@@ -602,12 +602,12 @@
 
 	beforeNavigate(drawerClose);
 
-	let onlinePlayerCount = 0;
+	let onlinePlayerCount: number | null = null;
 	let topbarStats: OnlineCounters = {
-		twitchChannels: 0,
-		twitchViewers: 0,
-		youtubeChannels: 0,
-		youtubeViewers: 0,
+		twitchChannels: null,
+		twitchViewers: null,
+		youtubeChannels: null,
+		youtubeViewers: null,
 	};
 
 	$: effectiveTopbarStats = classicReference
@@ -623,11 +623,12 @@
 		: onlinePlayerCount;
 
 	const formatTopbarCount = (value: number | null): string =>
-		String(onlineCounter(value));
+		String(onlineCounter(value) ?? '—');
 
-	$: formattedOnlinePlayerCount = new Intl.NumberFormat('en-US').format(
-		effectiveOnlinePlayerCount,
-	);
+	$: formattedOnlinePlayerCount =
+		effectiveOnlinePlayerCount === null
+			? '—'
+			: new Intl.NumberFormat('en-US').format(effectiveOnlinePlayerCount);
 	$: formattedTwitchChannels = formatTopbarCount(
 		effectiveTopbarStats.twitchChannels,
 	);

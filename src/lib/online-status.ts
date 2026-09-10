@@ -1,8 +1,8 @@
 export type OnlineCounters = {
-	twitchChannels: number;
-	twitchViewers: number;
-	youtubeChannels: number;
-	youtubeViewers: number;
+	twitchChannels: number | null;
+	twitchViewers: number | null;
+	youtubeChannels: number | null;
+	youtubeViewers: number | null;
 };
 
 export type OnlineStatus = {
@@ -11,10 +11,10 @@ export type OnlineStatus = {
 	topbarStats: OnlineCounters;
 };
 
-export function onlineCounter(value: unknown): number {
-	return typeof value === 'number' && Number.isFinite(value)
-		? Math.max(0, Math.trunc(value))
-		: 0;
+export function onlineCounter(value: unknown): number | null {
+	return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
+		? value
+		: null;
 }
 
 function parseStatus(value: unknown): OnlineStatus | null {

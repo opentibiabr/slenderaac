@@ -312,6 +312,12 @@ pages exercise the database. Calendar dates use UTC; its timestamp uses Berlin
 time with the correct daylight-saving abbreviation. Archive defaults cover the
 last 30 days, normalize invalid day/month combinations and swap inverted ranges.
 
+Audience counters distinguish a measured zero from unavailable data. The online-status
+endpoint currently has no audience provider and returns `topbarStats: null`;
+the information bar displays `—` with an unavailable tooltip, keeping the channel
+icons and configured links. Invalid or missing counters never become zero. The
+player count remains database-backed and also starts unknown until its first poll.
+
 Selecting the Classic preview keeps live online counters enabled. Only explicit
 reference fixtures replace those values; choosing a theme does not select demo data.
 
