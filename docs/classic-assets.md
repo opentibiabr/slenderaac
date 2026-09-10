@@ -76,4 +76,11 @@ If this image works but the page still uses fallbacks, verify the installed
 see a warning when the manifest cannot be loaded. Report the installer error,
 this asset's HTTP status and the theme being viewed; never send the full `.env`.
 
+Boosted creatures, bosses and player portraits also require the separate
+[outfit sprite pack](../README.md#animated-outfits), configured through
+`OUTFIT_ASSETS_ROOT`. They use the server database and `/api/outfits`; installing
+the Classic ZIP supplies their pedestals and decoration. A portrait with only one
+animation frame will remain still. Check the sprite pack when these portraits
+are missing but the theme borders and background load correctly.
+
 Maintainers: see [publishing and refreshing packages](classic.md#publishing-the-fixed-asset-channel).

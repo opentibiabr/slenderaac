@@ -89,6 +89,16 @@ Portrait lookup also accepts noninteractive boss cards, so a local boosted boss
 can display its artwork without acquiring a creature-detail link.
 Without catalog data, these routes retain an honest local empty state.
 
+The Classic header also reads the daily selections from the shared layout load.
+It uses `AnimatedOutfit` and `/api/outfits`, just like Legbone, while the external
+theme pack supplies the pedestal artwork. Captured `rightCreature` and `rightBoss`
+images must never override the server's selections. Configure `OUTFIT_ASSETS_ROOT`
+with the matching sprite pack; the theme ZIP alone does not contain server outfit
+sprites. Multi-frame sprites animate, while single-frame sprites remain still.
+Missing selections leave empty pedestals with an explicit accessible label;
+missing artwork must stop loading without substituting another creature.
+Keep both header links local and preserve the 64px artwork slots.
+
 `/library/spells` uses the [server library import](server-library.md), independently
 of the presentation pack. It provides local list, filter and detail views from
 server spell and rune definitions. Saved unavailable links upgrade to this route.

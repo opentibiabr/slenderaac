@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 
 	import type { InformationPresentation } from '$lib/information-content';
+	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import DirectoryLogo from '$lib/components/ui/DirectoryLogo.svelte';
 	import ServerBrand from '$lib/components/ui/ServerBrand.svelte';
 	import {
@@ -116,6 +117,18 @@
 	$: presentation = data.classicPresentation;
 	$: identity = { name: data.serverName, website: $page.url.origin };
 	$: fansitesHref = themePreviewHref($page.url, '/community/fansites');
+	$: boostedEntries = [
+		{
+			kind: 'creature',
+			boosted: data.boostedCreature,
+			href: '/library/creatures',
+		},
+		{
+			kind: 'boss',
+			boosted: data.boostedBoss,
+			href: '/library/boostable-bosses',
+		},
+	];
 
 	$: tickerPageArticles = getTickerArticles($page.data.tickers);
 	$: tickerItems = (
@@ -450,12 +463,6 @@
 		classicAsset(data.themeAssets, 'promoScreenshotImage');
 	$: promoPollBox = classicAsset(data.themeAssets, 'promoPollBox');
 	$: rightTopper = classicAsset(data.themeAssets, 'rightTopper');
-	$: rightCreature =
-		classicReference?.assets.rightCreature ??
-		classicAsset(data.themeAssets, 'rightCreature');
-	$: rightBoss =
-		classicReference?.assets.rightBoss ??
-		classicAsset(data.themeAssets, 'rightBoss');
 
 	function drawerOpen(): void {
 		drawerStore.open({});
@@ -935,22 +942,26 @@
 						alt=""
 						aria-hidden="true" />
 				{/if}
-				<a
-					class="theme-classic__right-boost theme-classic__right-boost--creature"
-					href={themePreviewHref($page.url, '/library/creatures')}
-					aria-label="Today's boosted creature">
-					{#if rightCreature}
-						<img src={rightCreature} alt="" aria-hidden="true" />
-					{/if}
-				</a>
-				<a
-					class="theme-classic__right-boost theme-classic__right-boost--boss"
-					href={themePreviewHref($page.url, '/library/boostable-bosses')}
-					aria-label="Today's boosted boss">
-					{#if rightBoss}
-						<img src={rightBoss} alt="" aria-hidden="true" />
-					{/if}
-				</a>
+				{#each boostedEntries as { kind, boosted, href } (kind)}
+					{@const label = boosted?.boostname
+						? `Today's boosted ${kind}: ${boosted.boostname}`
+						: `No boosted ${kind} selected`}
+					<a
+						class="theme-classic__right-boost"
+						class:theme-classic__right-boost--creature={kind === 'creature'}
+						class:theme-classic__right-boost--boss={kind === 'boss'}
+						href={themePreviewHref($page.url, href)}
+						title={label}
+						aria-label={label}>
+						{#if boosted}
+							<AnimatedOutfit
+								outfit={boosted}
+								alt={boosted.boostname ?? label}
+								class="theme-classic__boosted-avatar"
+								innerClass="theme-classic__boosted-avatar-inner" />
+						{/if}
+					</a>
+				{/each}
 			</div>
 
 			{#if promoPremiumBox}
@@ -1889,17 +1900,6 @@
 		left: 80px;
 	}
 
-	.theme-classic .theme-classic__right-boost > img {
-		position: absolute;
-		top: -24px;
-		left: -9px;
-		z-index: 1;
-		width: 64px;
-		max-width: none;
-		height: 64px;
-		object-fit: contain;
-	}
-
 	:global(.theme-classic .theme-classic__boosted-avatar) {
 		z-index: 2;
 		width: 46px;
@@ -1908,13 +1908,14 @@
 	}
 
 	:global(.theme-classic .theme-classic__boosted-avatar-inner) {
-		left: -18px !important;
-		bottom: -16px !important;
+		top: -24px;
+		left: -9px !important;
+		bottom: auto !important;
 	}
 
 	:global(.theme-classic .theme-classic__boosted-avatar canvas) {
-		width: 72px !important;
-		height: 72px !important;
+		width: 64px !important;
+		height: 64px !important;
 	}
 
 	.theme-classic .theme-classic__network-links a:hover {
