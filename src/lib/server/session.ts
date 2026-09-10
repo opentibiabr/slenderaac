@@ -7,13 +7,11 @@ import { prisma } from '$lib/server/prisma';
 export type SessionInfo = {
 	accountId: number;
 	email: string;
-	// This is just a cache, can be used to present UI elements but shouldn't be used for authorization
+	// Refresh authorization-sensitive account fields at the action boundary.
 	type: AccountType;
 	expires: number;
 };
 type Sid = string;
-
-const sessionStore = new Map<Sid, SessionInfo>();
 
 export async function performLogin(cookies: Cookies, email: string) {
 	const maxAgeSeconds = 60 * 60 * 24 * 30; // 30 days
@@ -38,33 +36,14 @@ export async function createSession(
 			expires: expiresAt,
 		},
 	});
-	sessionStore.set(session.id, {
-		accountId: account.id,
-		email: account.email,
-		type: account.type,
-		expires: expiresAt,
-	});
-
 	return session.id;
 }
 
 export async function deleteSession(sid: Sid) {
-	sessionStore.delete(sid);
-	await prisma.accountSessions.delete({ where: { id: sid } });
+	await prisma.accountSessions.deleteMany({ where: { id: sid } });
 }
 
 export async function getSession(sid: Sid): Promise<SessionInfo | undefined> {
-	if (sessionStore.has(sid)) {
-		const session = sessionStore.get(sid);
-		if (session) {
-			if (Date.now() > session.expires) {
-				await deleteSession(sid);
-				return undefined;
-			}
-			return session;
-		}
-	}
-
 	const session = await prisma.accountSessions.findUnique({
 		where: { id: sid },
 		include: { account: { select: { id: true, email: true, type: true } } },
@@ -94,12 +73,6 @@ async function clean() {
 	await prisma.accountSessions.deleteMany({
 		where: { expires: { lt: Date.now() } },
 	});
-	const now = Date.now();
-	for (const [sid, session] of sessionStore) {
-		if (session.expires < now) {
-			sessionStore.delete(sid);
-		}
-	}
 }
 
 void clean();
