@@ -129,6 +129,9 @@ retain a fixed height from an older asset pack.
 
 ## Local setup
 
+Start with the [Classic assets mini tutorial](classic-assets.md) for automatic installation,
+updates, fixed download links and missing-image diagnostics.
+
 The registered theme ID, preview value, asset folder and CSS namespace are all
 `classic`. Set `SLENDER_THEME=classic` to select it by default. An external
 manifest may declare up to 16 optional `aliases` (for example `legacy-classic`)
@@ -669,3 +672,40 @@ on the left, a title aligned right, and 18px text under Classic's 12px body font
 40px below the navigation row; the first paragraph starts 76px below the heading.
 Creature cards occupy 100x110px, with labels starting 67px below the card top.
 Do not let the inline image baseline increase the 64px detail heading to 67px.
+
+## Publishing the fixed asset channel
+
+The installer and publication helper live in `src/scripts/theme_assets.py` and
+require Python 3.10+. Installation does not require GitHub authentication. The
+`publish` subcommand is for maintainers and additionally requires an authenticated
+GitHub CLI with release-write permission.
+
+Prepare and validate a public ZIP with the external updater first. Include the
+current installer in `tools/install-classic-assets.py` and keep its README current;
+raw captures and local-only assets must remain excluded. From the application
+root, publish using a new versioned release tag and the full application commit
+SHA already pushed to GitHub:
+
+```sh
+python src/scripts/theme_assets.py publish --zip ../theme-assets/releases/classic.zip --release classic-assets-YYYYMMDD-NAME --target <published-application-commit-sha>
+```
+
+The helper validates the archive, uploads a versioned release if absent and
+verifies the published download. It then refreshes the fixed `classic-assets-latest`
+release attachments (`classic.zip`, checksum and standalone installer), publishing
+`classic-assets.json` last. The JSON points to the versioned archive, so automated
+installs cannot mix ZIP bytes and checksums during a channel update. Published
+versioned archives are never overwritten. A mismatched existing release stops
+publication. An interrupted first publication can be retried with the same arguments;
+the helper resumes an incomplete draft before activating the fixed channel.
+
+The dedicated channel does not change the repository-wide Latest release or move
+an existing Git tag. Keep old versioned releases for reproducible installs and
+rollback. The fixed channel is an explicit maintained selection; publishing an
+unrelated application or optional-artwork release must not change it.
+
+Run the installer/publication contract tests without network or database access:
+
+```sh
+python -m unittest discover -s src/scripts -p test_theme_assets.py
+```

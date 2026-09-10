@@ -15,3 +15,5 @@ cache.generated.txt
 /items
 *.patch
 /.codex/visual
+__pycache__/
+*.pyc

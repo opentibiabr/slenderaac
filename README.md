@@ -215,6 +215,17 @@ environment configuration remains private.
 
 ### External assets
 
+For installation or updates, follow the [Classic assets mini tutorial](docs/classic-assets.md).
+With Python 3.10+ available, run this from the application root:
+
+```sh
+python src/scripts/theme_assets.py install
+```
+
+It downloads the [current Classic package](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest),
+verifies it, installs it outside the checkout and configures `.env`. Restart the
+website afterwards. Use `python3` instead of `python` if that is your runtime's name.
+
 Theme-specific binary assets must not be committed to this repository. Mount or deploy them outside the repo and point `THEME_ASSETS_ROOT` to that directory:
 
 ```env
@@ -258,7 +269,7 @@ Example `classic` asset pack layout:
 }
 ```
 
-Only `png`, `jpg`, `jpeg`, `gif`, `webp`, and `ico` files are served by `/theme-assets/[theme]/[...path]`. Asset paths are validated before public URLs are generated, and the endpoint rejects traversal, dotfiles, backslashes, null bytes, directories, blocked extensions, and symlinks that escape the theme root.
+Only `png`, `jpg`, `jpeg`, `gif`, `webp`, `ico`, and `ttf` files are served by `/theme-assets/[theme]/[...path]`. Asset paths are validated before public URLs are generated, and the endpoint rejects traversal, dotfiles, backslashes, null bytes, directories, blocked extensions, and symlinks that escape the theme root.
 
 `classic` works without an asset pack and falls back to neutral placeholders. Missing or invalid asset pack warnings are only shown to admins.
 
