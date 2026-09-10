@@ -98,7 +98,6 @@
 	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
 	$: layout = classicLayoutForPath(currentPath);
 	$: nativePage = classicNativePage(currentPath);
-	$: isNewsArchivePage = currentPath === '/news/archive';
 	$: isEventSchedulePage = layout === 'compact-wide';
 	$: isCompactNewsToolPage = layout !== 'news';
 	$: showNewsTicker = !isCompactNewsToolPage && tickerItems.length > 0;
@@ -350,18 +349,11 @@
 		classicReference?.assets.premiumCrown ??
 		classicAsset(data.themeAssets, 'premiumCrown');
 	$: premiumOverlay = classicAsset(data.themeAssets, 'premiumOverlay');
-	$: premiumButtonLabel = classicAsset(data.themeAssets, 'serverShopButton');
 	$: premiumButtonDecor =
 		classicAsset(data.themeAssets, 'premiumButtonDecor') ??
 		classicAsset(data.themeAssets, 'premiumButtonPremiumTime');
-	$: premiumOfferText =
-		classicReference?.premiumText ??
-		presentation?.premiumText ??
-		(isNewsArchivePage ? 'Access ALL Areas!' : 'Get Supplies Anywhere!');
-	$: premiumButtonText =
-		classicReference?.premiumButtonText ??
-		presentation?.premiumButtonText ??
-		(isNewsArchivePage ? 'Get Premium' : `Get ${data.serverName} Coins`);
+	$: premiumOfferText = `${data.serverName} Coins`;
+	const premiumButtonText = 'Get Coins';
 	$: premiumButtonBackground = classicAsset(
 		data.themeAssets,
 		'premiumButtonBackground',
@@ -991,19 +983,11 @@
 							alt=""
 							aria-hidden="true" />
 					{/if}
-					<strong class="theme-classic__premium-offer">
+					<strong class="theme-classic__premium-offer" title={premiumOfferText}>
 						{serverText(premiumOfferText, identity)}
 					</strong>
 					<span class="theme-classic__premium-button">
-						{#if premiumButtonLabel}
-							<img
-								class="theme-classic__premium-button-label"
-								src={premiumButtonLabel}
-								alt=""
-								aria-hidden="true" />
-						{/if}
-						<span class:sr-only={!!premiumButtonLabel}
-							>{serverText(premiumButtonText, identity)}</span>
+						<span>{premiumButtonText}</span>
 						{#if premiumButtonDecor}<img
 								class="theme-classic__premium-button-decor"
 								src={premiumButtonDecor}
@@ -2113,8 +2097,7 @@
 	}
 
 	.theme-classic .theme-classic__premium-crown,
-	.theme-classic .theme-classic__premium-overlay,
-	.theme-classic .theme-classic__premium-button-label {
+	.theme-classic .theme-classic__premium-overlay {
 		position: absolute;
 		display: block;
 		max-width: none;
@@ -2155,6 +2138,8 @@
 		text-shadow:
 			1px 1px 0 rgb(0 0 0),
 			0 0 3px rgb(0 0 0 / 0.8);
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.theme-classic .theme-classic__premium-button {
@@ -2190,13 +2175,6 @@
 		z-index: 2;
 		width: 114px;
 		height: 26px;
-	}
-
-	.theme-classic .theme-classic__premium-button-label {
-		top: 2px;
-		left: 1px;
-		width: 140px;
-		height: 30px;
 	}
 
 	.theme-classic

@@ -273,8 +273,9 @@ existing imported Markdown without replacing editorial text, other images, autho
 publication dates or Classic presentation. Check the same article in both layouts after
 changing content conversion.
 
-The pack's presentation data supplies current promo assets/text and calendar
-colors. The application owns its built-in menu, shared actions, footer destinations and
+The pack supplies decorative promo artwork and calendar colors. The shop card
+uses the configured server name and the local coin-shop action. Captured offer
+text and image-based button labels cannot override its product or server identity. The application owns its built-in menu, shared actions, footer destinations and
 boosted-library links are owned by the application. A screenshot selection may
 choose an image index, but never changes its local destination. The footer
 identifies SlenderAAC and OpenTibiaBR. Updating or removing a presentation pack
