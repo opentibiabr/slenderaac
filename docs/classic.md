@@ -348,6 +348,12 @@ discard decoded frames. Keep pending-load indicators centered within the portrai
 slot, independent of the larger artwork's offset. A real appearance change still
 cancels stale work, and missing optional artwork must leave the page usable.
 
+Automatic search belongs to the visible search control. Legbone's character and
+guild searches share `SearchQuerier`, which cancels pending input on navigation
+and synchronizes from the current URL. Do not mount an automatic search behind
+a Classic submit form: a stale hidden value can immediately undo its filter.
+Render result links inside table cells so the browser keeps them with their rows.
+
 The shared layout switcher stays fixed to the desktop viewport, outside the shell,
 and does not add flow height or alter background/column offsets. Its mobile
 treatment provides a sticky row above the theme header so it remains available

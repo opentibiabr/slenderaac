@@ -5,41 +5,17 @@
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
+	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 	import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
-	import { debounce } from '$lib/utils';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-
-	let searchInput = $page.url.searchParams.get('search') || '';
-
-	$: {
-		if (browser) {
-			($page.url.searchParams.get('search') ?? '') !== searchInput &&
-				onSearchInput();
-		}
-	}
-
-	const onSearchInput = debounce(() => {
-		const url = new URL($page.url);
-		if (searchInput === '') {
-			url.searchParams.delete('search');
-		} else {
-			url.searchParams.set('search', searchInput);
-		}
-		void goto(`${url.pathname}${url.search}${url.hash}`, {
-			replaceState: true,
-			keepFocus: true,
-			noScroll: true,
-		});
-	}, 200);
 
 	$: results = data.results ?? [];
 </script>
@@ -48,16 +24,7 @@
 	<ClassicGuildList {data} />
 {:else}
 	<div class="flex flex-col items-center gap-2">
-		<label class="label flex flex-row gap-2 items-center">
-			<span>{$_('guilds.guild-name')}:</span>
-
-			<input
-				class="input flex-1"
-				type="search"
-				name="search"
-				bind:value={searchInput}
-				placeholder="{$_('search')}..." />
-		</label>
+		<SearchQuerier label={`${$_('guilds.guild-name')}:`} />
 
 		{#if results.length > 0}
 			<div class="table-container" transition:slide>
@@ -76,9 +43,8 @@
 					</thead>
 					<tbody class="transition-all duration-300 ease-in-out">
 						{#each results as guild}
-							<a
-								href="/guilds/{guild.name}"
-								class="table-row [&>td]:!align-middle cursor-pointer"
+							<tr
+								class="[&>td]:!align-middle"
 								transition:fly|local={{
 									duration: 300,
 									y: -20,
@@ -90,9 +56,14 @@
 									</span>
 								</td>
 								<td>
-									<span class="font-extrabold">
+									<a
+										href={themePreviewHref(
+											$page.url,
+											`/guilds/${encodeURIComponent(guild.name)}`,
+										)}
+										class="font-extrabold">
 										{guild.name}
-									</span>
+									</a>
 									<pre
 										class="font-sans font-light whitespace-pre-wrap">{guild.description ??
 											''}</pre>
@@ -102,7 +73,12 @@
 										<span
 											class="font-semibold flex flex-row gap-1 items-center">
 											<OnlineIndicator online={guild.leader.online} />
-											<a href="/characters/{guild.leader.name}" class="anchor">
+											<a
+												href={themePreviewHref(
+													$page.url,
+													`/characters/${encodeURIComponent(guild.leader.name)}`,
+												)}
+												class="anchor">
 												{guild.leader.name}
 											</a>
 										</span>
@@ -114,7 +90,7 @@
 											online />&nbsp;{guild.onlineMembers})
 									</span>
 								</td>
-							</a>
+							</tr>
 						{/each}
 					</tbody>
 				</table>
