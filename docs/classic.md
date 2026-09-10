@@ -344,6 +344,14 @@ above the viewport. Verify consecutive links near the bottom of an expanded menu
 keyboard activation and long-to-short page navigation. Keep these rules scoped to
 Legbone desktop; mobile retains its drawer, which closes after navigation.
 
+Legbone menu groups start collapsed except for the current page's section, on
+both first load and reload. Internal navigation reveals the destination section
+without resetting other manually toggled groups. Query changes and refreshed
+page data must not reopen a manually collapsed group. Keep category icons and
+carets from shrinking when the sidebar scrollbar appears; allow long labels to
+wrap instead. Verify the Portuguese Community label, keyboard toggles and the
+mobile drawer as well as English desktop navigation.
+
 Shared animated portraits reload only when their appearance URL changes, not when
 navigation replaces a character or boosted-selection object. Build that URL from
 normalized appearance fields in a fixed order; names and ranking changes must not

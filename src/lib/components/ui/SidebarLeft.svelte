@@ -20,6 +20,17 @@
 
 	export let isLoggedIn = false;
 	export let staticPages: { title: string; slug: string }[];
+	const routeSections: Record<string, string> = {
+		'': 'news',
+		news: 'news',
+		characters: 'community',
+		online: 'community',
+		highscores: 'community',
+		guilds: 'community',
+		pages: 'library',
+		shop: 'shop',
+	};
+	let openSections: Record<string, boolean> = {};
 	$: informationLinks = [
 		...informationPages.map((entry) => ({
 			...entry,
@@ -27,6 +38,17 @@
 		})),
 		...Object.entries(featurePages).map(([id, entry]) => ({ ...entry, id })),
 	];
+	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
+	$: activeSection =
+		informationLinks.find(
+			(entry) =>
+				currentPath === entry.path || currentPath.startsWith(`${entry.path}/`),
+		)?.section ?? routeSections[currentPath.split('/')[1]];
+	// Only a section change reveals a group; data refreshes keep manual toggles.
+	$: revealSection(activeSection);
+	function revealSection(section: string | undefined) {
+		if (section) openSections[section] = true;
+	}
 </script>
 
 <div class="card card-tertiary card-hover overflow-hidden">
@@ -72,12 +94,12 @@
 	</div>
 </div>
 
-<div class="card card-tertiary text-white overflow-hidden">
+<div class="sidebar-navigation card card-tertiary text-white overflow-hidden">
 	<article class="py-2 px-2">
-		<Accordion>
+		<Accordion regionControl="!space-x-2" regionCaret="shrink-0">
 			{#each ['about', 'guides'] as section}
 				{#if informationLinks.some((entry) => entry.section === section)}
-					<AccordionItem open>
+					<AccordionItem bind:open={openSections[section]}>
 						<svelte:fragment slot="lead"
 							><Fa icon={faBookBookmark} /></svelte:fragment>
 						<svelte:fragment slot="summary"
@@ -100,7 +122,7 @@
 					</AccordionItem>
 				{/if}
 			{/each}
-			<AccordionItem open>
+			<AccordionItem bind:open={openSections.news}>
 				<svelte:fragment slot="lead"><Fa icon={faNewspaper} /></svelte:fragment>
 				<svelte:fragment slot="summary">{$_('news')}</svelte:fragment>
 				<svelte:fragment slot="content">
@@ -122,7 +144,7 @@
 					</nav>
 				</svelte:fragment>
 			</AccordionItem>
-			<AccordionItem open>
+			<AccordionItem bind:open={openSections.community}>
 				<svelte:fragment slot="lead"
 					><Fa icon={faPeopleArrows} /></svelte:fragment>
 				<svelte:fragment slot="summary">{$_('community')}</svelte:fragment>
@@ -158,7 +180,7 @@
 					</nav>
 				</svelte:fragment>
 			</AccordionItem>
-			<AccordionItem open>
+			<AccordionItem bind:open={openSections.library}>
 				<svelte:fragment slot="lead"
 					><Fa icon={faBookBookmark} /></svelte:fragment>
 				<svelte:fragment slot="summary">{$_('library')}</svelte:fragment>
@@ -184,7 +206,7 @@
 					</nav>
 				</svelte:fragment>
 			</AccordionItem>
-			<AccordionItem open>
+			<AccordionItem bind:open={openSections.shop}>
 				<svelte:fragment slot="lead"><Fa icon={faGifts} /></svelte:fragment>
 				<svelte:fragment slot="summary">{$_('shop.title')}</svelte:fragment>
 				<svelte:fragment slot="content">
@@ -201,3 +223,13 @@
 		</Accordion>
 	</article>
 </div>
+
+<style>
+	.sidebar-navigation :global(.accordion-lead) {
+		flex-shrink: 0;
+	}
+	.sidebar-navigation :global(.accordion-summary) {
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+</style>
