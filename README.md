@@ -381,9 +381,11 @@ https://github.com/luan/slenderaac/assets/223760/a2cb7aad-a3df-46a2-b284-1f38a91
 
 Contributions are welcome! Please open an issue or pull request. Be sure to post screenshots and logs of any issues you're having.
 
-Follow the [UI state and data accuracy rules](docs/ui-states.md) when adding or
-changing data-driven pages. Both layouts must distinguish confirmed zero, empty
-results, offline services, unavailable data, errors and stale values.
+Start with the [website and theme contracts](docs/theme-contracts.md) when adding
+or changing pages. They link the shared layout, native data, navigation, identity,
+asset delivery and verification rules. Follow the [UI state rules](docs/ui-states.md)
+for confirmed zero, empty results, offline services, unavailable data, errors and
+stale values in both layouts.
 
 ## License
 

@@ -222,7 +222,8 @@ gallery artwork still depend on the external pack.
 
 ## Definition of done
 
-Apply this checklist to every page family:
+Apply the [website and theme contracts](theme-contracts.md) and this checklist to
+every page family:
 
 - [ ] Inspect the public visual reference and its actions; implement behavior using
       local data and application-owned logic. Never use another application as a fallback.
@@ -232,6 +233,11 @@ Apply this checklist to every page family:
       component rectangles and pixel comparisons for Classic; distinguish
       data-dependent text/height from structural differences.
 - [ ] Test Legbone, keyboard access, empty/error states and a narrow viewport.
+- [ ] Trace dynamic values to their local/configured source; verify zero, offline,
+      unavailable and stale states where applicable. Audit image/banner links,
+      redirects and forms for local destinations and layout/filter retention.
+- [ ] Verify required routes/schema/default records through the maintained install
+      or upgrade path. Keep operator content separate from comparison fixtures.
 - [ ] Validate authorization and concurrency where applicable. Remove temporary
       fixtures and record only checks actually performed.
 - [ ] Ship atomic commits, portable documentation and artwork through the maintained

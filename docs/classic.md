@@ -1,5 +1,9 @@
 # Classic layouts
 
+The [website and theme contracts](theme-contracts.md) define shared ownership,
+navigation, identity, data states and delivery requirements for current and future
+pages. This document owns the detailed Classic composition and measurement rules.
+
 These are [built-in SlenderAAC pages](news.md), available in the default theme
 without an external pack. The pack supplies Classic presentation assets and optional
 comparison content; it does not install routes or database features.
