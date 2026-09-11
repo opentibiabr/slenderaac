@@ -68,6 +68,11 @@
 	) {
 	height: 21px;
 }
+.theme-classic
+	.classic-native-content
+	:is(input, select, textarea).input-error {
+	border-color: rgb(var(--color-error-600));
+}
 .theme-classic .classic-native-content .btn:not(.btn-icon),
 .classic-native-button {
 	display: inline-flex;

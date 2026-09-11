@@ -618,6 +618,15 @@ continues to render its inline `PagePanel`. Check opening, Tab/Shift+Tab, Escape
 close-button navigation and narrow-screen dimensions without submitting account
 changes merely to test a dialog.
 
+Shared `TextField`, `Select`, `TextArea` and `Checkbox` error messages remain in
+normal document flow. Horizontal fields wrap the message onto a full-width row;
+stacked Classic forms let it span the grid columns. Only a displayed error sets
+`input-error` and `aria-invalid`, so an empty errors array is a valid state. Put
+checkbox validation on the input, not its enclosing label. Classic control
+styling must preserve the error border without changing control dimensions.
+Verify long messages followed immediately by another field in both themes,
+including horizontal and stacked variants at desktop and mobile widths.
+
 Keep permission gates and backend validation when adapting forms. Highscore
 labels may be translated, but submitted skill values remain canonical. Product
 and payment radios use separate names; currency changes clear an offer that is
