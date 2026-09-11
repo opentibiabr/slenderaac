@@ -34,6 +34,23 @@ def package(version="test", changes=None):
     return stream.getvalue()
 
 
+def sprite_package(name, changes=None):
+    png = b"\x89PNG\r\n\x1a\n" + b"image" + b"IEND\xaeB`\x82"
+    image_path = {"outfits": "128/1_1_1_3.png", "items": "3031.gif", "store": "13/Category_Coins.png"}[name]
+    image = b"GIF89a-test;" if name == "items" else png
+    files = {image_path: image, "README.md": b"readme"}
+    manifest = {"schemaVersion": 1, "name": name, "version": "test",
+                "hashes": {path: assets.digest(data) for path, data in files.items()}}
+    files["manifest.json"] = json.dumps(manifest).encode()
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w", zipfile.ZIP_DEFLATED) as archive:
+        for path, data in files.items():
+            archive.writestr(f"{name}/{path}", data)
+        for path, data in (changes or {}).items():
+            archive.writestr(path, data)
+    return stream.getvalue()
+
+
 class InstallerTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="classic-installer-test-")
@@ -60,6 +77,71 @@ class InstallerTests(unittest.TestCase):
         channel.update(overrides)
         with patch.object(assets, "read_channel", return_value=channel), patch.object(assets, "download", return_value=payload):
             assets.install(argparse.Namespace(app=self.app, root=self.destination))
+
+    def install_packs(self, packs, corrupt=None):
+        payloads = {name: package() if name == "classic" else sprite_package(name) for name in packs}
+        def channel(name):
+            data = payloads[name]
+            return {"size": len(data), "sha256": "0" * 64 if name == corrupt else assets.digest(data), "url": name}
+        with patch.object(assets, "read_channel", side_effect=channel), patch.object(assets, "download", side_effect=lambda name, _: payloads[name]):
+            assets.install(argparse.Namespace(app=self.app, root=self.destination, packs=packs))
+
+    def test_all_packages_configure_shared_external_root_and_repeat_without_backups(self):
+        self.install_packs(list(assets.PACKS))
+        before = (self.app / ".env").read_bytes()
+        for pack, (_, variable) in assets.PACKS.items():
+            expected = self.destination if pack == "classic" else self.destination / pack
+            self.assertEqual(assets.env_value(before.decode(), variable), expected.as_posix())
+        self.install_packs(list(assets.PACKS))
+        self.assertEqual((self.app / ".env").read_bytes(), before)
+        self.assertFalse(list(self.destination.glob("backup-*")))
+
+    def test_last_package_failure_does_not_activate_earlier_packages(self):
+        self.install(package("old"))
+        before = (self.app / ".env").read_bytes()
+        with self.assertRaisesRegex(ValueError, "checksum/size"):
+            self.install_packs(list(assets.PACKS), corrupt="store")
+        self.assertEqual((self.app / ".env").read_bytes(), before)
+        self.assertFalse((self.destination / "outfits").exists())
+        self.assertEqual(json.loads((self.destination / "classic/manifest.json").read_text())["version"], "old")
+
+    def test_selected_sprites_preserve_classic_and_move_legacy_store_outside_checkout(self):
+        self.install(package("custom"))
+        legacy = self.app / "static/images/store"
+        legacy.mkdir(parents=True)
+        (legacy / "custom.png").write_bytes(b"custom")
+        built = self.app / "build/client/images/store"
+        built.mkdir(parents=True)
+        (built / "stale.png").write_bytes(b"stale")
+        self.install_packs(["store"])
+        self.assertFalse(legacy.exists())
+        self.assertFalse(built.exists())
+        self.assertEqual(list(self.destination.glob("backup-*/legacy-built-store/stale.png"))[0].read_bytes(), b"stale")
+        self.assertEqual(list(self.destination.glob("backup-*/legacy-store/custom.png"))[0].read_bytes(), b"custom")
+        self.assertEqual(json.loads((self.destination / "classic/manifest.json").read_text())["version"], "custom")
+        self.assertIsNone(assets.env_value((self.app / ".env").read_text(), "ITEM_ASSETS_ROOT"))
+
+    def test_failed_environment_write_restores_legacy_store_and_all_packages(self):
+        legacy = self.app / "static/images/store"
+        legacy.mkdir(parents=True)
+        (legacy / "custom.png").write_bytes(b"custom")
+        with patch.object(assets, "atomic_env", side_effect=OSError("read only")):
+            with self.assertRaises(OSError):
+                self.install_packs(list(assets.PACKS))
+        self.assertEqual((legacy / "custom.png").read_bytes(), b"custom")
+        self.assertFalse((self.destination / "store").exists())
+        self.assertFalse((self.destination / "classic").exists())
+        self.assertFalse((self.app / ".env").exists())
+
+    def test_sprite_archives_reject_traversal_foreign_roots_and_unlisted_files(self):
+        for pack in ("outfits", "items", "store"):
+            for name in ("../escape", "classic/foreign.png", f"{pack}/unlisted.png"):
+                with self.subTest(pack=pack, name=name), tempfile.TemporaryDirectory() as tmp:
+                    archive = Path(tmp) / "test.zip"
+                    archive.write_bytes(sprite_package(pack, {name: b"bad"}))
+                    with self.assertRaises(ValueError):
+                        assets.unpack(archive, Path(tmp) / "stage", pack)
+
 
     def test_first_install_configures_external_root_without_touching_other_settings(self):
         self.install(package())
@@ -161,6 +243,33 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual(assets.env_value(updated, "THEME_ASSETS_ROOT"), self.destination.as_posix())
         self.assertEqual(assets.env_value(updated, "SLENDER_THEME"), "classic")
         self.assertEqual(assets.configure_env(updated, self.destination), updated)
+
+    def test_sprite_publication_does_not_replace_classic_channel_files(self):
+        payload = sprite_package("store")
+        archive = self.root / "store-test.zip"
+        archive.write_bytes(payload)
+        versioned = {"draft": False, "assets": [{"name": archive.name,
+                     "browser_download_url": assets.RELEASE_BASE + "classic-assets-store-test/" + archive.name}]}
+        with patch.object(assets, "get_release", side_effect=[versioned, versioned, {"draft": False}]), patch.object(assets, "download", return_value=payload), patch.object(assets, "gh") as gh:
+            assets.publish(argparse.Namespace(pack="store", zip=archive, release="classic-assets-store-test", target="a" * 40))
+        uploads = [call.args for call in gh.call_args_list if call.args[:2] == ("release", "upload")]
+        self.assertIn("store.zip", " ".join(uploads[0]))
+        self.assertNotIn("classic.zip", " ".join(uploads[0]))
+        self.assertIn("store-assets.json", " ".join(uploads[-1]))
+
+    def test_packager_rejects_invalid_images_without_overwriting_previous_zip(self):
+        source = self.root / "prepared"
+        source.mkdir()
+        archive = self.root / "output.zip"
+        archive.write_bytes(b"existing archive")
+        (source / "bad.png").write_bytes(b"html error page")
+        args = argparse.Namespace(source=source, zip=archive, pack="store", version="test")
+        with self.assertRaisesRegex(ValueError, "Unsupported store image"):
+            assets.package_sprites(args)
+        self.assertEqual(archive.read_bytes(), b"existing archive")
+        (source / "bad.png").write_bytes(b"\x89PNG\r\n\x1a\n" + b"image" + b"IEND\xaeB`\x82")
+        assets.package_sprites(args)
+        self.assertTrue(zipfile.is_zipfile(archive))
 
     def test_publication_updates_pointer_after_downloadable_attachments(self):
         payload = package()

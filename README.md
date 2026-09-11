@@ -149,7 +149,13 @@ Using your favorite method to edit the client (see [this tutorial](https://docs.
 <details>
 <summary><h2>Animated outfits</h2></summary>
 
-Install an outfit sprite pack compatible with your server from the [outfit image provider](https://outfit-images.ots.me/). Set `OUTFIT_ASSETS_ROOT` to the directory containing the numbered outfit folders, or use the default `outfits_anim` directory. Restart the app after changing this setting. Keep sprite packs outside version control; their license is separate from the application code.
+Run `python src/scripts/theme_assets.py install` from the application root to
+install Classic, outfits, items and store images together. To install only
+outfits, use `install --packs outfits`. The installer downloads the verified pack
+from the [SlenderAAC assets release](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest)
+and configures `OUTFIT_ASSETS_ROOT`. See the [mini tutorial](docs/classic-assets.md).
+Restart the website afterwards. Manual installations can still use the default
+`outfits_anim` directory; keep artwork outside version control.
 
 The renderer reads the requested outfit's PNG files directly. No generated metadata or cache marker is needed, and the sprite directory can be read-only. Replacing sprites takes effect on subsequent requests; browser responses are revalidated against their rendered content. Animations must contain consecutive frames starting at one, with at most 128 frames in a complete rider/mount loop. Missing optional outfits return `404` with no frames without interrupting character, account, or ranking pages. Invalid request parameters return `400`.
 
@@ -158,12 +164,11 @@ The renderer reads the requested outfit's PNG files directly. No generated metad
 <details>
 <summary><h2>Inventory Items</h2></summary>
 
-Install a matching sprite pack from the [item image provider](https://item-images.ots.me/)
-in `items`, or set `ITEM_ASSETS_ROOT` to an external directory containing
-numbered GIF files and the inventory placeholder images. Restart the app after
-changing this setting. These assets are not included in the repository
-because they can cause the repo to bloat, and are also not release under the same license
-as the code.
+The same installer includes animated item GIFs. Use
+`python src/scripts/theme_assets.py install --packs items` for just this package.
+It configures `ITEM_ASSETS_ROOT` outside the checkout. Manual installations can
+still use `items`. Artwork is distributed through the same SlenderAAC release
+channel and remains separate from the application's code license.
 
 Item requests accept numeric identities and the existing empty-slot names. Missing
 or invalid optional images return a non-cacheable `404`; malformed identities
@@ -178,7 +183,13 @@ numeric fallback label.
 <details>
 <summary><h2>Game store assets</h2></summary>
 
-Anything you put into the `static` folder in this repo will be served by the server. This is useful for storing assets for the game store. For example, you can put a `static/images/store` folder and then reference the images in the store using `/images/store/my-image.png`. For instance, you can use the store assets made available in the [canary docs](https://docs.opentibiabr.com/others/downloads/website-applications/applications#store-for-client-13)
+Use `python src/scripts/theme_assets.py install --packs store` or the default
+all-package command. Store images are downloaded from the SlenderAAC release,
+installed outside the checkout and served through `/images/store/...` using
+`STORE_ASSETS_ROOT`. Existing `static/images/store` artwork is retained in an
+external backup. Set the game server's `coinImagesURL` to your website's
+`/images/store/` URL and restart the website after installation. See the
+[store setup and checks](docs/classic-assets.md#store-and-animation-checks).
 
 </details>
 
@@ -227,15 +238,15 @@ environment configuration remains private.
 
 ### External assets
 
-For installation or updates, follow the [Classic assets mini tutorial](docs/classic-assets.md).
+For installation or updates, follow the [website assets mini tutorial](docs/classic-assets.md).
 With Python 3.10+ available, run this from the application root:
 
 ```sh
 python src/scripts/theme_assets.py install
 ```
 
-It downloads the [current Classic package](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest),
-verifies it, installs it outside the checkout and configures `.env`. Restart the
+It downloads the [current Classic, outfit, item and store packages](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest),
+verifies them, installs them outside the checkout and configures `.env`. Restart the
 website afterwards. Use `python3` instead of `python` if that is your runtime's name.
 
 Theme-specific binary assets must not be committed to this repository. Mount or deploy them outside the repo and point `THEME_ASSETS_ROOT` to that directory:

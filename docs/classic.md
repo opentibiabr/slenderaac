@@ -790,3 +790,32 @@ Run the installer/publication contract tests without network or database access:
 ```sh
 python -m unittest discover -s src/scripts -p test_theme_assets.py
 ```
+
+### Publishing outfit, item and store packages
+
+The same channel also hosts `outfits.zip`, `items.zip` and `store.zip`, each with
+its own `<pack>-assets.json` and checksum. Installation defaults to all four
+packages; `--packs` limits the selection. Sprite artwork and store URLs are shared
+by both layouts. No install-time request goes to an image provider.
+
+Maintainers prepare compatible images outside the checkout, then package and
+publish them from the application root (replace `store` with `items` or `outfits`
+as needed):
+
+```sh
+python src/scripts/theme_assets.py package --pack store --source ../prepared-store --zip ../theme-assets/releases/store.zip --version store-YYYYMMDD-1
+python src/scripts/theme_assets.py publish --pack store --zip ../theme-assets/releases/store.zip --release classic-assets-YYYYMMDD-store-1 --target <published-application-commit-sha>
+```
+
+The source directory contains the store's relative image paths, numbered item
+GIFs, or numbered outfit folders. The packager selects only supported images,
+rejects symlinks, hashes every file and validates the complete ZIP before replacing
+the output. It does not fetch source artwork or execute scripts in a downloaded
+archive. Keep original source provenance and any license records with the external
+source collection. Verify client-version compatibility before publishing.
+
+Use a unique versioned tag for each package update. The publisher only replaces
+that package's fixed ZIP/checksum/JSON attachments, keeping other selections
+intact. Update the standalone installer in the Classic pack's `tools/` as well
+when preparing a new Classic release. See the [installation guide](classic-assets.md)
+for environment variables, store migration and checks.

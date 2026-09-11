@@ -1,7 +1,8 @@
-# Install Classic assets
+# Install website assets
 
-The Layout menu selects the theme. Its images are a separate release package,
-installed outside the application checkout. You do not need to visit the visual
+Classic artwork, animated outfits, animated items and game-store images are
+separate ZIPs in the same fixed release channel, installed outside the checkout.
+The same outfit, item and store files serve both layouts. You do not need to visit the visual
 reference website, export pages, or import news to install the published images.
 
 ## One-command installation
@@ -16,10 +17,11 @@ python src/scripts/theme_assets.py install
 On systems where Python is named `python3`, use that command instead of `python`.
 The installer:
 
-- downloads the current package from the fixed Classic release channel;
+- downloads all four packages from the SlenderAAC release channel, with no provider-site fallback;
 - checks the ZIP checksum, manifest, image hashes and archive paths;
 - reuses `THEME_ASSETS_ROOT`, or creates a sibling `<application-name>-theme-assets` folder;
-- sets the absolute `THEME_ASSETS_ROOT` in `.env`, preserving other settings;
+- sets `THEME_ASSETS_ROOT`, `OUTFIT_ASSETS_ROOT`, `ITEM_ASSETS_ROOT` and `STORE_ASSETS_ROOT` in `.env`, preserving unrelated settings;
+- verifies every selected package before activating any of them;
 - keeps the existing default layout and switcher setting, adding Classic/true only when absent.
 
 Restart the website process, then choose **Layout → Classic**. To make Classic
@@ -32,37 +34,68 @@ To choose another external directory:
 python src/scripts/theme_assets.py install --root ../theme-assets
 ```
 
-The resulting directory contains `classic/manifest.json` and `tools/`.
-`THEME_ASSETS_ROOT` points to their **parent**, not to `classic/`.
+To install only selected packages (for example, to keep customized Classic artwork):
+
+```sh
+python src/scripts/theme_assets.py install --packs outfits items store
+python src/scripts/theme_assets.py install --packs classic
+```
+
+The resulting directory is:
+
+```text
+theme-assets/
+  classic/manifest.json
+  tools/
+  outfits/128/1_1_1_3.png
+  items/3031.gif
+  store/13/Category_Coins.png
+```
+
+`THEME_ASSETS_ROOT` points to the **parent**. Each other variable points to its
+respective `outfits/`, `items/` or `store/` directory. Only selected variables are
+updated. Previously configured sprite directories elsewhere are left untouched;
+the installer switches their selected `.env` variables to the managed directories.
 For Docker or a service manager, make that directory readable inside the runtime
-and pass the runtime's absolute path as `THEME_ASSETS_ROOT`. A host `.env` edit
+and pass the corresponding runtime paths through all selected asset variables. A host `.env` edit
 does not replace an environment variable already supplied by the container/service.
 
 ## Update and recovery
 
 Run the same installation command to update. Identical installations are left
-intact. When the package changes, the old `classic/` and `tools/` directories stay
+intact. When the package changes, the old selected directories stay
 in a printed `backup-*` directory. A changed `.env` also gets a private adjacent
 backup. Do not commit or share environment backups.
 
 Package upgrades replace the managed directories, including any locally edited
 artwork. Keep operator customizations separately and reapply them from the backup
 after upgrading. Other directories under the asset root are left intact.
-If activation fails, the installer restores the old directories. It does not run
+An existing `static/images/store` directory is moved into `backup-*/legacy-store`
+outside the checkout so static middleware cannot hide updated release images.
+An older `build/client/images/store` copy is also moved to `legacy-built-store`
+in the same backup. Keep custom store artwork in the external directory after
+installation, and install assets before your normal production deployment.
+
+If activation fails, the installer restores the old directories and legacy store. It does not run
 a build, database migration, content import or restart command.
 
 ## Fixed download links
 
-- [Current Classic package and installer](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest)
-- [Download ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/classic.zip)
-- [SHA-256 checksum](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/classic.zip.sha256)
+- [Current packages and installer](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest)
+- [Classic ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/classic.zip)
+- [Classic SHA-256 checksum](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/classic.zip.sha256)
+- [Outfits ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/outfits.zip)
+- [Items ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/items.zip)
+- [Store ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/store.zip)
 - [Standalone installer](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/install-classic-assets.py)
 
 The standalone script works with `python install-classic-assets.py install --app <application-directory>`.
-For manual installation, extract the ZIP outside the checkout, set the parent
-directory in `.env`, and restart. Automated installs read a small fixed-channel
-JSON file that points to a versioned archive and checksum. Other application or
-optional-artwork releases cannot change which package this channel selects.
+The standalone filename is retained for existing links; it now installs all four
+packages by default. Each ZIP also has a matching `.zip.sha256` attachment.
+For manual installation, extract selected ZIPs outside the checkout, set their
+corresponding `.env` variables and restart. Automated installs read one small
+`<pack>-assets.json` file per package, pointing to an immutable versioned ZIP and
+checksum. The repository-wide Latest release does not affect this channel.
 
 ## Images still missing?
 
@@ -76,14 +109,42 @@ If this image works but the page still uses fallbacks, verify the installed
 see a warning when the manifest cannot be loaded. Report the installer error,
 this asset's HTTP status and the theme being viewed; never send the full `.env`.
 
-Boosted creatures, bosses and player portraits also require the separate
-[outfit sprite pack](../README.md#animated-outfits), configured through
+Boosted creatures, bosses and player portraits use the outfit package installed
+by the default command, configured through
 `OUTFIT_ASSETS_ROOT`. They use the server database and `/api/outfits`; installing
 the Classic ZIP supplies their pedestals and decoration. A portrait with only one
 animation frame will remain still. Check the sprite pack when these portraits
 are missing but the theme borders and background load correctly.
 
 Maintainers: see [publishing and refreshing packages](classic.md#publishing-the-fixed-asset-channel).
+
+## Store and animation checks
+
+The published sprites target the current packaged client data (15.10 for the
+outfit and item snapshots). IDs must match the game server's data; custom or newer
+appearances may need an updated pack. Outfit animations use idle PNG frames;
+appearances with one frame remain still. Animated item GIFs keep their frames.
+Optional inventory placeholders and item-title metadata remain operator supplied.
+
+Check these URLs after restarting the website:
+
+- `/api/outfits?id=128` — JSON containing rendered outfit frames.
+- `/api/items?id=3031` — JSON containing the item image.
+- `/images/store/13/Category_Coins.png` — a store image with HTTP 200.
+
+In the game server's `config.lua`, `coinImagesURL` must point at **your website**,
+including the trailing slash and the port if needed:
+
+```lua
+coinImagesURL = "https://your-server.example/images/store/"
+```
+
+The installer does not edit the game server configuration or restart it. The
+store package supplies artwork, not offers or purchases. Keep the catalog's
+relative image names consistent with the package's `13/`, `32/`, `64/` and `home/`
+directories. A missing catalog-specific image returns 404; there is no external
+website fallback. Updating valid images changes their HTTP validators, allowing
+clients to revalidate them.
 
 ## Server-owned sidebar content
 
