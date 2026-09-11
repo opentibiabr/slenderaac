@@ -610,6 +610,14 @@ without horizontal overflow. Browser export resampling can change pixels even
 when CSS colors and text boxes agree; record the usable viewport width separately
 from the requested width before comparing captures.
 
+In Legbone, `StatelessModal` opens the native dialog with `showModal()` so the
+browser owns modal focus and background interaction blocking. Native `cancel`
+handles Escape and dispatches the same close event as the labeled close button
+and backdrop. Retain scroll locking and the toast inside the top layer. Classic
+continues to render its inline `PagePanel`. Check opening, Tab/Shift+Tab, Escape,
+close-button navigation and narrow-screen dimensions without submitting account
+changes merely to test a dialog.
+
 Keep permission gates and backend validation when adapting forms. Highscore
 labels may be translated, but submitted skill values remain canonical. Product
 and payment radios use separate names; currency changes clear an offer that is
