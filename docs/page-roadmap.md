@@ -1,67 +1,241 @@
-# Remaining page roadmap
+# Website page roadmap
 
-This roadmap separates implemented website behavior from operator content and
-game-server features. Classic and Legbone share routes, data, validation and
-permissions. A matching shell or an unavailable message does not complete a
-module. Complete the simplest independent website pages first.
+Track the remaining website pages and the work needed to complete each one.
+Classic and Legbone share routes, data, validation and permissions.
 
-## Current implementation pass
+**Completed in the latest pass:** FAQ, Parents' Guide and Legal Documents.
 
-| Page family     | Status      | Completion checks                                                                                                                            |
-| --------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Get Help / FAQ  | Implemented | Local categories, search, article navigation, actual view ordering, featured articles and administrator publication; both themes and mobile. |
-| Parents' Guide  | Implemented | Editable local content, configured server identity, working local links and shared document typography.                                      |
-| Legal Documents | Implemented | Index and selected operator documents, local footer/legacy links, explicit absent-content state; no copied third-party agreements.           |
+**Next priority:** simple website pages that need no gameplay changes.
 
-## Next: no gameplay changes required
+**Separate dependency:** operator content, media and authoritative game rules.
 
-| Module             | Missing work / dependency                                               | Acceptance checks                                                                                        |
-| ------------------ | ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Genesis            | Operator-owned story/chapter publication and navigation.                | Persist edits, chapter/fragment navigation, empty state, shared document layout.                         |
-| Fankit             | Curated operator artwork and a maintained downloadable package.         | Validated external files, download headers, missing/replaced assets, release/update flow.                |
-| Soundtrack         | Operator-provided audio, track metadata and redistribution permissions. | Play/pause, keyboard controls, track changes, failed media, ranged downloads, no source-site fallback.   |
-| Maps               | A render/export pipeline for the configured map and local map metadata. | Town/floor selection, coordinates, correct map identity, missing tiles, mobile pan/zoom.                 |
-| World Boards       | Shared native forum boards, topics, posts and moderation.               | Authentication, author ownership, verified-account rules, publication, pagination and race-safe posting. |
-| Trade Boards       | Category of the same forum module; no duplicated implementation.        | Board permissions and local topic/post navigation.                                                       |
-| Community Boards   | Category of the same forum module.                                      | Public visibility, pinned/locked topics and moderation.                                                  |
-| Support Boards     | Category of the same forum module.                                      | Posting permissions and local account/recovery links.                                                    |
-| Guild Boards       | Forum integration with current guild membership.                        | Membership changes, private-content isolation, guild creation/disbanding and stale authorization.        |
-| Staff Post Archive | Public archive of authorized staff posts from the forum.                | Historical staff attribution, filters/pagination and exclusion of private/deleted content.               |
+## Contents
 
-## Requires game rules or authoritative integration
+- [Completed support pages](#completed-support-pages)
+- [Next: website-only work](#next-website-only-work)
+- [Game rules and server integration](#game-rules-and-server-integration)
+- [Existing page families](#existing-page-families)
+- [Definition of done](#definition-of-done)
 
-| Module                                | Dependency                                                                                                                                   | Acceptance checks                                                                                                 |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Leaderboards                          | The configured server does not currently implement Drome rotations/results; its title integration still contains TODOs.                      | Real current/past rotations and scores; no substitution with level highscores or invented history.                |
-| Wheel of Destiny Planner              | A versioned wheel definition and rule evaluator compatible with the configured server. A planner need not mutate the character's live wheel. | Vocation/level/budget gates, dependencies, reset, deterministic share/import codes and version mismatch handling. |
-| Current Character Auctions            | Auction eligibility, character custody, escrow and authoritative server coordination.                                                        | Offline/online races, concurrent bids, funds, expiry, cancellation and settlement.                                |
-| Auction History                       | Settled records from the same auction module.                                                                                                | Immutable outcomes, filtering and pagination.                                                                     |
-| My Bids                               | Account-scoped bids from the same auction module.                                                                                            | Ownership, private maximum bids, outbid/settled states.                                                           |
-| My Auctions                           | Seller management in the same auction module.                                                                                                | Ownership, eligibility, custody and cancellation deadlines.                                                       |
-| My Watched Auctions                   | Account-scoped watch list for the same auctions.                                                                                             | Add/remove idempotency, ownership and expiry/deleted-auction handling.                                            |
-| House bidding, transfers and move-out | Search/detail already exist. Actions need the game server to own updates; direct website writes would race its in-memory state/save cycle.   | Bids and private limits, funds, ownership, eligibility, server-save races, settlement and failure recovery.       |
+---
+
+## Completed support pages
+
+- [x] **Get Help / FAQ** — categories, search, articles and administrator publication.
+- [x] **Parents' Guide** — editable local content and configured server identity.
+- [x] **Legal Documents** — local index, document selection and footer links.
+
+See the [support pages guide](support.md) for setup and editing. Legal routes are
+implemented; the operator still needs to supply the agreement and privacy policy.
+
+<details>
+<summary>Completed behavior and validation scope</summary>
+
+- **FAQ:** local categories, search, article navigation, actual view ordering,
+  featured articles and administrator publication in both themes and on mobile.
+- **Parents' Guide:** editable local content, configured server identity, working
+  local links and shared document typography.
+- **Legal Documents:** index and selected operator documents, local footer and
+  legacy links, and an explicit absent-content state. No copied third-party
+  agreements.
+
+</details>
+
+---
+
+## Next: website-only work
+
+These modules can be implemented without changing live gameplay. Some still need
+operator-provided content or an export pipeline. Expand a module for its completion
+criteria.
+
+### Content and downloads
+
+- [ ] **Genesis** — publish the operator's story and chapters.
+- [ ] **Fankit** — offer curated artwork in a maintained download.
+- [ ] **Soundtrack** — play the operator's published audio tracks.
+- [ ] **Maps** — display the configured map with town and floor selection.
+
+<details>
+<summary>Genesis — content and chapter navigation</summary>
+
+**Required:** operator-owned story/chapter publication and navigation.
+
+**Complete when:** edits persist, chapter and fragment links work, empty content
+has a clear state, and pages reuse the shared document layout.
+
+</details>
+
+<details>
+<summary>Fankit — artwork and downloadable package</summary>
+
+**Required:** curated operator artwork and a maintained downloadable package.
+
+**Complete when:** external files are validated, download headers are correct,
+missing or replaced assets are handled, and the release/update flow works.
+
+</details>
+
+<details>
+<summary>Soundtrack — audio and track controls</summary>
+
+**Required:** operator-provided audio, track metadata and redistribution permissions.
+
+**Complete when:** play/pause, keyboard controls, track changes, failed-media states
+and ranged downloads work. Never fall back to another site's media application.
+
+</details>
+
+<details>
+<summary>Maps — map export and navigation</summary>
+
+**Required:** a render/export pipeline for the configured map and local metadata.
+
+**Complete when:** town/floor selection, coordinates, correct map identity, missing
+tiles and mobile pan/zoom are covered.
+
+</details>
+
+### Shared forum
+
+Build one forum module and reuse it across these destinations:
+
+- [ ] **World Boards** — boards, topics, posts and moderation.
+- [ ] **Trade Boards** — trade categories and board permissions.
+- [ ] **Community Boards** — public topics, pinning and locking.
+- [ ] **Support Boards** — protected posting and local recovery links.
+- [ ] **Guild Boards** — private boards tied to current guild membership.
+- [ ] **Staff Post Archive** — public archive of authorized staff posts.
+
+<details>
+<summary>Forum completion criteria</summary>
+
+- **World Boards:** authentication, author ownership, verified-account rules,
+  publication, pagination and race-safe posting.
+- **Trade Boards:** board permissions and local topic/post navigation, using the
+  same forum implementation.
+- **Community Boards:** public visibility, pinned/locked topics and moderation.
+- **Support Boards:** posting permissions and local account/recovery links.
+- **Guild Boards:** membership changes, private-content isolation, guild
+  creation/disbanding and stale authorization.
+- **Staff Post Archive:** historical staff attribution, filters/pagination and
+  exclusion of private or deleted content.
+
+</details>
+
+---
+
+## Game rules and server integration
+
+These modules need compatible game definitions or an authoritative update path.
+A matching layout alone does not complete them.
+
+### Rankings and character planning
+
+- [ ] **Leaderboards** — real current and past Drome rotations/results.
+- [ ] **Wheel of Destiny Planner** — versioned definitions and compatible rules.
+
+<details>
+<summary>Leaderboards — rotation and score data</summary>
+
+**Dependency:** the configured server does not currently implement Drome
+rotations/results; its title integration still contains TODOs.
+
+**Complete when:** current/past rotations and scores come from real results.
+Do not substitute level highscores or invent historical records.
+
+</details>
+
+<details>
+<summary>Wheel of Destiny Planner — definitions and rule evaluation</summary>
+
+**Dependency:** a versioned wheel definition and rule evaluator compatible with the
+configured server. A planner need not mutate the character's live wheel.
+
+**Complete when:** vocation/level/budget gates, dependencies, reset, deterministic
+share/import codes and version mismatch handling are covered.
+
+</details>
+
+### Character auctions
+
+Build one auction module with these views:
+
+- [ ] **Current Character Auctions** — eligibility, custody, bids and settlement.
+- [ ] **Auction History** — settled records and immutable outcomes.
+- [ ] **My Bids** — account-scoped bids and their current state.
+- [ ] **My Auctions** — seller management and cancellation rules.
+- [ ] **My Watched Auctions** — account-scoped watch lists.
+
+<details>
+<summary>Auction dependencies and completion criteria</summary>
+
+**Shared dependency:** auction eligibility, character custody, escrow and
+coordination with the authoritative server state.
+
+- **Current Character Auctions:** offline/online races, concurrent bids, funds,
+  expiry, cancellation and settlement.
+- **Auction History:** settled records from the same module, immutable outcomes,
+  filtering and pagination.
+- **My Bids:** ownership, private maximum bids and outbid/settled states.
+- **My Auctions:** ownership, eligibility, custody and cancellation deadlines.
+- **My Watched Auctions:** add/remove idempotency, ownership and handling of
+  expired or deleted auctions.
+
+</details>
+
+### House actions
+
+- [ ] **Bidding, transfers and move-out** — authoritative updates and settlement.
+
+House search and detail pages already exist.
+
+<details>
+<summary>House actions — ownership and server-save safety</summary>
+
+**Dependency:** the game server must own updates. Direct website writes would
+race its in-memory state and save cycle.
+
+**Complete when:** bids and private limits, funds, ownership, eligibility,
+server-save races, settlement and failure recovery are covered.
+
+</details>
+
+---
 
 ## Existing page families
 
-News/archive/events, server/organization introduction, screenshots, guides,
-creature/boss/spell/achievement catalogs, experience table, world quests,
-characters/worlds/highscores/online, guild/account management, shop, house
-search/detail, polls, feedback, fansites and resellers already have local routes.
-This inventory does not certify every edge case of those workflows. Some guide
-presentation and gallery artwork still depend on the external pack.
+These families already have local routes:
 
-## Completion rule for each family
+- **News:** latest news, archive and event schedule.
+- **Information:** server/organization introduction, screenshots and guides.
+- **Library:** creatures, bosses, spells, achievements, experience table and world quests.
+- **Community:** characters, worlds, highscores, online players, guilds, polls,
+  feedback, fansites and resellers.
+- **Account and shop:** account management and shop flows.
+- **Houses:** search and detail pages.
 
-- Inspect the public visual reference and its actions, then use local data and
-  application-owned logic. Never use another site's application as a fallback.
-- Reuse shared page frames and controls, keeping Classic CSS scoped. Freeze
-  aligned shell/background geometry; compare matching viewport, scroll origin
-  and state before scoring image differences.
-- Record screenshots, component rectangles and pixel comparisons for Classic;
-  distinguish data-dependent text/height from structural differences. Also test
-  Legbone, keyboard access, empty/error states and a narrow viewport.
-- Validate authorization and concurrency where applicable. Remove temporary
-  fixtures and record only checks actually performed.
-- Ship atomic commits, portable documentation and external artwork through the
-  maintained asset package. Mark a module complete only when its frontend and
-  backend behavior are implemented and tested; content readiness is separate.
+This inventory does not certify every edge case. Some guide presentation and
+gallery artwork still depend on the external pack.
+
+---
+
+## Definition of done
+
+Apply this checklist to every page family:
+
+- [ ] Inspect the public visual reference and its actions; implement behavior using
+      local data and application-owned logic. Never use another application as a fallback.
+- [ ] Reuse shared frames and controls. Scope Classic CSS and preserve aligned
+      shell/background geometry.
+- [ ] Compare matching viewport, scroll origin and state. Record screenshots,
+      component rectangles and pixel comparisons for Classic; distinguish
+      data-dependent text/height from structural differences.
+- [ ] Test Legbone, keyboard access, empty/error states and a narrow viewport.
+- [ ] Validate authorization and concurrency where applicable. Remove temporary
+      fixtures and record only checks actually performed.
+- [ ] Ship atomic commits, portable documentation and artwork through the maintained
+      external asset package.
+
+Mark a module complete only when its frontend and backend behavior are implemented
+and tested. **Content readiness is a separate status.**

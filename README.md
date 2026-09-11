@@ -2,7 +2,17 @@
 
 This project is a website for the [Canary](https://github.com/opentibiabr/canary) project. The main goal is to use modern technology to have something that is easy to maintain and extend. It is also meant to be efficient, secure and easy to deploy.
 
-[Features / Roadmap](https://github.com/luan/slenderaac/issues/24) · [Remaining website pages](docs/page-roadmap.md)
+## Website roadmap
+
+FAQ, Parents' Guide and Legal Documents are implemented in Classic and Legbone.
+The next priority is website-only work, followed by modules that need game rules
+or authoritative server integration.
+
+- [Page roadmap — status, priorities and expandable details](docs/page-roadmap.md)
+- [Support pages — setup and content editing](docs/support.md)
+- [Feature discussion](https://github.com/luan/slenderaac/issues/24)
+
+---
 
 <details>
 <summary><h2>Getting started</h2></summary>
