@@ -341,7 +341,8 @@ icons and configured links. Invalid or missing counters never become zero. The
 player count remains database-backed and also starts unknown until its first poll.
 The shared server-status badge also starts unavailable. Only an explicit offline
 response may show Offline; a pending first request must not invent that state.
-Later failed refreshes retain the last valid status.
+Later failed refreshes retain the last valid result but mark it stale; the visible
+status becomes unavailable until a valid refresh confirms it again.
 
 Server availability is independent of player population. Both layout headers use
 the configured `SERVER_ADDRESS` / `SERVER_PORT` connection probe: a successful
@@ -351,6 +352,11 @@ The online list and world overview/details use the same probe on page load;
 offline worlds show no current population or player list, since database rows can
 remain after an unclean shutdown. A reachable port does not certify game login or
 gameplay health. Keep the status and population separate in future consumers.
+
+Character indicators and guild population use the same client status store as
+the headers, with one polling loop for all subscribers. A leftover database
+presence row never overrides an unreachable or unknown server. Follow the shared
+[UI state and data accuracy rules](ui-states.md) for other data-driven components.
 
 Selecting the Classic preview keeps live online counters enabled. Only explicit
 reference fixtures replace those values; choosing a theme does not select demo data.
