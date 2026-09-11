@@ -17,6 +17,12 @@ export const featurePages: Record<string, FeaturePage> = {
 		headline: 'headlineGetHelp',
 		queryKeys: ['topic', 'article', 'q', 'page'],
 	},
+	parentsguide: {
+		path: '/support/parents-guide',
+		title: "Parents' Guide",
+		section: 'support',
+		headline: 'headlineParentsGuide',
+	},
 	killstatistics: {
 		path: '/community/kill-statistics',
 		title: 'Kill Statistics',
