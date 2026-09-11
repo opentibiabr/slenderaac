@@ -4,8 +4,17 @@ import { test } from 'node:test';
 import {
 	onlineCounter,
 	type OnlineStatus,
+	playerOnline,
 	pollOnlineStatus,
 } from './online-status';
+
+void test('database presence requires a confirmed reachable server', () => {
+	assert.equal(playerOnline(true, true), true);
+	assert.equal(playerOnline(true, false), false);
+	assert.equal(playerOnline(true, null), null);
+	for (const server of [true, false, null])
+		assert.equal(playerOnline(false, server), false);
+});
 
 async function withPollingFixture(
 	run: (fixture: {
@@ -16,6 +25,7 @@ async function withPollingFixture(
 			reject: (error: Error) => void;
 		}[];
 		updates: OnlineStatus[];
+		failures: () => number;
 		stop: () => void;
 	}) => Promise<void>,
 ) {
@@ -29,6 +39,7 @@ async function withPollingFixture(
 		reject: (error: Error) => void;
 	}[] = [];
 	const updates: OnlineStatus[] = [];
+	let failures = 0;
 	let now = 0;
 	let nextId = 0;
 	globalThis.setTimeout = ((callback: () => void, delay: number) => {
@@ -51,9 +62,14 @@ async function withPollingFixture(
 		}
 		await new Promise<void>((resolve) => setImmediate(resolve));
 	};
-	const stop = pollOnlineStatus((status) => updates.push(status));
+	const stop = pollOnlineStatus(
+		(status) => updates.push(status),
+		() => {
+			failures++;
+		},
+	);
 	try {
-		await run({ advance, requests, updates, stop });
+		await run({ advance, requests, updates, failures: () => failures, stop });
 	} finally {
 		stop();
 		globalThis.fetch = originalFetch;
@@ -63,80 +79,87 @@ async function withPollingFixture(
 }
 
 void test('status polling validates responses, preserves the last value on failures and recovers', async () => {
-	await withPollingFixture(async ({ advance, requests, updates }) => {
-		requests[0].resolve(
-			Response.json({
-				serverOnline: true,
-				onlinePlayerCount: 12,
-				topbarStats: {
-					twitchChannels: 2.9,
-					twitchViewers: -1,
-					youtubeChannels: 'wrong',
-				},
-			}),
-		);
-		await advance(0);
-		assert.deepEqual(updates, [
-			{
-				serverOnline: true,
-				onlinePlayerCount: 12,
-				topbarStats: {
-					twitchChannels: null,
-					twitchViewers: null,
-					youtubeChannels: null,
-					youtubeViewers: null,
-				},
-			},
-		]);
-		const failures = [
-			new Response('unavailable', { status: 503 }),
-			new Response('not json'),
-			Response.json(null),
-			Response.json({ serverOnline: 'true', onlinePlayerCount: 14 }),
-			Response.json({ serverOnline: false, onlinePlayerCount: -1 }),
-			Response.json({ serverOnline: true, onlinePlayerCount: 1.5 }),
-			new Error('network disconnected'),
-		];
-		for (const failure of failures) {
-			await advance(5000);
-			const request = requests[requests.length - 1];
-			if (failure instanceof Error) request.reject(failure);
-			else request.resolve(failure);
+	await withPollingFixture(
+		async ({ advance, requests, updates, failures: failureCount }) => {
+			requests[0].resolve(
+				Response.json({
+					serverOnline: true,
+					onlinePlayerCount: 12,
+					topbarStats: {
+						twitchChannels: 2.9,
+						twitchViewers: -1,
+						youtubeChannels: 'wrong',
+					},
+				}),
+			);
 			await advance(0);
-			assert.equal(updates.length, 1);
-		}
-		await advance(5000);
-		requests[requests.length - 1].resolve(
-			Response.json({ serverOnline: false, onlinePlayerCount: 0 }),
-		);
-		await advance(0);
-		assert.equal(updates.length, 2);
-		assert.equal(updates[1].serverOnline, false);
-		assert.equal(updates[1].onlinePlayerCount, 0);
-	});
+			assert.deepEqual(updates, [
+				{
+					serverOnline: true,
+					onlinePlayerCount: 12,
+					topbarStats: {
+						twitchChannels: null,
+						twitchViewers: null,
+						youtubeChannels: null,
+						youtubeViewers: null,
+					},
+				},
+			]);
+			const failures = [
+				new Response('unavailable', { status: 503 }),
+				new Response('not json'),
+				Response.json(null),
+				Response.json({ serverOnline: 'true', onlinePlayerCount: 14 }),
+				Response.json({ serverOnline: false, onlinePlayerCount: -1 }),
+				Response.json({ serverOnline: true, onlinePlayerCount: 1.5 }),
+				new Error('network disconnected'),
+			];
+			for (const failure of failures) {
+				await advance(5000);
+				const request = requests[requests.length - 1];
+				if (failure instanceof Error) request.reject(failure);
+				else request.resolve(failure);
+				await advance(0);
+				assert.equal(updates.length, 1);
+			}
+			assert.equal(failureCount(), failures.length);
+			await advance(5000);
+			requests[requests.length - 1].resolve(
+				Response.json({ serverOnline: false, onlinePlayerCount: 0 }),
+			);
+			await advance(0);
+			assert.equal(updates.length, 2);
+			assert.equal(updates[1].serverOnline, false);
+			assert.equal(updates[1].onlinePlayerCount, 0);
+		},
+	);
 });
 
 void test('a slow status request is aborted without overlapping or publishing its late response', async () => {
-	await withPollingFixture(async ({ advance, requests, updates, stop }) => {
-		await advance(5000);
-		assert.equal(requests[0].signal.aborted, true);
-		assert.equal(requests.length, 1);
-		requests[0].resolve(
-			Response.json({ serverOnline: true, onlinePlayerCount: 99 }),
-		);
-		await advance(0);
-		assert.equal(updates.length, 0);
-		await advance(5000);
-		assert.equal(requests.length, 2);
-		stop();
-		assert.equal(requests[1].signal.aborted, true);
-		requests[1].resolve(
-			Response.json({ serverOnline: true, onlinePlayerCount: 1 }),
-		);
-		await advance(10000);
-		assert.equal(updates.length, 0);
-		assert.equal(requests.length, 2);
-	});
+	await withPollingFixture(
+		async ({ advance, requests, updates, failures, stop }) => {
+			await advance(5000);
+			assert.equal(requests[0].signal.aborted, true);
+			assert.equal(requests.length, 1);
+			requests[0].resolve(
+				Response.json({ serverOnline: true, onlinePlayerCount: 99 }),
+			);
+			await advance(0);
+			assert.equal(updates.length, 0);
+			assert.equal(failures(), 1);
+			await advance(5000);
+			assert.equal(requests.length, 2);
+			stop();
+			assert.equal(requests[1].signal.aborted, true);
+			requests[1].resolve(
+				Response.json({ serverOnline: true, onlinePlayerCount: 1 }),
+			);
+			await advance(10000);
+			assert.equal(updates.length, 0);
+			assert.equal(requests.length, 2);
+			assert.equal(failures(), 1, 'Unmounting must not publish a stale status');
+		},
+	);
 });
 
 void test('missing or invalid audience metrics remain unknown while measured zero is preserved', () => {

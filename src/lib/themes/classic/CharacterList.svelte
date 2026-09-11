@@ -11,8 +11,10 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import PanelUpdatedAt from '$lib/components/ui/PanelUpdatedAt.svelte';
 	import { highscoreCategories } from '$lib/highscores';
+	import { playerOnline } from '$lib/online-status';
 	import { vocationString } from '$lib/players';
 	import { sortHref } from '$lib/sorting';
+	import { serverAvailability } from '$lib/stores/online-status';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let characters: (Player | PlayerWithRank)[];
@@ -67,6 +69,10 @@
 					</tr></thead>
 				<tbody>
 					{#each characters as character}
+						{@const online = playerOnline(
+							character.online,
+							$serverAvailability,
+						)}
 						<tr>
 							{#if ranked}<td>{'rank' in character ? character.rank : ''}</td
 								>{/if}
@@ -85,7 +91,12 @@
 							{#if skill}<td class:classic-data-cell--numeric={ranked}
 									>{'skill' in character ? character.skill : ''}</td
 								>{/if}
-							{#if !ranked}<td>{character.online ? 'online' : 'offline'}</td
+							{#if !ranked}<td
+									>{online === null
+										? 'Unavailable'
+										: online
+											? 'online'
+											: 'offline'}</td
 								>{/if}
 						</tr>
 					{:else}<tr

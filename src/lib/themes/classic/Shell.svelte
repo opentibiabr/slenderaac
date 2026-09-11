@@ -4,7 +4,6 @@
 	import { faFacebookF, faYoutube } from '@fortawesome/free-brands-svg-icons';
 	import { faBars, faToolbox } from '@fortawesome/free-solid-svg-icons';
 	import { Drawer, getDrawerStore } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
@@ -16,12 +15,9 @@
 	import AssetImage from '$lib/components/ui/AssetImage.svelte';
 	import DirectoryLogo from '$lib/components/ui/DirectoryLogo.svelte';
 	import ServerBrand from '$lib/components/ui/ServerBrand.svelte';
-	import {
-		onlineCounter,
-		type OnlineCounters,
-		pollOnlineStatus,
-	} from '$lib/online-status';
+	import { onlineCounter, type OnlineCounters } from '$lib/online-status';
 	import { serverText } from '$lib/site-identity';
+	import { onlineStatus, serverAvailability } from '$lib/stores/online-status';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
@@ -577,9 +573,10 @@
 
 	beforeNavigate(drawerClose);
 
-	let onlinePlayerCount: number | null = null;
-	let serverOnline: boolean | null = null;
-	let topbarStats: OnlineCounters = {
+	$: onlinePlayerCount = $onlineStatus?.onlinePlayerCount ?? null;
+	$: serverOnline = $serverAvailability;
+	$: topbarStats = $onlineStatus?.topbarStats ?? emptyTopbarStats;
+	const emptyTopbarStats: OnlineCounters = {
 		twitchChannels: null,
 		twitchViewers: null,
 		youtubeChannels: null,
@@ -616,12 +613,6 @@
 	);
 	$: formattedYoutubeViewers = formatTopbarCount(
 		effectiveTopbarStats.youtubeViewers,
-	);
-
-	onMount(() =>
-		pollOnlineStatus((status) => {
-			({ onlinePlayerCount, serverOnline, topbarStats } = status);
-		}),
 	);
 </script>
 
@@ -788,6 +779,7 @@
 					onlineIcon={topIconOnline}
 					{onlineHref}
 					serverOnline={classicReference ? true : serverOnline}
+					statusStale={!classicReference && ($onlineStatus?.stale ?? false)}
 					onlineCount={formattedOnlinePlayerCount} />
 			</header>
 

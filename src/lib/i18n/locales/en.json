@@ -93,6 +93,7 @@
   "next": "Next",
   "offline": "Offline",
   "server-status-unknown": "Status unavailable",
+  "server-status-stale": "Status update failed; the last result is no longer current.",
   "online": "Online",
   "outfit": "Outfit",
   "password": "Password",

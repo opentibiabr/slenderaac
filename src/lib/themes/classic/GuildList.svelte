@@ -3,6 +3,7 @@
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { serverAvailability } from '$lib/stores/online-status';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from '../../../routes/(app)/guilds/$types';
@@ -51,7 +52,12 @@
 								'/characters/' + encodeURIComponent(guild.leader.name),
 							)}>{guild.leader.name}</a
 						></td>
-					<td>{guild.members}</td><td>{guild.onlineMembers}</td>
+					<td>{guild.members}</td><td
+						>{$serverAvailability === null
+							? 'Unavailable'
+							: $serverAvailability
+								? guild.onlineMembers
+								: 'Offline'}</td>
 				</tr>{:else}<tr><td colspan="4">No guilds found.</td></tr>{/each}
 		</tbody>
 	</table>

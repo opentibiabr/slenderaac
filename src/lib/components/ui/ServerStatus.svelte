@@ -1,23 +1,17 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { _ } from 'svelte-i18n';
 
 	import { page } from '$app/stores';
 
-	import { pollOnlineStatus } from '$lib/online-status';
+	import { onlineStatus, serverAvailability } from '$lib/stores/online-status';
 	import { themePreviewHref } from '$lib/themes/preview';
 
-	let serverOnline: boolean;
-	let onlinePlayerCount: number;
-
-	onMount(() =>
-		pollOnlineStatus((status) => {
-			({ onlinePlayerCount, serverOnline } = status);
-		}),
-	);
+	$: serverOnline = $serverAvailability;
+	$: onlinePlayerCount = $onlineStatus?.onlinePlayerCount;
 </script>
 
 <a
+	title={$onlineStatus?.stale ? $_('server-status-stale') : undefined}
 	href={themePreviewHref($page.url, '/online')}
 	class="text-xs px-2 rounded-full py-1 flex flex-row items-center gap-1 bg-surface-200/75 whitespace-nowrap">
 	{#if serverOnline}

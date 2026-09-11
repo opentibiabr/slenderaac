@@ -10,6 +10,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
+	import { serverAvailability } from '$lib/stores/online-status';
 	import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
 	import { themePreviewHref } from '$lib/themes/preview';
 
@@ -36,7 +37,7 @@
 							<th>{$_('guilds.leader')}</th>
 							<th class="w-32">
 								<span class="flex flex-row gap-0 items-center">
-									{$_('guilds.members')} (<OnlineIndicator online />)
+									{$_('guilds.members')} ({$_('online')})
 								</span>
 							</th>
 						</tr>
@@ -86,8 +87,11 @@
 								</td>
 								<td>
 									<span class="flex flex-row items-center gap-0">
-										{guild.members} (<OnlineIndicator
-											online />&nbsp;{guild.onlineMembers})
+										{guild.members} ({$serverAvailability === null
+											? $_('server-status-unknown')
+											: $serverAvailability
+												? guild.onlineMembers
+												: $_('offline')})
 									</span>
 								</td>
 							</tr>

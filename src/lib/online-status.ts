@@ -11,6 +11,14 @@ export type OnlineStatus = {
 	topbarStats: OnlineCounters;
 };
 
+/** A database presence row alone cannot establish a live connection. */
+export function playerOnline(
+	recordedOnline: boolean,
+	serverOnline: boolean | null,
+): boolean | null {
+	return !recordedOnline || serverOnline === false ? false : serverOnline;
+}
+
 export function onlineCounter(value: unknown): number | null {
 	return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0
 		? value
@@ -43,13 +51,17 @@ function parseStatus(value: unknown): OnlineStatus | null {
 	};
 }
 
-/** One bounded request at a time; failures preserve the last published value. */
-export function pollOnlineStatus(update: (status: OnlineStatus) => void) {
+/** One bounded request at a time; report failures without inventing a new value. */
+export function pollOnlineStatus(
+	update: (status: OnlineStatus) => void,
+	unavailable: () => void = () => {},
+) {
 	let active = true;
 	let controller: AbortController;
 	let timer: ReturnType<typeof setTimeout>;
 
 	async function refresh() {
+		let received = false;
 		controller = new AbortController();
 		const timeout = setTimeout(() => controller.abort(), 5000);
 		try {
@@ -58,11 +70,15 @@ export function pollOnlineStatus(update: (status: OnlineStatus) => void) {
 			});
 			if (!response.ok) return;
 			const status = parseStatus(await response.json());
-			if (active && !controller.signal.aborted && status) update(status);
+			if (active && !controller.signal.aborted && status) {
+				received = true;
+				update(status);
+			}
 		} catch {
 			// A later poll can recover from an HTTP, network or parsing failure.
 		} finally {
 			clearTimeout(timeout);
+			if (active && !received) unavailable();
 			if (active) timer = setTimeout(() => void refresh(), 5000);
 		}
 	}
