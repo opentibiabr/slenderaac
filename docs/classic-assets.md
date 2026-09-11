@@ -8,6 +8,10 @@ reference website, export pages, or import news to install the published images.
 ## One-command installation
 
 Use a SlenderAAC checkout that includes Classic and Python **3.10 or newer**.
+Update the application checkout first: the installer updates artwork, not application
+code. Store installation requires the external store route included in the updated
+checkout; an older version is rejected before any files are moved. Deploy the updated
+application code through your normal workflow before restarting a production service.
 From the application root, run:
 
 ```sh

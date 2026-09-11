@@ -58,6 +58,9 @@ class InstallerTests(unittest.TestCase):
         self.app = self.root / "application"
         self.app.mkdir()
         (self.app / "package.json").write_text('{"name":"slenderaac"}')
+        store_route = self.app / "src/routes/images/store/[...path]/+server.ts"
+        store_route.parent.mkdir(parents=True)
+        store_route.write_text("// compatible checkout fixture")
         self.original = b'DATABASE_URL="private-test-value"\r\nSLENDER_THEME=legbone\r\nSLENDER_THEME_SWITCHER_ENABLED=false\r\nTHEME_ASSETS_ROOT=\r\n'
         (self.app / ".env.dist").write_bytes(self.original)
         self.destination = self.root / "assets with spaces"
@@ -104,6 +107,14 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual((self.app / ".env").read_bytes(), before)
         self.assertFalse((self.destination / "outfits").exists())
         self.assertEqual(json.loads((self.destination / "classic/manifest.json").read_text())["version"], "old")
+
+    def test_old_checkout_cannot_move_store_files_without_the_external_route(self):
+        (self.app / "src/routes/images/store/[...path]/+server.ts").unlink()
+        with patch.object(assets, "read_channel") as read:
+            with self.assertRaisesRegex(ValueError, "external store route is missing"):
+                self.install_packs(["store"])
+            read.assert_not_called()
+        self.assertFalse(self.destination.exists())
 
     def test_selected_sprites_preserve_classic_and_move_legacy_store_outside_checkout(self):
         self.install(package("custom"))

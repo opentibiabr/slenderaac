@@ -303,6 +303,8 @@ def install(args) -> None:
     if root == app or root.is_relative_to(app):
         raise ValueError("Choose an asset root outside the application checkout")
     packs = list(dict.fromkeys(getattr(args, "packs", ["classic"])))
+    if "store" in packs and not (app / "src/routes/images/store/[...path]/+server.ts").is_file():
+        raise ValueError("Update the SlenderAAC checkout before installing store assets: the external store route is missing. Use --packs classic outfits items with an older checkout.")
     directories = tuple(directory for pack in packs for directory in PACKS[pack][0])
     for directory in directories:
         target = root / directory
