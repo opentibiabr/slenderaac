@@ -23,6 +23,25 @@ export const featurePages: Record<string, FeaturePage> = {
 		section: 'support',
 		headline: 'headlineParentsGuide',
 	},
+	legaldocuments: {
+		path: '/support/legal-documents',
+		title: 'Legal Documents',
+		section: 'support',
+		headline: 'headlineLegalDocuments',
+		queryKeys: ['page'],
+	},
+	agreement: {
+		path: '/support/service-agreement',
+		title: 'Service Agreement',
+		section: 'support',
+		headline: 'headlineLegalDocuments',
+	},
+	privacy: {
+		path: '/support/privacy-policy',
+		title: 'Privacy Policy',
+		section: 'support',
+		headline: 'headlineLegalDocuments',
+	},
 	killstatistics: {
 		path: '/community/kill-statistics',
 		title: 'Kill Statistics',

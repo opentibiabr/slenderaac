@@ -54,6 +54,10 @@ void test('saved unavailable support links upgrade locally in either theme', () 
 		const url = new URL('https://aac.example/?themePreview=' + theme);
 		for (const [feature, path] of Object.entries({
 			gethelp: '/support/get-help',
+			parentsguide: '/support/parents-guide',
+			legaldocuments: '/support/legal-documents',
+			agreement: '/support/service-agreement',
+			privacy: '/support/privacy-policy',
 		})) {
 			const destination = new URL(
 				themePreviewHref(url, '/unavailable?feature=' + feature),
