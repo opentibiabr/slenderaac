@@ -560,6 +560,14 @@ checkout use existing Slender data and actions. `PagePanel` selects shared Class
 layout. Extend those wrappers for future pages with the same structure before
 adding route-specific CSS. Theme-specific native controls are scoped to Classic.
 
+Organization and server-introduction tables use `InformationTable` to choose the
+same data rows in both themes. It retains the existing Classic panel geometry
+and supplies a heading, padded table cells and a bounded table container in
+Legbone. Links use the shared anchor style. `PagePanel` deliberately passes its
+children through in Legbone; do not add a heading to every panel, because other
+callers already own their default-theme headings. Check both themes and a narrow
+viewport when adding an information table.
+
 World overview and detail pages use the shared native panels, controls and
 tables described in [Server library](server-library.md). At the desktop content
 width, the selection panel is 833x85px, with a 531x19px selector and a 135x25px
