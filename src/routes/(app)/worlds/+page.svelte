@@ -37,7 +37,7 @@
 	);
 	$: details = [
 		['Status:', data.online ? 'Online' : 'Offline'],
-		['Players Online:', String(data.onlineCount)],
+		['Players Online:', data.online ? String(data.onlineCount) : '—'],
 		['Online Record:', record],
 		...(world.location ? [['Location:', world.location]] : []),
 		['PvP Type:', pvp],
@@ -71,6 +71,7 @@
 			variant="plain"
 			{illustrations} />
 		<OnlinePlayers
+			serverOnline={data.online}
 			characters={data.characters}
 			sort={data.sort}
 			order={data.order} />
@@ -119,7 +120,7 @@
 											href={themePreviewHref($page.url, worldHref(world.name))}
 											>{world.name}</a
 										></td
-									><td>{data.onlineCount}</td><td
+									><td>{data.online ? data.onlineCount : 'Offline'}</td><td
 										>{world.location ?? 'Not specified'}</td
 									><td>{pvp}</td><td
 										>{world.maxPlayers === undefined

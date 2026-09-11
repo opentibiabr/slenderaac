@@ -13,12 +13,13 @@
 	export let onlineIcon: string | null;
 	export let onlineHref: string;
 	export let onlineCount: string;
+	export let serverOnline: boolean | null = null;
 </script>
 
 <!-- Inline spacing is provided by the icon and channel margins. -->
 <!-- prettier-ignore -->
 <div class="classic-info-bar">
-	{#each channels as channel}<svelte:element this={channel.href ? 'a' : 'span'} class="classic-info-channel" href={channel.href || undefined} target={channel.href ? '_blank' : undefined} rel={channel.href ? 'noreferrer' : undefined} title={channel.href ? undefined : `${channel.label} channel not configured`}>{#if channel.icon}<img src={channel.icon} alt={channel.label} />{:else}{channel.label}{/if}<span class="classic-info-numbers">{#if signal}<img class="classic-info-small" src={signal} alt="Channels" />{/if}<span class="classic-info-small" title={channel.channels === "—" ? "Channel count unavailable" : undefined}>{channel.channels}</span>{#if eye}<img class="classic-info-small" src={eye} alt="Viewers" />{/if}<span class="classic-info-small" title={channel.viewers === "—" ? "Viewer count unavailable" : undefined}>{channel.viewers}</span></span></svelte:element>{/each}<a href={downloadHref}>{#if downloadIcon}<img src={downloadIcon} alt="" />{/if}<span class="classic-info-numbers"><span class="classic-info-small">Fankit</span></span></a><a class="classic-info-online" href={onlineHref}>{#if onlineIcon}<img src={onlineIcon} alt="" />{/if}<span class="classic-info-numbers"><span class="classic-info-small">{onlineCount} Players Online</span></span></a>
+	{#each channels as channel}<svelte:element this={channel.href ? 'a' : 'span'} class="classic-info-channel" href={channel.href || undefined} target={channel.href ? '_blank' : undefined} rel={channel.href ? 'noreferrer' : undefined} title={channel.href ? undefined : `${channel.label} channel not configured`}>{#if channel.icon}<img src={channel.icon} alt={channel.label} />{:else}{channel.label}{/if}<span class="classic-info-numbers">{#if signal}<img class="classic-info-small" src={signal} alt="Channels" />{/if}<span class="classic-info-small" title={channel.channels === "—" ? "Channel count unavailable" : undefined}>{channel.channels}</span>{#if eye}<img class="classic-info-small" src={eye} alt="Viewers" />{/if}<span class="classic-info-small" title={channel.viewers === "—" ? "Viewer count unavailable" : undefined}>{channel.viewers}</span></span></svelte:element>{/each}<a href={downloadHref}>{#if downloadIcon}<img src={downloadIcon} alt="" />{/if}<span class="classic-info-numbers"><span class="classic-info-small">Fankit</span></span></a><a class="classic-info-online" href={onlineHref}>{#if onlineIcon}<img src={onlineIcon} alt="" />{/if}<span class="classic-info-numbers"><span class="classic-info-small">{#if serverOnline === true}{onlineCount} Players Online{:else if serverOnline === false}Server Offline{:else}Server Status Unknown{/if}</span></span></a>
 </div>
 
 <style>

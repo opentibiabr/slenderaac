@@ -155,6 +155,20 @@ void test('missing or invalid audience metrics remain unknown while measured zer
 	for (const value of [0, 1, 5728]) assert.equal(onlineCounter(value), value);
 });
 
+void test('zero population remains distinct from server availability across status transitions', async () => {
+	await withPollingFixture(async ({ advance, requests, updates }) => {
+		for (const serverOnline of [true, false, true]) {
+			requests[requests.length - 1].resolve(
+				Response.json({ serverOnline, onlinePlayerCount: 0 }),
+			);
+			await advance(0);
+			assert.equal(updates.at(-1)?.serverOnline, serverOnline);
+			assert.equal(updates.at(-1)?.onlinePlayerCount, 0);
+			await advance(5000);
+		}
+	});
+});
+
 void test('audience metrics can move from unknown to measured and back without inventing zero', async () => {
 	await withPollingFixture(async ({ advance, requests, updates }) => {
 		const stats = {

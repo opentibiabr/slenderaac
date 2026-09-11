@@ -23,7 +23,7 @@ export const load = (async ({ url }) => {
 		prisma.serverConfig.findUnique({ where: { config: 'players_record' } }),
 		selected ? loadOnlinePlayers(sort, order, 'name') : [],
 		selected ? null : prisma.playerOnline.count({ where: publicOnlinePlayers }),
-		selected ? serverReachable(SERVER_ADDRESS, SERVER_PORT) : null,
+		serverReachable(SERVER_ADDRESS, SERVER_PORT),
 	]);
 	return {
 		title: 'Worlds',

@@ -45,7 +45,7 @@ for (const pathname of ['/', '/characters', '/houses', '/guides/quickstart']) {
 				}
 			}
 			assert.match(bar, /Fankit/);
-			assert.match(bar, /Players Online/);
+			assert.match(bar, /Server Status Unknown/);
 		},
 	);
 }

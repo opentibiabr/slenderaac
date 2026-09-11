@@ -12,6 +12,7 @@
 	export let characters: Player[];
 	export let sort: Sort;
 	export let order: Order;
+	export let serverOnline = true;
 	const columns = [
 		{ key: 'name', label: 'Name' },
 		{ key: 'level', label: 'Level' },
@@ -39,77 +40,84 @@
 
 <section class="online-players" aria-label="Players Online">
 	{#if !classic}<h3 class="h3">Players Online</h3>{/if}
-	<div
-		class="online-players__responsive-alphabet"
-		class:online-players__responsive-alphabet--classic={classic}>
-		<AlphabetNavigation {anchors} />
-	</div>
-	<PagePanel title="Players Online" variant="flush">
-		<svelte:fragment slot="caption">
-			Players Online
-			<span class="online-players__alphabet"
-				><AlphabetNavigation {anchors} /></span>
-		</svelte:fragment>
-		<CatalogTable>
-			<table
-				class="classic-data-table classic-data-table--grid online-players__table"
-				class:table={!classic}
-				aria-label="Players Online">
-				<thead
-					><tr
-						>{#each columns as column}
-							<th
-								scope="col"
-								aria-sort={sort === column.key
-									? order === 'asc'
-										? 'ascending'
-										: 'descending'
-									: 'none'}>
-								{column.label}
-								<small
-									>[<a
-										href={sortHref(
+	{#if !serverOnline}
+		<PagePanel title="Players Online">
+			<p>The server is offline. The online player list is unavailable.</p>
+		</PagePanel>
+	{:else}
+		<div
+			class="online-players__responsive-alphabet"
+			class:online-players__responsive-alphabet--classic={classic}>
+			<AlphabetNavigation {anchors} />
+		</div>
+		<PagePanel title="Players Online" variant="flush">
+			<svelte:fragment slot="caption">
+				Players Online
+				<span class="online-players__alphabet"
+					><AlphabetNavigation {anchors} /></span>
+			</svelte:fragment>
+			<CatalogTable>
+				<table
+					class="classic-data-table classic-data-table--grid online-players__table"
+					class:table={!classic}
+					aria-label="Players Online">
+					<thead
+						><tr
+							>{#each columns as column}
+								<th
+									scope="col"
+									aria-sort={sort === column.key
+										? order === 'asc'
+											? 'ascending'
+											: 'descending'
+										: 'none'}>
+									{column.label}
+									<small
+										>[<a
+											href={sortHref(
+												$page.url,
+												column.key,
+												sort,
+												order,
+												nextOrder,
+											)}
+											aria-label={`Sort by ${column.label.toLowerCase()}`}
+											>sort</a
+										>]</small>
+									<span class="online-players__sort-arrow"
+										>{#if sort === column.key}{#if arrow}<img
+													src={arrow}
+													width="10"
+													height="10"
+													alt="" />{:else}{order === 'asc'
+													? '↓'
+													: '↑'}{/if}{/if}</span>
+								</th>
+							{/each}</tr
+						></thead>
+					<tbody
+						>{#each characters as character}
+							<tr
+								id={initials.get(character.name[0]?.toUpperCase()) ===
+								character.id
+									? `online-${character.name[0].toUpperCase()}`
+									: undefined}>
+								<td
+									><a
+										href={themePreviewHref(
 											$page.url,
-											column.key,
-											sort,
-											order,
-											nextOrder,
-										)}
-										aria-label={`Sort by ${column.label.toLowerCase()}`}>sort</a
-									>]</small>
-								<span class="online-players__sort-arrow"
-									>{#if sort === column.key}{#if arrow}<img
-												src={arrow}
-												width="10"
-												height="10"
-												alt="" />{:else}{order === 'asc'
-												? '↓'
-												: '↑'}{/if}{/if}</span>
-							</th>
-						{/each}</tr
-					></thead>
-				<tbody
-					>{#each characters as character}
-						<tr
-							id={initials.get(character.name[0]?.toUpperCase()) ===
-							character.id
-								? `online-${character.name[0].toUpperCase()}`
-								: undefined}>
-							<td
-								><a
-									href={themePreviewHref(
-										$page.url,
-										`/characters/${encodeURIComponent(character.name)}`,
-									)}>{character.name}</a
-								></td>
-							<td>{character.level}</td><td
-								>{vocationString(character.vocation)}</td>
-						</tr>
-					{:else}<tr><td colspan="3">There are no players online.</td></tr
-						>{/each}</tbody>
-			</table>
-		</CatalogTable>
-	</PagePanel>
+											`/characters/${encodeURIComponent(character.name)}`,
+										)}>{character.name}</a
+									></td>
+								<td>{character.level}</td><td
+									>{vocationString(character.vocation)}</td>
+							</tr>
+						{:else}<tr><td colspan="3">There are no players online.</td></tr
+							>{/each}</tbody>
+				</table>
+			</CatalogTable>
+		</PagePanel>
+	{/if}
 </section>
 
 <style>

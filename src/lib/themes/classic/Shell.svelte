@@ -578,6 +578,7 @@
 	beforeNavigate(drawerClose);
 
 	let onlinePlayerCount: number | null = null;
+	let serverOnline: boolean | null = null;
 	let topbarStats: OnlineCounters = {
 		twitchChannels: null,
 		twitchViewers: null,
@@ -619,7 +620,7 @@
 
 	onMount(() =>
 		pollOnlineStatus((status) => {
-			({ onlinePlayerCount, topbarStats } = status);
+			({ onlinePlayerCount, serverOnline, topbarStats } = status);
 		}),
 	);
 </script>
@@ -786,6 +787,7 @@
 					)}
 					onlineIcon={topIconOnline}
 					{onlineHref}
+					serverOnline={classicReference ? true : serverOnline}
 					onlineCount={formattedOnlinePlayerCount} />
 			</header>
 

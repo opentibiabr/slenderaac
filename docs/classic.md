@@ -343,6 +343,15 @@ The shared server-status badge also starts unavailable. Only an explicit offline
 response may show Offline; a pending first request must not invent that state.
 Later failed refreshes retain the last valid status.
 
+Server availability is independent of player population. Both layout headers use
+the configured `SERVER_ADDRESS` / `SERVER_PORT` connection probe: a successful
+connection with zero players is Online, while an unreachable endpoint is Offline.
+The Classic bar shows `Server Offline` instead of `0 Players Online` in that case.
+The online list and world overview/details use the same probe on page load;
+offline worlds show no current population or player list, since database rows can
+remain after an unclean shutdown. A reachable port does not certify game login or
+gameplay health. Keep the status and population separate in future consumers.
+
 Selecting the Classic preview keeps live online counters enabled. Only explicit
 reference fixtures replace those values; choosing a theme does not select demo data.
 
