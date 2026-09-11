@@ -64,6 +64,29 @@ export function referenceSiteDestination(
 		return `${pathname}${query.size ? `?${query.toString()}` : ''}${url.hash}`;
 	};
 	if (section === '' || section === 'mmorpg') return '/';
+	if (section === 'support' && subtopic === 'gethelp') {
+		const topics: Record<string, string> = {
+			'18': 'account',
+			'6': 'payments',
+			'1': 'coins',
+			'29': 'gameplay',
+			'38': 'technical',
+			'25': 'rules',
+		};
+		const entries: Record<string, string> = {
+			'2': 'buy-coins',
+			'51': 'enable-authenticator',
+			'125': 'report-problem',
+			'144': 'account-security',
+			'38': 'recover-account',
+			'228': 'server-unavailable',
+		};
+		const article = url.searchParams.get('entryid');
+		if (article)
+			return `/support/get-help?article=${encodeURIComponent(entries[article] ?? `legacy-entry-${article}`)}${url.hash}`;
+		const topic = topics[url.searchParams.get('topicid') ?? ''];
+		if (topic) return `/support/get-help?topic=${topic}${url.hash}`;
+	}
 	if (Object.hasOwn(featurePages, subtopic)) {
 		const feature = featurePages[subtopic];
 		if (section === feature.section)

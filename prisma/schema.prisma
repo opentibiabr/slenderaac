@@ -1119,3 +1119,20 @@ model KillStatistic {
   @@index([minute], map: "slender_kill_statistics_minute_idx")
   @@map("slender_kill_statistics")
 }
+
+model HelpEntry {
+  id         String   @id @default(cuid())
+  slug       String   @unique @db.VarChar(80)
+  topic      String   @db.VarChar(16)
+  title      String   @db.VarChar(160)
+  content    String   @db.Text
+  published  Boolean  @default(false)
+  featured   Boolean  @default(false)
+  views      Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index([published, topic, title], map: "slender_help_public_idx")
+  @@index([published, views], map: "slender_help_views_idx")
+  @@map("slender_help_entries")
+}
