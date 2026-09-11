@@ -2,7 +2,7 @@
 
 This project is a website for the [Canary](https://github.com/opentibiabr/canary) project. The main goal is to use modern technology to have something that is easy to maintain and extend. It is also meant to be efficient, secure and easy to deploy.
 
-[Features / Roadmap](https://github.com/luan/slenderaac/issues/24)
+[Features / Roadmap](https://github.com/luan/slenderaac/issues/24) · [Remaining website pages](docs/page-roadmap.md)
 
 <details>
 <summary><h2>Getting started</h2></summary>
@@ -37,6 +37,8 @@ Latest News, News Archive, Event Schedule and their administrative editors are
 included in this setup and available in the default theme. No separate page
 creation, theme assets or sample-content import is required. See
 [built-in news and events](docs/news.md) for routes and content management.
+The [support pages guide](docs/support.md) covers FAQ articles, the parents’ guide
+and operator-owned legal documents.
 
 ### Running
 
