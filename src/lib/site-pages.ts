@@ -145,6 +145,13 @@ export const featurePages: Record<string, FeaturePage> = {
 		section: 'library',
 		headline: 'headlineSoundtrack',
 	},
+	maps: {
+		path: '/library/maps',
+		title: 'Maps',
+		section: 'library',
+		headline: 'headlineMaps',
+		queryKeys: ['area'],
+	},
 };
 
 /** Update obsolete menu aliases without changing the standalone route. */

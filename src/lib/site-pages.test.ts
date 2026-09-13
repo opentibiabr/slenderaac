@@ -96,4 +96,10 @@ void test('native catalog links retain selection and filters while dropping unkn
 		),
 		'/library/soundtrack',
 	);
+	assert.equal(
+		referenceSiteDestination(
+			new URL('https://game.example/library/?subtopic=maps&area=capital'),
+		),
+		'/library/maps?area=capital',
+	);
 });

@@ -68,6 +68,7 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 				{ slug: { startsWith: 'genesis-' } },
 				{ slug: { equals: 'fankit' } },
 				{ slug: { equals: 'soundtrack' } },
+				{ slug: { equals: 'maps' } },
 			],
 		},
 		orderBy: { order: 'asc' },

@@ -14,6 +14,7 @@ make a page complete.
 | Installation, updates, fixed downloads and recovery                 | [Website assets](classic-assets.md)                                                 |
 | Operator artwork downloads                                          | [Fankit](fankit.md)                                                                 |
 | Operator audio catalog and playback                                 | [Soundtrack](soundtrack.md)                                                         |
+| Operator map catalog and artwork                                    | [Maps](maps.md)                                                                     |
 | Asset preparation and publication                                   | [Publishing the fixed asset channel](classic.md#publishing-the-fixed-asset-channel) |
 | Native catalogs, game configuration and data boundaries             | [Server library](server-library.md)                                                 |
 | News, guides and editable information                               | [News and content](news.md), [Support](support.md)                                  |

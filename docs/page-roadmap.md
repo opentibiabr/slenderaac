@@ -4,7 +4,7 @@ Track the remaining website pages and the work needed to complete each one.
 Classic and Legbone share routes, data, validation and permissions.
 
 **Completed in the latest pass:** FAQ, Parents' Guide, Legal Documents, Genesis,
-the Fankit delivery route and the Soundtrack application flow.
+Fankit delivery, Soundtrack playback and the Maps application flow.
 
 **Next priority:** simple website pages that need no gameplay changes.
 
@@ -55,7 +55,7 @@ criteria.
 - [x] **Genesis** — publish the operator's story and chapters.
 - [ ] **Fankit** — delivery is implemented; publish the operator's artwork ZIP.
 - [ ] **Soundtrack** — playback is implemented; publish operator audio and artwork.
-- [ ] **Maps** — display the configured map with town and floor selection.
+- [ ] **Maps** — viewer is implemented; publish operator map artwork and regions.
 
 <details>
 <summary>Genesis — content and chapter navigation</summary>
@@ -106,8 +106,12 @@ checkbox represents content/release readiness.
 
 **Required:** a render/export pipeline for the configured map and local metadata.
 
-**Complete when:** town/floor selection, coordinates, correct map identity, missing
-tiles and mobile pan/zoom are covered.
+**Complete when:** region links and hotspots, coordinates, correct map identity,
+missing artwork and high-resolution downloads are covered.
+
+The shared catalog, selected-area view and local media routes are implemented.
+Configure operator-owned data through the [Maps guide](maps.md). The remaining
+checkbox represents map export/content readiness.
 
 </details>
 

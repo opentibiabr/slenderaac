@@ -1,22 +1,10 @@
-import { createReadStream } from 'node:fs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Readable } from 'node:stream';
 
-import {
-	attachmentDisposition,
-	fileNotModified,
-	weakFileEtag,
-} from '$lib/server/file-response';
+import type { ServedFile } from '$lib/server/file-response';
+import { localMediaFile, resolveLocalMediaRoot } from '$lib/server/local-media';
 
-type SoundtrackFile = {
-	path: string;
-	name: string;
-	size: number;
-	modified: Date;
-	etag: string;
-	contentType: string;
-};
+type SoundtrackFile = ServedFile;
 
 export type SoundtrackTrack = {
 	id: string;
@@ -62,7 +50,6 @@ const archiveTypes: Record<string, string> = { '.zip': 'application/zip' };
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
-
 function parseManifest(value: unknown): Manifest | null {
 	if (
 		!isRecord(value) ||
@@ -104,77 +91,12 @@ function parseManifest(value: unknown): Manifest | null {
 	};
 }
 
-function normalizedRelativePath(value: string): string | null {
-	if (
-		value.length === 0 ||
-		value.includes('\0') ||
-		value.includes('\\') ||
-		value.startsWith('/')
-	)
-		return null;
-	const parts = value.split('/');
-	if (
-		parts.some(
-			(part) =>
-				part.length === 0 ||
-				part === '.' ||
-				part === '..' ||
-				part.startsWith('.'),
-		)
-	)
-		return null;
-	const normalized = path.posix.normalize(value);
-	return normalized === '.' || normalized.startsWith('../') ? null : normalized;
-}
-
-async function catalogFile(
-	rootReal: string,
-	manifestPath: string | undefined,
-	contentTypes: Record<string, string>,
-): Promise<SoundtrackFile | null> {
-	if (!manifestPath) return null;
-	const normalized = normalizedRelativePath(manifestPath);
-	if (!normalized) return null;
-	const extension = path.posix.extname(normalized).toLowerCase();
-	const contentType = contentTypes[extension];
-	if (!contentType) return null;
-	const candidate = path.resolve(rootReal, ...normalized.split('/'));
-
-	try {
-		const linkStats = await fs.lstat(candidate);
-		if (linkStats.isSymbolicLink() || !linkStats.isFile()) return null;
-		const fileReal = await fs.realpath(candidate);
-		const relative = path.relative(rootReal, fileReal);
-		if (
-			relative.length === 0 ||
-			relative.startsWith('..') ||
-			path.isAbsolute(relative)
-		)
-			return null;
-		const stats = await fs.stat(fileReal);
-		if (!stats.isFile() || stats.size === 0) return null;
-		return {
-			path: fileReal,
-			name: path.basename(fileReal),
-			size: stats.size,
-			modified: stats.mtime,
-			etag: weakFileEtag(stats.size, stats.mtimeMs),
-			contentType,
-		};
-	} catch {
-		return null;
-	}
-}
-
 export async function loadSoundtrackCatalog(
 	configuredRoot: string | undefined,
 ): Promise<SoundtrackCatalog | null> {
-	if (!configuredRoot || !path.isAbsolute(configuredRoot)) return null;
-
 	try {
-		const rootReal = await fs.realpath(configuredRoot);
-		const rootStats = await fs.stat(rootReal);
-		if (!rootStats.isDirectory()) return null;
+		const rootReal = await resolveLocalMediaRoot(configuredRoot);
+		if (!rootReal) return null;
 		const manifestPath = path.join(rootReal, 'manifest.json');
 		const manifestStats = await fs.lstat(manifestPath);
 		if (
@@ -193,97 +115,13 @@ export async function loadSoundtrackCatalog(
 				manifest.tracks.map(async (track) => ({
 					id: track.id,
 					title: track.title,
-					audio: await catalogFile(rootReal, track.audio, audioTypes),
-					image: await catalogFile(rootReal, track.image, imageTypes),
+					audio: await localMediaFile(rootReal, track.audio, audioTypes),
+					image: await localMediaFile(rootReal, track.image, imageTypes),
 				})),
 			),
-			archive: await catalogFile(rootReal, manifest.archive, archiveTypes),
+			archive: await localMediaFile(rootReal, manifest.archive, archiveTypes),
 		};
 	} catch {
 		return null;
 	}
-}
-
-type ByteRange = { start: number; end: number };
-
-export function parseByteRange(value: string, size: number): ByteRange | null {
-	const match = /^bytes=(\d*)-(\d*)$/.exec(value.trim());
-	if (!match || size <= 0 || (!match[1] && !match[2])) return null;
-	if (!match[1]) {
-		const suffix = Number(match[2]);
-		if (!Number.isSafeInteger(suffix) || suffix <= 0) return null;
-		return { start: Math.max(0, size - suffix), end: size - 1 };
-	}
-	const start = Number(match[1]);
-	const requestedEnd = match[2] ? Number(match[2]) : size - 1;
-	if (
-		!Number.isSafeInteger(start) ||
-		!Number.isSafeInteger(requestedEnd) ||
-		start < 0 ||
-		start >= size ||
-		requestedEnd < start
-	)
-		return null;
-	return { start, end: Math.min(requestedEnd, size - 1) };
-}
-
-function ifRangeMatches(request: Request, file: SoundtrackFile): boolean {
-	const ifRange = request.headers.get('if-range');
-	if (!ifRange) return true;
-	const timestamp = Date.parse(ifRange);
-	return (
-		Number.isFinite(timestamp) &&
-		Math.floor(file.modified.getTime() / 1000) <= Math.floor(timestamp / 1000)
-	);
-}
-
-export function soundtrackFileResponse(
-	request: Request,
-	file: SoundtrackFile,
-	head = false,
-	download = false,
-): Response {
-	const headers = new Headers({
-		'Accept-Ranges': 'bytes',
-		'Cache-Control': 'public, max-age=300',
-		'Content-Length': String(file.size),
-		'Content-Type': file.contentType,
-		ETag: file.etag,
-		'Last-Modified': file.modified.toUTCString(),
-	});
-	if (download) {
-		headers.set(
-			'Content-Disposition',
-			attachmentDisposition(file.name, 'soundtrack.zip'),
-		);
-	}
-
-	if (fileNotModified(request, file)) {
-		headers.delete('Content-Length');
-		headers.delete('Content-Disposition');
-		return new Response(null, { status: 304, headers });
-	}
-
-	let status = 200;
-	let start = 0;
-	let end = file.size - 1;
-	const requestedRange = request.headers.get('range');
-	if (requestedRange && ifRangeMatches(request, file)) {
-		const range = parseByteRange(requestedRange, file.size);
-		if (!range) {
-			headers.set('Content-Range', `bytes */${file.size}`);
-			headers.set('Content-Length', '0');
-			return new Response(null, { status: 416, headers });
-		}
-		({ start, end } = range);
-		status = 206;
-		headers.set('Content-Range', `bytes ${start}-${end}/${file.size}`);
-		headers.set('Content-Length', String(end - start + 1));
-	}
-
-	if (head) return new Response(null, { status, headers });
-	const body = Readable.toWeb(
-		createReadStream(file.path, { start, end }),
-	) as ReadableStream;
-	return new Response(body, { status, headers });
 }

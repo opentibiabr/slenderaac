@@ -4,11 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
-import {
-	loadSoundtrackCatalog,
-	parseByteRange,
-	soundtrackFileResponse,
-} from './soundtrack';
+import { parseByteRange, rangedFileResponse } from './file-response';
+import { loadSoundtrackCatalog } from './soundtrack';
 
 async function soundtrackFixture() {
 	const root = await fs.mkdtemp(path.join(os.tmpdir(), 'slender-soundtrack-'));
@@ -101,7 +98,7 @@ void test('soundtrack responses stream ranges and reject unsatisfiable requests'
 		const catalog = await loadSoundtrackCatalog(root);
 		const file = catalog?.tracks[0].audio;
 		assert.ok(file);
-		const partial = soundtrackFileResponse(
+		const partial = rangedFileResponse(
 			new Request('http://localhost/media', {
 				headers: { Range: 'bytes=2-5' },
 			}),
@@ -110,7 +107,7 @@ void test('soundtrack responses stream ranges and reject unsatisfiable requests'
 		assert.equal(partial.status, 206);
 		assert.equal(partial.headers.get('Content-Range'), 'bytes 2-5/10');
 		assert.equal(await partial.text(), '2345');
-		const invalid = soundtrackFileResponse(
+		const invalid = rangedFileResponse(
 			new Request('http://localhost/media', {
 				headers: { Range: 'bytes=20-' },
 			}),
@@ -118,7 +115,7 @@ void test('soundtrack responses stream ranges and reject unsatisfiable requests'
 		);
 		assert.equal(invalid.status, 416);
 		assert.equal(invalid.headers.get('Content-Range'), 'bytes */10');
-		const cached = soundtrackFileResponse(
+		const cached = rangedFileResponse(
 			new Request('http://localhost/media', {
 				headers: { 'If-None-Match': file.etag },
 			}),

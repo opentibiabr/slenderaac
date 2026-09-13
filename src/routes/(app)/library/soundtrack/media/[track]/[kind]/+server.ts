@@ -1,7 +1,5 @@
-import {
-	loadSoundtrackCatalog,
-	soundtrackFileResponse,
-} from '$lib/server/soundtrack';
+import { rangedFileResponse } from '$lib/server/file-response';
+import { loadSoundtrackCatalog } from '$lib/server/soundtrack';
 
 import { env } from '$env/dynamic/private';
 
@@ -19,7 +17,7 @@ async function media(
 	const track = catalog?.tracks.find((entry) => entry.id === trackId);
 	const file = kind === 'audio' ? track?.audio : track?.image;
 	return file
-		? soundtrackFileResponse(request, file, head)
+		? rangedFileResponse(request, file, { head })
 		: new Response('Not found', {
 				status: 404,
 				headers: { 'Cache-Control': 'no-store' },
