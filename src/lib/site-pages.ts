@@ -133,6 +133,12 @@ export const featurePages: Record<string, FeaturePage> = {
 		headline: 'headlineGenesis',
 		queryKeys: ['page'],
 	},
+	fankit: {
+		path: '/fankit',
+		title: 'Fankit',
+		section: 'global',
+		headline: 'headlineFankit',
+	},
 };
 
 /** Update obsolete menu aliases without changing the standalone route. */

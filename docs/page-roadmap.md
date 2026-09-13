@@ -3,7 +3,8 @@
 Track the remaining website pages and the work needed to complete each one.
 Classic and Legbone share routes, data, validation and permissions.
 
-**Completed in the latest pass:** FAQ, Parents' Guide, Legal Documents and Genesis.
+**Completed in the latest pass:** FAQ, Parents' Guide, Legal Documents, Genesis
+and the Fankit delivery route.
 
 **Next priority:** simple website pages that need no gameplay changes.
 
@@ -52,7 +53,7 @@ criteria.
 ### Content and downloads
 
 - [x] **Genesis** — publish the operator's story and chapters.
-- [ ] **Fankit** — offer curated artwork in a maintained download.
+- [ ] **Fankit** — delivery is implemented; publish the operator's artwork ZIP.
 - [ ] **Soundtrack** — play the operator's published audio tracks.
 - [ ] **Maps** — display the configured map with town and floor selection.
 
@@ -79,6 +80,10 @@ body accept `{{serverName}}` and `{{serverWebsite}}` display placeholders.
 
 **Complete when:** external files are validated, download headers are correct,
 missing or replaced assets are handled, and the release/update flow works.
+
+The local page and download route are implemented. Set `FANKIT_FILE` to an
+absolute operator-owned ZIP as described in the [Fankit guide](fankit.md). The
+remaining checkbox represents content/release readiness, not application code.
 
 </details>
 

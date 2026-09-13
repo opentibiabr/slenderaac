@@ -82,4 +82,12 @@ void test('native catalog links retain selection and filters while dropping unkn
 		),
 		'/library/genesis?page=2',
 	);
+	assert.equal(
+		referenceSiteDestination(
+			new URL(
+				'https://game.example/forum/?action=announcement&announcementid=87',
+			),
+		),
+		'/fankit',
+	);
 });

@@ -10,6 +10,7 @@ or authoritative server integration.
 
 - [Page roadmap — status, priorities and expandable details](docs/page-roadmap.md)
 - [Support pages — setup and content editing](docs/support.md)
+- [Fankit — publish the operator artwork package](docs/fankit.md)
 - [Feature discussion](https://github.com/luan/slenderaac/issues/24)
 
 ---

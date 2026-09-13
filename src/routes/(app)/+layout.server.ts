@@ -62,7 +62,13 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 
 	const { boostedBoss, boostedCreature } = await loadBoostedSelections();
 	const staticPages = await prisma.staticPage.findMany({
-		where: { hide: false, NOT: { slug: { startsWith: 'genesis-' } } },
+		where: {
+			hide: false,
+			NOT: [
+				{ slug: { startsWith: 'genesis-' } },
+				{ slug: { equals: 'fankit' } },
+			],
+		},
 		orderBy: { order: 'asc' },
 	});
 
