@@ -95,20 +95,16 @@ a build, database migration, content import or restart command.
 
 ## Fixed download links
 
-- [Current packages and installer](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest)
+- [Current asset packages](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest)
 - [Classic ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/classic.zip)
 - [Classic SHA-256 checksum](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/classic.zip.sha256)
 - [Outfits ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/outfits.zip)
 - [Items ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/items.zip)
 - [Store ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/store.zip)
-- [Standalone installer](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/install-classic-assets.py)
 
-The standalone script works with Python 3.10+ and
-`python install-classic-assets.py install --app <application-directory>`. It remains
-available for recovery or hosts where application dependencies have not been installed;
-the package task is the normal checkout workflow.
-The standalone filename is retained for existing links; it now installs all four
-packages by default. Each ZIP also has a matching `.zip.sha256` attachment.
+`npm run install:assets` is the only supported automated installation path. This keeps
+download validation, environment updates, activation and rollback in one implementation.
+Each ZIP also has a matching `.zip.sha256` attachment.
 For manual installation, extract selected ZIPs outside the checkout, set their
 corresponding `.env` variables and restart. Automated installs read one small
 `<pack>-assets.json` file per package, pointing to an immutable versioned ZIP and

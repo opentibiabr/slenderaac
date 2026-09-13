@@ -154,7 +154,9 @@ snapshots into live player subscriptions.
 Keep theme, outfit, item and store binary packs outside Git, served through the
 existing validated local asset endpoints. Do not expose filesystem roots to the
 browser. Share outfit/item/store files across layouts and use the maintained
-Python installer instead of introducing parallel setup scripts.
+package task instead of introducing parallel setup scripts. `npm run install:assets`
+is the sole supported automated installer; Python tooling is maintainer-only for
+packaging and publishing release artifacts.
 
 Install published packs from the application's fixed release channel; do not
 fall back to source-provider downloads at install time or during page rendering.

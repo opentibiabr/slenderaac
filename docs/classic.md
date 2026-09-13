@@ -798,11 +798,10 @@ application. The publication helper remains in `src/scripts/theme_assets.py`, re
 Python 3.10+, and additionally requires an authenticated GitHub CLI with release-write
 permission.
 
-Prepare and validate a public ZIP with the external updater first. Include the
-current installer in `tools/install-classic-assets.py` and keep its README current;
-raw captures and local-only assets must remain excluded. From the application
-root, publish using a new versioned release tag and the full application commit
-SHA already pushed to GitHub:
+Prepare and validate a public ZIP with the external updater first. Keep the packaged
+tools documentation current; raw captures and local-only assets must remain excluded.
+From the application root, publish using a new versioned release tag and the full
+application commit SHA already pushed to GitHub:
 
 ```sh
 python src/scripts/theme_assets.py publish --zip ../theme-assets/releases/classic.zip --release classic-assets-YYYYMMDD-NAME --target <published-application-commit-sha>
@@ -810,7 +809,7 @@ python src/scripts/theme_assets.py publish --zip ../theme-assets/releases/classi
 
 The helper validates the archive, uploads a versioned release if absent and
 verifies the published download. It then refreshes the fixed `classic-assets-latest`
-release attachments (`classic.zip`, checksum and standalone installer), publishing
+release attachments (`classic.zip` and checksum), publishing
 `classic-assets.json` last. The JSON points to the versioned archive, so automated
 installs cannot mix ZIP bytes and checksums during a channel update. Published
 versioned archives are never overwritten. A mismatched existing release stops
@@ -828,7 +827,7 @@ Run the checkout installer contract tests without network or database access:
 npm run test:assets
 ```
 
-Run the standalone installer and publication contract tests separately:
+Run the packaging and publication contract tests separately:
 
 ```sh
 python -m unittest discover -s src/scripts -p test_theme_assets.py
@@ -859,6 +858,5 @@ source collection. Verify client-version compatibility before publishing.
 
 Use a unique versioned tag for each package update. The publisher only replaces
 that package's fixed ZIP/checksum/JSON attachments, keeping other selections
-intact. Update the standalone installer in the Classic pack's `tools/` as well
-when preparing a new Classic release. See the [installation guide](classic-assets.md)
+intact. See the [installation guide](classic-assets.md)
 for environment variables, store migration and checks.
