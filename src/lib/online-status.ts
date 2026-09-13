@@ -1,3 +1,5 @@
+import { pollJson } from '$lib/polling';
+
 export type OnlineCounters = {
 	twitchChannels: number | null;
 	twitchViewers: number | null;
@@ -25,7 +27,7 @@ export function onlineCounter(value: unknown): number | null {
 		: null;
 }
 
-function parseStatus(value: unknown): OnlineStatus | null {
+export function parseOnlineStatus(value: unknown): OnlineStatus | null {
 	if (!value || typeof value !== 'object') return null;
 	const status = value as Record<string, unknown>;
 	if (
@@ -56,37 +58,11 @@ export function pollOnlineStatus(
 	update: (status: OnlineStatus) => void,
 	unavailable: () => void = () => {},
 ) {
-	let active = true;
-	let controller: AbortController;
-	let timer: ReturnType<typeof setTimeout>;
-
-	async function refresh() {
-		let received = false;
-		controller = new AbortController();
-		const timeout = setTimeout(() => controller.abort(), 5000);
-		try {
-			const response = await fetch('/api/online-status', {
-				signal: controller.signal,
-			});
-			if (!response.ok) return;
-			const status = parseStatus(await response.json());
-			if (active && !controller.signal.aborted && status) {
-				received = true;
-				update(status);
-			}
-		} catch {
-			// A later poll can recover from an HTTP, network or parsing failure.
-		} finally {
-			clearTimeout(timeout);
-			if (active && !received) unavailable();
-			if (active) timer = setTimeout(() => void refresh(), 5000);
-		}
-	}
-
-	void refresh();
-	return () => {
-		active = false;
-		clearTimeout(timer);
-		controller.abort();
-	};
+	return pollJson({
+		url: '/api/online-status',
+		interval: 5000,
+		parse: parseOnlineStatus,
+		update,
+		unavailable,
+	});
 }
