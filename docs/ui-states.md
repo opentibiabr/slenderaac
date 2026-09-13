@@ -45,6 +45,20 @@ pending until the authoritative order state changes, even if a refresh times out
   and world tables refresh their data on navigation or reload; keep that distinction
   explicit when changing their refresh behavior.
 
+## Daily selections
+
+- The game server owns the daily creature and boss selection and persists it in
+  `boosted_creature` and `boosted_boss` during startup. The website reads those
+  tables; it never chooses a replacement or keeps a presentation default.
+- The website and game server must use the same database. A successful server log
+  with a different website value is a connection/configuration mismatch until the
+  shared tables prove otherwise.
+- A seed placeholder, zero race ID, empty name or row whose day does not match the
+  current server day is unavailable data. Do not present it as today's selection.
+- Active browser sessions poll the website endpoint and adopt the new persisted
+  selection without a website restart. A failed refresh preserves the last valid
+  value only when it is visibly marked stale.
+
 ## Shared implementation rules
 
 Keep these decisions in the existing data or component owner. Reuse the same

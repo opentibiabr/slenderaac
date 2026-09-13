@@ -11,7 +11,12 @@ pages show maximum health, elemental strengths and weaknesses, summon/convince
 requirements, locations, base experience and configured loot. Previous, next
 and back links retain theme preview. `/library/boostable-bosses` lists registered
 Archfoe boss types with a boss race ID. Boss portraits are informational. Both
-pages read the daily boosted selection from the application database.
+pages read the daily boosted selection from the application database. The game
+server updates that selection during startup when the stored day differs from its
+local day. The website exposes only a current non-placeholder row and refreshes
+open sessions through its local API; it does not generate or cache a substitute.
+Keep `DATABASE_URL` aligned with the game server database so both processes share
+the same `boosted_creature` and `boosted_boss` rows.
 
 `/library/achievements` groups the server's public achievements by grade and
 sorts them by name. Grade point ranges and the secret total come from the server
