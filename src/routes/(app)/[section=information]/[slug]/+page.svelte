@@ -1,14 +1,11 @@
 <script lang="ts">
 	import '$lib/components/information/manual.css';
 
-	import { page } from '$app/stores';
-
 	import Content from '$lib/components/information/Content.svelte';
 	import CreatureLibrary from '$lib/components/information/CreatureLibrary.svelte';
 	import Gallery from '$lib/components/information/Gallery.svelte';
 	import Organization from '$lib/components/information/Organization.svelte';
 	import ServerIntroduction from '$lib/components/information/ServerIntroduction.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -43,11 +40,9 @@
 	{:else}
 		<p>{data.informationPage.summary}</p>
 		{#if data.informationPage.section !== 'library'}<p>
-				<a href={themePreviewHref($page.url, '/account/signup')}
-					>Create account</a>
+				<a href="/account/signup">Create account</a>
 				·
-				<a href={themePreviewHref($page.url, '/characters')}
-					>Find a character</a>
+				<a href="/characters">Find a character</a>
 			</p>{/if}
 	{/if}
 </article>

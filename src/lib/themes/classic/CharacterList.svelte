@@ -15,7 +15,6 @@
 	import { vocationString } from '$lib/players';
 	import { sortHref } from '$lib/sorting';
 	import { serverAvailability } from '$lib/stores/online-status';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let characters: (Player | PlayerWithRank)[];
 	export let ranked = false;
@@ -78,10 +77,7 @@
 								>{/if}
 							<td
 								><a
-									href={themePreviewHref(
-										$page.url,
-										'/characters/' + encodeURIComponent(character.name),
-									)}
+									href={'/characters/' + encodeURIComponent(character.name)}
 									on:click={() => dispatch('selected')}>{character.name}</a
 								></td>
 							<td>{vocationString(character.vocation)}</td>

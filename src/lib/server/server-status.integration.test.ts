@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 const origin = process.env.CLASSIC_TEST_ORIGIN;
+const integrationTest = origin ? test : test.skip;
 
 // Opt in against the existing local app without starting the game or changing data.
-void test(
+void integrationTest(
 	'online and world pages distinguish availability from population in both layouts',
-	{ skip: !origin, timeout: 30000 },
+	{ timeout: 30000 },
 	async () => {
 		const base = new URL(origin!);
 		assert.ok(['127.0.0.1', 'localhost', '[::1]'].includes(base.hostname));
@@ -17,10 +18,18 @@ void test(
 		};
 		assert.equal(typeof status.serverOnline, 'boolean');
 		for (const theme of ['classic', 'legbone']) {
+			const selection = await fetch(new URL(`/online?layout=${theme}`, base), {
+				redirect: 'manual',
+			});
+			assert.equal(selection.status, 307);
+			assert.equal(selection.headers.get('location'), '/online');
+			const setCookie = selection.headers.get('set-cookie');
+			assert.ok(setCookie);
+			const cookie = setCookie.split(';', 1)[0];
+			assert.equal(cookie, `slender-theme=${theme}`);
 			for (const path of ['/online', '/worlds']) {
 				const url = new URL(path, base);
-				url.searchParams.set('themePreview', theme);
-				const response = await fetch(url);
+				const response = await fetch(url, { headers: { cookie } });
 				assert.equal(response.status, 200);
 				const html = await response.text();
 				const text = html
@@ -46,6 +55,7 @@ void test(
 					);
 					const details = await fetch(
 						new URL(worldLink[1].replaceAll('&amp;', '&'), base),
+						{ headers: { cookie } },
 					);
 					assert.equal(details.status, 200);
 					const detailText = (await details.text())

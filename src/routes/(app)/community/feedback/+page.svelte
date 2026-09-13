@@ -5,7 +5,6 @@
 	import CommunityTopics from '$lib/components/ui/CommunityTopics.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { enhance } from '$lib/enchance';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -82,10 +81,7 @@
 			title="Active Feedback Forms"
 			topics={data.forms}
 			href={(id) =>
-				themePreviewHref(
-					$page.url,
-					`/community/feedback?${new URLSearchParams({ form: id }).toString()}`,
-				)}
+				`/community/feedback?${new URLSearchParams({ form: id }).toString()}`}
 			empty="There are no active feedback forms." />
 	{/if}
 </div>

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import CharacterAchievements from '$lib/components/ui/CharacterAchievements.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
@@ -8,7 +6,6 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from '../../../routes/(app)/characters/[name]/$types';
@@ -16,7 +13,7 @@
 	export let data: PageData;
 	$: character = data.character;
 	function href(path: string, name: string) {
-		return themePreviewHref($page.url, path + encodeURIComponent(name));
+		return path + encodeURIComponent(name);
 	}
 	function characterHref(name: string) {
 		return href('/characters/', name);

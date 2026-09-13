@@ -11,14 +11,13 @@ import {
 	stringValidator,
 	validate,
 } from '$lib/server/validations';
-import { themePreviewHref } from '$lib/themes/preview';
 import { $_ } from '$lib/utils';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ locals, url }) => {
+export const load: PageServerLoad = ({ locals }) => {
 	if (locals.session) {
-		throw redirect(302, themePreviewHref(url, '/'));
+		throw redirect(302, '/');
 	}
 
 	return {
@@ -84,6 +83,6 @@ export const actions: Actions = {
 		}
 
 		await performLogin(cookies, account.email);
-		throw redirect(302, themePreviewHref(url, returnTo));
+		throw redirect(302, returnTo);
 	},
 } satisfies Actions;

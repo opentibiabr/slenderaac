@@ -7,7 +7,6 @@
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { serverText } from '$lib/site-identity';
 	import { classicAsset } from '$lib/themes/classic/theme';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -40,10 +39,7 @@
 	}
 
 	function monthHref(currentUrl: URL, target: { month: number; year: number }) {
-		const nextUrl = new URL(
-			themePreviewHref(currentUrl, '/news/event-schedule'),
-			currentUrl.origin,
-		);
+		const nextUrl = new URL('/news/event-schedule', currentUrl.origin);
 
 		nextUrl.searchParams.set('calendarmonth', String(target.month));
 		nextUrl.searchParams.set('calendaryear', String(target.year));

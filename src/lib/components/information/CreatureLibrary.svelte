@@ -11,7 +11,6 @@
 		creatureSentences,
 	} from '$lib/creatures';
 	import { boostedStatus } from '$lib/stores/boosted';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import LibraryBoosted from './LibraryBoosted.svelte';
 
@@ -89,7 +88,7 @@
 					{:else if assets?.[`creatureIcon-${entry.id}`]}
 						<a
 							class="creature-catalog__portrait"
-							href={themePreviewHref($page.url, href(entry.id))}
+							href={href(entry.id)}
 							aria-label={entry.name}
 							><img
 								src={assets[`creatureIcon-${entry.id}`]}
@@ -100,8 +99,7 @@
 						<div>{entry.name}</div>
 					{:else}
 						<div class="creature-catalog__portrait"></div>
-						<a href={themePreviewHref($page.url, href(entry.id))}
-							>{entry.name}</a>
+						<a href={href(entry.id)}>{entry.name}</a>
 					{/if}
 				</div>
 			{/each}

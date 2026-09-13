@@ -11,7 +11,6 @@
 	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let name: string;
 	export let isOwner: boolean;
@@ -24,10 +23,7 @@
 <div class="flex flex-row items-end gap-1">
 	{#if isVice}
 		<Button
-			href={themePreviewHref(
-				$page.url,
-				`/guilds/${encodeURIComponent(name)}/invite`,
-			)}
+			href={`/guilds/${encodeURIComponent(name)}/invite`}
 			size="sm"
 			iconBefore={faPersonCirclePlus}>
 			{$_('guilds.invite')}
@@ -35,10 +31,7 @@
 	{/if}
 	{#if isLeader}
 		<Button
-			href={themePreviewHref(
-				$page.url,
-				`/guilds/${encodeURIComponent(name)}/edit`,
-			)}
+			href={`/guilds/${encodeURIComponent(name)}/edit`}
 			size="sm"
 			color="secondary"
 			iconBefore={faEdit}>
@@ -48,10 +41,7 @@
 	{#if isOwner}
 		{#if resigning}
 			<Button
-				href={themePreviewHref(
-					$page.url,
-					`/guilds/${encodeURIComponent(name)}`,
-				)}
+				href={`/guilds/${encodeURIComponent(name)}`}
 				size="sm"
 				color="warning"
 				iconBefore={faRefresh}>
@@ -59,10 +49,7 @@
 			</Button>
 		{:else}
 			<Button
-				href={themePreviewHref(
-					$page.url,
-					`/guilds/${encodeURIComponent(name)}/resign`,
-				)}
+				href={`/guilds/${encodeURIComponent(name)}/resign`}
 				size="sm"
 				color="warning"
 				iconBefore={faHandHoldingHand}>
@@ -70,10 +57,7 @@
 			</Button>
 		{/if}
 		<Button
-			href={themePreviewHref(
-				$page.url,
-				`/guilds/${encodeURIComponent(name)}/disband`,
-			)}
+			href={`/guilds/${encodeURIComponent(name)}/disband`}
 			size="xs"
 			color="error"
 			iconBefore={faTrash}>

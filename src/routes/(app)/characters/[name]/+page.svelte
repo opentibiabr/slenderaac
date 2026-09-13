@@ -12,7 +12,6 @@
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
 	import ClassicCharacterProfile from '$lib/themes/classic/CharacterProfile.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -29,13 +28,10 @@
 		: null;
 	$: inventory = data.inventory;
 	function guildHref(name: string) {
-		return themePreviewHref($page.url, '/guilds/' + encodeURIComponent(name));
+		return '/guilds/' + encodeURIComponent(name);
 	}
 	function characterHref(name: string) {
-		return themePreviewHref(
-			$page.url,
-			`/characters/${encodeURIComponent(name)}`,
-		);
+		return `/characters/${encodeURIComponent(name)}`;
 	}
 </script>
 

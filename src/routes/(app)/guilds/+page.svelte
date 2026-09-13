@@ -12,7 +12,6 @@
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 	import { serverAvailability } from '$lib/stores/online-status';
 	import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -58,10 +57,7 @@
 								</td>
 								<td>
 									<a
-										href={themePreviewHref(
-											$page.url,
-											`/guilds/${encodeURIComponent(guild.name)}`,
-										)}
+										href={`/guilds/${encodeURIComponent(guild.name)}`}
 										class="font-extrabold">
 										{guild.name}
 									</a>
@@ -75,10 +71,7 @@
 											class="font-semibold flex flex-row gap-1 items-center">
 											<OnlineIndicator online={guild.leader.online} />
 											<a
-												href={themePreviewHref(
-													$page.url,
-													`/characters/${encodeURIComponent(guild.leader.name)}`,
-												)}
+												href={`/characters/${encodeURIComponent(guild.leader.name)}`}
 												class="anchor">
 												{guild.leader.name}
 											</a>

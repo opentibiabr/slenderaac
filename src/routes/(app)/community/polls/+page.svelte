@@ -8,7 +8,6 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import PollResults from '$lib/components/ui/PollResults.svelte';
 	import { enhance } from '$lib/enchance';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -16,13 +15,10 @@
 	export let form: ActionData;
 	$: classic = $page.data.selectedTheme === 'classic';
 	function href(id: string) {
-		return themePreviewHref(
-			$page.url,
-			`/community/polls?${new URLSearchParams({ poll: id }).toString()}`,
-		);
+		return `/community/polls?${new URLSearchParams({ poll: id }).toString()}`;
 	}
 	function pageHref(number: number) {
-		return themePreviewHref($page.url, `/community/polls?page=${number}`);
+		return `/community/polls?page=${number}`;
 	}
 </script>
 

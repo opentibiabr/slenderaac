@@ -19,7 +19,6 @@ import { loadPresentationReference } from '$lib/server/theme-assets/presentation
 import {
 	resolveThemeSelection,
 	themeCookie,
-	themePreferenceUpdate,
 } from '$lib/server/theme-assets/selection';
 import { parseTimeString } from '$lib/server/utils';
 import { serverName } from '$lib/server/worlds';
@@ -30,7 +29,16 @@ import { SERVER_SAVE_TIME } from '$env/static/private';
 import type { LayoutServerLoad } from './$types';
 
 export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
-	const preferenceUpdate = themePreferenceUpdate(themeSwitcherEnabled, url);
+	const { selectedTheme, redirectTo, preferenceUpdate } =
+		await resolveThemeSelection(
+			{
+				configuredTheme: env.SLENDER_THEME,
+				allowSwitching: themeSwitcherEnabled,
+				preference: cookies.get(themeCookie),
+				url,
+			},
+			resolveThemeId,
+		);
 	if (preferenceUpdate === null) {
 		cookies.delete(themeCookie, { path: '/' });
 	} else if (preferenceUpdate) {
@@ -41,16 +49,6 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 			secure: url.protocol === 'https:',
 		});
 	}
-
-	const { selectedTheme, redirectTo } = await resolveThemeSelection(
-		{
-			configuredTheme: env.SLENDER_THEME,
-			allowSwitching: themeSwitcherEnabled,
-			preference: cookies.get(themeCookie),
-			url,
-		},
-		resolveThemeId,
-	);
 	if (redirectTo) throw redirect(307, redirectTo);
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');

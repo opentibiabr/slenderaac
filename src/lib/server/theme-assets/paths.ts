@@ -114,5 +114,5 @@ export function isVersionedAssetRequest(assetPath: string, url: URL): boolean {
 
 	const basename = path.posix.basename(assetPath);
 
-	return /(?:^|[.-])[a-f0-9]{8,}(?:[.-]|$)/i.test(basename);
+	return /(?:^|[.-])[a-f0-9]{8}(?:[.-]|$)/i.test(basename);
 }

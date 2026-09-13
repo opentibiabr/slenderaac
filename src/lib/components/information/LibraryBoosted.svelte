@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import type { BoostedProps } from '$lib/boosted';
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let assets: Record<string, string | undefined> | null | undefined;
 	export let boss = false;
@@ -31,10 +28,8 @@
 			<p>
 				Today's boosted {boss ? 'boss' : 'creature'}:
 				{#if boosted.id && boosted.name && !boss}<a
-						href={themePreviewHref(
-							$page.url,
-							`/library/creatures?race=${encodeURIComponent(boosted.id)}`,
-						)}>{boosted.name}</a
+						href={`/library/creatures?race=${encodeURIComponent(boosted.id)}`}
+						>{boosted.name}</a
 					>{:else}{boosted.name ?? 'None'}{/if}
 				{#if stale}
 					<span>Update unavailable.</span>{/if}

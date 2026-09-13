@@ -7,7 +7,6 @@
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import { enhance } from '$lib/enchance';
 	import ClassicLogin from '$lib/themes/classic/Login.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData } from './$types';
 
@@ -53,8 +52,7 @@
 		{/if}
 
 		<div class="flex flex-row justify-end items-center gap-2">
-			<a href={themePreviewHref($page.url, `/account/lost`)}
-				>{$_('lost-account')}</a>
+			<a href={`/account/lost`}>{$_('lost-account')}</a>
 			<Button>{$_('login')}</Button>
 		</div>
 
@@ -62,9 +60,8 @@
 
 		<div class="flex flex-row justify-center items-center gap-2 mb-4">
 			<h3 class="h3">{$_('dont-have-an-account')}</h3>
-			<Button
-				href={themePreviewHref($page.url, `/account/signup`)}
-				color="secondary">{$_('create-account')}</Button>
+			<Button href={`/account/signup`} color="secondary"
+				>{$_('create-account')}</Button>
 		</div>
 	</form>
 {/if}

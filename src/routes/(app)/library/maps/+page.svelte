@@ -3,14 +3,13 @@
 
 	import DocumentContent from '$lib/components/ui/DocumentContent.svelte';
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };
 	const areaHref = (id: string) =>
-		themePreviewHref($page.url, `/library/maps?area=${encodeURIComponent(id)}`);
+		`/library/maps?area=${encodeURIComponent(id)}`;
 	const fileSize = (bytes: number) => {
 		const formatter = new Intl.NumberFormat('en', {
 			maximumFractionDigits: 1,
@@ -59,14 +58,14 @@
 						{serverText(data.selected.description, identity)}
 					</p>{/if}
 				{#if data.selected.imageHref}<img
-						src={themePreviewHref($page.url, data.selected.imageHref)}
+						src={data.selected.imageHref}
 						alt={`Map of ${serverText(data.selected.name, identity)}`} />{/if}
 			</article>{/if}
 
 		{#if data.catalog.overviewHref}<figure class="maps-page__overview">
 				<div class="maps-page__canvas">
 					<img
-						src={themePreviewHref($page.url, data.catalog.overviewHref)}
+						src={data.catalog.overviewHref}
 						alt={`${identity.name} world map`} />
 					{#each data.catalog.sections as section}{#each section.groups as group}{#each group.places.filter((place) => place.x !== null && place.y !== null) as place}<a
 									class="maps-page__hotspot"
@@ -81,7 +80,7 @@
 		{:else}<p class="maps-page__state">The overview map is unavailable.</p>{/if}
 
 		{#if data.catalog.highResolution}<p class="maps-page__download">
-				[<a href={themePreviewHref($page.url, data.catalog.highResolution.href)}
+				[<a href={data.catalog.highResolution.href}
 					>Download high resolution map ({fileSize(
 						data.catalog.highResolution.size,
 					)})</a

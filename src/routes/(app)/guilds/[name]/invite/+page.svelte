@@ -4,14 +4,12 @@
 	import { _ } from 'svelte-i18n';
 
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
 	import { vocationString } from '$lib/players';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -21,13 +19,7 @@
 	$: results = data.results ?? [];
 
 	function close() {
-		guild &&
-			void goto(
-				themePreviewHref(
-					$page.url,
-					`/guilds/${encodeURIComponent(guild.name)}`,
-				),
-			);
+		guild && void goto(`/guilds/${encodeURIComponent(guild.name)}`);
 	}
 </script>
 
@@ -44,10 +36,7 @@
 							<span>{character.level}</span>
 							<em>{vocationString(character.vocation)}</em>
 							{#if character.guildInvtes.includes(guild.name)}
-								<form
-									action={themePreviewHref($page.url, '?/uninvite')}
-									method="post"
-									use:enhance>
+								<form action="?/uninvite" method="post" use:enhance>
 									<input type="hidden" name="name" value={character.name} />
 									<Button
 										size="icon"
@@ -57,10 +46,7 @@
 										tooltip={$_('guilds.uninvite')} />
 								</form>
 							{:else}
-								<form
-									action={themePreviewHref($page.url, '?/invite')}
-									method="post"
-									use:enhance>
+								<form action="?/invite" method="post" use:enhance>
 									<input type="hidden" name="name" value={character.name} />
 									<Button
 										size="icon"
@@ -75,12 +61,8 @@
 			</div>
 		{/if}
 		<div class="flex flex-row w-full justify-end">
-			<Button
-				size="sm"
-				href={themePreviewHref(
-					$page.url,
-					`/guilds/${encodeURIComponent(guild.name)}`,
-				)}>{$_('done')}</Button>
+			<Button size="sm" href={`/guilds/${encodeURIComponent(guild.name)}`}
+				>{$_('done')}</Button>
 		</div>
 	</StatelessModal>
 {/if}

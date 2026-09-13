@@ -3,9 +3,9 @@ import { test } from 'node:test';
 
 import { availableFeatureHref } from './site-pages';
 import { referenceSiteDestination } from './source-navigation';
-import { themePreviewHref } from './themes/preview';
+import { siteHref } from './themes/navigation';
 
-void test('saved unavailable destinations upgrade without losing preview state or fragments', () => {
+void test('saved unavailable destinations upgrade while site links omit layout state', () => {
 	const legacy = new URL(
 		'https://game.example/unavailable?feature=experiencetable&themePreview=classic#levels',
 	);
@@ -15,11 +15,11 @@ void test('saved unavailable destinations upgrade without losing preview state o
 	);
 	assert.equal(legacy.pathname, '/unavailable');
 	assert.equal(
-		themePreviewHref(
+		siteHref(
 			new URL('https://game.example/?themePreview=classic'),
 			'/unavailable?feature=experiencetable',
 		),
-		'/library/experience-table?themePreview=classic',
+		'/library/experience-table',
 	);
 	for (const feature of ['unknown', 'constructor', '__proto__'])
 		assert.equal(
@@ -53,11 +53,11 @@ void test('native catalog links retain selection and filters while dropping unkn
 		'/library/achievements#Grade+3',
 	);
 	assert.equal(
-		themePreviewHref(
+		siteHref(
 			new URL('https://game.example/?themePreview=classic'),
 			'/unavailable?feature=achievements#Grade+3',
 		),
-		'/library/achievements?themePreview=classic#Grade+3',
+		'/library/achievements#Grade+3',
 	);
 	const target = referenceSiteDestination(
 		new URL(

@@ -31,6 +31,12 @@ not universal dimensions or proof of the current implementation.
 - Resolve theme selection on the server with validated IDs/manifests and the
   static component registry. Never construct component imports from user input
   or expose server-only asset configuration to select a theme.
+- Persist an enabled layout selection in a server-set, HTTP-only session cookie.
+  The selector may send a transient `layout` query value; validate it, update the
+  preference and redirect to the canonical URL without selection state. Accept
+  legacy selection URLs only as inbound compatibility. Do not propagate layout
+  state through ordinary links, forms or redirects. Authentication redirects may
+  carry a pending selection only until the root layout persists it.
 - Choose an existing page family before adding page CSS. Reuse `ContentFrame`,
   `Headline`, `MenuLabel`, `PagePanel`, `TableFrame`, `TableSurface` and existing
   controls where they own the pattern. A shared problem belongs in that owner;
@@ -47,7 +53,7 @@ not universal dimensions or proof of the current implementation.
 - Treat reference markup and captured data as isolated comparison fixtures.
   Adapt visual structure and interactions to native components and local data
   before delivery. Never ship a whole captured page as the feature, and never
-  enable captured content merely because `themePreview` selects Classic.
+  enable captured content merely because the Classic layout is selected.
 
 Every visible value needs an identifiable owner: local database/configuration,
 operator-published content, presentation artwork, or an explicit development

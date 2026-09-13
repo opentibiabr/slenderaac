@@ -17,7 +17,6 @@
 
 	import { serverText } from '$lib/site-identity';
 	import { siteNavigation } from '$lib/site-navigation';
-	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
@@ -49,7 +48,7 @@
 	$: aboutLinks = navigation.about;
 	$: guideLinks = navigation.guides;
 	function isActive(href: string, current = $page.url) {
-		const target = new URL(withThemePreview(current, href), current);
+		const target = new URL(href, current);
 		const pathname = current.pathname.replace(/\/$/, '') || '/';
 		if (target.pathname === '/unavailable')
 			return (
@@ -62,16 +61,16 @@
 			(target.pathname !== '/' && pathname.startsWith(`${target.pathname}/`))
 		);
 	}
-	$: latestNewsHref = withThemePreview($page.url, '/');
-	$: newsArchiveHref = withThemePreview($page.url, '/news/archive');
-	$: eventScheduleHref = withThemePreview($page.url, '/news/event-schedule');
+	$: latestNewsHref = '/';
+	$: newsArchiveHref = '/news/archive';
+	$: eventScheduleHref = '/news/event-schedule';
 	$: communityLinks = navigation.community;
 	$: communityActive = communityLinks.some((entry) =>
 		isActive(entry.href, $page.url),
 	);
-	$: accountPageHref = withThemePreview($page.url, '/account');
-	$: accountLoginHref = withThemePreview($page.url, '/account/login');
-	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
+	$: accountPageHref = '/account';
+	$: accountLoginHref = '/account/login';
+	$: accountSignupHref = '/account/signup';
 	$: isLatestNewsActive = currentPath === '/';
 	$: isNewsArchiveActive = currentPath === '/news/archive';
 	$: isEventScheduleActive = currentPath === '/news/event-schedule';
@@ -151,9 +150,7 @@
 					<Fa icon={faUser} />
 					{$_('my-account')}
 				</a>
-				<form
-					action={withThemePreview($page.url, '/account/logout')}
-					method="post">
+				<form action="/account/logout" method="post">
 					<button class="theme-classic-menu__action" type="submit">
 						<Fa icon={faRightFromBracket} />
 						{$_('logout')}
@@ -169,9 +166,7 @@
 					{$_('create-account')}
 				</a>
 			{/if}
-			<a
-				class="theme-classic-menu__action"
-				href={withThemePreview($page.url, PUBLIC_DOWNLOAD_URL)}>
+			<a class="theme-classic-menu__action" href={PUBLIC_DOWNLOAD_URL}>
 				<Fa icon={faDownload} />
 				{$_('download')}
 			</a>
@@ -247,8 +242,7 @@
 			{#each aboutLinks as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -281,8 +275,7 @@
 			{#each guideLinks as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -317,14 +310,10 @@
 			{#each navigation.library as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 			{#each staticPages.filter((entry) => entry.slug !== 'rules') as entry}<a
-					href={withThemePreview(
-						$page.url,
-						`/pages/${encodeURIComponent(entry.slug)}`,
-					)}>{entry.title}</a
+					href={`/pages/${encodeURIComponent(entry.slug)}`}>{entry.title}</a
 				>{/each}
 		</div>
 	</section>
@@ -360,8 +349,7 @@
 						link.href,
 						$page.url,
 					)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -396,8 +384,7 @@
 			{#each navigation.forum as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -432,8 +419,7 @@
 			{#each navigation.account as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -470,8 +456,7 @@
 			{#each navigation.characterTrade as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>
@@ -506,8 +491,7 @@
 			{#each navigation.support as link}
 				<a
 					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
-					href={withThemePreview($page.url, link.href)}
-					>{serverText(link.label, identity)}</a>
+					href={link.href}>{serverText(link.label, identity)}</a>
 			{/each}
 		</div>
 	</section>

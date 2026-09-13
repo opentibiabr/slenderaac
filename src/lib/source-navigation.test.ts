@@ -3,13 +3,13 @@ import { test } from 'node:test';
 
 import { informationDestination } from './information';
 import { isReferenceWebsite } from './source-navigation';
-import { themePreviewHref } from './themes/preview';
+import { siteHref } from './themes/navigation';
 
 const current = new URL(
 	'https://aac.example/guides/quickstart?themePreview=classic&classicReference=1&classicGrid=1&classicDemo=1',
 );
 
-void test('creature list and detail links stay local with their selected race and preview', () => {
+void test('creature links stay local, retain diagnostics and omit layout state', () => {
 	for (const source of [
 		'https://www.tibia.com',
 		'http://tibia.com',
@@ -17,7 +17,7 @@ void test('creature list and detail links stay local with their selected race an
 		'https://www.tibia.com.',
 	]) {
 		const target = new URL(
-			themePreviewHref(
+			siteHref(
 				current,
 				`${source}/library/?subtopic=creatures&race=acidblob#details`,
 			),
@@ -27,8 +27,10 @@ void test('creature list and detail links stay local with their selected race an
 		assert.equal(target.pathname, '/library/creatures');
 		assert.equal(target.searchParams.get('race'), 'acidblob');
 		assert.equal(target.hash, '#details');
-		for (const [key, value] of current.searchParams)
-			assert.equal(target.searchParams.get(key), value);
+		assert.equal(target.searchParams.get('themePreview'), null);
+		for (const key of ['classicReference', 'classicGrid', 'classicDemo']) {
+			assert.equal(target.searchParams.get(key), current.searchParams.get(key));
+		}
 	}
 });
 
@@ -42,7 +44,7 @@ void test('unknown reference features never fall through to their source website
 		'future-module',
 	]) {
 		const target = new URL(
-			themePreviewHref(
+			siteHref(
 				current,
 				`https://www.tibia.com/${family}/?subtopic=future-feature&redirect=https://www.tibia.com/`,
 			),
@@ -124,16 +126,20 @@ void test('social, configured external and ordinary local navigation preserve th
 		'https://www.facebook.com/tibia',
 		'https://downloads.example/client.zip',
 	])
-		assert.equal(themePreviewHref(current, href), href);
+		assert.equal(siteHref(current, href), href);
 	assert.equal(
-		themePreviewHref(new URL('https://aac.example/'), '/characters'),
+		siteHref(new URL('https://aac.example/'), '/characters'),
 		'/characters',
 	);
 	assert.equal(
-		themePreviewHref(current, '/guilds?name=test').startsWith(
-			'/guilds?name=test&',
-		),
+		siteHref(current, '/guilds?name=test').startsWith('/guilds?name=test&'),
 		true,
+	);
+	assert.equal(
+		new URL(siteHref(current, '/guilds'), current).searchParams.has(
+			'themePreview',
+		),
+		false,
 	);
 });
 

@@ -3,7 +3,6 @@
 
 	import SmallPanel from '$lib/components/ui/SmallPanel.svelte';
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let title: string;
 	export let entries: { slug: string; title: string }[];
@@ -19,11 +18,7 @@
 			</div>{/if}
 		{#if entries.length}<ul>
 				{#each entries as entry}<li>
-						<a
-							href={themePreviewHref(
-								$page.url,
-								`/support/get-help?article=${entry.slug}`,
-							)}
+						<a href={`/support/get-help?article=${entry.slug}`}
 							>{serverText(entry.title, {
 								name: $page.data.serverName,
 								website: '',

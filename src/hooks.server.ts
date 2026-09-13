@@ -6,7 +6,7 @@ import { AccountType, isAccountType } from '$lib/accounts';
 import { themeSwitcherEnabled } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { getSession, requireLogin } from '$lib/server/session';
-import { preservePreviewRedirect } from '$lib/server/theme-assets/preview-redirect';
+import { preserveLayoutSelectionRedirect } from '$lib/server/theme-assets/selection-redirect';
 
 const unauthorized = new Response(null, {
 	status: 401,
@@ -80,7 +80,7 @@ export const handle = (async ({ event, resolve }) => {
 
 	const response = await resolve(event);
 	return themeSwitcherEnabled && event.route.id?.startsWith('/(app)')
-		? preservePreviewRedirect(
+		? preserveLayoutSelectionRedirect(
 				response,
 				url,
 				event.isDataRequest ||

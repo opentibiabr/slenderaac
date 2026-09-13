@@ -4,13 +4,11 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { serverAvailability } from '$lib/stores/online-status';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from '../../../routes/(app)/guilds/$types';
 
 	export let data: PageData;
-	$: parameters = new URL(themePreviewHref($page.url, '/guilds'), $page.url)
-		.searchParams;
+	$: parameters = new URL('/guilds', $page.url).searchParams;
 </script>
 
 <PagePanel title="Search Guild">
@@ -37,20 +35,14 @@
 		><tbody>
 			{#each data.results as guild}<tr>
 					<td
-						><a
-							href={themePreviewHref(
-								$page.url,
-								'/guilds/' + encodeURIComponent(guild.name),
-							)}>{guild.name}</a
+						><a href={'/guilds/' + encodeURIComponent(guild.name)}
+							>{guild.name}</a
 						>{#if guild.description}<div class="classic-preserve-lines">
 								{guild.description}
 							</div>{/if}</td>
 					<td
-						><a
-							href={themePreviewHref(
-								$page.url,
-								'/characters/' + encodeURIComponent(guild.leader.name),
-							)}>{guild.leader.name}</a
+						><a href={'/characters/' + encodeURIComponent(guild.leader.name)}
+							>{guild.leader.name}</a
 						></td>
 					<td>{guild.members}</td><td
 						>{$serverAvailability === null
@@ -65,8 +57,8 @@
 <PagePanel title="Create Guild">
 	<p>Create and manage a guild using your local account.</p>
 	<Button
-		href={themePreviewHref(
-			$page.url,
-			data.isLoggedIn ? '/guilds/new' : '/account/login?returnTo=/guilds/new',
-		)}>{data.isLoggedIn ? 'Create Guild' : 'Login'}</Button>
+		href={data.isLoggedIn
+			? '/guilds/new'
+			: '/account/login?returnTo=/guilds/new'}
+		>{data.isLoggedIn ? 'Create Guild' : 'Login'}</Button>
 </PagePanel>

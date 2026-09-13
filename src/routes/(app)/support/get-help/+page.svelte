@@ -6,7 +6,6 @@
 	import HelpLinks from '$lib/components/ui/HelpLinks.svelte';
 	import { helpTopics, isHelpTopic } from '$lib/help';
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -16,8 +15,7 @@
 	$: topic = help.entry?.topic || help.topic;
 	$: title = (text: string) =>
 		serverText(text, { name: $page.data.serverName, website: '' });
-	const href = (query = '') =>
-		themePreviewHref($page.url, '/support/get-help' + query);
+	const href = (query = '') => '/support/get-help' + query;
 	const pageHref = (number: number) => {
 		const query = new URLSearchParams({
 			q: help.query,
@@ -35,10 +33,6 @@
 		action="/support/get-help"
 		method="GET"
 		role="search">
-		{#if $page.url.searchParams.has('themePreview')}<input
-				type="hidden"
-				name="themePreview"
-				value={$page.url.searchParams.get('themePreview')} />{/if}
 		<input
 			aria-label="Search the FAQ"
 			placeholder="Search the FAQ"

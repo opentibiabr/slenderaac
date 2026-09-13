@@ -8,7 +8,6 @@
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -22,7 +21,7 @@
 	}
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };
 	async function close() {
-		await goto(themePreviewHref($page.url, '/account'), { noScroll: true });
+		await goto('/account', { noScroll: true });
 	}
 </script>
 

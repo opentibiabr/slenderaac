@@ -7,15 +7,13 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { houseHref, houseOrders } from '$lib/houses';
 	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { layoutDebugKeys } from '$lib/themes/navigation';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: classic = $page.data.selectedTheme === 'classic';
 	$: house = data.house;
-	$: preview = new URL(themePreviewHref($page.url, '/houses'), $page.url)
-		.searchParams;
 	$: resultTitle = `Available ${data.filters.type === 'guildhalls' ? 'Guildhalls' : 'Houses and Flats'} in ${data.filters.town} on ${data.world}`;
 	const gold = (amount: number) =>
 		`${amount >= 1000 && amount % 1000 === 0 ? `${amount / 1000}k` : amount.toLocaleString('en-US')} gold`;
@@ -39,11 +37,8 @@
 			{#if house.rented}
 				<p>
 					The house has been rented{#if house.owner}
-						by <a
-							href={themePreviewHref(
-								$page.url,
-								`/characters/${encodeURIComponent(house.owner)}`,
-							)}>{house.owner}</a
+						by <a href={`/characters/${encodeURIComponent(house.owner)}`}
+							>{house.owner}</a
 						>{/if}.
 					{#if house.paidUntil}The rent has been paid until <strong
 							>{deadline(house.paidUntil)}</strong
@@ -83,8 +78,7 @@
 		</div>
 		<p class="houses-page__management">
 			Bids, transfers and move-outs are managed in the game client.
-			<a href={themePreviewHref($page.url, '/guides/manual?section=houses')}
-				>House controls</a>
+			<a href="/guides/manual?section=houses">House controls</a>
 		</p>
 	{:else}
 		<p class="page-intro page-intro--section">
@@ -92,8 +86,8 @@
 			Select your game world and town. Click on any View button to get more
 			information about a house, or adjust the search criteria and start a new
 			search. See the
-			<a href={themePreviewHref($page.url, '/guides/manual?section=houses')}
-				>manual</a> for a detailed description about renting houses.
+			<a href="/guides/manual?section=houses">manual</a> for a detailed description
+			about renting houses.
 		</p>
 		{#if data.searched}
 			{#if !classic}<h2 class="h2">Houses in {data.filters.town}</h2>{/if}
@@ -137,10 +131,12 @@
 			</PagePanel>
 		{/if}
 		<form action="/houses" method="GET">
-			{#each [...preview] as [name, value]}<input
-					type="hidden"
-					{name}
-					{value} />{/each}
+			{#each layoutDebugKeys as name}
+				{#if $page.url.searchParams.has(name)}<input
+						type="hidden"
+						{name}
+						value={$page.url.searchParams.get(name)} />{/if}
+			{/each}
 			{#if !classic}<h2 class="h2">House Search</h2>{/if}
 			<PagePanel title="House Search" variant="stack" compact>
 				<div class="houses-page__search">

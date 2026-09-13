@@ -10,15 +10,11 @@
 	import { highscoreCategories } from '$lib/highscores';
 	import { vocationFilters as vocations } from '$lib/players';
 	import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: previewParameters = new URL(
-		themePreviewHref($currentPage.url, '/highscores'),
-		$currentPage.url,
-	).searchParams;
+	$: previewParameters = new URL('/highscores', $currentPage.url).searchParams;
 
 	$: page = {
 		page: data.offset,
@@ -30,10 +26,7 @@
 
 	function onPageChange() {
 		void goto(
-			themePreviewHref(
-				$currentPage.url,
-				`/highscores?skill=${data.skill}&vocation=${data.vocation}&page=${page.page + 1}&limit=${page.limit}`,
-			),
+			`/highscores?skill=${data.skill}&vocation=${data.vocation}&page=${page.page + 1}&limit=${page.limit}`,
 		);
 	}
 

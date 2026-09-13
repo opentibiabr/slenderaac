@@ -6,18 +6,16 @@
 	import TableFilter from '$lib/components/ui/TableFilter.svelte';
 	import { highscoreCategories } from '$lib/highscores';
 	import { vocationFilters as vocations } from '$lib/players';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { worldHref, worldPvpTypes } from '$lib/worlds';
 
 	import type { PageData } from '../../../routes/(app)/highscores/$types';
 
 	export let data: PageData;
-	$: parameters = new URL(themePreviewHref($page.url, '/highscores'), $page.url)
-		.searchParams;
+	$: parameters = new URL('/highscores', $page.url).searchParams;
 	function pageHref(number: number) {
 		const url = new URL($page.url);
 		url.searchParams.set('page', String(number));
-		return themePreviewHref($page.url, url.pathname + url.search);
+		return url.pathname + url.search;
 	}
 </script>
 
@@ -25,9 +23,7 @@
 	<TableFilter action="/highscores" {parameters}>
 		<tr
 			><td>World:</td><td
-				><a href={themePreviewHref($page.url, worldHref(data.world.name))}
-					>{data.world.name}</a
-				></td
+				><a href={worldHref(data.world.name)}>{data.world.name}</a></td
 			><td><label for="ranking-limit">Results per page:</label></td><td>
 				<select id="ranking-limit" name="limit"
 					>{#each [50, 100, 200] as amount}<option

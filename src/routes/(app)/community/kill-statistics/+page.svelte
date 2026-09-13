@@ -4,16 +4,12 @@
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import LabeledForm from '$lib/components/ui/LabeledForm.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: classic = $page.data.selectedTheme === 'classic';
-	$: parameters = new URL(
-		themePreviewHref($page.url, '/community/kill-statistics'),
-		$page.url,
-	).searchParams;
+	$: parameters = new URL('/community/kill-statistics', $page.url).searchParams;
 	const timestamp = (value: number) =>
 		new Date(value * 1000)
 			.toISOString()

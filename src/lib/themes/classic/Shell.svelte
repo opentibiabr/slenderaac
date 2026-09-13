@@ -18,7 +18,7 @@
 	import { onlineCounter, type OnlineCounters } from '$lib/online-status';
 	import { serverText } from '$lib/site-identity';
 	import { onlineStatus, serverAvailability } from '$lib/stores/online-status';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { siteHref } from '$lib/themes/navigation';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
@@ -105,14 +105,14 @@
 	$: fontStyle =
 		headlineFontStyle(data.themeAssets?.headlineFont) +
 		headlineFontStyle(data.themeAssets?.menuFont, 'ClassicMenu');
-	$: homeHref = makeClassicPreviewHref($page.url, '/');
-	$: accountHref = makeClassicPreviewHref($page.url, '/account');
-	$: accountLoginHref = makeClassicPreviewHref($page.url, '/account/login');
-	$: accountSignupHref = makeClassicPreviewHref($page.url, '/account/signup');
-	$: onlineHref = makeClassicPreviewHref($page.url, '/online');
-	$: shopHref = makeClassicPreviewHref($page.url, '/shop');
+	$: homeHref = pageHref($page.url, '/');
+	$: accountHref = pageHref($page.url, '/account');
+	$: accountLoginHref = pageHref($page.url, '/account/login');
+	$: accountSignupHref = pageHref($page.url, '/account/signup');
+	$: onlineHref = pageHref($page.url, '/online');
+	$: shopHref = pageHref($page.url, '/shop');
 	$: identity = { name: data.serverName, website: $page.url.origin };
-	$: fansitesHref = themePreviewHref($page.url, '/community/fansites');
+	$: fansitesHref = '/community/fansites';
 	$: boostedEntries = [
 		{
 			kind: 'creature',
@@ -139,7 +139,7 @@
 				}))
 			: tickerPageArticles.map((article) => ({
 					id: String(article.id),
-					href: makeClassicPreviewHref($page.url, `/?ticker=${article.id}`),
+					href: pageHref($page.url, `/?ticker=${article.id}`),
 					date: `${formatClassicTickerDate(article.created_at)} -`,
 					title: '',
 					copySegments: makeTickerSummarySegments(article),
@@ -553,22 +553,15 @@
 		return trim ? text.trim() : text;
 	}
 
-	function makeClassicPreviewHref(
-		currentUrl: URL,
-		path: string,
-		hash = '',
-	): string {
-		const nextUrl = makeClassicPreviewUrl(currentUrl, path);
+	function pageHref(currentUrl: URL, path: string, hash = ''): string {
+		const nextUrl = pageUrl(currentUrl, path);
 		nextUrl.hash = hash;
 
 		return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 	}
 
-	function makeClassicPreviewUrl(currentUrl: URL, path: string): URL {
-		const nextUrl = new URL(
-			themePreviewHref(currentUrl, path),
-			currentUrl.origin,
-		);
+	function pageUrl(currentUrl: URL, path: string): URL {
+		const nextUrl = new URL(siteHref(currentUrl, path), currentUrl.origin);
 		return nextUrl;
 	}
 
@@ -682,9 +675,7 @@
 								<span>{$_('my-account')}</span>
 							{/if}
 						</a>
-						<form
-							action={themePreviewHref($page.url, '/account/logout')}
-							method="post">
+						<form action="/account/logout" method="post">
 							<button class="theme-classic__create-account-link" type="submit">
 								{#if logoutButton}
 									<img src={logoutButton} alt={$_('logout')} />
@@ -726,7 +717,7 @@
 						class={`theme-classic__image-button theme-classic__image-button--medium ${
 							downloadButton ? 'theme-classic__image-button--rendered' : ''
 						}`}
-						href={themePreviewHref($page.url, PUBLIC_DOWNLOAD_URL)}>
+						href={PUBLIC_DOWNLOAD_URL}>
 						{#if downloadButton}
 							<img src={downloadButton} alt={$_('download')} />
 						{:else}
@@ -773,10 +764,7 @@
 					signal={topIconSignal}
 					eye={topIconEye}
 					downloadIcon={topIconDownload}
-					downloadHref={themePreviewHref(
-						$page.url,
-						'/unavailable?feature=fankit',
-					)}
+					downloadHref={siteHref($page.url, '/unavailable?feature=fankit')}
 					onlineIcon={topIconOnline}
 					{onlineHref}
 					serverOnline={classicReference ? true : serverOnline}
@@ -831,7 +819,7 @@
 								{/if}
 								<span class="theme-classic__ticker-date">{item.date}</span>
 								<!-- prettier-ignore -->
-								<span class="theme-classic__ticker-copy">{#each item.copySegments as segment}{#if segment.href}<a class="theme-classic__ticker-link" href={themePreviewHref($page.url, segment.href)}>{serverText(segment.text, identity)}</a>{:else}{serverText(segment.text, identity)}{/if}{/each}</span>
+								<span class="theme-classic__ticker-copy">{#each item.copySegments as segment}{#if segment.href}<a class="theme-classic__ticker-link" href={siteHref($page.url, segment.href)}>{serverText(segment.text, identity)}</a>{:else}{serverText(segment.text, identity)}{/if}{/each}</span>
 								<span class="theme-classic__ticker-control" aria-hidden="true"
 								></span>
 							</label>
@@ -891,14 +879,12 @@
 			<footer class="theme-classic__footer">
 				<div>Powered by SlenderAAC · OpenTibiaBR</div>
 				<div>
-					<a href={themePreviewHref($page.url, '/about/company')}
-						>About OpenTibiaBR</a>
+					<a href={siteHref($page.url, '/about/company')}>About OpenTibiaBR</a>
 					|
-					<a
-						href={themePreviewHref($page.url, '/unavailable?feature=agreement')}
+					<a href={siteHref($page.url, '/unavailable?feature=agreement')}
 						>Service Agreement</a>
 					|
-					<a href={themePreviewHref($page.url, '/unavailable?feature=privacy')}
+					<a href={siteHref($page.url, '/unavailable?feature=privacy')}
 						>Privacy Policy</a>
 				</div>
 			</footer>
@@ -921,7 +907,7 @@
 						class="theme-classic__right-boost"
 						class:theme-classic__right-boost--creature={kind === 'creature'}
 						class:theme-classic__right-boost--boss={kind === 'boss'}
-						href={themePreviewHref($page.url, href)}
+						{href}
 						title={label}
 						aria-label={label}>
 						{#if boosted}
@@ -1028,10 +1014,7 @@
 			{#if showAuxiliaryThemeboxes && promoScreenshotBox && data.featuredScreenshot}
 				<a
 					class="theme-classic__official-box theme-classic__official-box--screenshot"
-					href={themePreviewHref(
-						$page.url,
-						`/about/screenshots?currentscreenshot=${data.featuredScreenshot.id}`,
-					)}
+					href={`/about/screenshots?currentscreenshot=${data.featuredScreenshot.id}`}
 					aria-label={`Screenshot of the day: ${serverText(data.featuredScreenshot.caption, identity)}`}>
 					<img src={promoScreenshotBox} alt="Screenshots" />
 					{#if promoScreenshotFrame && promoScreenshotImage}
@@ -1060,10 +1043,8 @@
 						></strong>
 					<a
 						class="theme-classic__poll-button"
-						href={themePreviewHref(
-							$page.url,
-							`/community/polls?${new URLSearchParams({ poll: data.currentPoll.id }).toString()}`,
-						)}>Vote Now</a>
+						href={`/community/polls?${new URLSearchParams({ poll: data.currentPoll.id }).toString()}`}
+						>Vote Now</a>
 					<span class="theme-classic__poll-bottom" aria-hidden="true"></span>
 				</div>
 			{/if}

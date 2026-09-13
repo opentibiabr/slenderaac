@@ -4,14 +4,12 @@
 	import DocumentContent from '$lib/components/ui/DocumentContent.svelte';
 	import { romanNumeral } from '$lib/genesis';
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };
-	const href = (chapter: number) =>
-		themePreviewHref($page.url, `/library/genesis?page=${chapter}`);
+	const href = (chapter: number) => `/library/genesis?page=${chapter}`;
 </script>
 
 <section class="genesis-page">

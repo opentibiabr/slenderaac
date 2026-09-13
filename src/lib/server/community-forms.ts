@@ -1,7 +1,5 @@
 import { fail } from '@sveltejs/kit';
 
-import { themePreviewHref } from '$lib/themes/preview';
-
 export const communityFormFailure = (
 	status: number,
 	errors: Record<string, string[]>,
@@ -10,5 +8,5 @@ export const communityFormFailure = (
 
 export function communityLoginHref(url: URL) {
 	const query = new URLSearchParams({ returnTo: url.pathname + url.search });
-	return themePreviewHref(url, `/account/login?${query.toString()}`);
+	return `/account/login?${query.toString()}`;
 }

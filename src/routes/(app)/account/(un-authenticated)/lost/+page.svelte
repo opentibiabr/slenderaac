@@ -3,7 +3,6 @@
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import { enhance } from '$lib/enchance';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData } from './$types';
 
@@ -43,9 +42,7 @@
 
 	<div class="flex flex-row justify-center items-center gap-2">
 		<h3 class="h3">{$_('dont-have-an-account')}</h3>
-		<Button
-			href={themePreviewHref($page.url, `/account/signup`)}
-			size="sm"
-			color="secondary">{$_('create-account')}</Button>
+		<Button href={`/account/signup`} size="sm" color="secondary"
+			>{$_('create-account')}</Button>
 	</div>
 </form>

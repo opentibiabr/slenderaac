@@ -5,7 +5,6 @@
 	import DocumentContent from '$lib/components/ui/DocumentContent.svelte';
 	import SoundtrackPlayer from '$lib/components/ui/SoundtrackPlayer.svelte';
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -38,12 +37,8 @@
 						{...track}
 						title={serverText(track.title, identity)}
 						{activeTrack}
-						audioHref={track.audioHref
-							? themePreviewHref($page.url, track.audioHref)
-							: null}
-						imageHref={track.imageHref
-							? themePreviewHref($page.url, track.imageHref)
-							: null}
+						audioHref={track.audioHref ? track.audioHref : null}
+						imageHref={track.imageHref ? track.imageHref : null}
 						on:requestplay={(event) => {
 							activeTrack = event.detail.id;
 						}} />{/each}

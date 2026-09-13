@@ -1,14 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { themeSelectionHref } from '$lib/themes/preview';
+import { layoutLoginHref, layoutSelectionHref } from '$lib/themes/navigation';
 import { isThemeId, type ThemeId } from '$lib/themes/theme-ids';
 
-import {
-	isThemeSwitchingEnabled,
-	resolveThemeSelection,
-	themePreferenceUpdate,
-} from './selection';
+import { isThemeSwitchingEnabled, resolveThemeSelection } from './selection';
 
 const resolveId = (value: unknown): Promise<ThemeId | null> =>
 	Promise.resolve(
@@ -23,41 +19,26 @@ void test('switching defaults to enabled and an invalid explicit flag fails clos
 		assert.equal(isThemeSwitchingEnabled(value), false);
 });
 
-void test('preference updates are synchronous and accept only canonical previews', () => {
-	assert.equal(
-		themePreferenceUpdate(true, url('/?themePreview=classic')),
-		'classic',
-	);
-	assert.equal(
-		themePreferenceUpdate(true, url('/?themePreview=legacy-classic')),
-		undefined,
-	);
-	assert.equal(
-		themePreferenceUpdate(true, url('/?themePreview=unknown')),
-		undefined,
-	);
-	assert.equal(
-		themePreferenceUpdate(false, url('/?themePreview=classic')),
-		null,
-	);
-});
-
-void test('explicit selection overrides the session preference and server default', async () => {
+void test('layout requests override the cookie and leave a clean canonical URL', async () => {
 	for (const theme of ['classic', 'legbone'] as const) {
 		const result = await resolveThemeSelection(
 			{
 				configuredTheme: theme === 'classic' ? 'legbone' : 'classic',
 				preference: theme === 'classic' ? 'legbone' : 'classic',
 				allowSwitching: true,
-				url: url(`/characters?themePreview=${theme}`),
+				url: url(`/characters?layout=${theme}&search=Knight`),
 			},
 			resolveId,
 		);
-		assert.deepEqual(result, { selectedTheme: theme, redirectTo: null });
+		assert.deepEqual(result, {
+			selectedTheme: theme,
+			redirectTo: '/characters?search=Knight',
+			preferenceUpdate: theme,
+		});
 	}
 });
 
-void test('navigation without preview retains the browser preference and rejects unknown cookies', async () => {
+void test('clean navigation retains the browser preference and rejects unknown cookies', async () => {
 	for (const [preference, expected] of [
 		['classic', 'classic'],
 		['invalid', 'legbone'],
@@ -74,12 +55,13 @@ void test('navigation without preview retains the browser preference and rejects
 		);
 		assert.equal(result.selectedTheme, expected);
 		assert.equal(result.redirectTo, null);
+		assert.equal(result.preferenceUpdate, undefined);
 	}
 });
 
-void test('locked selection ignores both a valid preview and an existing preference', async () => {
+void test('locked selection ignores requests and an existing preference', async () => {
 	for (const theme of ['classic', 'legbone'] as const) {
-		let previewResolved = false;
+		let selectionResolved = false;
 		const result = await resolveThemeSelection(
 			{
 				configuredTheme: theme,
@@ -90,15 +72,16 @@ void test('locked selection ignores both a valid preview and an existing prefere
 				),
 			},
 			async (value) => {
-				if (value === 'legacy-classic') previewResolved = true;
+				if (value === 'legacy-classic') selectionResolved = true;
 				return resolveId(value);
 			},
 		);
 		assert.deepEqual(result, {
 			selectedTheme: theme,
 			redirectTo: '/highscores?skill=achievements&vocation=2&vocation=3',
+			preferenceUpdate: null,
 		});
-		assert.equal(previewResolved, false);
+		assert.equal(selectionResolved, false);
 	}
 });
 
@@ -111,22 +94,31 @@ void test('locked clean URLs do not redirect and configured aliases still resolv
 		},
 		resolveId,
 	);
-	assert.deepEqual(result, { selectedTheme: 'classic', redirectTo: null });
-});
-
-void test('preview aliases canonicalize without losing page filters', async () => {
-	const result = await resolveThemeSelection(
-		{
-			configuredTheme: 'legbone',
-			allowSwitching: true,
-			url: url('/highscores?skill=achievements&themePreview=legacy-classic'),
-		},
-		resolveId,
-	);
 	assert.deepEqual(result, {
 		selectedTheme: 'classic',
-		redirectTo: '/highscores?skill=achievements&themePreview=classic',
+		redirectTo: null,
+		preferenceUpdate: null,
 	});
+});
+
+void test('legacy preview URLs update the cookie and canonicalize cleanly', async () => {
+	for (const key of ['layout', 'themePreview']) {
+		const result = await resolveThemeSelection(
+			{
+				configuredTheme: 'legbone',
+				allowSwitching: true,
+				url: url(
+					`/highscores?skill=achievements&${key}=legacy-classic&classicGrid=1`,
+				),
+			},
+			resolveId,
+		);
+		assert.deepEqual(result, {
+			selectedTheme: 'classic',
+			redirectTo: '/highscores?skill=achievements&classicGrid=1',
+			preferenceUpdate: 'classic',
+		});
+	}
 });
 
 void test('invalid theme values retain safe fallback behavior', async () => {
@@ -143,19 +135,41 @@ void test('invalid theme values retain safe fallback behavior', async () => {
 			},
 			resolveId,
 		);
-		assert.deepEqual(result, { selectedTheme: expected, redirectTo: null });
+		assert.deepEqual(result, {
+			selectedTheme: expected,
+			redirectTo: '/',
+			preferenceUpdate: undefined,
+		});
 	}
 });
 
-void test('switch links preserve route, duplicate filters and fragment while replacing the theme', () => {
+void test('switch links preserve page state and use one transient layout parameter', () => {
 	const current = url(
 		'/highscores?skill=achievements&vocation=2&vocation=3&themePreview=classic&themePreview=classic#results',
 	);
-	const target = new URL(themeSelectionHref(current, 'legbone'), current);
+	const target = new URL(layoutSelectionHref(current, 'legbone'), current);
 	assert.equal(target.pathname, '/highscores');
 	assert.equal(target.hash, '#results');
 	assert.deepEqual(target.searchParams.getAll('vocation'), ['2', '3']);
 	assert.equal(target.searchParams.get('skill'), 'achievements');
-	assert.deepEqual(target.searchParams.getAll('themePreview'), ['legbone']);
+	assert.equal(target.searchParams.get('layout'), 'legbone');
+	assert.equal(target.searchParams.has('themePreview'), false);
 	assert.equal(current.searchParams.get('themePreview'), 'classic');
+});
+
+void test('login redirects carry layout state only while a selection is pending', () => {
+	assert.equal(
+		layoutLoginHref(url('/characters?search=Knight')),
+		'/account/login',
+	);
+	const target = new URL(
+		layoutLoginHref(url('/characters?layout=classic&search=Knight')),
+		'https://example.test',
+	);
+	assert.equal(target.pathname, '/account/login');
+	assert.equal(target.searchParams.get('layout'), 'classic');
+	assert.equal(
+		target.searchParams.get('returnTo'),
+		'/characters?layout=classic&search=Knight',
+	);
 });

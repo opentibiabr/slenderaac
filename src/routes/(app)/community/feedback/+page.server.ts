@@ -6,7 +6,6 @@ import { submitFeedback } from '$lib/server/feedback';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
 import { serverName } from '$lib/server/worlds';
-import { themePreviewHref } from '$lib/themes/preview';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -76,10 +75,7 @@ export const actions = {
 		if (!('submitted' in result)) return result;
 		throw redirect(
 			303,
-			themePreviewHref(
-				url,
-				`/community/feedback?${new URLSearchParams({ form: id }).toString()}`,
-			),
+			`/community/feedback?${new URLSearchParams({ form: id }).toString()}`,
 		);
 	},
 } satisfies Actions;

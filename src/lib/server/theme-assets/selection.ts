@@ -1,19 +1,10 @@
-import { previewKeys } from '$lib/themes/preview';
+import { layoutDebugKeys, layoutSelectionKeys } from '$lib/themes/navigation';
 import { isThemeId, normalizeTheme, type ThemeId } from '$lib/themes/theme-ids';
 
 export const themeCookie = 'slender-theme';
 
 export function isThemeSwitchingEnabled(value: string | undefined): boolean {
 	return !value?.trim() || value.trim().toLowerCase() === 'true';
-}
-
-export function themePreferenceUpdate(
-	allowSwitching: boolean,
-	url: URL,
-): ThemeId | null | undefined {
-	if (!allowSwitching) return null;
-	const preview = url.searchParams.get('themePreview');
-	return isThemeId(preview) ? preview : undefined;
 }
 
 export async function resolveThemeSelection(
@@ -29,28 +20,42 @@ export async function resolveThemeSelection(
 		url: URL;
 	},
 	resolveId: (value: unknown) => Promise<ThemeId | null>,
-): Promise<{ selectedTheme: ThemeId; redirectTo: string | null }> {
+): Promise<{
+	selectedTheme: ThemeId;
+	redirectTo: string | null;
+	preferenceUpdate: ThemeId | null | undefined;
+}> {
 	const defaultTheme =
 		(await resolveId(configuredTheme)) ?? normalizeTheme(configuredTheme);
 	const canonical = new URL(url);
 	if (!allowSwitching) {
-		const hasPreview = previewKeys.some((key) =>
-			canonical.searchParams.has(key),
+		const hasSelectionState = [...layoutSelectionKeys, ...layoutDebugKeys].some(
+			(key) => canonical.searchParams.has(key),
 		);
-		for (const key of previewKeys) canonical.searchParams.delete(key);
+		for (const key of [...layoutSelectionKeys, ...layoutDebugKeys]) {
+			canonical.searchParams.delete(key);
+		}
 		return {
 			selectedTheme: defaultTheme,
-			redirectTo: hasPreview ? canonical.pathname + canonical.search : null,
+			redirectTo: hasSelectionState
+				? canonical.pathname + canonical.search
+				: null,
+			preferenceUpdate: null,
 		};
 	}
 
-	const preview = url.searchParams.get('themePreview');
-	const resolvedPreview = await resolveId(preview);
+	const requestedLayout =
+		url.searchParams.get('layout') ?? url.searchParams.get('themePreview');
+	const resolvedLayout = await resolveId(requestedLayout);
 	const selectedTheme =
-		resolvedPreview ?? (isThemeId(preference) ? preference : defaultTheme);
-	if (resolvedPreview && preview !== resolvedPreview) {
-		canonical.searchParams.set('themePreview', resolvedPreview);
-		return { selectedTheme, redirectTo: canonical.pathname + canonical.search };
-	}
-	return { selectedTheme, redirectTo: null };
+		resolvedLayout ?? (isThemeId(preference) ? preference : defaultTheme);
+	const hasSelection = layoutSelectionKeys.some((key) =>
+		canonical.searchParams.has(key),
+	);
+	for (const key of layoutSelectionKeys) canonical.searchParams.delete(key);
+	return {
+		selectedTheme,
+		redirectTo: hasSelection ? canonical.pathname + canonical.search : null,
+		preferenceUpdate: resolvedLayout ?? undefined,
+	};
 }

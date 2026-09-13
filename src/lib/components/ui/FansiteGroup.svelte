@@ -14,7 +14,6 @@
 		directorySocials,
 	} from '$lib/directories';
 	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let promoted: boolean;
 	export let entries: DirectoryRecord[];
@@ -70,10 +69,8 @@
 								></td>
 							<td
 								>{#if entry.contactExists}<a
-										href={themePreviewHref(
-											$page.url,
-											`/characters/${encodeURIComponent(entry.details.contactCharacter)}`,
-										)}>{entry.details.contactCharacter}</a
+										href={`/characters/${encodeURIComponent(entry.details.contactCharacter)}`}
+										>{entry.details.contactCharacter}</a
 									>{:else}{entry.details.contactCharacter || '—'}{/if}</td>
 							<td
 								>{#each entry.details.content as content}<DirectoryIcon

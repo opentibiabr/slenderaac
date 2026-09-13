@@ -6,7 +6,7 @@
 	import { serverText } from '$lib/site-identity';
 	import { classicNewsCategories } from '$lib/themes/classic/news-icons';
 	import { classicAsset } from '$lib/themes/classic/theme';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { layoutDebugKeys } from '$lib/themes/navigation';
 
 	import type { PageData } from './$types';
 
@@ -29,7 +29,6 @@
 		{ key: 'news', label: 'News' },
 	] as const;
 
-	$: previewTheme = $page.url.searchParams.get('themePreview');
 	$: themeAssets = $page.data.themeAssets as
 		| Record<string, string | undefined>
 		| null
@@ -53,10 +52,7 @@
 	}
 
 	function newsHref(currentUrl: URL, articleId: string, type: string) {
-		const nextUrl = new URL(
-			themePreviewHref(currentUrl, '/'),
-			currentUrl.origin,
-		);
+		const nextUrl = new URL('/', currentUrl.origin);
 		if (type === 'ticker') {
 			const index = articleId.startsWith('classic-ticker-')
 				? articleId.slice('classic-ticker-'.length)
@@ -76,15 +72,12 @@
 	class:news-archive--default={!isClassicTheme}
 	style={archiveStyle}>
 	<form class="news-archive__form" method="get" action="/news/archive">
-		{#if previewTheme}
-			<input type="hidden" name="themePreview" value={previewTheme} />
-			{#each ['classicReference', 'classicGrid', 'classicDemo'] as key}
-				{#if $page.url.searchParams.has(key)}<input
-						type="hidden"
-						name={key}
-						value={$page.url.searchParams.get(key)} />{/if}
-			{/each}
-		{/if}
+		{#each layoutDebugKeys as key}
+			{#if $page.url.searchParams.has(key)}<input
+					type="hidden"
+					name={key}
+					value={$page.url.searchParams.get(key)} />{/if}
+		{/each}
 		<input type="hidden" name="archive" value="1" />
 
 		<TableFrame assets={themeAssets} minWidth={698} minHeight={181}>

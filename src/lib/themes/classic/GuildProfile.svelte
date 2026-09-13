@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import GuildCharacterRow from '$lib/components/guilds/GuildCharacterRow.svelte';
 	import GuildOperations from '$lib/components/guilds/GuildOperations.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
 	import type { LayoutData } from '../../../routes/(app)/guilds/[name]/$types';
@@ -30,11 +27,8 @@
 			<tbody>
 				<tr
 					><td>Leader:</td><td
-						><a
-							href={themePreviewHref(
-								$page.url,
-								'/characters/' + encodeURIComponent(owner.name),
-							)}>{owner.name}</a
+						><a href={'/characters/' + encodeURIComponent(owner.name)}
+							>{owner.name}</a
 						></td
 					></tr>
 				<tr

@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 
 	import { serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { siteHref } from '$lib/themes/navigation';
 
 	export let id: number | string;
 	export let title: string;
@@ -29,8 +29,7 @@
 	</div>
 	{#if commentHref}
 		<div class="classic-news-comment">
-			<a href={themePreviewHref($page.url, commentHref)}
-				>» Comment on this news</a>
+			<a href={siteHref($page.url, commentHref)}>» Comment on this news</a>
 		</div>
 	{/if}
 </article>

@@ -5,15 +5,11 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import PropertyTable from '$lib/components/ui/PropertyTable.svelte';
 	import { resellerProperties } from '$lib/directories';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: parameters = new URL(
-		themePreviewHref($page.url, '/community/resellers'),
-		$page.url,
-	).searchParams;
+	$: parameters = new URL('/community/resellers', $page.url).searchParams;
 	$: classic = $page.data.selectedTheme === 'classic';
 </script>
 
@@ -21,8 +17,8 @@
 	<div class="page-prose resellers-page__intro">
 		<p>
 			Premium services and coins for {$page.data.serverName} are available from the
-			<a href={themePreviewHref($page.url, '/shop')}>webshop</a>. The resellers
-			listed here offer additional ways to purchase the services they advertise.
+			<a href="/shop">webshop</a>. The resellers listed here offer additional
+			ways to purchase the services they advertise.
 		</p>
 		<p>
 			Select your country to see the partners registered by the server team.
@@ -53,7 +49,7 @@
 		</PagePanel>
 	{:else if !data.countries.length}<p class="page-intro">
 			No resellers are currently listed. You can purchase server services
-			through the <a href={themePreviewHref($page.url, '/shop')}>webshop</a>.
+			through the <a href="/shop">webshop</a>.
 		</p>{/if}
 </div>
 

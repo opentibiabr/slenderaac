@@ -2,7 +2,6 @@
 	import { page } from '$app/stores';
 
 	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import PagePanel from './PagePanel.svelte';
 
@@ -65,9 +64,7 @@
 							class="description-card"
 							class:description-card--default={!classic}>
 							<dt>
-								{#if entry.href}<a
-										href={themePreviewHref($page.url, entry.href)}
-										>{entry.name}</a
+								{#if entry.href}<a href={entry.href}>{entry.name}</a
 									>{:else}{entry.name}{/if}
 							</dt>
 							<dd>{entry.description}</dd>

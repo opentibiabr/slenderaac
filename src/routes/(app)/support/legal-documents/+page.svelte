@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import { themePreviewHref } from '$lib/themes/preview';
-
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -25,8 +23,7 @@
 						on:error={() => (broken = true)} />{:else}<span aria-hidden="true"
 						>•</span
 					>{/if}
-				<a href={themePreviewHref($page.url, document.path)}
-					>{$page.data.serverName} {document.title}</a>
+				<a href={document.path}>{$page.data.serverName} {document.title}</a>
 			</li>{/each}
 	</ul>
 </div>

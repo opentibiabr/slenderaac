@@ -11,12 +11,12 @@ import { loadAchievements } from '$lib/server/catalog';
 import { nativeCharacterAchievements } from '$lib/server/character-achievements';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
-import { themePreviewHref, themePreviewLoginHref } from '$lib/themes/preview';
+import { layoutLoginHref } from '$lib/themes/navigation';
 
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ locals, params, url }) => {
-	requireLogin(locals, '', themePreviewLoginHref(url));
+	requireLogin(locals, '', layoutLoginHref(url));
 	const player = await prisma.players.findFirst({
 		where: {
 			name: params.name,
@@ -50,7 +50,7 @@ export const load = (async ({ locals, params, url }) => {
 export const actions = {
 	default: async (event) => {
 		const { locals, params, request, url } = event;
-		requireLogin(locals, '', themePreviewLoginHref(url));
+		requireLogin(locals, '', layoutLoginHref(url));
 		const values = (await request.formData()).getAll('achievement');
 		if (values.length > MAX_SHOWCASE_ACHIEVEMENTS)
 			return fail(400, {
@@ -111,7 +111,7 @@ export const actions = {
 			throw cause;
 		}
 		throw redirect(
-			themePreviewHref(url, `/characters/${encodeURIComponent(params.name)}`),
+			`/characters/${encodeURIComponent(params.name)}`,
 			{
 				type: 'success',
 				message: 'Achievement selection saved.',

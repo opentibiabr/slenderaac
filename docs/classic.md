@@ -311,8 +311,10 @@ cannot replace menu destinations or remove built-in sections. Visible custom pag
 are appended to the Library; the rules page keeps its Support entry.
 Routes with local equivalents remain
 local; public modules without an equivalent use the local unavailable page.
-When layout switching is enabled, internal preview links preserve `themePreview`
-and the active comparison flags.
+When layout switching is enabled, the selected layout persists in a server-set
+session cookie and normal internal links stay canonical. Only the selector sends
+a transient layout parameter, which the server consumes and removes. Local
+comparison flags may remain in links and forms used by the visual-review tools.
 
 Set `PUBLIC_TWITCH_URL`, `PUBLIC_YOUTUBE_URL`, `PUBLIC_FACEBOOK_URL` and
 `PUBLIC_TRAILER_URL` in the global environment configuration to show the server's
@@ -477,7 +479,8 @@ on the other edge and changes the measured centering.
 Before accepting any shared layout change, run this regression check in the
 browser where the mismatch was reported, at a fixed viewport and zoom:
 
-1. Open a short Classic page such as `/characters?themePreview=classic` with
+1. Select Classic from the Layout menu on a short page such as `/characters` (or
+   open `/characters?layout=classic` and wait for the clean redirect), with
    collapsed optional menu groups. Record the body, background, shell and column
    rectangles, the computed root `scrollbar-gutter`, viewport dimensions, device
    pixel ratio and scroll origin.

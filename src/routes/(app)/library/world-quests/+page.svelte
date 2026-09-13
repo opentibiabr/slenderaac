@@ -7,7 +7,6 @@
 	import DescriptionPanel from '$lib/components/ui/DescriptionPanel.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import SectionNavigation from '$lib/components/ui/SectionNavigation.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { questDate, questHref } from '$lib/world-quests';
 	import { worldHref } from '$lib/worlds';
 
@@ -118,11 +117,8 @@
 							>{#each quest.results.filter((result) => result.outcome === group.outcome) as result}
 								<tr
 									><td>{questDate(result.occurred_at, true)}</td><td
-										><a
-											href={themePreviewHref(
-												$page.url,
-												worldHref(data.serverName),
-											)}>{$page.data.serverName}</a
+										><a href={worldHref(data.serverName)}
+											>{$page.data.serverName}</a
 										></td
 									></tr>
 							{:else}<tr

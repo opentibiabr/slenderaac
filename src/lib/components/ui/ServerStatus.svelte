@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import { onlineStatus, serverAvailability } from '$lib/stores/online-status';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	$: serverOnline = $serverAvailability;
 	$: onlinePlayerCount = $onlineStatus?.onlinePlayerCount;
@@ -12,7 +9,7 @@
 
 <a
 	title={$onlineStatus?.stale ? $_('server-status-stale') : undefined}
-	href={themePreviewHref($page.url, '/online')}
+	href="/online"
 	class="text-xs px-2 rounded-full py-1 flex flex-row items-center gap-1 bg-surface-200/75 whitespace-nowrap">
 	{#if serverOnline}
 		<div class="w-2 h-2 rounded-full bg-success-500" />

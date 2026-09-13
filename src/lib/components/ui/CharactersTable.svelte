@@ -21,7 +21,6 @@
 		vocationString,
 	} from '$lib/players';
 	import ClassicCharacterList from '$lib/themes/classic/CharacterList.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { toProperCase } from '$lib/utils';
 
 	import GuildMembership from './GuildMembership.svelte';
@@ -47,7 +46,7 @@
 		dispatch('selected');
 	}
 	function guildHref(name: string) {
-		return themePreviewHref($page.url, '/guilds/' + encodeURIComponent(name));
+		return '/guilds/' + encodeURIComponent(name);
 	}
 
 	if (ranked) {
@@ -101,10 +100,7 @@
 						{/if}
 						<td>
 							<a
-								href={themePreviewHref(
-									$page.url,
-									'/characters/' + encodeURIComponent(character.name),
-								)}
+								href={'/characters/' + encodeURIComponent(character.name)}
 								on:click={selected}
 								><AnimatedOutfit outfit={character} alt={character.name} /></a>
 						</td>
@@ -113,10 +109,7 @@
 								<span class="font-semibold flex flex-row gap-1 items-center">
 									<OnlineIndicator online={character.online} />
 									<a
-										href={themePreviewHref(
-											$page.url,
-											'/characters/' + encodeURIComponent(character.name),
-										)}
+										href={'/characters/' + encodeURIComponent(character.name)}
 										on:click={selected}>{character.name}</a>
 									{#if character.isMain}
 										<MainCharacterIndicator />

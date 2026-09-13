@@ -1,12 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 
 import { requireLogin } from '$lib/server/session';
-import { themePreviewHref, themePreviewLoginHref } from '$lib/themes/preview';
+import { layoutLoginHref } from '$lib/themes/navigation';
 
 import type { PageServerLoad } from '../$types';
 
 export const load = (({ locals, url }) => {
-	requireLogin(locals, '', themePreviewLoginHref(url));
+	requireLogin(locals, '', layoutLoginHref(url));
 
-	throw redirect(302, themePreviewHref(url, '/shop/coins'));
+	throw redirect(302, '/shop/coins');
 }) satisfies PageServerLoad;

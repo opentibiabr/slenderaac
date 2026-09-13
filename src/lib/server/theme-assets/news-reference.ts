@@ -50,7 +50,6 @@ export async function loadNewsReference(
 ): Promise<ClassicNewsReference | null> {
 	if (
 		!dev ||
-		url.searchParams.get('themePreview') !== 'classic' ||
 		url.searchParams.get('classicReference') !== '1' ||
 		!env.THEME_ASSETS_ROOT
 	) {

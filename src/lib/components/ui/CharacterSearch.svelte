@@ -1,16 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import { themePreviewHref } from '$lib/themes/preview';
-
 	import LabeledForm from './LabeledForm.svelte';
 	import PagePanel from './PagePanel.svelte';
 
 	export let variant: 'native' | 'plain' = 'native';
 	export let compact = true;
 
-	$: parameters = new URL(themePreviewHref($page.url, '/characters'), $page.url)
-		.searchParams;
+	$: parameters = new URL('/characters', $page.url).searchParams;
 </script>
 
 <PagePanel title="Search Character" {compact} {variant}>

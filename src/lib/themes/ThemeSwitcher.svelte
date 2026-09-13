@@ -7,7 +7,7 @@
 	import { page } from '$app/stores';
 
 	import { classicAsset, type ClassicAssets } from '$lib/themes/classic/theme';
-	import { themeSelectionHref } from '$lib/themes/preview';
+	import { layoutSelectionHref } from '$lib/themes/navigation';
 	import { themeRegistry } from '$lib/themes/registry';
 	import { type ThemeId, themeIds } from '$lib/themes/theme-ids';
 
@@ -66,7 +66,7 @@
 				{#each themeIds as id}
 					<li>
 						<a
-							href={themeSelectionHref($page.url, id)}
+							href={layoutSelectionHref($page.url, id)}
 							aria-current={id === selectedTheme ? 'true' : undefined}
 							on:click={() => (open = false)}>{themeRegistry[id].name}</a>
 					</li>

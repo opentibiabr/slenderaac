@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import { themePreviewHref } from '$lib/themes/preview';
-
 	export let back: string;
 	export let previous: string | null = null;
 	export let next: string | null = null;
@@ -13,21 +11,21 @@
 
 <nav class="catalog-navigation" aria-label={label}>
 	<span
-		>{#if previous}<a href={themePreviewHref($page.url, previous)}
+		>{#if previous}<a href={previous}
 				>{#if assets?.catalogPrevious}<img
 						src={assets.catalogPrevious}
 						width="15"
 						height="11"
 						alt="" />{/if} previous</a
 			>{/if}</span>
-	<a class="catalog-navigation__back" href={themePreviewHref($page.url, back)}
+	<a class="catalog-navigation__back" href={back}
 		>{#if assets?.catalogBack}<img
 				src={assets.catalogBack}
 				width="11"
 				height="15"
 				alt="" />{/if} back</a>
 	<span
-		>{#if next}<a href={themePreviewHref($page.url, next)}
+		>{#if next}<a href={next}
 				>next {#if assets?.catalogNext}<img
 						src={assets.catalogNext}
 						width="15"

@@ -14,7 +14,6 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import { informationPages, informationPath } from '$lib/information';
 	import { featurePages } from '$lib/site-pages';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
@@ -54,13 +53,10 @@
 <div class="card card-tertiary card-hover overflow-hidden">
 	<div class="flex flex-col gap-0 py-2 px-2 items-center">
 		{#if isLoggedIn}
-			<Button href={themePreviewHref($page.url, '/account')} class="w-full">
+			<Button href="/account" class="w-full">
 				{$_('my-account')}
 			</Button>
-			<form
-				action={themePreviewHref($page.url, '/account/logout')}
-				method="post"
-				class="flex w-2/3">
+			<form action="/account/logout" method="post" class="flex w-2/3">
 				<Button
 					type="submit"
 					size="sm"
@@ -71,11 +67,9 @@
 				</Button>
 			</form>
 		{:else}
+			<Button href="/account/login" class="w-full">{$_('login')}</Button>
 			<Button
-				href={themePreviewHref($page.url, '/account/login')}
-				class="w-full">{$_('login')}</Button>
-			<Button
-				href={themePreviewHref($page.url, '/account/signup')}
+				href="/account/signup"
 				size="sm"
 				variant="soft"
 				color="secondary"
@@ -86,9 +80,7 @@
 	</div>
 	<hr class="opacity-5" />
 	<div class="py-2 px-2">
-		<Button
-			href={themePreviewHref($page.url, PUBLIC_DOWNLOAD_URL)}
-			class="w-full text-xs p-1">
+		<Button href={PUBLIC_DOWNLOAD_URL} class="w-full text-xs p-1">
 			{$_('download')}
 		</Button>
 	</div>
@@ -111,7 +103,7 @@
 								<ul>
 									{#each informationLinks.filter((entry) => entry.section === section) as entry}
 										<li>
-											<a href={themePreviewHref($page.url, entry.path)}
+											<a href={entry.path}
 												>{entry.id === 'server'
 													? `About ${$page.data.serverName}`
 													: entry.title}</a>
@@ -129,16 +121,13 @@
 					<nav class="list-nav">
 						<ul>
 							<li>
-								<a href={themePreviewHref($page.url, '/')}
-									>{$_('latest-news')}</a>
+								<a href="/">{$_('latest-news')}</a>
 							</li>
 							<li>
-								<a href={themePreviewHref($page.url, '/news/archive')}
-									>{$_('news-archive')}</a>
+								<a href="/news/archive">{$_('news-archive')}</a>
 							</li>
 							<li>
-								<a href={themePreviewHref($page.url, '/news/event-schedule')}
-									>{$_('event-schedule')}</a>
+								<a href="/news/event-schedule">{$_('event-schedule')}</a>
 							</li>
 						</ul>
 					</nav>
@@ -152,26 +141,21 @@
 					<nav class="list-nav">
 						<ul>
 							<li>
-								<a href={themePreviewHref($page.url, '/characters')}
-									>{$_('characters')}</a>
+								<a href="/characters">{$_('characters')}</a>
 							</li>
 							<li>
-								<a href={themePreviewHref($page.url, '/online')}
-									>{$_('whos-online')}</a>
+								<a href="/online">{$_('whos-online')}</a>
 							</li>
 							{#each Object.values(featurePages).filter((entry) => entry.section === 'community') as entry}
 								<li>
-									<a href={themePreviewHref($page.url, entry.path)}
-										>{entry.title}</a>
+									<a href={entry.path}>{entry.title}</a>
 								</li>
 							{/each}
 							<li>
-								<a href={themePreviewHref($page.url, '/highscores')}
-									>{$_('highscores')}</a>
+								<a href="/highscores">{$_('highscores')}</a>
 							</li>
 							<li>
-								<a href={themePreviewHref($page.url, '/guilds')}
-									>{$_('guilds.title')}</a>
+								<a href="/guilds">{$_('guilds.title')}</a>
 							</li>
 							<!-- <li><a href="/latest-deaths">Latest deaths</a></li> -->
 							<!-- <li><a href="#">Power gamers</a></li> -->
@@ -189,17 +173,13 @@
 						<ul>
 							{#each informationLinks.filter((entry) => entry.section === 'library') as entry}
 								<li>
-									<a href={themePreviewHref($page.url, entry.path)}
-										>{entry.title}</a>
+									<a href={entry.path}>{entry.title}</a>
 								</li>
 							{/each}
 							{#each staticPages as staticPage}
 								<li>
-									<a
-										href={themePreviewHref(
-											$page.url,
-											`/pages/${encodeURIComponent(staticPage.slug)}`,
-										)}>{staticPage.title}</a>
+									<a href={`/pages/${encodeURIComponent(staticPage.slug)}`}
+										>{staticPage.title}</a>
 								</li>
 							{/each}
 						</ul>
@@ -213,8 +193,7 @@
 					<nav class="list-nav">
 						<ul>
 							<li>
-								<a href={themePreviewHref($page.url, '/shop')}
-									>{$_('buy-coins')}</a>
+								<a href="/shop">{$_('buy-coins')}</a>
 							</li>
 						</ul>
 					</nav>

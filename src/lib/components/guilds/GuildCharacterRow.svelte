@@ -18,7 +18,6 @@
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import { enhance } from '$lib/enchance';
 	import { type Player, vocationString } from '$lib/players';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let character: Player;
 	export let rankLevel: number;
@@ -52,10 +51,7 @@
 			<span class="font-semibold flex flex-row gap-1 items-center">
 				<OnlineIndicator online={character.online} />
 				<a
-					href={themePreviewHref(
-						$page.url,
-						`/characters/${encodeURIComponent(character.name)}`,
-					)}
+					href={`/characters/${encodeURIComponent(character.name)}`}
 					class="anchor">
 					{character.name}
 				</a>
@@ -66,10 +62,7 @@
 				{#if isInvited}
 					{#if canRevokeInvite}
 						<form
-							action={themePreviewHref(
-								$page.url,
-								`/guilds/${encodeURIComponent(guildName)}/invite?/uninvite`,
-							)}
+							action={`/guilds/${encodeURIComponent(guildName)}/invite?/uninvite`}
 							method="post"
 							use:enhance>
 							<input type="hidden" name="name" value={character.name} />
@@ -82,10 +75,7 @@
 					{/if}
 					{#if isSelf}
 						<form
-							action={themePreviewHref(
-								$page.url,
-								`/guilds/${encodeURIComponent(guildName)}/join?/accept`,
-							)}
+							action={`/guilds/${encodeURIComponent(guildName)}/join?/accept`}
 							method="post"
 							use:enhance>
 							<input type="hidden" name="name" value={character.name} />
@@ -97,10 +87,7 @@
 								tooltip={$_('guilds.accept')} />
 						</form>
 						<form
-							action={themePreviewHref(
-								$page.url,
-								`/guilds/${encodeURIComponent(guildName)}/join?/reject`,
-							)}
+							action={`/guilds/${encodeURIComponent(guildName)}/join?/reject`}
 							method="post"
 							use:enhance>
 							<input type="hidden" name="name" value={character.name} />
@@ -114,10 +101,7 @@
 					{/if}
 				{:else if (canRemovePlayer || isSelf) && !isOwner}
 					<form
-						action={themePreviewHref(
-							$page.url,
-							`/guilds/${encodeURIComponent(guildName)}/leave`,
-						)}
+						action={`/guilds/${encodeURIComponent(guildName)}/leave`}
 						method="post"
 						use:enhance>
 						<input type="hidden" name="name" value={character.name} />
@@ -138,10 +122,7 @@
 						</Button>
 						{#if leaving}
 							<Button
-								href={themePreviewHref(
-									$page.url,
-									`/guilds/${encodeURIComponent(guildName)}`,
-								)}
+								href={`/guilds/${encodeURIComponent(guildName)}`}
 								noscroll
 								size="xs"
 								color="primary"
@@ -155,10 +136,7 @@
 				{/if}
 				{#if resigning && !isOwner && !isInvited}
 					<form
-						action={themePreviewHref(
-							$page.url,
-							`/guilds/${encodeURIComponent(guildName)}/resign`,
-						)}
+						action={`/guilds/${encodeURIComponent(guildName)}/resign`}
 						method="post"
 						use:enhance>
 						<input type="hidden" name="newOwner" value={character.name} />

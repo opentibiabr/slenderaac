@@ -10,7 +10,6 @@
 	import { classicNewsIcon } from '$lib/themes/classic/news-icons';
 	import NewsArticle from '$lib/themes/classic/NewsArticle.svelte';
 	import ReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -45,10 +44,7 @@
 	}
 
 	function characterHref(currentUrl: URL, name: string): string {
-		return themePreviewHref(
-			currentUrl,
-			`/characters/${encodeURIComponent(name)}`,
-		);
+		return `/characters/${encodeURIComponent(name)}`;
 	}
 </script>
 

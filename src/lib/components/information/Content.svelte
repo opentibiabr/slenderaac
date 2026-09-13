@@ -7,7 +7,7 @@
 	import { informationDestination } from '$lib/information';
 	import { informationAttributes } from '$lib/information-content';
 	import { serverText, serverTextAttributes } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { siteHref } from '$lib/themes/navigation';
 
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
@@ -22,7 +22,7 @@
 	function attributes(attrs: Record<string, string>) {
 		const safe = serverTextAttributes(informationAttributes(attrs), identity);
 		if (safe.href)
-			safe.href = themePreviewHref(
+			safe.href = siteHref(
 				$page.url,
 				informationDestination(safe.href, PUBLIC_DOWNLOAD_URL),
 			);

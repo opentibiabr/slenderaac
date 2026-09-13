@@ -3,7 +3,7 @@ import { test } from 'node:test';
 
 import { helpEntryInput, helpQuery } from './help';
 import { referenceSiteDestination } from './source-navigation';
-import { themePreviewHref } from './themes/preview';
+import { siteHref } from './themes/navigation';
 
 void test('help queries reject malformed selection and keep bounded search pagination', () => {
 	for (const query of [
@@ -49,9 +49,12 @@ void test('FAQ publication requires complete bounded input and preserves checkbo
 	form.delete('published');
 	assert.equal(helpEntryInput(form).data.published, false);
 });
-void test('saved unavailable support links upgrade locally in either theme', () => {
-	for (const theme of ['classic', 'legbone']) {
-		const url = new URL('https://aac.example/?themePreview=' + theme);
+void test('saved unavailable support links upgrade locally without carrying layout state', () => {
+	for (const [key, theme] of [
+		['layout', 'classic'],
+		['themePreview', 'legbone'],
+	]) {
+		const url = new URL(`https://aac.example/?${key}=${theme}&classicGrid=1`);
 		for (const [feature, path] of Object.entries({
 			gethelp: '/support/get-help',
 			parentsguide: '/support/parents-guide',
@@ -60,12 +63,14 @@ void test('saved unavailable support links upgrade locally in either theme', () 
 			privacy: '/support/privacy-policy',
 		})) {
 			const destination = new URL(
-				themePreviewHref(url, '/unavailable?feature=' + feature),
+				siteHref(url, '/unavailable?feature=' + feature),
 				url,
 			);
 			assert.equal(destination.pathname, path);
 			assert.equal(destination.origin, url.origin);
-			assert.equal(destination.searchParams.get('themePreview'), theme);
+			assert.equal(destination.searchParams.get('layout'), null);
+			assert.equal(destination.searchParams.get('themePreview'), null);
+			assert.equal(destination.searchParams.get('classicGrid'), '1');
 		}
 	}
 });

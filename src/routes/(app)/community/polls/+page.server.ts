@@ -5,7 +5,6 @@ import { communityLoginHref } from '$lib/server/community-forms';
 import { loadPollResults, submitVote } from '$lib/server/polls';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
-import { themePreviewHref } from '$lib/themes/preview';
 
 import type { Actions, PageServerLoad } from './$types';
 
@@ -94,10 +93,7 @@ export const actions = {
 		if (!('submitted' in result)) return result;
 		throw redirect(
 			303,
-			themePreviewHref(
-				url,
-				`/community/polls?${new URLSearchParams({ poll: id }).toString()}`,
-			),
+			`/community/polls?${new URLSearchParams({ poll: id }).toString()}`,
 		);
 	},
 } satisfies Actions;

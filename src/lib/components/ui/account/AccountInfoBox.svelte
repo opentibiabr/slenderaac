@@ -6,7 +6,6 @@
 
 	import type { AccountInfo } from '$lib/accounts';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { formatDate } from '$lib/utils';
 
 	export let account: AccountInfo;
@@ -29,9 +28,7 @@
 						{$_('account.change-pending', {
 							values: { email: account.newEmail },
 						})}
-						<form
-							action={themePreviewHref($page.url, `/account/resend`)}
-							method="post">
+						<form action={`/account/resend`} method="post">
 							<button class="anchor" type="submit"
 								>{$_('account.resend')}</button>
 						</form>
@@ -71,7 +68,7 @@
 			<dd class="flex flex-row items-center gap-2">
 				{account.coinsTransferable}
 				<Button
-					href={themePreviewHref($page.url, `/shop/coins`)}
+					href={`/shop/coins`}
 					size="sm"
 					color="success"
 					class="py-0.5 px-2">{$_('get-coins')}</Button>

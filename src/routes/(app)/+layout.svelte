@@ -20,13 +20,12 @@
 	import { getFlash } from 'sveltekit-flash-message/client';
 
 	import { browser } from '$app/environment';
-	import { beforeNavigate, goto } from '$app/navigation';
+	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	import ProgressBar from '$lib/components/ui/ProgressBar.svelte';
 	import { boostedStatus } from '$lib/stores/boosted';
 	import { loading } from '$lib/stores/loading';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { themeRegistry } from '$lib/themes/registry';
 	import { normalizeTheme } from '$lib/themes/theme-ids';
 	import ThemeSwitcher from '$lib/themes/ThemeSwitcher.svelte';
@@ -60,17 +59,6 @@
 	beforeNavigate((nav) => {
 		if ($flash && nav.from?.url.toString() !== nav.to?.url.toString()) {
 			$flash = undefined;
-		}
-		if (
-			data.themeSwitcherEnabled &&
-			nav.type === 'link' &&
-			nav.to?.route.id?.startsWith('/(app)') &&
-			nav.to.url.origin === $page.url.origin &&
-			$page.url.searchParams.has('themePreview') &&
-			!nav.to.url.searchParams.has('themePreview')
-		) {
-			nav.cancel();
-			void goto(themePreviewHref($page.url, nav.to.url.href));
 		}
 	});
 

@@ -5,7 +5,6 @@
 
 	import { applyAction, enhance } from '$app/forms';
 	import { goto, invalidateAll } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	import GuildMemberEditing from '$lib/components/guilds/GuildMemberEditing.svelte';
 	import GuildRankEditing from '$lib/components/guilds/GuildRankEditing.svelte';
@@ -13,7 +12,6 @@
 	import TextArea from '$lib/components/ui/forms/TextArea.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { hotkeys } from '$lib/hotkeys';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -25,13 +23,7 @@
 	$: errors = form?.errors ?? {};
 
 	function close() {
-		guild &&
-			void goto(
-				themePreviewHref(
-					$page.url,
-					`/guilds/${encodeURIComponent(guild.name)}`,
-				),
-			);
+		guild && void goto(`/guilds/${encodeURIComponent(guild.name)}`);
 	}
 
 	let tabSet = 0;
@@ -83,10 +75,7 @@
 					<form
 						id="info-form"
 						bind:this={infoForm}
-						action={themePreviewHref(
-							$page.url,
-							`/guilds/${encodeURIComponent(guildName)}/edit?/saveDescription`,
-						)}
+						action={`/guilds/${encodeURIComponent(guildName)}/edit?/saveDescription`}
 						class="flex flex-col gap-1"
 						method="post"
 						use:enhance={() => {
@@ -106,10 +95,7 @@
 					<form
 						id="ranks-form"
 						bind:this={ranksForm}
-						action={themePreviewHref(
-							$page.url,
-							`/guilds/${encodeURIComponent(guildName)}/edit?/saveRanks`,
-						)}
+						action={`/guilds/${encodeURIComponent(guildName)}/edit?/saveRanks`}
 						class="flex flex-col gap-2"
 						method="post"
 						use:enhance={() => {
@@ -129,10 +115,7 @@
 							<GuildRankEditing {rank} {guildName} />
 						{/each}
 						<Button
-							formaction={themePreviewHref(
-								$page.url,
-								`/guilds/${encodeURIComponent(guildName)}/edit?/addRank`,
-							)}
+							formaction={`/guilds/${encodeURIComponent(guildName)}/edit?/addRank`}
 							color="success"
 							size="sm"
 							variant="soft"
@@ -142,10 +125,7 @@
 					<form
 						id="members-form"
 						bind:this={membersForm}
-						action={themePreviewHref(
-							$page.url,
-							`/guilds/${encodeURIComponent(guildName)}/edit?/saveMembers`,
-						)}
+						action={`/guilds/${encodeURIComponent(guildName)}/edit?/saveMembers`}
 						class="flex flex-col gap-2"
 						method="post"
 						use:enhance={() => {

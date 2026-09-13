@@ -3,7 +3,6 @@
 
 	import { type Player, vocationString } from '$lib/players';
 	import { type Order, type Sort, sortHref } from '$lib/sorting';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import AlphabetNavigation from './AlphabetNavigation.svelte';
 	import CatalogTable from './CatalogTable.svelte';
@@ -104,11 +103,8 @@
 									? `online-${character.name[0].toUpperCase()}`
 									: undefined}>
 								<td
-									><a
-										href={themePreviewHref(
-											$page.url,
-											`/characters/${encodeURIComponent(character.name)}`,
-										)}>{character.name}</a
+									><a href={`/characters/${encodeURIComponent(character.name)}`}
+										>{character.name}</a
 									></td>
 								<td>{character.level}</td><td
 									>{vocationString(character.vocation)}</td>

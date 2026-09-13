@@ -9,7 +9,6 @@
 	import OnlinePlayers from '$lib/components/ui/OnlinePlayers.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 	import { worldHref, worldPvpTypes } from '$lib/worlds';
 
 	import type { PageData } from './$types';
@@ -18,8 +17,7 @@
 	$: classic = $page.data.selectedTheme === 'classic';
 	$: world = data.world;
 	$: pvp = world.pvpType ? worldPvpTypes[world.pvpType] : 'Not specified';
-	$: preview = new URL(themePreviewHref($page.url, '/worlds'), $page.url)
-		.searchParams;
+	$: preview = new URL('/worlds', $page.url).searchParams;
 	$: record =
 		data.onlineRecord === null
 			? 'Not recorded'
@@ -115,14 +113,9 @@
 								></thead>
 							<tbody
 								><tr
-									><td
-										><a
-											href={themePreviewHref($page.url, worldHref(world.name))}
-											>{world.name}</a
-										></td
-									><td>{data.online ? data.onlineCount : 'Offline'}</td><td
-										>{world.location ?? 'Not specified'}</td
-									><td>{pvp}</td><td
+									><td><a href={worldHref(world.name)}>{world.name}</a></td><td
+										>{data.online ? data.onlineCount : 'Offline'}</td
+									><td>{world.location ?? 'Not specified'}</td><td>{pvp}</td><td
 										>{world.maxPlayers === undefined
 											? ''
 											: world.maxPlayers === 0

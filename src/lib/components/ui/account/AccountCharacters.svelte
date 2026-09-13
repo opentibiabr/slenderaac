@@ -11,7 +11,6 @@
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, type Player, vocationString } from '$lib/players';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let characters: Player[];
 </script>
@@ -43,10 +42,7 @@
 								<span class="font-semibold flex flex-row gap-1 items-center">
 									<OnlineIndicator online={character.online} />
 									<a
-										href={themePreviewHref(
-											$page.url,
-											`/characters/${encodeURIComponent(character.name)}`,
-										)}
+										href={`/characters/${encodeURIComponent(character.name)}`}
 										class="anchor text-surface-900">
 										{character.name}
 									</a>
@@ -68,10 +64,7 @@
 									{#if !character.isMain}
 										<form
 											class="flex"
-											action={themePreviewHref(
-												$page.url,
-												`/account/characters/set-main`,
-											)}
+											action={`/account/characters/set-main`}
 											method="POST">
 											<input type="hidden" name="name" value={character.name} />
 											<button class="anchor" type="submit">
@@ -80,25 +73,16 @@
 										</form>
 									{/if}
 									<a
-										href={themePreviewHref(
-											$page.url,
-											`/account/characters/${encodeURIComponent(character.name)}/edit`,
-										)}
+										href={`/account/characters/${encodeURIComponent(character.name)}/edit`}
 										class="anchor"
 										type="submit">
 										{$_('edit')}
 									</a>
 									<a
-										href={themePreviewHref(
-											$page.url,
-											`/account/characters/${encodeURIComponent(character.name)}/achievements`,
-										)}
+										href={`/account/characters/${encodeURIComponent(character.name)}/achievements`}
 										class="anchor">Achievements</a>
 									<a
-										href={themePreviewHref(
-											$page.url,
-											`/account/characters/${encodeURIComponent(character.name)}/delete`,
-										)}
+										href={`/account/characters/${encodeURIComponent(character.name)}/delete`}
 										class="anchor"
 										type="submit">
 										{$_('delete')}
@@ -117,10 +101,7 @@
 									</span>
 									<form
 										class="flex"
-										action={themePreviewHref(
-											$page.url,
-											`/account/characters/${encodeURIComponent(character.name)}/delete?cancel=true`,
-										)}
+										action={`/account/characters/${encodeURIComponent(character.name)}/delete?cancel=true`}
 										method="POST">
 										(<button class="anchor" type="submit"
 											>{$_('undelete')}</button
@@ -136,8 +117,7 @@
 	</div>
 
 	<div class="flex flex-row justify-end">
-		<Button
-			href={themePreviewHref($page.url, `/account/characters/create`)}
-			size="sm">{$_('new-character')}</Button>
+		<Button href={`/account/characters/create`} size="sm"
+			>{$_('new-character')}</Button>
 	</div>
 </div>

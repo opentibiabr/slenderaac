@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 
 	import { serverText, serverTextAttributes } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { siteHref } from '$lib/themes/navigation';
 
 	import type { ReferenceNode } from './reference-types';
 
@@ -52,7 +52,7 @@
 			);
 		}
 		if (spacing.length) safe.style = spacing.join('; ');
-		if (safe.href) safe.href = themePreviewHref(url, safe.href);
+		if (safe.href) safe.href = siteHref(url, safe.href);
 		return serverTextAttributes(safe, identity);
 	}
 	function imageLink(value: string | undefined) {

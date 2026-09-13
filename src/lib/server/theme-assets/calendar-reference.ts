@@ -25,7 +25,6 @@ export async function loadCalendarReference(
 ): Promise<CalendarReference | null> {
 	if (
 		!dev ||
-		url.searchParams.get('themePreview') !== 'classic' ||
 		url.searchParams.get('classicDemo') !== '1' ||
 		!env.THEME_ASSETS_ROOT
 	)

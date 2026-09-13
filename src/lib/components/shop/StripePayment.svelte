@@ -21,10 +21,8 @@
 	} from 'svelte-stripe';
 
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import {
 		PUBLIC_BASE_URL,
@@ -56,10 +54,8 @@
 			elements,
 			redirect: 'always',
 			confirmParams: {
-				return_url: new URL(
-					themePreviewHref($page.url, '/shop/coins?step=confirmation'),
-					PUBLIC_BASE_URL,
-				).href,
+				return_url: new URL('/shop/coins?step=confirmation', PUBLIC_BASE_URL)
+					.href,
 			},
 		});
 		if (result.error) {
@@ -117,7 +113,7 @@
 				type="button"
 				variant="ghost"
 				iconBefore={faArrowLeft}
-				on:click={() => goto(themePreviewHref($page.url, '/shop/coins'))}>
+				on:click={() => goto('/shop/coins')}>
 				Back
 			</Button>
 			<Button disabled={processing} type="submit">

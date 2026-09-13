@@ -7,7 +7,6 @@
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { spellMana, spellSorts } from '$lib/spells';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { PageData } from './$types';
 
@@ -15,10 +14,7 @@
 	$: classic = $page.data.selectedTheme === 'classic';
 	$: selected = data.selectedSpell;
 	$: query = new URLSearchParams(data.filters);
-	$: preview = new URL(
-		themePreviewHref($page.url, '/library/spells'),
-		$page.url,
-	).searchParams;
+	$: preview = new URL('/library/spells', $page.url).searchParams;
 	$: groups = [
 		{ name: 'vocation', title: 'Vocation', values: data.vocations },
 		{ name: 'group', title: 'Group', values: data.groups },
@@ -28,7 +24,7 @@
 	function href(id?: string) {
 		const params = new URLSearchParams(query);
 		if (id) params.set('spell', id);
-		return themePreviewHref($page.url, `/library/spells?${params.toString()}`);
+		return `/library/spells?${params.toString()}`;
 	}
 	const seconds = (value: number) => `${value / 1000}s`;
 	$: details = selected
@@ -88,9 +84,7 @@
 		its formula and requirements.
 		<br /><br />Use the search below to filter or sort this list. For more about
 		magic, read the
-		<a href={themePreviewHref($page.url, '/guides/manual?section=magic')}
-			>manual</a
-		>.
+		<a href="/guides/manual?section=magic">manual</a>.
 	</p>
 	<PagePanel title="Spells" surface variant="list">
 		<CatalogTable>

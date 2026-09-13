@@ -7,7 +7,6 @@
 	import GuildInfoBox from '$lib/components/guilds/GuildInfoBox.svelte';
 	import GuildOperations from '$lib/components/guilds/GuildOperations.svelte';
 	import ClassicGuildProfile from '$lib/themes/classic/GuildProfile.svelte';
-	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { LayoutData } from './$types';
 
@@ -25,10 +24,7 @@
 		);
 	}
 	function characterHref(name: string) {
-		return themePreviewHref(
-			$page.url,
-			'/characters/' + encodeURIComponent(name),
-		);
+		return '/characters/' + encodeURIComponent(name);
 	}
 
 	function isCharacerOwner(name: string) {

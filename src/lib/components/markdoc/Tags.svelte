@@ -9,7 +9,7 @@
 	import { page } from '$app/stores';
 
 	import { serverMarkupText, serverText } from '$lib/site-identity';
-	import { themePreviewHref } from '$lib/themes/preview';
+	import { siteHref } from '$lib/themes/navigation';
 
 	import { PUBLIC_TITLE } from '$env/static/public';
 
@@ -21,7 +21,7 @@
 		website: $page.url.origin,
 	};
 
-	function previewAttributes(value: unknown, url: URL) {
+	function linkAttributes(value: unknown, url: URL) {
 		const attributes = Object.fromEntries(
 			Object.entries(value as Record<string, unknown>).map(([key, item]) => [
 				key,
@@ -30,12 +30,8 @@
 					: item,
 			]),
 		);
-		if (
-			!url.searchParams.has('themePreview') ||
-			typeof attributes.href !== 'string'
-		)
-			return attributes;
-		return { ...attributes, href: themePreviewHref(url, attributes.href) };
+		if (typeof attributes.href !== 'string') return attributes;
+		return { ...attributes, href: siteHref(url, attributes.href) };
 	}
 
 	const nodeName = (node: RenderableTreeNode) => {
@@ -79,12 +75,12 @@
 	{:else}
 		<svelte:element
 			this={node.name}
-			{...previewAttributes(node.attributes, $page.url)}>
+			{...linkAttributes(node.attributes, $page.url)}>
 			<svelte:self node={node.children} {components} />
 		</svelte:element>
 	{/if}
 {:else}
 	<svelte:element
 		this={node.name}
-		{...previewAttributes(node.attributes, $page.url)} />
+		{...linkAttributes(node.attributes, $page.url)} />
 {/if}
