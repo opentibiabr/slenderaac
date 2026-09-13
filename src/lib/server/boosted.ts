@@ -19,7 +19,6 @@ type StoredSelection = BoostedProps & { date: string };
 export type BoostedSelectionState =
 	| 'active'
 	| 'missing'
-	| 'stale-day'
 	| 'invalid-name'
 	| 'placeholder'
 	| 'invalid-race';
@@ -33,11 +32,8 @@ let lastLoggedSnapshot = '';
 
 export function inspectBoostedSelection(
 	stored: StoredSelection | null,
-	today: number,
 ): BoostedSelectionInspection {
 	if (!stored) return { selection: null, state: 'missing' };
-	if (Number(stored.date) !== today)
-		return { selection: null, state: 'stale-day' };
 	if (!stored.boostname?.trim())
 		return { selection: null, state: 'invalid-name' };
 	if (stored.boostname.trim().toLowerCase() === 'default')
@@ -61,23 +57,19 @@ export function inspectBoostedSelection(
 	};
 }
 
-export function activeBoostedSelection(
-	stored: StoredSelection | null,
-	today: number,
-) {
-	return inspectBoostedSelection(stored, today).selection;
+export function activeBoostedSelection(stored: StoredSelection | null) {
+	return inspectBoostedSelection(stored).selection;
 }
 
 function selectionLog(
 	kind: 'creature' | 'boss',
 	stored: StoredSelection | null,
 	inspection: BoostedSelectionInspection,
-	today: number,
 ): string {
 	if (inspection.selection)
-		return `${kind}=active name=${JSON.stringify(inspection.selection.boostname)} race=${inspection.selection.raceid} day=${today}`;
+		return `${kind}=active name=${JSON.stringify(inspection.selection.boostname)} race=${inspection.selection.raceid} sourceDay=${JSON.stringify(stored?.date)}`;
 	const storedDay = stored ? JSON.stringify(stored.date) : 'none';
-	return `${kind}=unavailable reason=${inspection.state} storedDay=${storedDay} expectedDay=${today}`;
+	return `${kind}=unavailable reason=${inspection.state} sourceDay=${storedDay}`;
 }
 
 function logBoostedSnapshot(
@@ -85,32 +77,27 @@ function logBoostedSnapshot(
 	boss: StoredSelection | null,
 	creatureInspection: BoostedSelectionInspection,
 	bossInspection: BoostedSelectionInspection,
-	today: number,
 ) {
-	const fingerprint = JSON.stringify([today, creature, boss]);
+	const fingerprint = JSON.stringify([creature, boss]);
 	if (fingerprint === lastLoggedSnapshot) return;
 	lastLoggedSnapshot = fingerprint;
 	console.info(
-		`[boosted] ${selectionLog('creature', creature, creatureInspection, today)}; ${selectionLog('boss', boss, bossInspection, today)}`,
+		`[boosted] ${selectionLog('creature', creature, creatureInspection)}; ${selectionLog('boss', boss, bossInspection)}`,
 	);
 }
 
-export async function loadBoostedSelections(
-	now = new Date(),
-): Promise<BoostedSelections> {
+export async function loadBoostedSelections(): Promise<BoostedSelections> {
 	const [boostedCreature, boostedBoss] = await Promise.all([
 		prisma.boostedCreature.findFirst({ select: selection }),
 		prisma.boostedBoss.findFirst({ select: selection }),
 	]);
-	const today = now.getDate();
-	const creatureInspection = inspectBoostedSelection(boostedCreature, today);
-	const bossInspection = inspectBoostedSelection(boostedBoss, today);
+	const creatureInspection = inspectBoostedSelection(boostedCreature);
+	const bossInspection = inspectBoostedSelection(boostedBoss);
 	logBoostedSnapshot(
 		boostedCreature,
 		boostedBoss,
 		creatureInspection,
 		bossInspection,
-		today,
 	);
 	return {
 		boostedCreature: creatureInspection.selection,

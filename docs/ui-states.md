@@ -53,19 +53,21 @@ pending until the authoritative order state changes, even if a refresh times out
 - The website and game server must use the same database. A successful server log
   with a different website value is a connection/configuration mismatch until the
   shared tables prove otherwise.
-- A seed placeholder, zero race ID, empty name or row whose day does not match the
-  current server day is unavailable data. Do not present it as today's selection.
+- A seed placeholder, zero race ID or empty name is unavailable data. The row's
+  `date` is the game server's day-of-month rotation marker. The website must not
+  compare it with its own clock because the two processes can use different time
+  zones or start at different moments.
 - Active browser sessions poll the website endpoint and adopt the new persisted
-  selection without a website restart. A failed refresh preserves the last valid
-  value only when it is visibly marked stale.
+  selection within one minute without a website restart. A failed refresh preserves
+  the last valid value only when it is visibly marked stale.
 - The server log reports the first database snapshot and each later change. It
   labels each slot as active or unavailable with the precise reason (`missing`,
-  `stale-day`, `invalid-name`, `placeholder` or `invalid-race`) and the expected
-  day, without printing database credentials. Use this line to distinguish a
-  stale server row from a website connected to another database.
+  `invalid-name`, `placeholder` or `invalid-race`) and the source day, without
+  printing database credentials. Use this line to distinguish unchanged source
+  data from a website connected to another database.
 - The client login endpoint uses the same validation. It advertises no boosted
-  selection when both rows are absent, placeholders or stale, and never leaks a
-  seed race ID as if it were active.
+  selection when both rows are absent or placeholders, and never leaks a seed race
+  ID as if it were active.
 
 ## Shared implementation rules
 

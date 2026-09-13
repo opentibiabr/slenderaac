@@ -17,7 +17,7 @@ export type BoostedSelections = {
 	boostedBoss: BoostedProps | null;
 };
 
-export const boostedRefreshInterval = 5 * 60 * 1000;
+export const boostedRefreshInterval = 60 * 1000;
 
 const appearanceFields = [
 	'looktype',

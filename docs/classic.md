@@ -97,7 +97,7 @@ loading and leave the selected name visible. Without catalog data, these routes
 retain an honest local empty state.
 
 The shared browser store reads the current selection immediately, then checks the
-dedicated non-cached endpoint every five minutes. This follows the server's daily
+dedicated non-cached endpoint every minute. This follows the server's daily
 rotation without retaining the first layout snapshot for the rest of a browser
 session or reloading the complete layout. Classic, Legbone and open creature
 catalog pages consume the same store. A failed refresh retains the previous
