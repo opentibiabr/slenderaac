@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { activeBoostedSelection } from './boosted';
+import { activeBoostedSelection, boostedClientResponse } from './boosted';
 
 const stored = {
 	date: '13',
@@ -38,4 +38,19 @@ void test('seed placeholders and invalid race ids are never presented as active'
 	);
 	assert.equal(activeBoostedSelection({ ...stored, raceid: '0' }, 13), null);
 	assert.equal(activeBoostedSelection({ ...stored, raceid: '' }, 13), null);
+});
+
+void test('the client response uses the same validated daily selections', () => {
+	const creature = activeBoostedSelection(stored, 13);
+	assert.deepEqual(
+		boostedClientResponse({ boostedCreature: creature, boostedBoss: null }),
+		{
+			boostedcreature: true,
+			creatureraceid: 321,
+		},
+	);
+	assert.deepEqual(
+		boostedClientResponse({ boostedCreature: null, boostedBoss: null }),
+		{ boostedcreature: false },
+	);
 });

@@ -4,6 +4,10 @@ import { authenticator } from 'otplib';
 import parseDuration from 'parse-duration';
 
 import { PlayerGroup, PlayerSex, vocationString } from '$lib/players';
+import {
+	boostedClientResponse,
+	loadBoostedSelections,
+} from '$lib/server/boosted';
 import { requireEmailVerification } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { comparePassword } from '$lib/server/utils';
@@ -132,17 +136,7 @@ async function handleCacheInfo() {
 }
 
 async function handleBoostedCreature() {
-	const boostedCreature = await prisma.boostedCreature.findFirstOrThrow({
-		select: { raceid: true },
-	});
-	const boostedBoss = await prisma.boostedBoss.findFirstOrThrow({
-		select: { raceid: true },
-	});
-	return {
-		boostedcreature: true,
-		creatureraceid: Number(boostedCreature.raceid),
-		bossraceid: Number(boostedBoss.raceid),
-	};
+	return boostedClientResponse(await loadBoostedSelections());
 }
 
 async function handleLogin(

@@ -56,3 +56,18 @@ export async function loadBoostedSelections(
 		boostedBoss: activeBoostedSelection(boostedBoss, today),
 	};
 }
+
+/** Keep the client status response aligned with the website's daily validation. */
+export function boostedClientResponse(selections: BoostedSelections) {
+	const creature = selections.boostedCreature
+		? Number(selections.boostedCreature.raceid)
+		: null;
+	const boss = selections.boostedBoss
+		? Number(selections.boostedBoss.raceid)
+		: null;
+	return {
+		boostedcreature: creature !== null || boss !== null,
+		...(creature !== null ? { creatureraceid: creature } : {}),
+		...(boss !== null ? { bossraceid: boss } : {}),
+	};
+}

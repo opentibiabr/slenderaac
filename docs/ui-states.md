@@ -58,6 +58,9 @@ pending until the authoritative order state changes, even if a refresh times out
 - Active browser sessions poll the website endpoint and adopt the new persisted
   selection without a website restart. A failed refresh preserves the last valid
   value only when it is visibly marked stale.
+- The client login endpoint uses the same validation. It advertises no boosted
+  selection when both rows are absent, placeholders or stale, and never leaks a
+  seed race ID as if it were active.
 
 ## Shared implementation rules
 
