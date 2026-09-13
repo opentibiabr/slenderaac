@@ -90,4 +90,10 @@ void test('native catalog links retain selection and filters while dropping unkn
 		),
 		'/fankit',
 	);
+	assert.equal(
+		referenceSiteDestination(
+			new URL('https://game.example/library/?subtopic=soundtrack'),
+		),
+		'/library/soundtrack',
+	);
 });

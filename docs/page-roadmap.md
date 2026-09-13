@@ -3,8 +3,8 @@
 Track the remaining website pages and the work needed to complete each one.
 Classic and Legbone share routes, data, validation and permissions.
 
-**Completed in the latest pass:** FAQ, Parents' Guide, Legal Documents, Genesis
-and the Fankit delivery route.
+**Completed in the latest pass:** FAQ, Parents' Guide, Legal Documents, Genesis,
+the Fankit delivery route and the Soundtrack application flow.
 
 **Next priority:** simple website pages that need no gameplay changes.
 
@@ -54,7 +54,7 @@ criteria.
 
 - [x] **Genesis** — publish the operator's story and chapters.
 - [ ] **Fankit** — delivery is implemented; publish the operator's artwork ZIP.
-- [ ] **Soundtrack** — play the operator's published audio tracks.
+- [ ] **Soundtrack** — playback is implemented; publish operator audio and artwork.
 - [ ] **Maps** — display the configured map with town and floor selection.
 
 <details>
@@ -94,6 +94,10 @@ remaining checkbox represents content/release readiness, not application code.
 
 **Complete when:** play/pause, keyboard controls, track changes, failed-media states
 and ranged downloads work. Never fall back to another site's media application.
+
+The shared catalog, players and ranged media routes are implemented. Configure
+operator-owned media through the [Soundtrack guide](soundtrack.md). The remaining
+checkbox represents content/release readiness.
 
 </details>
 

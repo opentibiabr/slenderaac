@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { attachmentDisposition, weakFileEtag } from '$lib/server/file-response';
+
 export type FankitPackage = {
 	path: string;
 	name: string;
@@ -8,10 +10,6 @@ export type FankitPackage = {
 	modified: Date;
 	etag: string;
 };
-
-function weakEtag(size: number, mtimeMs: number): string {
-	return `W/"${size.toString(16)}-${Math.trunc(mtimeMs).toString(16)}"`;
-}
 
 export async function loadFankitPackage(
 	configuredPath: string | undefined,
@@ -37,7 +35,7 @@ export async function loadFankitPackage(
 			name: path.basename(resolvedPath),
 			size: stats.size,
 			modified: stats.mtime,
-			etag: weakEtag(stats.size, stats.mtimeMs),
+			etag: weakFileEtag(stats.size, stats.mtimeMs),
 		};
 	} catch {
 		return null;
@@ -45,39 +43,12 @@ export async function loadFankitPackage(
 }
 
 export function fankitDownloadHeaders(file: FankitPackage): Headers {
-	const encodedName = encodeURIComponent(file.name).replace(
-		/[!'()*]/g,
-		(character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
-	);
 	return new Headers({
 		'Cache-Control': 'public, max-age=300',
-		'Content-Disposition': `attachment; filename="fankit.zip"; filename*=UTF-8''${encodedName}`,
+		'Content-Disposition': attachmentDisposition(file.name, 'fankit.zip'),
 		'Content-Length': String(file.size),
 		'Content-Type': 'application/zip',
 		ETag: file.etag,
 		'Last-Modified': file.modified.toUTCString(),
 	});
-}
-
-export function isFankitNotModified(
-	request: Request,
-	file: FankitPackage,
-): boolean {
-	const ifNoneMatch = request.headers.get('if-none-match');
-	if (
-		ifNoneMatch
-			?.split(',')
-			.map((value) => value.trim())
-			.some((value) => value === '*' || value === file.etag)
-	)
-		return true;
-
-	if (ifNoneMatch) return false;
-	const ifModifiedSince = request.headers.get('if-modified-since');
-	if (!ifModifiedSince) return false;
-	const timestamp = Date.parse(ifModifiedSince);
-	return (
-		Number.isFinite(timestamp) &&
-		Math.floor(file.modified.getTime() / 1000) <= Math.floor(timestamp / 1000)
-	);
 }

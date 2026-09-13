@@ -1,11 +1,8 @@
 import { createReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
 
-import {
-	fankitDownloadHeaders,
-	isFankitNotModified,
-	loadFankitPackage,
-} from '$lib/server/fankit';
+import { fankitDownloadHeaders, loadFankitPackage } from '$lib/server/fankit';
+import { fileNotModified } from '$lib/server/file-response';
 
 import { env } from '$env/dynamic/private';
 
@@ -23,7 +20,7 @@ async function download(request: Request, head: boolean): Promise<Response> {
 	if (!file) return notFound();
 
 	const headers = fankitDownloadHeaders(file);
-	if (isFankitNotModified(request, file)) {
+	if (fileNotModified(request, file)) {
 		return new Response(null, {
 			status: 304,
 			headers: {

@@ -139,6 +139,12 @@ export const featurePages: Record<string, FeaturePage> = {
 		section: 'global',
 		headline: 'headlineFankit',
 	},
+	soundtrack: {
+		path: '/library/soundtrack',
+		title: 'Soundtrack',
+		section: 'library',
+		headline: 'headlineSoundtrack',
+	},
 };
 
 /** Update obsolete menu aliases without changing the standalone route. */

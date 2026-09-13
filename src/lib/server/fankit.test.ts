@@ -4,11 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
-import {
-	fankitDownloadHeaders,
-	isFankitNotModified,
-	loadFankitPackage,
-} from './fankit';
+import { fankitDownloadHeaders, loadFankitPackage } from './fankit';
+import { fileNotModified } from './file-response';
 
 void test('fankit metadata and download headers follow the configured ZIP', async () => {
 	const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'slender-fankit-'));
@@ -27,7 +24,7 @@ void test('fankit metadata and download headers follow the configured ZIP', asyn
 			/filename\*=UTF-8''Server%20Media%202026\.zip/,
 		);
 		assert.equal(
-			isFankitNotModified(
+			fileNotModified(
 				new Request('http://localhost/fankit/download', {
 					headers: { 'If-None-Match': `"older", ${file.etag}` },
 				}),
@@ -36,7 +33,7 @@ void test('fankit metadata and download headers follow the configured ZIP', asyn
 			true,
 		);
 		assert.equal(
-			isFankitNotModified(
+			fileNotModified(
 				new Request('http://localhost/fankit/download', {
 					headers: { 'If-Modified-Since': file.modified.toUTCString() },
 				}),
