@@ -14,11 +14,11 @@
 	import { onMount } from 'svelte';
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
-	import { portal } from 'svelte-portal';
 
 	import { beforeNavigate } from '$app/navigation';
 	import { page } from '$app/stores';
 
+	import { portal } from '$lib/actions/portal';
 	import BoostedSection from '$lib/components/ui/BoostedSection.svelte';
 	import ServerBrand from '$lib/components/ui/ServerBrand.svelte';
 	import ServerStatus from '$lib/components/ui/ServerStatus.svelte';

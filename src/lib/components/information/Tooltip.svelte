@@ -7,10 +7,10 @@
 		shift,
 	} from '@floating-ui/dom';
 	import { onDestroy, tick } from 'svelte';
-	import { portal } from 'svelte-portal';
 
 	import { page } from '$app/stores';
 
+	import { portal } from '$lib/actions/portal';
 	import { serverText } from '$lib/site-identity';
 
 	import {

@@ -25,11 +25,11 @@
 	} from '@skeletonlabs/skeleton';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import Fa from 'svelte-fa';
-	import { portal } from 'svelte-portal';
 
 	import { browser } from '$app/environment';
 	import { page } from '$app/stores';
 
+	import { portal } from '$lib/actions/portal';
 	import { browserTitle } from '$lib/utils';
 
 	initializeStores();

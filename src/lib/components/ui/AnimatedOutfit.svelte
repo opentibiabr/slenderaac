@@ -138,6 +138,8 @@
 	<slot />
 	{#if frames.length && outfit?.looktype > 0}
 		<div
+			role="img"
+			aria-label={alt}
 			class="absolute {hasMount
 				? '-left-7 -bottom-1'
 				: '-left-10 bottom-1'} {innerClass}">
@@ -146,8 +148,7 @@
 				width={frames[0].image.naturalWidth}
 				height={frames[0].image.naturalHeight}
 				class="w-20 h-20"
-				role="img"
-				aria-label={alt} />
+				aria-hidden="true" />
 		</div>
 	{:else if loading}
 		<div class="absolute inset-0 grid place-items-center" aria-hidden="true">
