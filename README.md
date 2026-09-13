@@ -58,7 +58,13 @@ and operator-owned legal documents.
 At this point you should be ready to run the server:
 
 ```bash
-bun dev
+npm run dev
+```
+
+Pass Vite network options after `--` when a specific address or port is needed:
+
+```bash
+npm run dev -- --host 127.0.0.1 --port 80
 ```
 
 </details>
