@@ -58,6 +58,11 @@ pending until the authoritative order state changes, even if a refresh times out
 - Active browser sessions poll the website endpoint and adopt the new persisted
   selection without a website restart. A failed refresh preserves the last valid
   value only when it is visibly marked stale.
+- The server log reports the first database snapshot and each later change. It
+  labels each slot as active or unavailable with the precise reason (`missing`,
+  `stale-day`, `invalid-name`, `placeholder` or `invalid-race`) and the expected
+  day, without printing database credentials. Use this line to distinguish a
+  stale server row from a website connected to another database.
 - The client login endpoint uses the same validation. It advertises no boosted
   selection when both rows are absent, placeholders or stale, and never leaks a
   seed race ID as if it were active.

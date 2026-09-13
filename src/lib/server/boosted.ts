@@ -16,31 +16,83 @@ const selection = {
 
 type StoredSelection = BoostedProps & { date: string };
 
+export type BoostedSelectionState =
+	| 'active'
+	| 'missing'
+	| 'stale-day'
+	| 'invalid-name'
+	| 'placeholder'
+	| 'invalid-race';
+
+export type BoostedSelectionInspection = {
+	selection: BoostedProps | null;
+	state: BoostedSelectionState;
+};
+
+let lastLoggedSnapshot = '';
+
+export function inspectBoostedSelection(
+	stored: StoredSelection | null,
+	today: number,
+): BoostedSelectionInspection {
+	if (!stored) return { selection: null, state: 'missing' };
+	if (Number(stored.date) !== today)
+		return { selection: null, state: 'stale-day' };
+	if (!stored.boostname?.trim())
+		return { selection: null, state: 'invalid-name' };
+	if (stored.boostname.trim().toLowerCase() === 'default')
+		return { selection: null, state: 'placeholder' };
+	if (!/^\d+$/.test(stored.raceid) || Number(stored.raceid) <= 0)
+		return { selection: null, state: 'invalid-race' };
+
+	return {
+		selection: {
+			boostname: stored.boostname,
+			raceid: stored.raceid,
+			looktype: stored.looktype,
+			lookaddons: stored.lookaddons,
+			lookhead: stored.lookhead,
+			lookbody: stored.lookbody,
+			looklegs: stored.looklegs,
+			lookfeet: stored.lookfeet,
+			lookmount: stored.lookmount,
+		},
+		state: 'active',
+	};
+}
+
 export function activeBoostedSelection(
 	stored: StoredSelection | null,
 	today: number,
 ) {
-	if (
-		!stored ||
-		Number(stored.date) !== today ||
-		!stored.boostname?.trim() ||
-		stored.boostname.trim().toLowerCase() === 'default' ||
-		!/^\d+$/.test(stored.raceid) ||
-		Number(stored.raceid) <= 0
-	)
-		return null;
+	return inspectBoostedSelection(stored, today).selection;
+}
 
-	return {
-		boostname: stored.boostname,
-		raceid: stored.raceid,
-		looktype: stored.looktype,
-		lookaddons: stored.lookaddons,
-		lookhead: stored.lookhead,
-		lookbody: stored.lookbody,
-		looklegs: stored.looklegs,
-		lookfeet: stored.lookfeet,
-		lookmount: stored.lookmount,
-	};
+function selectionLog(
+	kind: 'creature' | 'boss',
+	stored: StoredSelection | null,
+	inspection: BoostedSelectionInspection,
+	today: number,
+): string {
+	if (inspection.selection)
+		return `${kind}=active name=${JSON.stringify(inspection.selection.boostname)} race=${inspection.selection.raceid} day=${today}`;
+	const storedDay = stored ? JSON.stringify(stored.date) : 'none';
+	return `${kind}=unavailable reason=${inspection.state} storedDay=${storedDay} expectedDay=${today}`;
+}
+
+function logBoostedSnapshot(
+	creature: StoredSelection | null,
+	boss: StoredSelection | null,
+	creatureInspection: BoostedSelectionInspection,
+	bossInspection: BoostedSelectionInspection,
+	today: number,
+) {
+	const fingerprint = JSON.stringify([today, creature, boss]);
+	if (fingerprint === lastLoggedSnapshot) return;
+	lastLoggedSnapshot = fingerprint;
+	console.info(
+		`[boosted] ${selectionLog('creature', creature, creatureInspection, today)}; ${selectionLog('boss', boss, bossInspection, today)}`,
+	);
 }
 
 export async function loadBoostedSelections(
@@ -51,9 +103,18 @@ export async function loadBoostedSelections(
 		prisma.boostedBoss.findFirst({ select: selection }),
 	]);
 	const today = now.getDate();
+	const creatureInspection = inspectBoostedSelection(boostedCreature, today);
+	const bossInspection = inspectBoostedSelection(boostedBoss, today);
+	logBoostedSnapshot(
+		boostedCreature,
+		boostedBoss,
+		creatureInspection,
+		bossInspection,
+		today,
+	);
 	return {
-		boostedCreature: activeBoostedSelection(boostedCreature, today),
-		boostedBoss: activeBoostedSelection(boostedBoss, today),
+		boostedCreature: creatureInspection.selection,
+		boostedBoss: bossInspection.selection,
 	};
 }
 

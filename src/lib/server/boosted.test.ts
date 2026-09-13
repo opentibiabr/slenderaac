@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { activeBoostedSelection, boostedClientResponse } from './boosted';
+import {
+	activeBoostedSelection,
+	boostedClientResponse,
+	inspectBoostedSelection,
+} from './boosted';
 
 const stored = {
 	date: '13',
@@ -38,6 +42,24 @@ void test('seed placeholders and invalid race ids are never presented as active'
 	);
 	assert.equal(activeBoostedSelection({ ...stored, raceid: '0' }, 13), null);
 	assert.equal(activeBoostedSelection({ ...stored, raceid: '' }, 13), null);
+});
+
+void test('daily selection diagnostics identify why a value is unavailable', () => {
+	assert.equal(inspectBoostedSelection(null, 13).state, 'missing');
+	assert.equal(inspectBoostedSelection(stored, 14).state, 'stale-day');
+	assert.equal(
+		inspectBoostedSelection({ ...stored, boostname: '' }, 13).state,
+		'invalid-name',
+	);
+	assert.equal(
+		inspectBoostedSelection({ ...stored, boostname: 'default' }, 13).state,
+		'placeholder',
+	);
+	assert.equal(
+		inspectBoostedSelection({ ...stored, raceid: '0' }, 13).state,
+		'invalid-race',
+	);
+	assert.equal(inspectBoostedSelection(stored, 13).state, 'active');
 });
 
 void test('the client response uses the same validated daily selections', () => {
