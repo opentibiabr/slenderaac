@@ -19,6 +19,7 @@
 		{ key: 'vocation', label: 'Vocation' },
 	] as const;
 	$: classic = $page.data.selectedTheme === 'classic';
+	let nextOrder: Order;
 	$: nextOrder = order === 'asc' ? 'desc' : 'asc';
 	$: arrow =
 		$page.data.themeAssets?.[

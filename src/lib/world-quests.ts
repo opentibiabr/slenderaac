@@ -1,13 +1,29 @@
 export type QuestKind = 'event' | 'task';
 export type QuestOutcome = 'success' | 'failure';
 
+type QuestInput = {
+	slug: string;
+	name: string;
+	description: string;
+	kind: QuestKind;
+	sort_order: number;
+	published: boolean;
+};
+
+type QuestResultInput = {
+	outcome: QuestOutcome;
+	occurred_at: Date;
+	schedule_event_id: string | null;
+	published: boolean;
+};
+
 export function questHref(slug?: string): string {
 	return slug
 		? `/library/world-quests?${new URLSearchParams({ worldquest: slug }).toString()}`
 		: '/library/world-quests';
 }
 
-export function questInput(form: FormData) {
+export function questInput(form: FormData): QuestInput | null {
 	const slug = String(form.get('slug') ?? '')
 		.trim()
 		.toLowerCase();
@@ -38,7 +54,10 @@ export function questInput(form: FormData) {
 	};
 }
 
-export function questResultInput(form: FormData, now = new Date()) {
+export function questResultInput(
+	form: FormData,
+	now = new Date(),
+): QuestResultInput | null {
 	const outcome = form.get('outcome');
 	const stamp = String(form.get('occurred_at') ?? '');
 	if (

@@ -41,6 +41,9 @@
 		class="modal-backdrop fixed inset-0 bg-surface-backdrop-token w-full h-full max-w-none max-h-none m-0 p-0 border-0 flex items-center justify-center"
 		aria-label={title}
 		on:click|self={close}
+		on:keydown={(event) => {
+			if (event.key === 'Escape') close();
+		}}
 		on:cancel|preventDefault={close}
 		transition:fade
 		use:openDialog>
