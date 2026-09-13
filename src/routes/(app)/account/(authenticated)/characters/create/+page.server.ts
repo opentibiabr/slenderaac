@@ -17,8 +17,8 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (() => {
-	return { availableTowns: getAvailableTowns() };
+export const load = (async () => {
+	return { availableTowns: await getAvailableTowns() };
 }) satisfies PageServerLoad;
 
 export const actions = {

@@ -48,7 +48,7 @@ export const load = (async ({ params }) => {
 			error: $_('characters-not-found', { values: { name: params.name } }),
 		};
 	}
-	const town = await prisma.towns.findUniqueOrThrow({
+	const town = await prisma.towns.findUnique({
 		where: { id: player?.town_id },
 		select: { name: true },
 	});
@@ -82,7 +82,7 @@ export const load = (async ({ params }) => {
 			).map(dbToItem);
 
 	return {
-		character: dbToPlayer({ ...player, town: town }),
+		character: dbToPlayer({ ...player, town: town ?? undefined }),
 		deaths: player.deaths,
 		balance: showInventory ? player.balance : null,
 		skills: showSkills ? dbToSkills(player) : null,

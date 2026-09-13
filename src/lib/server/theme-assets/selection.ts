@@ -7,6 +7,15 @@ export function isThemeSwitchingEnabled(value: string | undefined): boolean {
 	return !value?.trim() || value.trim().toLowerCase() === 'true';
 }
 
+export function themePreferenceUpdate(
+	allowSwitching: boolean,
+	url: URL,
+): ThemeId | null | undefined {
+	if (!allowSwitching) return null;
+	const preview = url.searchParams.get('themePreview');
+	return isThemeId(preview) ? preview : undefined;
+}
+
 export async function resolveThemeSelection(
 	{
 		configuredTheme,

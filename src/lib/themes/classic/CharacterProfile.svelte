@@ -38,7 +38,10 @@
 						>{vocationString(character.vocation)}</td
 					></tr>
 				<tr><th scope="row">Level:</th><td>{character.level}</td></tr>
-				<tr><th scope="row">Residence:</th><td>{character.townName}</td></tr>
+				<tr
+					><th scope="row">Residence:</th><td
+						>{character.townName ?? 'Unknown'}</td
+					></tr>
 				<tr
 					><th scope="row">Achievement Points:</th><td
 						>{data.achievementPoints ?? 'Unavailable'}</td

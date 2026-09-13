@@ -4,7 +4,11 @@ import { test } from 'node:test';
 import { themeSelectionHref } from '$lib/themes/preview';
 import { isThemeId, type ThemeId } from '$lib/themes/theme-ids';
 
-import { isThemeSwitchingEnabled, resolveThemeSelection } from './selection';
+import {
+	isThemeSwitchingEnabled,
+	resolveThemeSelection,
+	themePreferenceUpdate,
+} from './selection';
 
 const resolveId = (value: unknown): Promise<ThemeId | null> =>
 	Promise.resolve(
@@ -17,6 +21,25 @@ void test('switching defaults to enabled and an invalid explicit flag fails clos
 		assert.equal(isThemeSwitchingEnabled(value), true);
 	for (const value of ['false', ' FALSE ', '0', 'tru'])
 		assert.equal(isThemeSwitchingEnabled(value), false);
+});
+
+void test('preference updates are synchronous and accept only canonical previews', () => {
+	assert.equal(
+		themePreferenceUpdate(true, url('/?themePreview=classic')),
+		'classic',
+	);
+	assert.equal(
+		themePreferenceUpdate(true, url('/?themePreview=legacy-classic')),
+		undefined,
+	);
+	assert.equal(
+		themePreferenceUpdate(true, url('/?themePreview=unknown')),
+		undefined,
+	);
+	assert.equal(
+		themePreferenceUpdate(false, url('/?themePreview=classic')),
+		null,
+	);
 });
 
 void test('explicit selection overrides the session preference and server default', async () => {

@@ -91,7 +91,7 @@
 			{/if}
 			<div class="data-row">
 				<dt>{$_('residence')}</dt>
-				<dd>{character.townName}</dd>
+				<dd>{character.townName ?? 'Unknown'}</dd>
 			</div>
 			<div class="data-row">
 				<dt>{$_('last-login')}</dt>
