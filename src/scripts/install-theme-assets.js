@@ -1,3 +1,4 @@
+// @ts-nocheck -- This standalone Node.js installer is validated by its integration tests.
 import { createHash, randomUUID } from 'node:crypto';
 import { createWriteStream } from 'node:fs';
 import {

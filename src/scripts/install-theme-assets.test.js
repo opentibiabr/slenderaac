@@ -1,3 +1,4 @@
+// @ts-nocheck -- Test fixtures intentionally use compact dynamic JavaScript objects.
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import {
