@@ -54,7 +54,11 @@ export async function storeImage(
 				const tag = value.trim().replace(/^W\//, '');
 				return tag === '*' || tag === etag;
 			});
-		return new Response(matches ? null : bytes, {
+		const body = bytes.buffer.slice(
+			bytes.byteOffset,
+			bytes.byteOffset + bytes.byteLength,
+		) as ArrayBuffer;
+		return new Response(matches ? null : body, {
 			status: matches ? 304 : 200,
 			headers,
 		});

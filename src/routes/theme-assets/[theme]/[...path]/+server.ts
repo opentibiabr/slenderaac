@@ -90,7 +90,12 @@ export const GET: RequestHandler = async ({ params, request, url }) => {
 			? 'public, max-age=31536000, immutable'
 			: 'public, max-age=300';
 
-		return new Response(await fs.readFile(fileReal), {
+		const bytes = await fs.readFile(fileReal);
+		const body = bytes.buffer.slice(
+			bytes.byteOffset,
+			bytes.byteOffset + bytes.byteLength,
+		) as ArrayBuffer;
+		return new Response(body, {
 			headers: {
 				'Cache-Control': cacheControl,
 				ETag: etag,

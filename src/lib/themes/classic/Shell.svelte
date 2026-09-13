@@ -344,7 +344,7 @@
 	$: promoFansitesBox = classicAsset(data.themeAssets, 'promoFansitesBox');
 	$: fansiteLogoFrame = classicAsset(data.themeAssets, 'fansiteLogoFrame');
 	$: fansiteLogo = data.featuredFansite?.logoAsset
-		? classicAsset(data.themeAssets, data.featuredFansite.logoAsset)
+		? (data.themeAssets?.[data.featuredFansite.logoAsset] ?? null)
 		: null;
 	$: fansiteButtonBackground = classicAsset(
 		data.themeAssets,
