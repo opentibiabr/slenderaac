@@ -44,4 +44,8 @@ void test('native modules and configured downloads replace only their owned navi
 		navigation.library.find((entry) => entry.label === 'Spells')?.href,
 		'/library/spells',
 	);
+	assert.equal(
+		navigation.library.find((entry) => entry.label === 'Genesis')?.href,
+		'/library/genesis',
+	);
 });

@@ -3,7 +3,7 @@
 Track the remaining website pages and the work needed to complete each one.
 Classic and Legbone share routes, data, validation and permissions.
 
-**Completed in the latest pass:** FAQ, Parents' Guide and Legal Documents.
+**Completed in the latest pass:** FAQ, Parents' Guide, Legal Documents and Genesis.
 
 **Next priority:** simple website pages that need no gameplay changes.
 
@@ -51,7 +51,7 @@ criteria.
 
 ### Content and downloads
 
-- [ ] **Genesis** — publish the operator's story and chapters.
+- [x] **Genesis** — publish the operator's story and chapters.
 - [ ] **Fankit** — offer curated artwork in a maintained download.
 - [ ] **Soundtrack** — play the operator's published audio tracks.
 - [ ] **Maps** — display the configured map with town and floor selection.
@@ -63,6 +63,12 @@ criteria.
 
 **Complete when:** edits persist, chapter and fragment links work, empty content
 has a clear state, and pages reuse the shared document layout.
+
+Create chapters in **Admin → Static Pages** with reserved slugs such as
+`genesis-1`, `genesis-2` and `genesis-3`. Their normal publisher order defines
+the public chapter order. The website keeps these records out of the generic
+static-page menu and publishes them at `/library/genesis`; the title and Markdoc
+body accept `{{serverName}}` and `{{serverWebsite}}` display placeholders.
 
 </details>
 

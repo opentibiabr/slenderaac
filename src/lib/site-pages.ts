@@ -126,6 +126,13 @@ export const featurePages: Record<string, FeaturePage> = {
 		section: 'library',
 		headline: 'headlineExperienceTable',
 	},
+	genesis: {
+		path: '/library/genesis',
+		title: 'Genesis',
+		section: 'library',
+		headline: 'headlineGenesis',
+		queryKeys: ['page'],
+	},
 };
 
 /** Update obsolete menu aliases without changing the standalone route. */

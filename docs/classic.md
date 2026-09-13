@@ -514,6 +514,12 @@ visual or functional parity of every page.
 `src/lib/information.ts` registers native destinations. The shared link helper
 maps matching official URLs to these routes and preserves query parameters,
 anchors and preview flags. Menu groups expand for the active information page.
+Genesis chapters reuse the static-page publisher through reserved `genesis-N`
+slugs. Both themes render the same stored Markdoc, while Classic supplies the
+document headline, compact typography, drop capitals and previous/next chapter
+navigation. Invalid chapter numbers return 404 and a missing chapter catalog
+stays an explicit operator-content state.
+
 Additional pages should extend this catalog and reuse the document renderer and
 frame rather than add parallel loaders or copy source HTML into the repository.
 

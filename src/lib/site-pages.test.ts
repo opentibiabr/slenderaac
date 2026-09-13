@@ -76,4 +76,10 @@ void test('native catalog links retain selection and filters while dropping unkn
 		),
 		'/library/spells?themePreview=classic',
 	);
+	assert.equal(
+		referenceSiteDestination(
+			new URL('https://game.example/library/?subtopic=genesis&page=2'),
+		),
+		'/library/genesis?page=2',
+	);
 });
