@@ -53,40 +53,53 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 	);
 	if (redirectTo) throw redirect(307, redirectTo);
 
-	const highscores = await prisma.players.findMany({
-		where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
-		select: PlayerSelectForList,
-		orderBy: { experience: 'desc' },
-		take: 5,
-	});
-
-	const { boostedBoss, boostedCreature } = await loadBoostedSelections();
-	const staticPages = await prisma.staticPage.findMany({
-		where: {
-			hide: false,
-			NOT: [
-				{ slug: { startsWith: 'genesis-' } },
-				{ slug: { equals: 'fankit' } },
-				{ slug: { equals: 'soundtrack' } },
-				{ slug: { equals: 'maps' } },
-			],
-		},
-		orderBy: { order: 'asc' },
-	});
-
-	const accountCharacters = locals.session?.accountId
-		? await prisma.players.findMany({
-				where: { account_id: locals.session.accountId },
-				select: PlayerSelectForList,
-			})
-		: null;
-
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
 	const isAdmin = locals.session?.type === AccountType.God;
-	const classicAssetMetadata = await loadThemeAssetMetadata('classic');
-	const screenshotGallery =
-		(await loadInformationPresentation('classic', 'screenshots'))?.gallery ??
-		null;
+	const [
+		highscores,
+		{ boostedBoss, boostedCreature },
+		staticPages,
+		accountCharacters,
+		classicAssetMetadata,
+		informationPresentation,
+		selectedFansite,
+		selectedPoll,
+		selectedServerName,
+		classicPresentation,
+	] = await Promise.all([
+		prisma.players.findMany({
+			where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
+			select: PlayerSelectForList,
+			orderBy: { experience: 'desc' },
+			take: 5,
+		}),
+		loadBoostedSelections(),
+		prisma.staticPage.findMany({
+			where: {
+				hide: false,
+				NOT: [
+					{ slug: { startsWith: 'genesis-' } },
+					{ slug: { equals: 'fankit' } },
+					{ slug: { equals: 'soundtrack' } },
+					{ slug: { equals: 'maps' } },
+				],
+			},
+			orderBy: { order: 'asc' },
+		}),
+		locals.session?.accountId
+			? prisma.players.findMany({
+					where: { account_id: locals.session.accountId },
+					select: PlayerSelectForList,
+				})
+			: Promise.resolve(null),
+		loadThemeAssetMetadata('classic'),
+		loadInformationPresentation('classic', 'screenshots'),
+		featuredFansite(),
+		currentPoll(),
+		serverName(),
+		loadPresentationReference(selectedTheme),
+	]);
+	const screenshotGallery = informationPresentation?.gallery ?? null;
 	const themeAssetMetadata =
 		selectedTheme === 'classic'
 			? classicAssetMetadata
@@ -94,13 +107,13 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 
 	return {
 		siteLinks,
-		featuredFansite: await featuredFansite(),
-		currentPoll: await currentPoll(),
-		serverName: await serverName(),
+		featuredFansite: selectedFansite,
+		currentPoll: selectedPoll,
+		serverName: selectedServerName,
 		serverLogo: classicAssetMetadata.assets.serverLogo ?? null,
 		screenshotGallery,
 		featuredScreenshot: dailyScreenshot(screenshotGallery?.items ?? []),
-		classicPresentation: await loadPresentationReference(selectedTheme),
+		classicPresentation,
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,
 		boostedCreature,

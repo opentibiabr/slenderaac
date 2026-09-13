@@ -3,6 +3,21 @@ import { defineConfig, type PluginOption } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit() as PluginOption],
+	server: {
+		warmup: {
+			clientFiles: [
+				'./src/routes/(app)/+layout.svelte',
+				'./src/routes/(app)/+page.svelte',
+				'./src/lib/themes/classic/Shell.svelte',
+				'./src/lib/themes/legbone/Shell.svelte',
+			],
+			ssrFiles: [
+				'./src/routes/(app)/+layout.server.ts',
+				'./src/routes/(app)/+page.server.ts',
+				'./src/routes/api/boosted/+server.ts',
+			],
+		},
+	},
 	optimizeDeps: {
 		exclude: [
 			'codemirror',
