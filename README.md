@@ -67,6 +67,13 @@ Pass Vite network options after `--` when a specific address or port is needed:
 npm run dev -- --host 127.0.0.1 --port 80
 ```
 
+In Windows PowerShell, call the command shim explicitly so option names reach
+Vite unchanged:
+
+```powershell
+npm.cmd run dev -- --host 127.0.0.1 --port 80
+```
+
 </details>
 
 <details>
