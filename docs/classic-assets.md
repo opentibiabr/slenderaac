@@ -7,18 +7,18 @@ reference website, export pages, or import news to install the published images.
 
 ## One-command installation
 
-Use a SlenderAAC checkout that includes Classic and Python **3.10 or newer**.
-Update the application checkout first: the installer updates artwork, not application
-code. Store installation requires the external store route included in the updated
-checkout; an older version is rejected before any files are moved. Deploy the updated
-application code through your normal workflow before restarting a production service.
-From the application root, run:
+Use an updated SlenderAAC checkout and install its dependencies first. The installer
+updates artwork, not application code. Store installation requires the external store
+route included in the updated checkout; an older version is rejected before any files
+are moved. Deploy the updated application code through your normal workflow before
+restarting a production service. From the application root, run:
 
 ```sh
-python src/scripts/theme_assets.py install
+git pull
+bun install --frozen-lockfile
+npm run install:assets
 ```
 
-On systems where Python is named `python3`, use that command instead of `python`.
 The installer:
 
 - downloads all four packages from the SlenderAAC release channel, with no provider-site fallback;
@@ -28,6 +28,12 @@ The installer:
 - verifies every selected package before activating any of them;
 - keeps the existing default layout and switcher setting, adding Classic/true only when absent.
 
+The first run downloads about one release archive per package and expands tens of
+thousands of small image files. It can take several minutes on a slower connection or
+disk. Progress is printed while each download runs and again when validation/staging
+starts. This does not change the development command: restart the website afterwards
+with `npm run dev`, or use the service command from your deployment.
+
 Restart the website process, then choose **Layout → Classic**. To make Classic
 the default, set `SLENDER_THEME=classic` in `.env` before restarting. Changing the
 layout menu itself does not download the package.
@@ -35,15 +41,19 @@ layout menu itself does not download the package.
 To choose another external directory:
 
 ```sh
-python src/scripts/theme_assets.py install --root ../theme-assets
+npm run install:assets -- --root ../theme-assets
 ```
 
 To install only selected packages (for example, to keep customized Classic artwork):
 
 ```sh
-python src/scripts/theme_assets.py install --packs outfits items store
-python src/scripts/theme_assets.py install --packs classic
+npm run install:assets -- --packs outfits items store
+npm run install:assets -- --packs classic
 ```
+
+In PowerShell, use `npm.cmd` instead of the `npm` PowerShell shim when passing
+options, for example `npm.cmd run install:assets -- --packs classic`. The default
+all-package command has no extra options and works as shown above.
 
 The resulting directory is:
 
@@ -93,7 +103,10 @@ a build, database migration, content import or restart command.
 - [Store ZIP](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/store.zip)
 - [Standalone installer](https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-latest/install-classic-assets.py)
 
-The standalone script works with `python install-classic-assets.py install --app <application-directory>`.
+The standalone script works with Python 3.10+ and
+`python install-classic-assets.py install --app <application-directory>`. It remains
+available for recovery or hosts where application dependencies have not been installed;
+the package task is the normal checkout workflow.
 The standalone filename is retained for existing links; it now installs all four
 packages by default. Each ZIP also has a matching `.zip.sha256` attachment.
 For manual installation, extract selected ZIPs outside the checkout, set their

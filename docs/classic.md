@@ -789,10 +789,11 @@ Do not let the inline image baseline increase the 64px detail heading to 67px.
 
 ## Publishing the fixed asset channel
 
-The installer and publication helper live in `src/scripts/theme_assets.py` and
-require Python 3.10+. Installation does not require GitHub authentication. The
-`publish` subcommand is for maintainers and additionally requires an authenticated
-GitHub CLI with release-write permission.
+The checkout installer runs through `npm run install:assets` and does not require
+GitHub authentication. It uses the Node.js dependencies already installed for the
+application. The publication helper remains in `src/scripts/theme_assets.py`, requires
+Python 3.10+, and additionally requires an authenticated GitHub CLI with release-write
+permission.
 
 Prepare and validate a public ZIP with the external updater first. Include the
 current installer in `tools/install-classic-assets.py` and keep its README current;
@@ -818,7 +819,13 @@ an existing Git tag. Keep old versioned releases for reproducible installs and
 rollback. The fixed channel is an explicit maintained selection; publishing an
 unrelated application or optional-artwork release must not change it.
 
-Run the installer/publication contract tests without network or database access:
+Run the checkout installer contract tests without network or database access:
+
+```sh
+npm run test:assets
+```
+
+Run the standalone installer and publication contract tests separately:
 
 ```sh
 python -m unittest discover -s src/scripts -p test_theme_assets.py

@@ -456,8 +456,8 @@ def publish(args) -> None:
         notes = stage / "notes.md"
         notes.write_text(
             "Fixed download channel for Classic, animated outfits, animated items and game-store images.\n\n"
-            "From the application root, with Python 3.10+: `python src/scripts/theme_assets.py install`. "
-            "Use `install --packs classic` or `install --packs outfits items store` to select packages. "
+            "From an application checkout with dependencies installed: `npm run install:assets`. "
+            "Use `npm run install:assets -- --packs classic` or append `--packs outfits items store` to select packages. "
             "Or download `install-classic-assets.py` and use `install --app <application-directory>`.\n\n"
             "Each package has a fixed ZIP and SHA-256 attachment, plus a JSON pointer to an immutable versioned archive. "
             "All installation downloads stay in this repository's releases. Existing directories are backed up, "
