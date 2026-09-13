@@ -75,7 +75,12 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 		informationPresentation: presentation,
 		library: isLibrary
 			? {
-					entries: entries.map(({ id, name }) => ({ id, name })),
+					entries: entries.map(({ id, name, raceId, bossRaceId }) => ({
+						id,
+						name,
+						raceId,
+						bossRaceId,
+					})),
 					selected,
 					artwork,
 					boosted: {

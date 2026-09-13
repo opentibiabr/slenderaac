@@ -24,6 +24,7 @@
 	import { page } from '$app/stores';
 
 	import ProgressBar from '$lib/components/ui/ProgressBar.svelte';
+	import { boostedStatus } from '$lib/stores/boosted';
 	import { loading } from '$lib/stores/loading';
 	import { themePreviewHref } from '$lib/themes/preview';
 	import { themeRegistry } from '$lib/themes/registry';
@@ -44,6 +45,15 @@
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: selectedTheme = normalizeTheme(data.selectedTheme);
 	$: activeTheme = themeRegistry[selectedTheme] ?? themeRegistry.legbone;
+	$: liveBoosted = $boostedStatus?.selections;
+	$: shellData = {
+		...data,
+		boostedCreature: liveBoosted
+			? liveBoosted.boostedCreature
+			: data.boostedCreature,
+		boostedBoss: liveBoosted ? liveBoosted.boostedBoss : data.boostedBoss,
+		boostedDataStale: $boostedStatus?.stale ?? false,
+	};
 
 	const flash = getFlash(page);
 
@@ -92,7 +102,7 @@
 	<Toast />
 {/if}
 
-<svelte:component this={activeTheme.Shell} {data}>
+<svelte:component this={activeTheme.Shell} data={shellData}>
 	<slot />
 </svelte:component>
 

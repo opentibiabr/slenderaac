@@ -13,6 +13,7 @@
 		id: string | null;
 		outfit: BoostedProps | null;
 	};
+	export let stale = false;
 </script>
 
 <div class="library-boosted">
@@ -35,6 +36,8 @@
 							`/library/creatures?race=${encodeURIComponent(boosted.id)}`,
 						)}>{boosted.name}</a
 					>{:else}{boosted.name ?? 'None'}{/if}
+				{#if stale}
+					<span>Update unavailable.</span>{/if}
 			</p>
 			<p>
 				The daily selection shown here comes from this server. Available bonuses

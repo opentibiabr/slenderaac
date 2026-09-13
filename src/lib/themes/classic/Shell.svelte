@@ -38,6 +38,7 @@
 		selectedTheme?: string;
 		themeAssets?: Record<string, string | undefined>;
 		themeAssetWarning?: string | null;
+		boostedDataStale?: boolean;
 	};
 
 	type ClassicNewsArticle = {
@@ -914,8 +915,8 @@
 				{/if}
 				{#each boostedEntries as { kind, boosted, href } (kind)}
 					{@const label = boosted?.boostname
-						? `Today's boosted ${kind}: ${boosted.boostname}`
-						: `No boosted ${kind} selected`}
+						? `Today's boosted ${kind}: ${boosted.boostname}${data.boostedDataStale ? ' (update unavailable)' : ''}`
+						: `No boosted ${kind} selected${data.boostedDataStale ? ' (update unavailable)' : ''}`}
 					<a
 						class="theme-classic__right-boost"
 						class:theme-classic__right-boost--creature={kind === 'creature'}

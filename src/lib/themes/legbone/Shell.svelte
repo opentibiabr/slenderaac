@@ -37,7 +37,10 @@
 
 	const drawerStore = getDrawerStore();
 
-	export let data: LayoutData & { selectedTheme?: string };
+	export let data: LayoutData & {
+		selectedTheme?: string;
+		boostedDataStale?: boolean;
+	};
 
 	$: ({
 		highscores,
@@ -49,6 +52,7 @@
 	} = data);
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: staticPages = data.staticPages;
+	$: boostedDataStale = data.boostedDataStale ?? false;
 
 	function drawerOpen(): void {
 		drawerStore.open({});
@@ -97,7 +101,10 @@
 			bgBackdrop="bg-tertiary-900/50 backdrop-blur-sm">
 			<div class="flex flex-col items-stretch gap-2 p-2 pt-4">
 				<SidebarLeft {isLoggedIn} {staticPages} />
-				<BoostedSection {boostedCreature} {boostedBoss} />
+				<BoostedSection
+					{boostedCreature}
+					{boostedBoss}
+					stale={boostedDataStale} />
 				<SidebarRight {accountCharacters} {highscores} />
 			</div>
 		</Drawer>
@@ -127,7 +134,10 @@
 					</div>
 					<svelte:fragment slot="trail">
 						<div class="hidden md:block w-48">
-							<BoostedSection {boostedCreature} {boostedBoss} />
+							<BoostedSection
+								{boostedCreature}
+								{boostedBoss}
+								stale={boostedDataStale} />
 						</div>
 						<div class="block md:hidden">
 							<LightSwitch />

@@ -96,7 +96,15 @@ must not override a daily selection or fill an empty one. Missing sprites stop
 loading and leave the selected name visible. Without catalog data, these routes
 retain an honest local empty state.
 
-The Classic header also reads the daily selections from the shared layout load.
+The shared browser store reads the current selection immediately, then checks the
+dedicated non-cached endpoint every five minutes. This follows the server's daily
+rotation without retaining the first layout snapshot for the rest of a browser
+session or reloading the complete layout. Classic, Legbone and open creature
+catalog pages consume the same store. A failed refresh retains the previous
+selection as stale and identifies the update failure without moving its artwork
+slot.
+
+The Classic header first renders the daily selections from the shared layout load.
 It uses `AnimatedOutfit` and `/api/outfits`, just like Legbone, while the external
 theme pack supplies the pedestal artwork. Captured `rightCreature` and `rightBoss`
 images must never override the server's selections. Configure `OUTFIT_ASSETS_ROOT`

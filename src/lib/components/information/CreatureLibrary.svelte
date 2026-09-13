@@ -4,12 +4,18 @@
 	import type { BoostedProps } from '$lib/boosted';
 	import CatalogHeading from '$lib/components/ui/CatalogHeading.svelte';
 	import CatalogNavigation from '$lib/components/ui/CatalogNavigation.svelte';
-	import { type CreatureRecord, creatureSentences } from '$lib/creatures';
+	import {
+		boostedCatalogEntry,
+		type CreatureCatalogIdentity,
+		type CreatureRecord,
+		creatureSentences,
+	} from '$lib/creatures';
+	import { boostedStatus } from '$lib/stores/boosted';
 	import { themePreviewHref } from '$lib/themes/preview';
 
 	import LibraryBoosted from './LibraryBoosted.svelte';
 
-	export let entries: { id: string; name: string }[];
+	export let entries: CreatureCatalogIdentity[];
 	export let selected: CreatureRecord | null = null;
 	export let boss = false;
 	export let boosted: {
@@ -19,6 +25,23 @@
 	};
 	export let artwork: Record<string, string> | null = null;
 	$: assets = artwork ?? $page.data.themeAssets;
+	$: liveSelections = $boostedStatus?.selections;
+	$: currentOutfit = liveSelections
+		? boss
+			? liveSelections.boostedBoss
+			: liveSelections.boostedCreature
+		: boosted.outfit;
+	$: currentEntry = boostedCatalogEntry(
+		entries,
+		currentOutfit?.boostname ?? null,
+		Number(currentOutfit?.raceid),
+		boss,
+	);
+	$: currentBoosted = {
+		name: currentOutfit?.boostname ?? null,
+		id: currentEntry?.id ?? null,
+		outfit: currentOutfit,
+	};
 	$: index = selected
 		? entries.findIndex((entry) => entry.id === selected?.id)
 		: -1;
@@ -44,7 +67,11 @@
 		</div>
 	</div>
 {:else}
-	<LibraryBoosted {assets} {boss} {boosted} />
+	<LibraryBoosted
+		{assets}
+		{boss}
+		boosted={currentBoosted}
+		stale={$boostedStatus?.stale ?? false} />
 	{#if entries.length}
 		<div class="creature-catalog">
 			{#each entries as entry}

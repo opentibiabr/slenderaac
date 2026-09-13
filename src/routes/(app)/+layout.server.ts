@@ -4,6 +4,7 @@ import { loadFlashMessage } from 'sveltekit-flash-message/server';
 import { AccountType } from '$lib/accounts';
 import { dailyScreenshot } from '$lib/gallery';
 import { PlayerGroup } from '$lib/players';
+import { loadBoostedSelections } from '$lib/server/boosted';
 import { siteLinks, themeSwitcherEnabled } from '$lib/server/config';
 import { featuredFansite } from '$lib/server/directories';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
@@ -56,8 +57,7 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		take: 5,
 	});
 
-	const boostedBoss = await prisma.boostedBoss.findFirst();
-	const boostedCreature = await prisma.boostedCreature.findFirst();
+	const { boostedBoss, boostedCreature } = await loadBoostedSelections();
 	const staticPages = await prisma.staticPage.findMany({
 		where: { hide: false },
 		orderBy: { order: 'asc' },

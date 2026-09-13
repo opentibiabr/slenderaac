@@ -147,13 +147,18 @@ export function creatureCatalog(records: CreatureRecord[], boss = false) {
 }
 
 /** Race IDs may be shared by variants; only a unique match can resolve by ID. */
-export function boostedCatalogEntry(
-	records: CreatureRecord[],
+export type CreatureCatalogIdentity = Pick<
+	CreatureRecord,
+	'id' | 'name' | 'raceId' | 'bossRaceId'
+>;
+
+export function boostedCatalogEntry<T extends CreatureCatalogIdentity>(
+	records: T[],
 	name: string | null,
 	raceId?: number,
 	boss = false,
-) {
-	const identity = (entry: CreatureRecord) =>
+): T | null {
+	const identity = (entry: CreatureCatalogIdentity) =>
 		boss ? entry.bossRaceId : entry.raceId;
 	const named =
 		name &&
