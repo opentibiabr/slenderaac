@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte';
+	import type { ComponentType } from 'svelte';
 	import {
 		type Config as MarkdocConfig,
 		default as Markdoc,
@@ -13,8 +13,6 @@
 	import { PUBLIC_BASE_URL, PUBLIC_TITLE } from '$env/static/public';
 
 	import Tags from './Tags.svelte';
-
-	type ComponentType = typeof Callout | typeof Col | typeof Row;
 
 	const defaultConfig = {
 		tags: {

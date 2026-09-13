@@ -95,7 +95,7 @@ export async function getTemplate(vocation: PlayerVocation): Promise<Players> {
 					manamax: 55,
 					cap: 400,
 					town_id: 3,
-			  }
+				}
 			: {
 					level: 8,
 					health: 185,
@@ -105,7 +105,7 @@ export async function getTemplate(vocation: PlayerVocation): Promise<Players> {
 					manamax: 90,
 					cap: 470,
 					town_id: 8,
-			  };
+				};
 
 	return await prisma.players.create({
 		data: {
@@ -226,7 +226,16 @@ export function dbToPlayer(
 	player: Partial<PlayerWithData> & PlayerWithoutOptionals,
 ): Player {
 	return {
-		...player,
+		id: player.id,
+		name: player.name,
+		level: player.level,
+		experience: player.experience,
+		looktype: player.looktype,
+		lookaddons: player.lookaddons,
+		lookhead: player.lookhead,
+		lookbody: player.lookbody,
+		looklegs: player.looklegs,
+		lookfeet: player.lookfeet,
 		deletion:
 			player.deletion && player.deletion > 0
 				? parseDate(player.deletion)
@@ -249,7 +258,7 @@ export function dbToPlayer(
 					nick: player.guild_membership.nick,
 					name: player.guild_membership.guild.name,
 					rank: player.guild_membership.rank.name,
-			  }
+				}
 			: null,
 		guildInvtes: player.guild_invites
 			? player.guild_invites.map((invite) => invite.guild.name)

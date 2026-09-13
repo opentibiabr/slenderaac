@@ -12,42 +12,37 @@
 	import { _ } from 'svelte-i18n';
 
 	import { invalidate } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
+	import {
+		MAX_CONFIRMATION_ATTEMPTS,
+		pollOrderConfirmation,
+	} from '$lib/order-confirmation';
 	import { CoinOrderStatus } from '$lib/shop';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import { PUBLIC_SUPPORT_EMAIL, PUBLIC_TITLE } from '$env/static/public';
 
 	export let status: CoinOrderStatus;
 	export let amount: number;
 
-	const MAX_TRIES = 10;
 	let tries = 0;
 
-	onMount(() => {
-		const interval = setInterval(async () => {
-			await invalidate('shop:order');
-			tries++;
-			if (
-				status === CoinOrderStatus.COMPLETED ||
-				status === CoinOrderStatus.CANCELED ||
-				tries >= MAX_TRIES
-			) {
-				clearInterval(interval);
-			}
-		}, 1000);
-
-		return () => {
-			clearInterval(interval);
-		};
-	});
+	onMount(() =>
+		pollOrderConfirmation(
+			() => invalidate('shop:order'),
+			() => nonFinalStatus.includes(status),
+			(attempts) => (tries = attempts),
+		),
+	);
 
 	const nonFinalStatus: CoinOrderStatus[] = [
 		CoinOrderStatus.PENDING,
 		CoinOrderStatus.FAILED_ATTEMPT,
 	];
 	$: isFinal = !nonFinalStatus.includes(status);
-	$: processing = !isFinal && tries < MAX_TRIES;
+	$: processing = !isFinal && tries < MAX_CONFIRMATION_ATTEMPTS;
 
 	$: headerText = {
 		[CoinOrderStatus.PENDING]: processing
@@ -121,8 +116,11 @@
 		{/if}
 	</div>
 	<div class="flex flex-row w-full justify-between gap-2">
-		<Button href="/shop/coins" color="base" class="whitespace-normal"
-			>{$_('shop.goback')}</Button>
-		<Button href="/account">{$_('my-account')}</Button>
+		<Button
+			href={themePreviewHref($page.url, '/shop/coins')}
+			color="base"
+			class="whitespace-normal">{$_('shop.goback')}</Button>
+		<Button href={themePreviewHref($page.url, '/account')}
+			>{$_('my-account')}</Button>
 	</div>
 {/if}

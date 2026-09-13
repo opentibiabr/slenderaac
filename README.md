@@ -2,7 +2,17 @@
 
 This project is a website for the [Canary](https://github.com/opentibiabr/canary) project. The main goal is to use modern technology to have something that is easy to maintain and extend. It is also meant to be efficient, secure and easy to deploy.
 
-[Features / Roadmap](https://github.com/luan/slenderaac/issues/24)
+## Website roadmap
+
+FAQ, Parents' Guide and Legal Documents are implemented in Classic and Legbone.
+The next priority is website-only work, followed by modules that need game rules
+or authoritative server integration.
+
+- [Page roadmap — status, priorities and expandable details](docs/page-roadmap.md)
+- [Support pages — setup and content editing](docs/support.md)
+- [Feature discussion](https://github.com/luan/slenderaac/issues/24)
+
+---
 
 <details>
 <summary><h2>Getting started</h2></summary>
@@ -32,6 +42,13 @@ bun migrate:resolve
 bun migrate
 bun generate
 ```
+
+Latest News, News Archive, Event Schedule and their administrative editors are
+included in this setup and available in the default theme. No separate page
+creation, theme assets or sample-content import is required. See
+[built-in news and events](docs/news.md) for routes and content management.
+The [support pages guide](docs/support.md) covers FAQ articles, the parents’ guide
+and operator-owned legal documents.
 
 ### Running
 
@@ -132,25 +149,165 @@ Using your favorite method to edit the client (see [this tutorial](https://docs.
 <details>
 <summary><h2>Animated outfits</h2></summary>
 
-You'll need to download the spritesheet from [here](https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#animated-items-and-outfits) and place it in `outfits_anim`. These assets are not included in the repository because they can cause the repo to bloat, and are also not release under the same license as the code.
+Run `python src/scripts/theme_assets.py install` from the application root to
+install Classic, outfits, items and store images together. To install only
+outfits, use `install --packs outfits`. The installer downloads the verified pack
+from the [SlenderAAC assets release](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest)
+and configures `OUTFIT_ASSETS_ROOT`. See the [mini tutorial](docs/classic-assets.md).
+Restart the website afterwards. Manual installations can still use the default
+`outfits_anim` directory; keep artwork outside version control.
+
+The renderer reads the requested outfit's PNG files directly. No generated metadata or cache marker is needed, and the sprite directory can be read-only. Replacing sprites takes effect on subsequent requests; browser responses are revalidated against their rendered content. Animations must contain consecutive frames starting at one, with at most 128 frames in a complete rider/mount loop. Missing optional outfits return `404` with no frames without interrupting character, account, or ranking pages. Invalid request parameters return `400`.
 
 </details>
 
 <details>
 <summary><h2>Inventory Items</h2></summary>
 
-You'll need to download the spritesheet from
-[here](https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#animated-items-and-outfits)
-the items in `items`. These assets are not included in the repository
-because they can cause the repo to bloat, and are also not release under the same license
-as the code.
+The same installer includes animated item GIFs. Use
+`python src/scripts/theme_assets.py install --packs items` for just this package.
+It configures `ITEM_ASSETS_ROOT` outside the checkout. Manual installations can
+still use `items`. Artwork is distributed through the same SlenderAAC release
+channel and remains separate from the application's code license.
+
+Item requests accept numeric identities and the existing empty-slot names. Missing
+or invalid optional images return a non-cacheable `404`; malformed identities
+return `400`. Successful responses revalidate their complete image and title, so
+replacing artwork or item names takes effect without restarting the app.
+The optional `appearances.dat` and `appearances.proto` files provide item titles.
+Missing or malformed title data leaves the image available with the client's
+numeric fallback label.
 
 </details>
 
 <details>
 <summary><h2>Game store assets</h2></summary>
 
-Anything you put into the `static` folder in this repo will be served by the server. This is useful for storing assets for the game store. For example, you can put a `static/images/store` folder and then reference the images in the store using `/images/store/my-image.png`. For instance, you can use the store assets made available in the [canary docs](https://docs.opentibiabr.com/others/downloads/website-applications/applications#store-for-client-13)
+Use `python src/scripts/theme_assets.py install --packs store` or the default
+all-package command. Store images are downloaded from the SlenderAAC release,
+installed outside the checkout and served through `/images/store/...` using
+`STORE_ASSETS_ROOT`. Existing `static/images/store` artwork is retained in an
+external backup. Set the game server's `coinImagesURL` to your website's
+`/images/store/` URL and restart the website after installation. See the
+[store setup and checks](docs/classic-assets.md#store-and-animation-checks).
+
+</details>
+
+<details>
+<summary><h2>Theme layouts and external asset packs</h2></summary>
+
+SlenderAAC supports server-side layout shells through the theme registry. The current themes are `legbone` and `classic`.
+
+See [Classic news layouts](docs/classic.md) for the shared page components, local content management, external pack updater and visual verification workflow.
+
+Use `SLENDER_THEME` to select the server-side layout shell:
+
+```env
+SLENDER_THEME=legbone
+```
+
+or:
+
+```env
+SLENDER_THEME=classic
+```
+
+The shared **Layout** menu is enabled by default, including when
+`SLENDER_THEME_SWITCHER_ENABLED` is absent. It switches between registered layouts
+on the current page, retaining filters and anchors. The choice persists for the
+browser session and applies to navigation and form submissions. A valid
+`themePreview` URL takes precedence over that preference; new browser sessions
+start with `SLENDER_THEME`.
+
+To hide the menu and enforce a single layout, set both values in `.env` and restart
+the app:
+
+```env
+SLENDER_THEME=classic
+SLENDER_THEME_SWITCHER_ENABLED=false
+```
+
+The server then ignores and clears the browser preference and removes preview
+parameters from page URLs. Direct preview URLs cannot bypass the lock. Use
+`true` to enable switching again; blank or absent values enable it, while other
+explicit values disable it.
+
+`PUBLIC_THEME` controls existing Skeleton/Tailwind colors, not layout selection.
+The server sends only the selected layout ID and whether switching is enabled;
+environment configuration remains private.
+
+### External assets
+
+For installation or updates, follow the [website assets mini tutorial](docs/classic-assets.md).
+With Python 3.10+ available, run this from the application root:
+
+```sh
+python src/scripts/theme_assets.py install
+```
+
+It downloads the [current Classic, outfit, item and store packages](https://github.com/opentibiabr/slenderaac/releases/tag/classic-assets-latest),
+verifies them, installs them outside the checkout and configures `.env`. Restart the
+website afterwards. Use `python3` instead of `python` if that is your runtime's name.
+
+Theme-specific binary assets must not be committed to this repository. Mount or deploy them outside the repo and point `THEME_ASSETS_ROOT` to that directory:
+
+```env
+THEME_ASSETS_ROOT=/var/lib/slender/theme-assets
+```
+
+Example `classic` asset pack layout:
+
+```text
+/var/lib/slender/theme-assets/classic/
+  manifest.json
+  images/
+  backgrounds/
+  buttons/
+  icons/
+  menu/
+  boxes/
+  frames/
+  content/
+  strings/
+  themeboxes/
+```
+
+`manifest.json` must include `schemaVersion`, `name`, `version`, and `assets`. `hashes` is optional.
+
+```json
+{
+	"schemaVersion": 1,
+	"name": "classic",
+	"version": "2026.05.26",
+	"assets": {
+		"logo": "images/logo.png",
+		"background": "backgrounds/background.webp",
+		"menuOrnament": "icons/menu-ornament.png",
+		"contentOrnament": "icons/content-ornament.png",
+		"themeBoxOrnament": "boxes/box-ornament.png"
+	},
+	"hashes": {
+		"images/logo.png": "sha256-example"
+	}
+}
+```
+
+Only `png`, `jpg`, `jpeg`, `gif`, `webp`, `ico`, and `ttf` files are served by `/theme-assets/[theme]/[...path]`. Asset paths are validated before public URLs are generated, and the endpoint rejects traversal, dotfiles, backslashes, null bytes, directories, blocked extensions, and symlinks that escape the theme root.
+
+`classic` works without an asset pack and falls back to neutral placeholders. Missing or invalid asset pack warnings are only shown to admins.
+
+The deployment operator is responsible for confirming asset rights and authorization. Keeping reference-style assets outside the MIT repository keeps the code repository clean, but it does not remove legal risk from deploying or distributing those assets.
+
+For local visual review, a `classic` pack can contain official/reference-style pieces such as the page background, logo, menu icons and labels, blue button sprites, content frame borders, news headline strips, topbar social/status icons, right-side theme boxes, trailer/screenshot previews, and shop/poll panels. These files must remain external to the repository. Before production distribution, either obtain authorization for those assets or replace/modify them with assets the deployment operator is allowed to use.
+
+### Acceptance checklist
+
+- `SLENDER_THEME=legbone` keeps the existing visual and flows.
+- `SLENDER_THEME=classic` works without external assets.
+- `SLENDER_THEME=classic` works with a mounted external asset pack.
+- Asset endpoint attacks using `..`, encoded traversal, backslashes, null bytes, dotfiles, symlink escape, directories, and blocked extensions fail.
+- No MyAAC PHP/Twig/CSS/JS is copied into this repository.
+- No reference-style binary assets are committed to this repository.
 
 </details>
 
@@ -223,6 +380,12 @@ https://github.com/luan/slenderaac/assets/223760/a2cb7aad-a3df-46a2-b284-1f38a91
 ## Contributing
 
 Contributions are welcome! Please open an issue or pull request. Be sure to post screenshots and logs of any issues you're having.
+
+Start with the [website and theme contracts](docs/theme-contracts.md) when adding
+or changing pages. They link the shared layout, native data, navigation, identity,
+asset delivery and verification rules. Follow the [UI state rules](docs/ui-states.md)
+for confirmed zero, empty results, offline services, unavailable data, errors and
+stale values in both layouts.
 
 ## License
 

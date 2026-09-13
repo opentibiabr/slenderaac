@@ -30,6 +30,8 @@
 				offerId={data.offerId} />
 		{/if}
 	{:else if step == 'confirmation' && data.order}
-		<Confirmation status={data.order.status} amount={data.order.amount} />
+		{#key data.token}
+			<Confirmation status={data.order.status} amount={data.order.amount} />
+		{/key}
 	{/if}
 </Steps>

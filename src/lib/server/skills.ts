@@ -1,38 +1,23 @@
-import { $_ } from '$lib/utils';
+const skillColumns = {
+	experience: 'experience',
+	magic: 'maglevel',
+	fist: 'skill_fist',
+	club: 'skill_club',
+	sword: 'skill_sword',
+	axe: 'skill_axe',
+	distance: 'skill_dist',
+	shielding: 'skill_shielding',
+	fishing: 'skill_fishing',
+	balance: 'balance',
+} as const;
 
-const skillColumns = [
-	'experience',
-	'maglevel',
-	'skill_fist',
-	'skill_club',
-	'skill_sword',
-	'skill_axe',
-	'skill_dist',
-	'skill_shielding',
-	'skill_fishing',
-	'balance',
-] as const;
-
-const skills = [
-	'experience',
-	'magic',
-	'fist',
-	'club',
-	'sword',
-	'axe',
-	'distance',
-	'shielding',
-	'fishing',
-	'balance',
-].map((skill) => $_(`skills.${skill}`).toLowerCase());
-
-type SkillColumn = (typeof skillColumns)[number];
-type Skill = (typeof skills)[number];
+type Skill = keyof typeof skillColumns;
+type SkillColumn = (typeof skillColumns)[Skill];
 
 export function isSkill(skill: string | null): skill is Skill {
-	return skills.includes(skill ?? '');
+	return skill !== null && Object.hasOwn(skillColumns, skill);
 }
 
 export function skillToColumn(skill: Skill): SkillColumn {
-	return skillColumns[skills.indexOf(skill)];
+	return skillColumns[skill];
 }

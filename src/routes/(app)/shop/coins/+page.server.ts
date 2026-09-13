@@ -12,6 +12,8 @@ import { enableStripeCheckout, enableStripeCustom } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
 import { stripe } from '$lib/server/stripe';
+import { serverName } from '$lib/server/worlds';
+import { themePreviewHref, themePreviewLoginHref } from '$lib/themes/preview';
 import { formatCurrency, groupBy } from '$lib/utils';
 
 import { PUBLIC_BASE_URL, PUBLIC_TITLE } from '$env/static/public';
@@ -26,7 +28,7 @@ const enabledPaymentMethods = [
 export const load = (async ({ locals, url, depends }) => {
 	depends('shop:order');
 
-	requireLogin(locals);
+	requireLogin(locals, '', themePreviewLoginHref(url));
 
 	const offers = groupBy(
 		(await prisma.coinOffers.findMany({ orderBy: { amount: 'asc' } })).map(
@@ -83,7 +85,7 @@ export const load = (async ({ locals, url, depends }) => {
 			order.status !== CoinOrderStatus.PENDING &&
 			order.status !== CoinOrderStatus.FAILED_ATTEMPT
 		) {
-			throw redirect(302, '/shop/coins');
+			throw redirect(302, themePreviewHref(url, '/shop/coins'));
 		}
 	}
 
@@ -100,14 +102,14 @@ export const load = (async ({ locals, url, depends }) => {
 			? {
 					status: order.status,
 					amount: order.amount,
-			  }
+				}
 			: null,
 	};
 }) satisfies PageServerLoad;
 
 export const actions = {
-	createIntent: async ({ locals, request }) => {
-		requireLogin(locals);
+	createIntent: async ({ locals, request, url }) => {
+		requireLogin(locals, '', themePreviewLoginHref(url));
 		invariant(locals.session, 'No session found in locals');
 
 		const data = await request.formData();
@@ -144,6 +146,7 @@ export const actions = {
 				({ token, redirectURL } = await handleStripeCheckout(
 					locals.session.email,
 					offer,
+					url,
 				));
 				break;
 			default:
@@ -167,11 +170,15 @@ export const actions = {
 			throw redirect(303, redirectURL);
 		}
 
-		let url = `/shop/coins/?step=payment&paymentMethod=${paymentMethod}&token=${token}&offerId=${offerId}`;
+		const paymentUrl = new URL(themePreviewHref(url, '/shop/coins/'), url);
+		paymentUrl.searchParams.set('step', 'payment');
+		paymentUrl.searchParams.set('paymentMethod', paymentMethod);
+		paymentUrl.searchParams.set('token', token);
+		paymentUrl.searchParams.set('offerId', offerId);
 		if (clientSecret) {
-			url += `&clientSecret=${clientSecret}`;
+			paymentUrl.searchParams.set('clientSecret', clientSecret);
 		}
-		throw redirect(302, url);
+		throw redirect(302, `${paymentUrl.pathname}${paymentUrl.search}`);
 	},
 } satisfies Actions;
 
@@ -182,7 +189,7 @@ async function handleStripe(accountEmail: string, offer: CoinOffers) {
 		amount: Number(offer.price.toString().replace('.', '')),
 		currency: offer.currency.toLowerCase(),
 		receipt_email: accountEmail,
-		description: `Purchase of ${offer.amount} coins`,
+		description: `Purchase of ${offer.amount} ${await serverName()} Coins`,
 		statement_descriptor_suffix: `${PUBLIC_TITLE} Coins`,
 		automatic_payment_methods: {
 			enabled: true,
@@ -192,16 +199,24 @@ async function handleStripe(accountEmail: string, offer: CoinOffers) {
 	return { token: paymentIntent.id, clientSecret: paymentIntent.client_secret };
 }
 
-async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
+async function handleStripeCheckout(
+	accountEmail: string,
+	offer: CoinOffers,
+	currentUrl: URL,
+) {
 	invariant(stripe, 'Stripe not enabled');
-	const redirectURL = `${PUBLIC_BASE_URL}/shop/coins/?step=confirmation`;
+	const returnPath = themePreviewHref(
+		currentUrl,
+		'/shop/coins/?step=confirmation',
+	);
+	const redirectURL = new URL(returnPath, PUBLIC_BASE_URL).href;
 	const session = await stripe.checkout.sessions.create({
 		line_items: [
 			{
 				price_data: {
 					currency: offer.currency.toLowerCase(),
 					product_data: {
-						name: `${offer.amount} ${PUBLIC_TITLE} Coins`,
+						name: `${offer.amount} ${await serverName()} Coins`,
 					},
 					unit_amount: Number(offer.price.toFixed(2).replace('.', '')),
 				},

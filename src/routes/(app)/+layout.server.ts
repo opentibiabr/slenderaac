@@ -1,16 +1,55 @@
+import { redirect } from '@sveltejs/kit';
 import { loadFlashMessage } from 'sveltekit-flash-message/server';
 
 import { AccountType } from '$lib/accounts';
+import { dailyScreenshot } from '$lib/gallery';
 import { PlayerGroup } from '$lib/players';
+import { loadBoostedSelections } from '$lib/server/boosted';
+import { siteLinks, themeSwitcherEnabled } from '$lib/server/config';
+import { featuredFansite } from '$lib/server/directories';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
+import { currentPoll } from '$lib/server/polls';
 import { prisma } from '$lib/server/prisma';
+import { loadInformationPresentation } from '$lib/server/theme-assets/information';
+import {
+	loadThemeAssetMetadata,
+	resolveThemeId,
+} from '$lib/server/theme-assets/manifest';
+import { loadPresentationReference } from '$lib/server/theme-assets/presentation-reference';
+import {
+	resolveThemeSelection,
+	themeCookie,
+} from '$lib/server/theme-assets/selection';
 import { parseTimeString } from '$lib/server/utils';
+import { serverName } from '$lib/server/worlds';
 
+import { env } from '$env/dynamic/private';
 import { SERVER_SAVE_TIME } from '$env/static/private';
 
 import type { LayoutServerLoad } from './$types';
 
-export const load = loadFlashMessage(async ({ locals }) => {
+export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
+	const { selectedTheme, redirectTo } = await resolveThemeSelection(
+		{
+			configuredTheme: env.SLENDER_THEME,
+			allowSwitching: themeSwitcherEnabled,
+			preference: cookies.get(themeCookie),
+			url,
+		},
+		resolveThemeId,
+	);
+	if (!themeSwitcherEnabled) {
+		cookies.delete(themeCookie, { path: '/' });
+	} else if (url.searchParams.has('themePreview')) {
+		cookies.set(themeCookie, selectedTheme, {
+			path: '/',
+			httpOnly: true,
+			sameSite: 'lax',
+			secure: url.protocol === 'https:',
+		});
+	}
+	if (redirectTo) throw redirect(307, redirectTo);
+
 	const highscores = await prisma.players.findMany({
 		where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
 		select: PlayerSelectForList,
@@ -18,8 +57,7 @@ export const load = loadFlashMessage(async ({ locals }) => {
 		take: 5,
 	});
 
-	const boostedBoss = await prisma.boostedBoss.findFirst();
-	const boostedCreature = await prisma.boostedCreature.findFirst();
+	const { boostedBoss, boostedCreature } = await loadBoostedSelections();
 	const staticPages = await prisma.staticPage.findMany({
 		where: { hide: false },
 		orderBy: { order: 'asc' },
@@ -29,19 +67,40 @@ export const load = loadFlashMessage(async ({ locals }) => {
 		? await prisma.players.findMany({
 				where: { account_id: locals.session.accountId },
 				select: PlayerSelectForList,
-		  })
+			})
 		: null;
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
+	const isAdmin = locals.session?.type === AccountType.God;
+	const classicAssetMetadata = await loadThemeAssetMetadata('classic');
+	const screenshotGallery =
+		(await loadInformationPresentation('classic', 'screenshots'))?.gallery ??
+		null;
+	const themeAssetMetadata =
+		selectedTheme === 'classic'
+			? classicAssetMetadata
+			: { assets: {}, version: null, warning: null };
 
 	return {
+		siteLinks,
+		featuredFansite: await featuredFansite(),
+		currentPoll: await currentPoll(),
+		serverName: await serverName(),
+		serverLogo: classicAssetMetadata.assets.serverLogo ?? null,
+		screenshotGallery,
+		featuredScreenshot: dailyScreenshot(screenshotGallery?.items ?? []),
+		classicPresentation: await loadPresentationReference(selectedTheme),
 		highscores: highscores.map(dbToPlayer),
 		boostedBoss,
 		boostedCreature,
 		isLoggedIn: Boolean(locals.session),
-		isAdmin: locals.session?.type === AccountType.God,
+		isAdmin,
 		staticPages,
 		accountCharacters: accountCharacters?.map(dbToPlayer),
 		nextServerSave,
+		selectedTheme,
+		themeSwitcherEnabled,
+		themeAssets: themeAssetMetadata.assets,
+		themeAssetWarning: isAdmin ? themeAssetMetadata.warning : null,
 	};
 }) satisfies LayoutServerLoad;

@@ -1,4 +1,5 @@
-import { fail } from '@sveltejs/kit';
+import { Prisma } from '@prisma/client';
+import { error, fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import invariant from 'tiny-invariant';
 
@@ -9,35 +10,32 @@ import { stringValidator, validate } from '$lib/server/validations';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({ params }) => {
+export const load = (async ({ locals, params }) => {
+	requireLogin(locals);
 	const characterName = params.name;
 	invariant(characterName, 'Missing character name');
 
-	const player = await prisma.players.findUnique({
-		where: { name: characterName },
-		include: { settings: true },
+	const player = await prisma.players.findFirst({
+		where: {
+			name: characterName,
+			account_id: locals.session.accountId,
+			deletion: 0,
+		},
+		select: { name: true, pronoun: true, settings: true },
 	});
 
-	if (!player) {
-		throw fail(404, {
-			errors: {
-				global: ['Character not found'],
-			} as Record<string, string[]>,
-		});
-	}
-
-	let settings = player.settings;
-	if (!settings) {
-		settings = await prisma.playerSettings.create({
-			data: { player_id: player.id },
-		});
-	}
+	if (!player) throw error(404, 'Character not found');
 
 	return {
 		player: {
 			name: player.name,
 			pronoun: player.pronoun,
-			settings: settings,
+			settings: player.settings ?? {
+				hidden: false,
+				show_skills: true,
+				show_inventory: true,
+				comment: null,
+			},
 		},
 	};
 }) satisfies PageServerLoad;
@@ -66,36 +64,35 @@ export const actions = {
 			'Comment must be a string or not set',
 		);
 
-		const characterPronounsValue = parsePlayerPronoun(characterPronouns);
-
-		const existingPlayer = await prisma.players.findFirst({
-			where: { name: characterName },
-		});
-		if (
-			!existingPlayer ||
-			existingPlayer.account_id !== locals.session?.accountId
-		) {
-			return fail(400, {
-				errors: {
-					characterName: ['This character does not exist'],
-				} as Record<string, string[]>,
-			});
-		}
-
-		await prisma.players.update({
-			where: { name: characterName },
-			data: {
-				pronoun: characterPronounsValue,
-				settings: {
-					update: {
-						hidden: characterHidden === 'on',
-						show_skills: showSkills === 'on',
-						show_inventory: showInventory === 'on',
-						comment: comment,
-					},
+		const settings = {
+			hidden: characterHidden === 'on',
+			show_skills: showSkills === 'on',
+			show_inventory: showInventory === 'on',
+			comment,
+		};
+		try {
+			await prisma.players.update({
+				where: {
+					name: characterName,
+					account_id: locals.session.accountId,
+					deletion: 0,
 				},
-			},
-		});
+				data: {
+					pronoun:
+						characterPronouns === null
+							? undefined
+							: parsePlayerPronoun(characterPronouns),
+					settings: { upsert: { create: settings, update: settings } },
+				},
+			});
+		} catch (cause) {
+			if (
+				cause instanceof Prisma.PrismaClientKnownRequestError &&
+				cause.code === 'P2025'
+			)
+				return fail(404, { errors: { global: ['Character not found'] } });
+			throw cause;
+		}
 
 		throw redirect(
 			'/account',

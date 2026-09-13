@@ -9,12 +9,15 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import { enhance } from '$lib/enchance';
+	import { newsCategories, newsTypes } from '$lib/news';
 
 	export let news: News | null = null;
 	export let authorName: string | null = null;
 	export let errors: Record<string, string[]> | null = null;
 	let published = news ? news.published : false;
 	let value = news ? news.content : '';
+	let type = news?.type ?? 'news';
+	let category = news?.category ?? 'community';
 
 	let isFocused = true;
 </script>
@@ -36,6 +39,35 @@
 		errors={errors?.title} />
 
 	<input type="hidden" name="content" bind:value />
+	<div class="grid gap-3 md:grid-cols-3">
+		<label class="label"
+			><span>Type</span><select class="select" name="type" bind:value={type}
+				>{#each newsTypes as option}<option
+						value={option.value}
+						selected={type === option.value}>{option.label}</option
+					>{/each}</select
+			></label>
+		<label class="label"
+			><span>Category</span><select
+				class="select"
+				name="category"
+				bind:value={category}
+				>{#each newsCategories as option}<option
+						value={option.value}
+						selected={category === option.value}>{option.label}</option
+					>{/each}</select
+			></label>
+		<label class="label"
+			><span>Publication date (UTC)</span><input
+				class="input"
+				type="date"
+				name="date"
+				value={(news?.created_at ?? new Date()).toISOString().slice(0, 10)}
+				required /></label>
+	</div>
+	{#if news?.presentation}<p class="text-sm">
+			The imported article layout is preserved until you change its content.
+		</p>{/if}
 	<div class="label">
 		<span
 			>Content (<a

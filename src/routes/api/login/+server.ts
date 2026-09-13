@@ -7,6 +7,7 @@ import { PlayerGroup, PlayerSex, vocationString } from '$lib/players';
 import { requireEmailVerification } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { comparePassword } from '$lib/server/utils';
+import { serverName } from '$lib/server/worlds';
 
 import {
 	DEPRECATED_USE_SHA1_PASSWORDS,
@@ -14,7 +15,6 @@ import {
 	GAME_SESSION_EXPIRATION_TIME,
 	PVP_TYPE,
 	SERVER_ADDRESS,
-	SERVER_NAME,
 	SERVER_PORT,
 } from '$env/static/private';
 
@@ -243,7 +243,7 @@ async function handleLogin(
 			worlds: [
 				{
 					id: 0,
-					name: SERVER_NAME,
+					name: await serverName(),
 					externaladdress: SERVER_ADDRESS,
 					externalport: serverPort,
 					externaladdressprotected: SERVER_ADDRESS,

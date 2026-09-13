@@ -4,15 +4,26 @@
 	import { _ } from 'svelte-i18n';
 	import { tooltip } from 'svooltip';
 
+	import { playerOnline } from '$lib/online-status';
+	import { serverAvailability } from '$lib/stores/online-status';
+
 	export let online = false;
+	$: available = playerOnline(online, $serverAvailability);
+	$: label = $_(
+		available === null
+			? 'server-status-unknown'
+			: available
+				? 'online'
+				: 'offline',
+	);
 </script>
 
-{#if online}
-	<span class="text-success-600" use:tooltip={{ content: $_('online') }}>
-		<Fa icon={faCircle} size="xs" />
-	</span>
-{:else}
-	<span class="text-error-600" use:tooltip={{ content: $_('offline') }}>
-		<Fa icon={faCircle} size="xs" />
-	</span>
-{/if}
+<span
+	role="img"
+	aria-label={label}
+	class:text-success-600={available === true}
+	class:text-error-600={available === false}
+	class:text-surface-500={available === null}
+	use:tooltip={{ content: label }}>
+	<Fa icon={faCircle} size="xs" />
+</span>

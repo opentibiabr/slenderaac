@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import Checkbox from '$lib/components/ui/forms/Checkbox.svelte';
@@ -11,17 +12,18 @@
 	import { pronounsEnabled } from '$lib/config';
 	import { enhance } from '$lib/enchance';
 	import { allPronouns, pronounString } from '$lib/players';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
 	export let form: ActionData;
 
-	const settings = data.player.settings;
-	const pronoun = data.player.pronoun.toString();
+	$: settings = data.player.settings;
+	$: pronoun = data.player.pronoun.toString();
 
 	async function close() {
-		await goto('/account', { noScroll: true });
+		await goto(themePreviewHref($page.url, '/account'), { noScroll: true });
 	}
 </script>
 

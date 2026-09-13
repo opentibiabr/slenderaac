@@ -3,8 +3,10 @@ import { randomUUID } from 'crypto';
 import { locale } from 'svelte-i18n';
 
 import { AccountType, isAccountType } from '$lib/accounts';
+import { themeSwitcherEnabled } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { getSession, requireLogin } from '$lib/server/session';
+import { preservePreviewRedirect } from '$lib/server/theme-assets/preview-redirect';
 
 const unauthorized = new Response(null, {
 	status: 401,
@@ -77,5 +79,12 @@ export const handle = (async ({ event, resolve }) => {
 	}
 
 	const response = await resolve(event);
-	return response;
+	return themeSwitcherEnabled && event.route.id?.startsWith('/(app)')
+		? preservePreviewRedirect(
+				response,
+				url,
+				event.isDataRequest ||
+					event.request.headers.get('x-sveltekit-action') === 'true',
+			)
+		: response;
 }) satisfies Handle;

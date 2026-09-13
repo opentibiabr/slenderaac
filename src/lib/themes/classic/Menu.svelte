@@ -1,0 +1,846 @@
+<script lang="ts">
+	import {
+		faBookBookmark,
+		faDownload,
+		faGifts,
+		faNewspaper,
+		faPeopleArrows,
+		faRightFromBracket,
+		faRightToBracket,
+		faUser,
+		faUserPlus,
+	} from '@fortawesome/free-solid-svg-icons';
+	import Fa from 'svelte-fa';
+	import { _ } from 'svelte-i18n';
+
+	import { page } from '$app/stores';
+
+	import { serverText } from '$lib/site-identity';
+	import { siteNavigation } from '$lib/site-navigation';
+	import { themePreviewHref as withThemePreview } from '$lib/themes/preview';
+
+	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
+
+	import MenuLabel from './MenuLabel.svelte';
+	import { classicAsset } from './theme';
+
+	type StaticPage = {
+		title: string;
+		slug: string;
+	};
+
+	export let isLoggedIn = false;
+	export let staticPages: StaticPage[] = [];
+	export let assets: Record<string, string | undefined> | null | undefined = {};
+	export let showAccountActions = true;
+
+	$: menuIdPrefix = showAccountActions
+		? 'classic-menu-drawer'
+		: 'classic-menu-main';
+	$: currentPath = $page.url.pathname.replace(/\/$/, '') || '/';
+	$: identity = { name: $page.data.serverName, website: $page.url.origin };
+	$: aboutLabel = `About ${$page.data.serverName}`;
+	$: navigation = siteNavigation(
+		typeof $page.data.serverName === 'string'
+			? $page.data.serverName
+			: 'Server',
+		PUBLIC_DOWNLOAD_URL,
+	);
+	$: aboutLinks = navigation.about;
+	$: guideLinks = navigation.guides;
+	function isActive(href: string, current = $page.url) {
+		const target = new URL(withThemePreview(current, href), current);
+		const pathname = current.pathname.replace(/\/$/, '') || '/';
+		if (target.pathname === '/unavailable')
+			return (
+				pathname === target.pathname &&
+				target.searchParams.get('feature') ===
+					current.searchParams.get('feature')
+			);
+		return (
+			target.pathname === pathname ||
+			(target.pathname !== '/' && pathname.startsWith(`${target.pathname}/`))
+		);
+	}
+	$: latestNewsHref = withThemePreview($page.url, '/');
+	$: newsArchiveHref = withThemePreview($page.url, '/news/archive');
+	$: eventScheduleHref = withThemePreview($page.url, '/news/event-schedule');
+	$: communityLinks = navigation.community;
+	$: communityActive = communityLinks.some((entry) =>
+		isActive(entry.href, $page.url),
+	);
+	$: accountPageHref = withThemePreview($page.url, '/account');
+	$: accountLoginHref = withThemePreview($page.url, '/account/login');
+	$: accountSignupHref = withThemePreview($page.url, '/account/signup');
+	$: isLatestNewsActive = currentPath === '/';
+	$: isNewsArchiveActive = currentPath === '/news/archive';
+	$: isEventScheduleActive = currentPath === '/news/event-schedule';
+
+	$: menuButtonBackground = classicAsset(assets, 'menuButtonBackground');
+	$: menuButtonHover = classicAsset(assets, 'menuButtonHover');
+	$: menuStyle = [
+		menuButtonBackground
+			? `--classic-menu-button: url("${menuButtonBackground}")`
+			: '',
+		menuButtonHover
+			? `--classic-menu-button-hover: url("${menuButtonHover}")`
+			: '',
+	]
+		.filter(Boolean)
+		.join('; ');
+
+	$: menuIcons = {
+		news: classicAsset(assets, 'menuIconNews'),
+		community: classicAsset(assets, 'menuIconCommunity'),
+		library: classicAsset(assets, 'menuIconLibrary'),
+		shop: classicAsset(assets, 'menuIconShop'),
+		about: classicAsset(assets, 'menuIconAbout'),
+		guides: classicAsset(assets, 'menuIconGameGuides'),
+		characterTrade: classicAsset(assets, 'menuIconCharacterTrade'),
+		account: classicAsset(assets, 'menuIconAccount'),
+		forum: classicAsset(assets, 'menuIconForum'),
+		support: classicAsset(assets, 'menuIconSupport'),
+	};
+
+	$: activeSubmenuIcon = classicAsset(assets, 'menuIconActiveSubmenu');
+	$: expandPlus = classicAsset(assets, 'menuExpandPlus');
+	$: expandMinus = classicAsset(assets, 'menuExpandMinus');
+	$: greenLight = classicAsset(assets, 'menuGreenLight');
+	$: boxTop = classicAsset(assets, 'boxTop');
+	$: boxBottom = classicAsset(assets, 'boxBottom');
+	$: chain = classicAsset(assets, 'chain');
+
+	$: menuLabels = {
+		news: classicAsset(assets, 'menuLabelNews'),
+		community: classicAsset(assets, 'menuLabelCommunity'),
+		library: classicAsset(assets, 'menuLabelLibrary'),
+		shop: classicAsset(assets, 'menuLabelShop'),
+		guides: classicAsset(assets, 'menuLabelGameGuides'),
+		characterTrade: classicAsset(assets, 'menuLabelCharacterTrade'),
+		account: classicAsset(assets, 'menuLabelAccount'),
+		forum: classicAsset(assets, 'menuLabelForum'),
+		support: classicAsset(assets, 'menuLabelSupport'),
+	};
+
+	$: menuChromeStyle = [
+		menuStyle,
+		activeSubmenuIcon
+			? `--classic-active-submenu: url("${activeSubmenuIcon}")`
+			: '',
+		expandPlus ? `--classic-expand-plus: url("${expandPlus}")` : '',
+		expandMinus ? `--classic-expand-minus: url("${expandMinus}")` : '',
+		greenLight ? `--classic-green-light: url("${greenLight}")` : '',
+		boxTop ? `--classic-menu-box-top: url("${boxTop}")` : '',
+		boxBottom ? `--classic-menu-box-bottom: url("${boxBottom}")` : '',
+		chain ? `--classic-menu-chain: url("${chain}")` : '',
+	]
+		.filter(Boolean)
+		.join('; ');
+</script>
+
+<nav
+	class={`theme-classic-menu${
+		!showAccountActions ? ' theme-classic-menu--main' : ''
+	}`}
+	aria-label="Main navigation"
+	style={menuChromeStyle}>
+	{#if showAccountActions}
+		<section class="theme-classic-menu__account">
+			{#if isLoggedIn}
+				<a class="theme-classic-menu__action" href={accountPageHref}>
+					<Fa icon={faUser} />
+					{$_('my-account')}
+				</a>
+				<form
+					action={withThemePreview($page.url, '/account/logout')}
+					method="post">
+					<button class="theme-classic-menu__action" type="submit">
+						<Fa icon={faRightFromBracket} />
+						{$_('logout')}
+					</button>
+				</form>
+			{:else}
+				<a class="theme-classic-menu__action" href={accountLoginHref}>
+					<Fa icon={faRightToBracket} />
+					{$_('login')}
+				</a>
+				<a class="theme-classic-menu__link-action" href={accountSignupHref}>
+					<Fa icon={faUserPlus} />
+					{$_('create-account')}
+				</a>
+			{/if}
+			<a
+				class="theme-classic-menu__action"
+				href={withThemePreview($page.url, PUBLIC_DOWNLOAD_URL)}>
+				<Fa icon={faDownload} />
+				{$_('download')}
+			</a>
+		</section>
+	{/if}
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-news-toggle`}
+			checked />
+		<h2>
+			{#if menuIcons.news}
+				<img src={menuIcons.news} alt="" aria-hidden="true" />
+			{:else}
+				<Fa icon={faNewspaper} />
+			{/if}
+			<MenuLabel text={$_('news')} image={menuLabels.news} />
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-news-toggle`}
+				aria-label="Toggle News"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-news-toggle`}
+				aria-label="Toggle News"></label>
+		</h2>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-news`}>
+			<a
+				class={isLatestNewsActive
+					? 'theme-classic-menu__submenu-link--active'
+					: undefined}
+				href={latestNewsHref}>Latest News</a>
+			<a
+				class={isNewsArchiveActive
+					? 'theme-classic-menu__submenu-link--active'
+					: undefined}
+				href={newsArchiveHref}>News Archive</a>
+			<a
+				class={isEventScheduleActive
+					? 'theme-classic-menu__submenu-link--active'
+					: undefined}
+				href={eventScheduleHref}>Event Schedule</a>
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-about-toggle`}
+			checked={currentPath.startsWith('/about/')} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.about}
+					<img src={menuIcons.about} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faBookBookmark} />
+				{/if}
+				<MenuLabel text={aboutLabel} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-about-toggle`}
+				aria-label={`Toggle ${aboutLabel}`}></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-about-toggle`}
+				aria-label={`Toggle ${aboutLabel}`}></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-about`}>
+			{#each aboutLinks as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-guides-toggle`}
+			checked={currentPath.startsWith('/guides/')} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.guides}
+					<img src={menuIcons.guides} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faBookBookmark} />
+				{/if}
+				<MenuLabel text="Game Guides" image={menuLabels.guides} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-guides-toggle`}
+				aria-label="Toggle Game Guides"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-guides-toggle`}
+				aria-label="Toggle Game Guides"></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-guides`}>
+			{#each guideLinks as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-library-toggle`}
+			checked={navigation.library.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.library}
+					<img src={menuIcons.library} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faBookBookmark} />
+				{/if}
+				<MenuLabel text={$_('library')} image={menuLabels.library} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-library-toggle`}
+				aria-label="Toggle Library"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-library-toggle`}
+				aria-label="Toggle Library"></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-library`}>
+			{#each navigation.library as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+			{#each staticPages.filter((entry) => entry.slug !== 'rules') as entry}<a
+					href={withThemePreview(
+						$page.url,
+						`/pages/${encodeURIComponent(entry.slug)}`,
+					)}>{entry.title}</a
+				>{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-community-toggle`}
+			checked={communityActive} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.community}
+					<img src={menuIcons.community} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faPeopleArrows} />
+				{/if}
+				<MenuLabel text={$_('community')} image={menuLabels.community} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-community-toggle`}
+				aria-label="Toggle Community"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-community-toggle`}
+				aria-label="Toggle Community"></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-community`}>
+			{#each communityLinks as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(
+						link.href,
+						$page.url,
+					)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-forum-toggle`}
+			checked={navigation.forum.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.forum}
+					<img src={menuIcons.forum} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faPeopleArrows} />
+				{/if}
+				<MenuLabel text="Forum" image={menuLabels.forum} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-forum-toggle`}
+				aria-label="Toggle Forum"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-forum-toggle`}
+				aria-label="Toggle Forum"></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-forum`}>
+			{#each navigation.forum as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-account-toggle`}
+			checked={navigation.account.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.account}
+					<img src={menuIcons.account} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faUser} />
+				{/if}
+				<MenuLabel text={$_('my-account')} image={menuLabels.account} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-account-toggle`}
+				aria-label="Toggle Account"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-account-toggle`}
+				aria-label="Toggle Account"></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-account`}>
+			{#each navigation.account as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-character-trade-toggle`}
+			checked={navigation.characterTrade.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.characterTrade}
+					<img src={menuIcons.characterTrade} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faGifts} />
+				{/if}
+				<MenuLabel text="Char Bazaar" image={menuLabels.characterTrade} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-character-trade-toggle`}
+				aria-label="Toggle Char Bazaar"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-character-trade-toggle`}
+				aria-label="Toggle Char Bazaar"></label>
+		</div>
+		<div
+			class="theme-classic-menu__submenu"
+			id={`${menuIdPrefix}-character-trade`}>
+			{#each navigation.characterTrade as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+
+	<section>
+		<input
+			class="theme-classic-menu__toggle-input"
+			type="checkbox"
+			id={`${menuIdPrefix}-support-toggle`}
+			checked={navigation.support.some((link) =>
+				isActive(link.href, $page.url),
+			)} />
+		<div class="theme-classic-menu__category">
+			<span class="theme-classic-menu__category-link">
+				{#if menuIcons.support}
+					<img src={menuIcons.support} alt="" aria-hidden="true" />
+				{:else}
+					<Fa icon={faBookBookmark} />
+				{/if}
+				<MenuLabel text="Support" image={menuLabels.support} />
+			</span>
+			<label
+				class="theme-classic-menu__header-hitbox"
+				for={`${menuIdPrefix}-support-toggle`}
+				aria-label="Toggle Support"></label>
+			<label
+				class="theme-classic-menu__toggle"
+				for={`${menuIdPrefix}-support-toggle`}
+				aria-label="Toggle Support"></label>
+		</div>
+		<div class="theme-classic-menu__submenu" id={`${menuIdPrefix}-support`}>
+			{#each navigation.support as link}
+				<a
+					class:theme-classic-menu__submenu-link--active={isActive(link.href)}
+					href={withThemePreview($page.url, link.href)}
+					>{serverText(link.label, identity)}</a>
+			{/each}
+		</div>
+	</section>
+</nav>
+
+<style>
+	:global(.theme-classic) .theme-classic-menu {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+		color: rgb(242 226 195);
+		font-family: Verdana, Arial, sans-serif;
+	}
+
+	:global(.theme-classic) .theme-classic-menu--main {
+		position: relative;
+		width: 180px;
+		gap: 0;
+		transform: translateY(11px);
+	}
+
+	:global(.theme-classic) .theme-classic-menu--main::before,
+	:global(.theme-classic) .theme-classic-menu--main::after {
+		position: absolute;
+		left: 1px;
+		z-index: 6;
+		width: 180px;
+		height: 12px;
+		background-repeat: repeat-x;
+		background-size: auto 12px;
+		content: '';
+		pointer-events: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu--main::before {
+		top: -12px;
+		background-image: var(--classic-menu-box-top, none);
+	}
+
+	:global(.theme-classic) .theme-classic-menu--main::after {
+		bottom: -12px;
+		background-image: var(--classic-menu-box-bottom, none);
+	}
+
+	:global(.theme-classic) .theme-classic-menu section {
+		position: relative;
+		border: 0;
+		background: transparent;
+		box-shadow: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__account {
+		padding: 8px 8px 10px;
+		border-color: rgb(75 69 60);
+		background:
+			linear-gradient(rgb(37 35 31 / 0.92), rgb(22 21 19 / 0.96)), rgb(22 21 19);
+	}
+
+	:global(.theme-classic) .theme-classic-menu__account form {
+		margin: 5px 0;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__action,
+	:global(.theme-classic) .theme-classic-menu__link-action {
+		display: flex;
+		width: 100%;
+		min-height: 32px;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+		border: 0;
+		background: var(
+				--classic-menu-button,
+				linear-gradient(180deg, rgb(21 42 207), rgb(14 8 137))
+			)
+			center / 100% 100% no-repeat;
+		color: rgb(255 223 61);
+		cursor: pointer;
+		font-size: 16px;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		text-decoration: none;
+		text-shadow:
+			1px 1px 0 rgb(0 0 0),
+			-1px -1px 0 rgb(0 0 0);
+	}
+
+	:global(.theme-classic) .theme-classic-menu__link-action {
+		min-height: 26px;
+		background:
+			linear-gradient(rgb(43 34 30 / 0.86), rgb(33 24 21 / 0.92)), rgb(38 27 23);
+		color: rgb(233 213 181);
+		font-size: 12px;
+		font-weight: 400;
+		text-shadow: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__action:hover,
+	:global(.theme-classic) .theme-classic-menu__action:focus {
+		background: var(
+				--classic-menu-button-hover,
+				linear-gradient(180deg, rgb(36 73 255), rgb(15 8 160))
+			)
+			center / 100% 100% no-repeat;
+		color: white;
+	}
+
+	:global(.theme-classic) .theme-classic-menu h2,
+	:global(.theme-classic) .theme-classic-menu__category {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		align-items: center;
+		gap: 2px;
+		margin: 0;
+		padding: 0 17px 0 14px;
+		border: 0;
+		background: var(
+				--classic-menu-button,
+				linear-gradient(90deg, rgb(67 22 14), rgb(137 31 20), rgb(50 19 15))
+			)
+			6px 0 / 170px 32px no-repeat;
+		box-shadow: none;
+		color: rgb(239 222 186);
+		font-size: 13px;
+		font-weight: 700;
+		line-height: 1.1;
+		text-decoration: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu h2 {
+		min-height: 32px;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__category {
+		min-height: 32px;
+		gap: 0;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__category-link {
+		display: flex;
+		min-width: 0;
+		flex: 1 1 auto;
+		align-items: center;
+		gap: 2px;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu h2::before,
+	:global(.theme-classic) .theme-classic-menu h2::after,
+	:global(.theme-classic) .theme-classic-menu__category::before,
+	:global(.theme-classic) .theme-classic-menu__category::after {
+		position: absolute;
+		display: none;
+		width: 8px;
+		height: 32px;
+		top: 0;
+		background: var(--classic-green-light, none) center / 8px 32px no-repeat;
+		content: '';
+		pointer-events: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu h2::before {
+		left: -5px;
+	}
+
+	:global(.theme-classic) .theme-classic-menu h2::after,
+	:global(.theme-classic) .theme-classic-menu__category::after {
+		right: -5px;
+		transform: scaleX(-1);
+	}
+
+	:global(.theme-classic) .theme-classic-menu__category::before {
+		left: -5px;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__category:hover,
+	:global(.theme-classic) .theme-classic-menu__category:focus-within {
+		background-image: var(
+			--classic-menu-button-hover,
+			var(--classic-menu-button)
+		);
+		filter: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu h2 > img,
+	:global(.theme-classic) .theme-classic-menu__category-link > img {
+		width: 32px;
+		height: 32px;
+		flex: 0 0 32px;
+		object-fit: contain;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__toggle-input {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		margin: 0;
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:not(:checked)
+		+ h2
+		+ .theme-classic-menu__submenu,
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:not(:checked)
+		+ .theme-classic-menu__category
+		+ .theme-classic-menu__submenu {
+		display: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__header-hitbox {
+		position: absolute;
+		inset: 0;
+		z-index: 5;
+		display: block;
+		cursor: pointer;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu {
+		position: relative;
+		z-index: 2;
+		overflow: hidden;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu::before,
+	:global(.theme-classic) .theme-classic-menu__submenu::after {
+		display: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu::before {
+		left: 6px;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu::after {
+		right: 5px;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__toggle {
+		position: absolute;
+		top: 20px;
+		right: 2px;
+		z-index: 7;
+		display: block;
+		width: 12px;
+		height: 12px;
+		padding: 0;
+		border: 0;
+		background-color: transparent;
+		background: var(--classic-expand-plus, none) center / 12px 12px no-repeat;
+		cursor: pointer;
+		font-size: 0;
+		image-rendering: pixelated;
+	}
+
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:checked
+		+ h2
+		.theme-classic-menu__toggle,
+	:global(.theme-classic)
+		.theme-classic-menu__toggle-input:checked
+		+ .theme-classic-menu__category
+		.theme-classic-menu__toggle {
+		background-image: var(
+			--classic-expand-minus,
+			var(--classic-expand-plus, none)
+		);
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu > a {
+		position: relative;
+		display: block;
+		box-sizing: border-box;
+		height: 21px;
+		min-height: 0;
+		margin: 0 9px 0 11px;
+		padding: 2px 0 2px 15px;
+		background: rgb(13 46 43);
+		box-shadow: inset 0 -1px 0 rgb(76 119 116);
+		color: rgb(215 215 215);
+		font-family: Arial, sans-serif;
+		font-size: 13.3333px;
+		font-weight: 700;
+		line-height: 16px;
+		text-decoration: none;
+		text-shadow: 1px 1px 0 rgb(0 0 0);
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu > a::before {
+		position: absolute;
+		top: 0;
+		left: -5px;
+		z-index: 2;
+		width: 18px;
+		height: 33px;
+		background: var(--classic-menu-chain, none) left top / 7px 10px repeat-y;
+		content: '';
+		pointer-events: none;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu > a::after {
+		position: absolute;
+		top: 0;
+		right: -4px;
+		z-index: 2;
+		width: 7px;
+		height: 33px;
+		background: var(--classic-menu-chain, none) left top / 7px 10px repeat-y;
+		content: '';
+		pointer-events: none;
+	}
+
+	:global(.theme-classic)
+		.theme-classic-menu__submenu
+		> a.theme-classic-menu__submenu-link--active::before {
+		background:
+			var(--classic-menu-chain, none) left top / 7px 10px repeat-y,
+			var(--classic-active-submenu, none) 8px 5px / 10px 10px no-repeat;
+	}
+
+	:global(.theme-classic) .theme-classic-menu__submenu > a:hover,
+	:global(.theme-classic) .theme-classic-menu__submenu > a:focus {
+		background: rgb(48 58 42 / 0.88);
+		color: white;
+	}
+
+	:global(.theme-classic)
+		.theme-classic-menu__submenu
+		> a.theme-classic-menu__submenu-link--active {
+		color: rgb(255 255 255);
+	}
+</style>

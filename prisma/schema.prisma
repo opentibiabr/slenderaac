@@ -79,6 +79,8 @@ model Accounts {
   passwordReset       PasswordReset?
   accountSessions     AccountSessions[]
   store_history       StoreHistory[]
+  feedback_responses  FeedbackResponse[]
+  poll_votes          PollVote[]
 
   @@map("accounts")
 }
@@ -698,6 +700,7 @@ model Players {
   online                                            PlayerOnline?
   posted_articles                                   News[]
   settings                                          PlayerSettings?
+  achievement_showcase                              AchievementShowcase[]
 
   @@index([account_id], map: "account_id")
   @@index([vocation], map: "vocation")
@@ -802,18 +805,131 @@ model AccountSessions {
   @@map("slender_sessions")
 }
 
+enum NewsType {
+  news
+  ticker
+  article
+}
+
+enum NewsCategory {
+  server
+  community
+  development
+  support
+  technical
+}
+
 model News {
   id         String   @id @default(cuid())
   published  Boolean  @default(false)
   title      String   @db.VarChar(255)
   content    String   @db.Text
+  type       NewsType @default(news)
+  category   NewsCategory @default(community)
+  presentation Json?
   author_id  Int
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
   author     Players  @relation(fields: [author_id], references: [id])
 
   @@index([author_id], map: "slender_news_author_id_fkey")
+  @@index([published, type, category, created_at], map: "slender_news_archive_idx")
   @@map("slender_news")
+}
+
+model ScheduleEvent {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(255)
+  description String   @db.Text
+  starts_at   DateTime @db.Date
+  ends_at     DateTime @db.Date
+  color       String   @default("#24657b") @db.VarChar(7)
+  seasonal    Boolean  @default(false)
+  published   Boolean  @default(false)
+  sort_order  Int      @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  world_quest_id String?
+  world_quest WorldQuest? @relation(fields: [world_quest_id], references: [id], onDelete: Cascade)
+  quest_result WorldQuestResult?
+
+  @@index([published, starts_at, ends_at], map: "slender_schedule_events_range_idx")
+  @@index([world_quest_id], map: "slender_schedule_events_world_quest_idx")
+  @@map("slender_schedule_events")
+}
+
+enum WorldQuestKind {
+  event
+  task
+}
+
+enum WorldQuestOutcome {
+  success
+  failure
+}
+
+model WorldQuest {
+  id          String @id @default(cuid())
+  slug        String @unique @db.VarChar(100)
+  name        String @db.VarChar(255)
+  description String @db.Text
+  kind        WorldQuestKind
+  published   Boolean @default(false)
+  sort_order  Int @default(0)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  events      ScheduleEvent[]
+  results     WorldQuestResult[]
+
+  @@index([published, kind, sort_order], map: "slender_world_quests_public_idx")
+  @@map("slender_world_quests")
+}
+
+model WorldQuestResult {
+  id                String @id @default(cuid())
+  world_quest_id    String
+  schedule_event_id String? @unique
+  outcome           WorldQuestOutcome
+  occurred_at       DateTime
+  published         Boolean @default(false)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now()) @updatedAt
+  world_quest       WorldQuest @relation(fields: [world_quest_id], references: [id], onDelete: Cascade)
+  schedule_event    ScheduleEvent? @relation(fields: [schedule_event_id], references: [id], onDelete: Restrict)
+
+  @@index([world_quest_id, published, occurred_at], map: "slender_world_quest_results_public_idx")
+  @@map("slender_world_quest_results")
+}
+
+model FeedbackForm {
+  id          String @id @default(cuid())
+  title       String @db.VarChar(255)
+  description String @db.Text
+  questions   Json
+  starts_at   DateTime @db.Date
+  ends_at     DateTime? @db.Date
+  published   Boolean @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+  responses   FeedbackResponse[]
+
+  @@index([published, starts_at, ends_at], map: "slender_feedback_forms_public_idx")
+  @@map("slender_feedback_forms")
+}
+
+model FeedbackResponse {
+  id           String @id @default(cuid())
+  form_id      String
+  account_id   Int? @db.UnsignedInt
+  answers      Json
+  submitted_at DateTime @default(now())
+  form         FeedbackForm @relation(fields: [form_id], references: [id], onDelete: Cascade, map: "slender_feedback_responses_form_fk")
+  account      Accounts? @relation(fields: [account_id], references: [id], onDelete: SetNull, map: "slender_feedback_responses_account_fk")
+
+  @@unique([form_id, account_id], map: "slender_feedback_response_account_unique")
+  @@index([submitted_at], map: "slender_feedback_responses_date_idx")
+  @@index([account_id], map: "slender_feedback_responses_account_idx")
+  @@map("slender_feedback_responses")
 }
 
 model StaticPage {
@@ -896,6 +1012,17 @@ model PlayerSettings {
   @@map("slender_player_settings")
 }
 
+model AchievementShowcase {
+  player_id      Int
+  achievement_id Int
+  position       Int
+  player         Players @relation(fields: [player_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([player_id, achievement_id])
+  @@unique([player_id, position])
+  @@map("slender_achievement_showcase")
+}
+
 model Monsters {
   id         Int    @id @default(autoincrement())
   name       String @unique(map: "name") @db.VarChar(191)
@@ -919,4 +1046,93 @@ enum CoinOrderStatus {
   CANCELED
 
   @@map("slender_coin_order_status")
+}
+
+model Poll {
+  id          String     @id @default(cuid())
+  title       String     @db.VarChar(255)
+  description String     @db.Text
+  options     Json
+  published   Boolean    @default(false)
+  starts_at   DateTime   @db.Date
+  ends_at     DateTime?  @db.Date
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @default(now()) @updatedAt
+  votes       PollVote[]
+
+  @@index([published, starts_at, ends_at], map: "slender_polls_public_idx")
+  @@map("slender_polls")
+}
+
+model PollVote {
+  id           String    @id @default(cuid())
+  poll_id      String
+  account_id   Int?      @db.UnsignedInt
+  option_id    String    @db.VarChar(32)
+  submitted_at DateTime  @default(now())
+  poll         Poll      @relation(fields: [poll_id], references: [id], onDelete: Cascade, map: "slender_poll_votes_poll_fk")
+  account      Accounts? @relation(fields: [account_id], references: [id], onDelete: SetNull, map: "slender_poll_votes_account_fk")
+
+  @@unique([poll_id, account_id], map: "slender_poll_votes_account_unique")
+  @@index([poll_id, option_id], map: "slender_poll_votes_result_idx")
+  @@index([account_id], map: "slender_poll_votes_account_idx")
+  @@map("slender_poll_votes")
+}
+
+model DirectoryEntry {
+  id          String   @id @default(cuid())
+  kind        String   @db.VarChar(16)
+  name        String   @db.VarChar(255)
+  url         String   @db.Text
+  description String   @db.Text
+  details     Json
+  promoted    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  published   Boolean  @default(false)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @default(now()) @updatedAt
+
+  @@index([kind, published, promoted, name], map: "slender_directory_public_idx")
+  @@map("slender_directory_entries")
+}
+
+model KillCollector {
+  id             String          @id @db.VarChar(36)
+  started_at     Int             @db.UnsignedInt
+  updated_at     Int             @db.UnsignedInt
+  dropped_events Int             @default(0) @db.UnsignedInt
+  statistics     KillStatistic[]
+
+  @@index([updated_at], map: "slender_kill_collectors_updated_idx")
+  @@map("slender_kill_collectors")
+}
+
+model KillStatistic {
+  collector_id      String        @db.VarChar(36)
+  minute            Int           @db.UnsignedInt
+  race              String        @db.VarChar(255)
+  players_killed    Int           @default(0) @db.UnsignedInt
+  killed_by_players Int           @default(0) @db.UnsignedInt
+  collector         KillCollector @relation(fields: [collector_id], references: [id], onDelete: Cascade, map: "slender_kill_statistics_collector_fk")
+
+  @@id([collector_id, minute, race])
+  @@index([minute], map: "slender_kill_statistics_minute_idx")
+  @@map("slender_kill_statistics")
+}
+
+model HelpEntry {
+  id         String   @id @default(cuid())
+  slug       String   @unique @db.VarChar(80)
+  topic      String   @db.VarChar(16)
+  title      String   @db.VarChar(160)
+  content    String   @db.Text
+  published  Boolean  @default(false)
+  featured   Boolean  @default(false)
+  views      Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+
+  @@index([published, topic, title], map: "slender_help_public_idx")
+  @@index([published, views], map: "slender_help_views_idx")
+  @@map("slender_help_entries")
 }

@@ -14,3 +14,6 @@ cache.generated.txt
 /static/images/store
 /items
 *.patch
+/.codex/visual
+__pycache__/
+*.pyc

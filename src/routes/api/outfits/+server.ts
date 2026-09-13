@@ -1,172 +1,90 @@
-import { error, json } from '@sveltejs/kit';
-import { existsSync, readdirSync, writeFileSync } from 'fs';
-import path, { relative, resolve } from 'path';
-import invariant from 'tiny-invariant';
+import { createHash } from 'node:crypto';
 
-import { outfitImagesPath, walkSpeeds } from '$lib/server/animations/config';
+import { json } from '@sveltejs/kit';
+
 import {
-	loadData,
-	outfit,
-	type OutfitData,
-} from '$lib/server/animations/outfits';
+	mountOutfitId,
+	outfitColors,
+	outfitImagesPath,
+	walkSpeeds,
+} from '$lib/server/animations/config';
+import { animationFrameCount, loadData } from '$lib/server/animations/metadata';
+import { outfit } from '$lib/server/animations/outfits';
 
 import type { RequestHandler } from './$types';
 
-const CACHE_FILE_PATH = './cache.generated.txt';
-
-function getFilesSync(dir: string): string[] {
-	const dirents = readdirSync(dir, { withFileTypes: true });
-	const files = dirents
-		.map((dirent) => {
-			const res = relative('.', resolve(dir, dirent.name));
-			return dirent.isDirectory() ? getFilesSync(res) : res;
-		})
-		.flat();
-
-	return files;
-}
-
-function generateCacheIfNeeded(): boolean {
-	if (!existsSync(CACHE_FILE_PATH)) {
-		const dirIterator = getFilesSync(outfitImagesPath);
-		const outfits: { [outfitId: string]: OutfitData } = {};
-		const frameNumbers = Array(10).fill(0);
-
-		for (const filePath of dirIterator) {
-			const normalizedFilePath = filePath.replaceAll('\\', '/');
-			const outfitIdData = path.dirname(normalizedFilePath).split('/');
-			const outfitId = outfitIdData[outfitIdData.length - 1];
-
-			if (!outfits[outfitId]) {
-				outfits[outfitId] = {
-					files: [],
-					framesNumber: 0,
-					mountFramesNumber: 0,
-				};
-			}
-
-			const fileName = path.basename(normalizedFilePath);
-			outfits[outfitId].files.push(normalizedFilePath);
-
-			const currentFramesNumber = parseInt(fileName.charAt(0));
-			if (Number.isNaN(currentFramesNumber)) {
-				continue;
-			}
-			outfits[outfitId].framesNumber = Math.max(
-				outfits[outfitId].framesNumber,
-				currentFramesNumber,
-			);
-		}
-
-		for (const outfitId in outfits) {
-			const outfit = outfits[outfitId];
-			const serializedOutfit = JSON.stringify(outfit);
-			const outfitDataFilePath = path.join(
-				outfitImagesPath,
-				outfitId,
-				'outfit.data.json',
-			);
-
-			try {
-				writeFileSync(outfitDataFilePath, serializedOutfit);
-			} catch (err) {
-				console.error(
-					`Node.js cannot write to: "${outfitDataFilePath}", check directory access rights`,
-				);
-			}
-
-			frameNumbers[outfit.framesNumber]++;
-		}
-
-		const cacheGeneratedFilePath = CACHE_FILE_PATH;
-		try {
-			writeFileSync(cacheGeneratedFilePath, 'cache generated');
-		} catch (err) {
-			console.log(
-				`Node.js cannot write to: "${cacheGeneratedFilePath}", check directory access rights`,
-			);
-			process.exit(1);
-		}
-
-		console.log('FILE SYSTEM CACHE GENERATED');
-		console.log('Animation frames count in loaded outfits:', frameNumbers);
-
-		return true;
-	}
-	return false;
-}
-
-function parseIntWithDefault(value: unknown, def = 0): number {
-	if (!value) return def;
-
-	invariant(
-		typeof value === 'string' || typeof value === 'number',
-		'value must be a string or number found ' + typeof value + ' instead',
-	);
-	if (typeof value === 'number') return value;
-
-	return parseInt(value) ?? def;
-}
-
 export const GET = (async ({ url, request }) => {
-	generateCacheIfNeeded();
-
-	const headers = {
-		'Cache-Control': `max-age=${60 * 60 * 24 * 365}`,
-		Expires: new Date(Date.now() + 60 * 60 * 24 * 365 * 1000).toUTCString(),
-		'Last-Modified': new Date(1337).toUTCString(),
-	};
-
-	if (url.host) {
-		const ifModifiedSince = request.headers.get('if-modified-since');
-		if (ifModifiedSince) {
-			return new Response(null, {
-				status: 304,
-				headers,
-			});
-		}
-	}
-
-	const looktype = parseIntWithDefault(url.searchParams.get('looktype') || url.searchParams.get('id'));
-	let outfitData = loadData(looktype, outfitImagesPath, false);
-	if (!outfitData) {
-		return json({});
-	}
-	let mount = parseIntWithDefault(url.searchParams.get('mount'));
-
-	if (mount > 0) {
-		const mountOutfitData = loadData(mount, outfitImagesPath, true, outfitData);
-		if (mountOutfitData) {
-			outfitData = mountOutfitData;
-		} else {
-			mount = 0;
-		}
-	}
-
-	if (!outfitData) {
-		throw error(404, 'Outfit not found');
-	}
-
-	const head = parseIntWithDefault(url.searchParams.get('lookhead'));
-	const body = parseIntWithDefault(url.searchParams.get('lookbody'));
-	const legs = parseIntWithDefault(url.searchParams.get('looklegs'));
-	const feet = parseIntWithDefault(url.searchParams.get('lookfeet'));
-	const addons = parseIntWithDefault(url.searchParams.get('lookaddons'));
-	const direction = parseIntWithDefault(url.searchParams.get('direction'), 3);
-	const resize = parseIntWithDefault(url.searchParams.get('resize'), 0);
-
-	const frames: CanvasRenderingContext2D[] = [];
-	const durations: number[] = [];
-
-	const moveAnimFrames: number = outfitData?.framesNumber;
-
-	for (
-		let moveAnimFrame = 1;
-		moveAnimFrame <= moveAnimFrames;
-		++moveAnimFrame
+	function parameter(
+		key: string,
+		fallback: number,
+		maximum: number,
+		minimum = 0,
 	) {
-		const frame = await outfit(
-			outfitData,
+		const text = url.searchParams.get(key);
+		if (text === null) return fallback;
+		if (!/^\d+$/.test(text)) return null;
+		const value = Number(text);
+		return Number.isSafeInteger(value) && value >= minimum && value <= maximum
+			? value
+			: null;
+	}
+	const looktype = parameter(
+		url.searchParams.has('looktype') ? 'looktype' : 'id',
+		0,
+		65535,
+		1,
+	);
+	const mountValue = parameter('mount', 0, 0xffffffff);
+	const head = parameter('lookhead', 0, outfitColors.length - 1);
+	const body = parameter('lookbody', 0, outfitColors.length - 1);
+	const legs = parameter('looklegs', 0, outfitColors.length - 1);
+	const feet = parameter('lookfeet', 0, outfitColors.length - 1);
+	const addons = parameter('lookaddons', 0, 3);
+	const direction = parameter('direction', 3, 4, 1);
+	const resize = parameter('resize', 0, 1);
+	const noCache = { 'Cache-Control': 'no-store' };
+	if (
+		!looktype ||
+		mountValue === null ||
+		head === null ||
+		body === null ||
+		legs === null ||
+		feet === null ||
+		addons === null ||
+		direction === null ||
+		resize === null
+	)
+		return json(
+			{ frames: [], message: 'Invalid outfit parameters' },
+			{ status: 400, headers: noCache },
+		);
+	let mount = mountOutfitId(mountValue);
+	const mountData = mount
+		? loadData(mount, outfitImagesPath, { direction })
+		: null;
+	if (!mountData) mount = 0;
+	let data = loadData(looktype, outfitImagesPath, {
+		mounted: Boolean(mount),
+		direction,
+	});
+	if (!data && mount) {
+		mount = 0;
+		data = loadData(looktype, outfitImagesPath, { direction });
+	}
+	if (!data) return json({ frames: [] }, { status: 404, headers: noCache });
+	if (mount && mountData)
+		data = {
+			...data,
+			files: [...data.files, ...mountData.files],
+			mountFramesNumber: mountData.framesNumber,
+		};
+	const frames: { image: string; duration: number }[] = [];
+	const count = animationFrameCount(data.framesNumber, data.mountFramesNumber);
+	const duration =
+		walkSpeeds[Math.max(data.framesNumber, data.mountFramesNumber)] ?? 100;
+	for (let frame = 1; frame <= count; frame++) {
+		const rendered = await outfit(
+			data,
 			outfitImagesPath,
 			looktype,
 			addons,
@@ -176,20 +94,33 @@ export const GET = (async ({ url, request }) => {
 			feet,
 			mount,
 			direction,
-			moveAnimFrame,
+			frame,
 			resize === 1,
 		);
-		if (!frame) {
-			throw error(500, 'Failed to create canvas frame');
-		}
-		frames.push(frame as unknown as CanvasRenderingContext2D);
-		durations.push(walkSpeeds[moveAnimFrames]);
+		if (!rendered)
+			return json({ frames: [] }, { status: 404, headers: noCache });
+		frames.push({
+			image: rendered.canvas.toDataURL(),
+			duration,
+		});
 	}
-
-	return json({
-		frames: frames.map((frame, index) => ({
-			image: frame.canvas.toDataURL(),
-			duration: durations[index],
-		})),
+	const response = JSON.stringify({ frames, mounted: Boolean(mount) });
+	const etag = '"' + createHash('sha256').update(response).digest('hex') + '"';
+	const headers = {
+		'Cache-Control': 'public, max-age=0, must-revalidate',
+		ETag: etag,
+	};
+	if (
+		request.headers
+			.get('if-none-match')
+			?.split(',')
+			.some((value) => {
+				const validator = value.trim().replace(/^W\//, '');
+				return validator === '*' || validator === etag;
+			})
+	)
+		return new Response(null, { status: 304, headers });
+	return new Response(response, {
+		headers: { ...headers, 'Content-Type': 'application/json' },
 	});
 }) satisfies RequestHandler;

@@ -1,4 +1,6 @@
 {
+	"plugins": ["prettier-plugin-svelte"],
+	"endOfLine": "auto",
 	"useTabs": true,
 	"singleQuote": true,
 	"trailingComma": "all",

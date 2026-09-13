@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
+import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
 import { performLogin } from '$lib/server/session';
 import { check2faToken, comparePassword } from '$lib/server/utils';
@@ -10,13 +11,14 @@ import {
 	stringValidator,
 	validate,
 } from '$lib/server/validations';
+import { themePreviewHref } from '$lib/themes/preview';
 import { $_ } from '$lib/utils';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = ({ locals }) => {
+export const load: PageServerLoad = ({ locals, url }) => {
 	if (locals.session) {
-		throw redirect(302, '/');
+		throw redirect(302, themePreviewHref(url, '/'));
 	}
 
 	return {
@@ -30,7 +32,7 @@ export const actions: Actions = {
 		let email = data.get('email');
 		const password = data.get('password');
 		const token = data.get('token');
-		const returnTo = url.searchParams.get('returnTo') ?? '/account';
+		const returnTo = localReturnTo(url.searchParams.get('returnTo'), url);
 
 		const errors = await validate(
 			{
@@ -82,6 +84,6 @@ export const actions: Actions = {
 		}
 
 		await performLogin(cookies, account.email);
-		throw redirect(302, returnTo);
+		throw redirect(302, themePreviewHref(url, returnTo));
 	},
 } satisfies Actions;

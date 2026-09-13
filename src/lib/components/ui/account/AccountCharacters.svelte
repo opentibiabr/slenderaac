@@ -3,17 +3,20 @@
 	import { _ } from 'svelte-i18n';
 	import { tooltip } from 'svooltip';
 
+	import { page } from '$app/stores';
+
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import MainCharacterIndicator from '$lib/components/ui/MainCharacterIndicator.svelte';
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, type Player, vocationString } from '$lib/players';
+	import { themePreviewHref } from '$lib/themes/preview';
 
 	export let characters: Player[];
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="classic-account-section flex flex-col gap-2">
 	<h3 class="h3">{$_('characters')}</h3>
 
 	<div class="table-container">
@@ -21,24 +24,29 @@
 			<thead>
 				<tr class="[&>th]:!p-2">
 					<th class="w-10" />
-					<th class="w-20">{$_('outfit')}</th>
+					{#if $page.data.selectedTheme !== 'classic'}<th class="w-20"
+							>{$_('outfit')}</th
+						>{/if}
 					<th>{$_('name')}</th>
 					<th class="w-48" />
 				</tr>
 			</thead>
 			<tbody>
-				{#each characters as character, i}
+				{#each characters as character, i (character.id)}
 					<tr class="[&>td]:!align-middle">
 						<td>{i + 1}</td>
-						<td>
-							<AnimatedOutfit outfit={character} alt={character.name} />
-						</td>
+						{#if $page.data.selectedTheme !== 'classic'}<td>
+								<AnimatedOutfit outfit={character} alt={character.name} />
+							</td>{/if}
 						<td>
 							<div class="flex flex-col">
 								<span class="font-semibold flex flex-row gap-1 items-center">
 									<OnlineIndicator online={character.online} />
 									<a
-										href="/characters/{character.name}"
+										href={themePreviewHref(
+											$page.url,
+											`/characters/${encodeURIComponent(character.name)}`,
+										)}
 										class="anchor text-surface-900">
 										{character.name}
 									</a>
@@ -60,7 +68,10 @@
 									{#if !character.isMain}
 										<form
 											class="flex"
-											action="/account/characters/set-main"
+											action={themePreviewHref(
+												$page.url,
+												`/account/characters/set-main`,
+											)}
 											method="POST">
 											<input type="hidden" name="name" value={character.name} />
 											<button class="anchor" type="submit">
@@ -69,13 +80,25 @@
 										</form>
 									{/if}
 									<a
-										href="/account/characters/{character.name}/edit"
+										href={themePreviewHref(
+											$page.url,
+											`/account/characters/${encodeURIComponent(character.name)}/edit`,
+										)}
 										class="anchor"
 										type="submit">
 										{$_('edit')}
 									</a>
 									<a
-										href="/account/characters/{character.name}/delete"
+										href={themePreviewHref(
+											$page.url,
+											`/account/characters/${encodeURIComponent(character.name)}/achievements`,
+										)}
+										class="anchor">Achievements</a>
+									<a
+										href={themePreviewHref(
+											$page.url,
+											`/account/characters/${encodeURIComponent(character.name)}/delete`,
+										)}
 										class="anchor"
 										type="submit">
 										{$_('delete')}
@@ -94,7 +117,10 @@
 									</span>
 									<form
 										class="flex"
-										action="/account/characters/{character.name}/delete?cancel=true"
+										action={themePreviewHref(
+											$page.url,
+											`/account/characters/${encodeURIComponent(character.name)}/delete?cancel=true`,
+										)}
 										method="POST">
 										(<button class="anchor" type="submit"
 											>{$_('undelete')}</button
@@ -110,7 +136,8 @@
 	</div>
 
 	<div class="flex flex-row justify-end">
-		<Button href="/account/characters/create" size="sm"
-			>{$_('new-character')}</Button>
+		<Button
+			href={themePreviewHref($page.url, `/account/characters/create`)}
+			size="sm">{$_('new-character')}</Button>
 	</div>
 </div>

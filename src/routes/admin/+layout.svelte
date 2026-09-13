@@ -12,15 +12,16 @@
 	} from '@floating-ui/dom';
 	import {
 		faBookBookmark,
+		faCalendar,
 		faGlobe,
 		faHome,
 		faNewspaper,
 	} from '@fortawesome/free-solid-svg-icons';
 	import {
 		AppShell,
+		initializeStores,
 		Modal,
 		Toast,
-		initializeStores,
 	} from '@skeletonlabs/skeleton';
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import Fa from 'svelte-fa';
@@ -73,6 +74,23 @@
 			<ul class="[&_a]:flex [&_a]:flex-row [&_a]:gap-2 [&_a]:items-center">
 				<li><a href="/admin"><Fa icon={faHome} />Home</a></li>
 				<li><a href="/admin/news"><Fa icon={faNewspaper} />News</a></li>
+				<li>
+					<a href="/admin/events"><Fa icon={faCalendar} />Event Schedule</a>
+				</li>
+				<li>
+					<a href="/admin/world-quests"><Fa icon={faGlobe} />World Quests</a>
+				</li>
+				<li>
+					<a href="/admin/feedback"><Fa icon={faBookBookmark} />Feedback</a>
+				</li>
+				<li>
+					<a href="/admin/help"><Fa icon={faBookBookmark} />FAQ Articles</a>
+				</li>
+				<li><a href="/admin/polls"><Fa icon={faBookBookmark} />Polls</a></li>
+				<li>
+					<a href="/admin/directories"
+						><Fa icon={faBookBookmark} />Directories</a>
+				</li>
 				<li>
 					<a href="/admin/static-pages"
 						><Fa icon={faBookBookmark} />Static Pages</a>
