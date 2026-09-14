@@ -591,18 +591,21 @@ export async function install(options = {}, services = {}) {
 		.toString('utf8')
 		.replace(/^\uFEFF/, '')
 		.replaceAll('\r\n', '\n');
-	const configuredRoot =
-		process.env.THEME_ASSETS_ROOT ||
-		envValue(normalizedEnvironment, 'THEME_ASSETS_ROOT');
+	const processRoot = process.env.THEME_ASSETS_ROOT;
+	const configuredRoot = processRoot?.trim()
+		? processRoot
+		: envValue(normalizedEnvironment, 'THEME_ASSETS_ROOT');
 	const requestedRoot =
 		options.root ??
-		configuredRoot ??
+		(configuredRoot?.trim() ? configuredRoot : undefined) ??
 		join(dirname(app), `${basename(app)}-theme-assets`);
 	const root = await canonicalPath(
 		isAbsolute(requestedRoot) ? requestedRoot : join(app, requestedRoot),
 	);
 	if (isWithin(app, root))
-		throw new Error('Choose an asset root outside the application checkout');
+		throw new Error(
+			'Choose an asset root outside the application checkout. Run npm run install:assets -- --root ../theme-assets to select an external directory.',
+		);
 
 	const packs = [...new Set(options.packs ?? Object.keys(PACKS))];
 	if (!packs.length || packs.some((pack) => !Object.hasOwn(PACKS, pack)))

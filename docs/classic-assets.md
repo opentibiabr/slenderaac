@@ -23,7 +23,7 @@ The installer:
 
 - downloads all four packages from the SlenderAAC release channel, with no provider-site fallback;
 - checks the ZIP checksum, manifest, image hashes and archive paths;
-- reuses `THEME_ASSETS_ROOT`, or creates a sibling `<application-name>-theme-assets` folder;
+- reuses a non-empty `THEME_ASSETS_ROOT`, or creates a sibling `<application-name>-theme-assets` folder; empty or whitespace-only values use the default, including a fresh `.env.dist`;
 - sets `THEME_ASSETS_ROOT`, `OUTFIT_ASSETS_ROOT`, `ITEM_ASSETS_ROOT` and `STORE_ASSETS_ROOT` in `.env`, preserving unrelated settings;
 - verifies every selected package before activating any of them;
 - keeps the existing default layout and switcher setting, adding Classic/true only when absent.
@@ -43,6 +43,11 @@ To choose another external directory:
 ```sh
 npm run install:assets -- --root ../theme-assets
 ```
+
+`--root` takes priority over the process environment and `.env`. A non-empty path
+inside the application checkout is rejected before downloading anything; choose an
+external directory with the command above. A blank root does not mean the current
+directory. The same rules apply to all four packages.
 
 To install only selected packages (for example, to keep customized Classic artwork):
 

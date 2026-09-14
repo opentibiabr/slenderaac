@@ -10,7 +10,7 @@ import {
 	writeFile,
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import test from 'node:test';
 
 import {
@@ -187,6 +187,96 @@ void test('installs every package, preserves settings and repeats without backup
 			false,
 		);
 	} finally {
+		await rm(temporary, { recursive: true, force: true });
+	}
+});
+
+void test('fresh installations with empty roots choose an external sibling and install all packages', async () => {
+	const originalRoot = process.env.THEME_ASSETS_ROOT;
+	delete process.env.THEME_ASSETS_ROOT;
+	const payloads = Object.fromEntries(
+		Object.keys(PACKS).map((pack) => [
+			pack,
+			pack === 'classic' ? classicPackage() : spritePackage(pack),
+		]),
+	);
+	try {
+		for (const [file, value] of [
+			['.env.dist', ''],
+			['.env', ''],
+			['.env', '""'],
+			['.env', "''"],
+			['.env', "'   '"],
+			['.env', undefined],
+		]) {
+			const { temporary, app } = await fixture();
+			try {
+				await writeFile(
+					join(app, file),
+					value === undefined
+						? 'SLENDER_THEME=legbone\n'
+						: `THEME_ASSETS_ROOT=${value}\nSLENDER_THEME=legbone\n`,
+				);
+				const result = await install({ app }, servicesFor(payloads));
+				const expectedRoot = join(temporary, 'application-theme-assets');
+				assert.equal(result.root, expectedRoot);
+				assert.equal(result.manifests.length, 4);
+				const environment = (await readFile(join(app, '.env'))).toString();
+				assert.equal(envValue(environment, 'SLENDER_THEME'), 'legbone');
+				for (const [pack, config] of Object.entries(PACKS)) {
+					assert.equal(
+						envValue(environment, config.environment),
+						(pack === 'classic'
+							? expectedRoot
+							: join(expectedRoot, pack)
+						).replaceAll('\\', '/'),
+					);
+					assert.equal(
+						JSON.parse(
+							await readFile(join(expectedRoot, pack, 'manifest.json'), 'utf8'),
+						).name,
+						pack,
+					);
+				}
+			} finally {
+				assert.equal(dirname(temporary), tmpdir());
+				await rm(temporary, { recursive: true, force: true });
+			}
+		}
+	} finally {
+		if (originalRoot === undefined) delete process.env.THEME_ASSETS_ROOT;
+		else process.env.THEME_ASSETS_ROOT = originalRoot;
+	}
+});
+
+void test('blank process roots reuse file configuration while explicit roots retain precedence', async () => {
+	const { temporary, app, root } = await fixture();
+	const originalRoot = process.env.THEME_ASSETS_ROOT;
+	const services = servicesFor({ classic: classicPackage() });
+	try {
+		await writeFile(
+			join(app, '.env'),
+			`THEME_ASSETS_ROOT="${root.replaceAll('\\', '/')}"\n`,
+		);
+		process.env.THEME_ASSETS_ROOT = '   ';
+		assert.equal(
+			(await install({ app, packs: ['classic'] }, services)).root,
+			root,
+		);
+		const processRoot = join(temporary, 'process-assets');
+		process.env.THEME_ASSETS_ROOT = processRoot;
+		assert.equal(
+			(await install({ app, packs: ['classic'] }, services)).root,
+			processRoot,
+		);
+		assert.equal(
+			(await install({ app, root, packs: ['classic'] }, services)).root,
+			root,
+		);
+	} finally {
+		if (originalRoot === undefined) delete process.env.THEME_ASSETS_ROOT;
+		else process.env.THEME_ASSETS_ROOT = originalRoot;
+		assert.equal(dirname(temporary), tmpdir());
 		await rm(temporary, { recursive: true, force: true });
 	}
 });
