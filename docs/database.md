@@ -55,7 +55,7 @@ copy databases or modify either configuration file.
 Use these package commands instead of invoking `prisma` directly: the Prisma CLI
 alone reads `DATABASE_URL` from its schema and does not load the game configuration.
 For initial setup, the selected database must already contain the game server's
-schema; follow the [README setup sequence](../README.md#installation).
+schema; follow the [beginner setup sequence](getting-started.md#3-prepare-the-website-tables).
 
 ## Check the startup log
 

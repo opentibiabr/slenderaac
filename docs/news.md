@@ -8,7 +8,7 @@ preview flag or importing sample content.
 
 ## Installation and upgrades
 
-Follow the database setup in the [README](../README.md#getting-started). From the
+Follow the database setup in [Getting started](getting-started.md#3-prepare-the-website-tables). From the
 repository root, the normal commands include the news and event schema:
 
 ```sh

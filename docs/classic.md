@@ -154,7 +154,9 @@ retain a fixed height from an older asset pack.
 
 ## Local setup
 
-Start with the [Classic assets mini tutorial](classic-assets.md) for automatic installation,
+Start with [Getting started](getting-started.md) for a first installation and
+[layout settings](themes.md) for choosing or locking the layout. The
+[Classic assets mini tutorial](classic-assets.md) covers automatic installation,
 updates, fixed download links and missing-image diagnostics.
 
 The registered theme ID, preview value, asset folder and CSS namespace are all
@@ -173,8 +175,9 @@ preference. With switching disabled, the server clears the preference and strips
 preview/comparison parameters, including aliases, without changing page filters.
 
 `SERVER_NAME` supplies the server identity in navigation, headings, guides,
-promotions and accessible labels. It uses the same server-side configuration as the rest of SlenderAAC, with
-`OpenTibia` as a fallback for an empty value. `/about/company` describes OpenTibiaBR
+promotions and accessible labels. The shared resolver falls back to the imported
+world name, then `Server`, when that value is empty. See the
+[server library configuration](server-library.md#import-and-update). `/about/company` describes OpenTibiaBR
 and links to its projects. Both pages are built in; external packs cannot replace
 their content. Older introduction URLs redirect locally and preserve the query.
 
@@ -860,3 +863,61 @@ Use a unique versioned tag for each package update. The publisher only replaces
 that package's fixed ZIP/checksum/JSON attachments, keeping other selections
 intact. See the [installation guide](classic-assets.md)
 for environment variables, store migration and checks.
+
+## External pack format
+
+Theme-specific binary assets must not be committed to this repository. The [installer](classic-assets.md) configures `THEME_ASSETS_ROOT` with an external absolute directory. For a manual installation, set it to the absolute path of the parent of `classic`, using forward slashes on Windows.
+
+Example `classic` asset pack layout:
+
+```text
+theme-assets/classic/
+  manifest.json
+  images/
+  backgrounds/
+  buttons/
+  icons/
+  menu/
+  boxes/
+  frames/
+  content/
+  strings/
+  themeboxes/
+```
+
+`manifest.json` must include `schemaVersion`, `name`, `version`, and `assets`. `hashes` is optional.
+
+```json
+{
+	"schemaVersion": 1,
+	"name": "classic",
+	"version": "2026.05.26",
+	"assets": {
+		"logo": "images/logo.png",
+		"background": "backgrounds/background.webp",
+		"menuOrnament": "icons/menu-ornament.png",
+		"contentOrnament": "icons/content-ornament.png",
+		"themeBoxOrnament": "boxes/box-ornament.png"
+	},
+	"hashes": {
+		"images/logo.png": "sha256-example"
+	}
+}
+```
+
+Only `png`, `jpg`, `jpeg`, `gif`, `webp`, `ico`, and `ttf` files are served by `/theme-assets/[theme]/[...path]`. Asset paths are validated before public URLs are generated, and the endpoint rejects traversal, dotfiles, backslashes, null bytes, directories, blocked extensions, and symlinks that escape the theme root.
+
+`classic` works without an asset pack and falls back to neutral placeholders. Missing or invalid asset pack warnings are only shown to admins.
+
+The deployment operator is responsible for confirming asset rights and authorization. Keeping reference-style assets outside the MIT repository keeps the code repository clean, but it does not remove legal risk from deploying or distributing those assets.
+
+For local visual review, a `classic` pack can contain official/reference-style pieces such as the page background, logo, menu icons and labels, blue button sprites, content frame borders, news headline strips, topbar social/status icons, right-side theme boxes, trailer/screenshot previews, and shop/poll panels. These files must remain external to the repository. Before production distribution, either obtain authorization for those assets or replace/modify them with assets the deployment operator is allowed to use.
+
+### Asset acceptance checklist
+
+- `SLENDER_THEME=legbone` keeps the existing visual and flows.
+- `SLENDER_THEME=classic` works without external assets.
+- `SLENDER_THEME=classic` works with a mounted external asset pack.
+- Asset endpoint attacks using `..`, encoded traversal, backslashes, null bytes, dotfiles, symlink escape, directories, and blocked extensions fail.
+- No MyAAC PHP/Twig/CSS/JS is copied into this repository.
+- No reference-style binary assets are committed to this repository.

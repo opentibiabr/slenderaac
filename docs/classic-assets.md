@@ -5,6 +5,9 @@ separate ZIPs in the same fixed release channel, installed outside the checkout.
 The same outfit, item and store files serve both layouts. You do not need to visit the visual
 reference website, export pages, or import news to install the published images.
 
+New installation? Start with [Getting started](getting-started.md) for the database
+and application setup. [Layout settings](themes.md) explains the default and switcher.
+
 ## One-command installation
 
 Use an updated SlenderAAC checkout and install its dependencies first. The installer
@@ -184,3 +187,28 @@ manifest hash/version using the existing asset-pack workflow. Without that optio
 image, or if it fails to load, the card shows a Play trailer action. Captured trailer
 thumbnails are not a fallback. Keep this poster in sync with the configured video
 and reapply operator customizations after a package upgrade.
+
+## Renderer behavior
+
+<details>
+<summary>Outfit and item response contracts for maintainers</summary>
+
+### Animated outfits
+
+The renderer reads the requested outfit's PNG files directly. No generated metadata or cache marker is needed, and the sprite directory can be read-only. Replacing sprites takes effect on subsequent requests; browser responses are revalidated against their rendered content. Animations must contain consecutive frames starting at one, with at most 128 frames in a complete rider/mount loop. Missing optional outfits return `404` with no frames without interrupting character, account, or ranking pages. Invalid request parameters return `400`.
+
+### Inventory items
+
+Item requests accept numeric identities and the existing empty-slot names. Missing
+or invalid optional images return a non-cacheable `404`; malformed identities
+return `400`. Successful responses revalidate their complete image and title, so
+replacing artwork or item names takes effect without restarting the app.
+The optional `appearances.dat` and `appearances.proto` files provide item titles.
+Missing or malformed title data leaves the image available with the client's
+numeric fallback label.
+
+Manual installations can still use the legacy `outfits_anim` and `items`
+directories. Keep artwork outside version control; use the installer for new
+installations so these files stay outside the checkout.
+
+</details>
