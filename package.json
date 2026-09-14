@@ -18,9 +18,10 @@
 		"migrate:dev": "node src/scripts/with-server-config.js prisma migrate dev",
 		"migrate:resolve": "node src/scripts/with-server-config.js prisma migrate resolve --applied 000000000000_init_from_canary",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:themes": "node src/scripts/check-themes.mjs",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:assets": "node --test src/scripts/install-theme-assets.test.js",
-		"lint": "prettier --check . && eslint .",
+		"lint": "npm run check:themes && prettier --check . && eslint .",
 		"format": "prettier --write ."
 	},
 	"devDependencies": {

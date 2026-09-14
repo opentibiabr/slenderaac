@@ -46,11 +46,14 @@ import {
 } from '$lib/themes/profiles';
 
 export type ThemeDefinition = {
+	profile: ThemeProfile;
+	components: ThemeComponents;
+};
+
+export type RegisteredThemeDefinition = ThemeDefinition & {
 	id: ThemeId;
 	name: string;
-	profile: ThemeProfile;
 	Shell: ComponentType;
-	components: ThemeComponents;
 };
 
 export type ThemeComponents = {
@@ -139,8 +142,8 @@ export const themeRegistry = {
 			OnlinePlayers: ClassicOnlinePlayers,
 		},
 	},
-} satisfies Record<ThemeId, ThemeDefinition>;
+} satisfies Record<ThemeId, RegisteredThemeDefinition>;
 
-export function themeDefinition(theme: ThemeId): ThemeDefinition {
+export function themeDefinition(theme: ThemeId): RegisteredThemeDefinition {
 	return themeRegistry[theme];
 }
