@@ -21,8 +21,26 @@ void test(
 			},
 		});
 		try {
+			for (const type of [5, 6]) {
+				await prisma.accounts.update({
+					where: { id: account.id },
+					data: { type },
+				});
+				const staffSession = await createSession(account.email, 60);
+				assert.equal((await getSession(staffSession))?.type, type);
+				await deleteSession(staffSession);
+			}
 			const sid = await createSession(account.email, 60);
 			assert.equal((await getSession(sid))?.accountId, account.id);
+			await prisma.accounts.update({
+				where: { id: account.id },
+				data: { type: 5 },
+			});
+			assert.equal(
+				(await getSession(sid))?.type,
+				5,
+				'a role change must be visible to an existing session',
+			);
 			await prisma.accountSessions.delete({ where: { id: sid } });
 			assert.equal(
 				await getSession(sid),

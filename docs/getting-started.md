@@ -98,6 +98,11 @@ choose an address you control. Changing that value does not promote an existing
 account. For local browsing without payments, set `ENABLE_STRIPE_CUSTOM=false`
 and `ENABLE_STRIPE_CHECKOUT=false`.
 
+Account roles follow the game server: type `5` is Community Manager and type `6`
+is God. Both can sign in, but website administration requires God (`6`). Updating
+the website does not promote existing accounts; review staff roles in the game
+database when upgrading from an older role mapping.
+
 ### 3. Prepare the website tables
 
 Back up the game database before applying schema changes. For a game database
