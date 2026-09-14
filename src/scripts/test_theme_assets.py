@@ -110,6 +110,15 @@ class ReleaseToolTests(unittest.TestCase):
                 with self.subTest(pack=pack, name=name), self.assertRaises(ValueError):
                     self.unpack(sprite_package(pack, {name: b"bad"}), pack)
 
+    def test_archive_size_bounds_are_checked_before_extraction(self):
+        for pack in ("outfits", "items", "store"):
+            payload = sprite_package(pack)
+            with self.subTest(pack=pack), patch.dict(assets.MAX_ZIP, {pack: len(payload)}):
+                self.assertEqual(self.unpack(payload, pack)["name"], pack)
+            with self.subTest(pack=pack), patch.dict(assets.MAX_ZIP, {pack: len(payload) - 1}):
+                with self.assertRaisesRegex(ValueError, "Invalid archive size"):
+                    self.unpack(payload, pack)
+
     def test_release_urls_accept_only_immutable_repository_archives(self):
         valid = assets.RELEASE_BASE + "classic-assets-test/test.zip"
         self.assertEqual(assets.release_url(valid), valid)

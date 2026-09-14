@@ -178,10 +178,16 @@ back up replaced directories and restore them after a failed activation. Check
 application compatibility before moving legacy static store files. Installation
 does not imply a build, migration, content import, restart or game-config edit.
 
-Preserve catalog filenames, actual MIME types and animation. A GIF behind a
-`.png` URL must not lose its frames; an outfit with one real idle frame is not a
-failed download. Validate actual image responses and rendered behavior in both
-themes, including missing-asset fallbacks, rather than checking ZIP existence only.
+Preserve catalog filenames, actual MIME types and animation. Publish walking outfit
+sequences in the default pack; an idle-only export can render successfully while
+leaving players and boosted portraits still. Verify multiple distinct frames for
+representative players, creatures and mounts before updating the fixed channel.
+Refresh prepared library portraits from the same sequences when the source changes.
+A GIF behind a `.png` URL must retain all frames, durations and its loop. A genuinely
+single-frame appearance remains still; do not invent movement or hide missing assets
+with a static substitute. Validate rendered behavior in both themes, including
+navigation and missing-asset fallbacks, rather than checking ZIP existence or HTTP
+200 alone. Keep sprite preparation outside runtime requests and the source checkout.
 
 ## Evidence and completion
 

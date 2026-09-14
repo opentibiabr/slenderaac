@@ -31,9 +31,9 @@ The installer:
 - verifies every selected package before activating any of them;
 - keeps the existing default layout and switcher setting, adding Classic/true only when absent.
 
-The first run downloads about one release archive per package and expands tens of
-thousands of small image files. It can take several minutes on a slower connection or
-disk. Progress is printed while each download runs and again when validation/staging
+The first run downloads one release archive per package. The walking outfit pack
+alone contains more than 100,000 small PNG files. Installation can take several
+minutes on a slower connection or disk. Progress is printed while each download runs and again when validation/staging
 starts. This does not change the development command: restart the website afterwards
 with `npm run dev`, or use the service command from your deployment.
 
@@ -133,9 +133,10 @@ this asset's HTTP status and the theme being viewed; never send the full `.env`.
 Boosted creatures, bosses and player portraits use the outfit package installed
 by the default command, configured through
 `OUTFIT_ASSETS_ROOT`. They use the server database and `/api/outfits`; installing
-the Classic ZIP supplies their pedestals and decoration. A portrait with only one
-animation frame will remain still. Check the sprite pack when these portraits
-are missing but the theme borders and background load correctly.
+the Classic ZIP supplies their pedestals and decoration. If portraits load but stay
+still, update the application and run `npm run install:assets` again, then restart.
+Older outfit packages contained only idle frames for many appearances. Updating
+the Classic package also refreshes the prepared library portraits.
 
 Maintainers: see [publishing and refreshing packages](classic.md#publishing-the-fixed-asset-channel).
 
@@ -143,15 +144,23 @@ Maintainers: see [publishing and refreshing packages](classic.md#publishing-the-
 
 The published sprites target the current packaged client data (15.10 for the
 outfit and item snapshots). IDs must match the game server's data; custom or newer
-appearances may need an updated pack. Outfit animations use idle PNG frames;
-appearances with one frame remain still. Animated item GIFs keep their frames.
+appearances may need an updated pack. The default outfit package includes walking
+PNG sequences, including colors, addons, directions and mounted poses. An
+appearance that has only one genuine frame still remains still; do not synthesize
+movement. Animated item and store GIFs keep every frame, duration and loop setting.
 Optional inventory placeholders and item-title metadata remain operator supplied.
 
 Check these URLs after restarting the website:
 
-- `/api/outfits?id=128` — JSON containing rendered outfit frames.
-- `/api/items?id=3031` — JSON containing the item image.
-- `/images/store/13/Category_Coins.png` — a store image with HTTP 200.
+- `/api/outfits?id=128` — JSON with multiple distinct rendered frames in the default pack.
+- `/api/outfits?id=300` — another walking sequence, covering a formerly static creature.
+- `/api/items?id=10329` — JSON containing a complete animated GIF, not a single extracted frame.
+- `/images/store/64/Djinn_Lamp_Idle.png` — an animated image served as `image/gif` despite its catalog filename.
+
+Confirm visible movement in both layouts, including boosted portraits and player
+portraits after navigation. HTTP 200 or a nonempty image alone does not establish
+that an animation works. Naturally static items, such as the basic gold coin, are
+not suitable animation checks.
 
 In the game server's `config.lua`, `coinImagesURL` must point at **your website**,
 including the trailing slash and the port if needed:

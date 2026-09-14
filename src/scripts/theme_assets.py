@@ -19,7 +19,13 @@ import zipfile
 REPOSITORY = "opentibiabr/slenderaac"
 CHANNEL_TAG = "classic-assets-latest"
 RELEASE_BASE = f"https://github.com/{REPOSITORY}/releases/download/"
-MAX_ZIP = 128 * 1024 * 1024
+# Keep publication and installation bounds aligned with install-theme-assets.js.
+MAX_ZIP = {
+    "classic": 128 * 1024 * 1024,
+    "outfits": 256 * 1024 * 1024,
+    "items": 128 * 1024 * 1024,
+    "store": 128 * 1024 * 1024,
+}
 MAX_EXPANDED = 512 * 1024 * 1024
 PACKS = {
     "classic": ("classic", "tools"),
@@ -71,9 +77,12 @@ def safe_path(name: str) -> PurePosixPath:
 
 def unpack(archive: Path, staging: Path, pack: str = "classic") -> dict:
     """Validate all paths before extracting; never execute packaged tools."""
+    if pack not in PACKS or not 0 < archive.stat().st_size <= MAX_ZIP[pack]:
+        raise ValueError("Invalid archive size")
     with zipfile.ZipFile(archive) as source:
         entries = source.infolist()
-        if len(entries) > (10000 if pack == "classic" else 100000) or sum(e.file_size for e in entries) > MAX_EXPANDED:
+        maximum_entries = 10000 if pack == "classic" else 200000 if pack == "outfits" else 100000
+        if len(entries) > maximum_entries or sum(e.file_size for e in entries) > MAX_EXPANDED:
             raise ValueError("Archive is too large")
         seen = set()
         for entry in entries:
@@ -182,7 +191,7 @@ def package_sprites(args) -> None:
             target.writestr(f"{args.pack}/README.md", readme)
             manifest = {"schemaVersion": 1, "name": args.pack, "version": args.version, "hashes": hashes}
             target.writestr(f"{args.pack}/manifest.json", json.dumps(manifest, indent=2) + "\n")
-        if archive.stat().st_size > MAX_ZIP:
+        if archive.stat().st_size > MAX_ZIP[args.pack]:
             raise ValueError("Archive is too large")
         unpack(archive, stage / "check", args.pack)
         os.replace(archive, output)
@@ -213,7 +222,7 @@ def publish(args) -> None:
         raise ValueError("--target must be the full published application commit SHA")
     archive = args.zip.resolve()
     payload = archive.read_bytes()
-    if not payload or len(payload) > MAX_ZIP:
+    if not payload or len(payload) > MAX_ZIP[pack]:
         raise ValueError("Invalid archive size")
     with tempfile.TemporaryDirectory(prefix="classic-publish-") as directory:
         stage = Path(directory)
@@ -235,7 +244,7 @@ def publish(args) -> None:
         if not attachment or versioned["draft"]:
             raise ValueError("Versioned release archive is missing or still a draft")
         url = release_url(attachment["browser_download_url"])
-        if digest(download(url, MAX_ZIP)) != checksum:
+        if digest(download(url, MAX_ZIP[pack])) != checksum:
             raise ValueError("Published versioned archive differs; channel was not changed")
         channel = {"schemaVersion": 1, "name": pack, "version": manifest["version"],
                    "release": args.release, "url": url, "sha256": checksum, "size": len(payload)}

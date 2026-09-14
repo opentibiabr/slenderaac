@@ -859,6 +859,25 @@ the output. It does not fetch source artwork or execute scripts in a downloaded
 archive. Keep original source provenance and any license records with the external
 source collection. Verify client-version compatibility before publishing.
 
+Use the walking outfit export for the default package, preserving every numbered
+frame, direction, addon, color template and mounted pose. An idle export is not an
+equivalent substitute: many valid idle appearances contain only one frame. Check
+multiple distinct frames through `/api/outfits?id=128` and `/api/outfits?id=300`,
+a mounted player, and visible playback in both layouts. Preserve animated GIF bytes
+for items and store images, including files whose catalog name ends in `.png`.
+Include item appearances referenced by the native creature/boss catalog as well as
+inventory items: an inventory-only archive may omit those identities.
+Refresh generated library portraits with the external `render-server-art.py --all`
+workflow when replacing their source sequences; installing new outfit PNGs does
+not regenerate those prepared images during a page request.
+
+Walking sequences require larger archives. Both publication and installation allow
+up to 256 MiB and 200,000 entries for outfits; other ZIPs retain their 128 MiB bound
+(10,000 entries for Classic, 100,000 for items/store). Every pack still has a
+512 MiB expanded limit and a 32 MiB per-file limit. Keep these bounds synchronized
+between the maintainer publisher and the Node.js installer. Update the application
+before installing a newer package that exceeds the previous limits.
+
 Use a unique versioned tag for each package update. The publisher only replaces
 that package's fixed ZIP/checksum/JSON attachments, keeping other selections
 intact. See the [installation guide](classic-assets.md)

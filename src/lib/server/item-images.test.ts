@@ -13,8 +13,9 @@ import { createItemImageLoader, itemImageId } from './item-images';
 // eslint-disable-next-line import/no-named-as-default-member -- Match the CommonJS SSR import.
 const { parse: parseProtobuf } = protobuf;
 
+// Two different frames, unequal durations and an infinite loop must survive loading.
 const gif = Buffer.from(
-	'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
+	'R0lGODlhAgABAIEAAP8AAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQADAAAACwAAAAAAgABAAAIBQABAAgIACH5BAEYAAEALAAAAAACAAEAgQAA/wAAAAAAAAAAAAgFAAEACAgAOw==',
 	'base64',
 );
 

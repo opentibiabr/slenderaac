@@ -33,7 +33,13 @@ import yauzl from 'yauzl';
 const REPOSITORY = 'opentibiabr/slenderaac';
 const CHANNEL_TAG = 'classic-assets-latest';
 const RELEASE_BASE = `https://github.com/${REPOSITORY}/releases/download/`;
-const MAX_ZIP = 128 * 1024 * 1024;
+// Keep publication and installation bounds aligned with theme_assets.py.
+const MAX_ZIP = {
+	classic: 128 * 1024 * 1024,
+	outfits: 256 * 1024 * 1024,
+	items: 128 * 1024 * 1024,
+	store: 128 * 1024 * 1024,
+};
 const MAX_EXPANDED = 512 * 1024 * 1024;
 const MAX_FILE = 32 * 1024 * 1024;
 const DOWNLOAD_TIMEOUT = 10 * 60 * 1000;
@@ -160,6 +166,7 @@ export function releaseUrl(value) {
 
 export function validateChannel(channel, pack) {
 	if (
+		!Object.hasOwn(PACKS, pack) ||
 		!isRecord(channel) ||
 		channel.schemaVersion !== 1 ||
 		channel.name !== pack ||
@@ -167,7 +174,7 @@ export function validateChannel(channel, pack) {
 		!/^[0-9a-f]{64}$/.test(channel.sha256) ||
 		!Number.isInteger(channel.size) ||
 		channel.size <= 0 ||
-		channel.size > MAX_ZIP
+		channel.size > MAX_ZIP[pack]
 	)
 		throw new Error('Invalid asset release metadata');
 	releaseUrl(channel.url);
@@ -210,7 +217,8 @@ export function safePath(name) {
 const inspectEntries = async (archive, pack) => {
 	const entries = [];
 	const seen = new Set();
-	const maximumEntries = pack === 'classic' ? 10000 : 100000;
+	const maximumEntries =
+		pack === 'classic' ? 10000 : pack === 'outfits' ? 200000 : 100000;
 	let expandedSize = 0;
 	for await (const entry of archive.eachEntry()) {
 		const parts = safePath(entry.fileName);
@@ -359,7 +367,7 @@ export async function unpack(payload, staging, pack = 'classic') {
 	if (
 		!Buffer.isBuffer(payload) ||
 		payload.length === 0 ||
-		payload.length > MAX_ZIP
+		payload.length > MAX_ZIP[pack]
 	)
 		throw new Error('Invalid archive size');
 	const archive = await yauzl.fromBufferPromise(payload, {
@@ -672,13 +680,17 @@ export async function install(options = {}, services = {}) {
 					`Downloading the published ${pack} package (${(channel.size / 1024 / 1024).toFixed(1)} MiB)...`,
 				);
 				let nextQuarter = 1;
-				const payload = await loadArchive(channel.url, MAX_ZIP, (received) => {
-					const completedQuarters = Math.floor((received / channel.size) * 4);
-					while (nextQuarter <= completedQuarters && nextQuarter < 4) {
-						console.log(`${pack}: ${nextQuarter * 25}% downloaded`);
-						nextQuarter += 1;
-					}
-				});
+				const payload = await loadArchive(
+					channel.url,
+					MAX_ZIP[pack],
+					(received) => {
+						const completedQuarters = Math.floor((received / channel.size) * 4);
+						while (nextQuarter <= completedQuarters && nextQuarter < 4) {
+							console.log(`${pack}: ${nextQuarter * 25}% downloaded`);
+							nextQuarter += 1;
+						}
+					},
+				);
 				if (
 					payload.length !== channel.size ||
 					digest(payload) !== channel.sha256

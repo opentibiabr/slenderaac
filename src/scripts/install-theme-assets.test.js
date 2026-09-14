@@ -20,6 +20,7 @@ import {
 	PACKS,
 	releaseUrl,
 	unpack,
+	validateChannel,
 } from './install-theme-assets.js';
 
 const crcTable = Array.from({ length: 256 }, (_, value) => {
@@ -409,6 +410,25 @@ void test('only accepts immutable versioned application release URLs', () => {
 		'https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-test/classic.zip?changed=1',
 	])
 		assert.throws(() => releaseUrl(url));
+});
+
+void test('walking outfit downloads have a larger bounded allowance without relaxing other packs', () => {
+	const channel = (name, size) => ({
+		schemaVersion: 1,
+		name,
+		size,
+		sha256: 'a'.repeat(64),
+		url: `https://github.com/opentibiabr/slenderaac/releases/download/classic-assets-test/${name}.zip`,
+	});
+	for (const pack of Object.keys(PACKS)) {
+		const limit = (pack === 'outfits' ? 256 : 128) * 1024 * 1024;
+		assert.equal(validateChannel(channel(pack, limit), pack).size, limit);
+		assert.throws(
+			() => validateChannel(channel(pack, limit + 1), pack),
+			/Invalid asset release metadata/,
+		);
+	}
+	assert.throws(() => validateChannel(channel('toString', 1), 'toString'));
 });
 
 void test('test fixture digests use the same SHA-256 representation as the installer', () => {

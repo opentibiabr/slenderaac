@@ -46,16 +46,16 @@ void test('store images use external nested paths and revalidate replacements', 
 		assert.equal(invalid.status, 404);
 		assert.equal(invalid.headers.get('Cache-Control'), 'no-store');
 		const catalogName = "13/Lamp_&_Ship's_Wheel_(Lit).png";
-		await fs.writeFile(
-			path.join(root, catalogName),
-			Buffer.from(
-				'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-				'base64',
-			),
+		// Preserve both frames, their timings and the loop behind a catalog PNG URL.
+		const animation = Buffer.from(
+			'R0lGODlhAgABAIEAAP8AAAAAAAAAAAAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQADAAAACwAAAAAAgABAAAIBQABAAgIACH5BAEYAAEALAAAAAACAAEAgQAA/wAAAAAAAAAAAAgFAAEACAgAOw==',
+			'base64',
 		);
+		await fs.writeFile(path.join(root, catalogName), animation);
 		const gif = await storeImage(root, catalogName, request);
 		assert.equal(gif.status, 200);
 		assert.equal(gif.headers.get('Content-Type'), 'image/gif');
+		assert.deepEqual(Buffer.from(await gif.arrayBuffer()), animation);
 	} finally {
 		await fs.rm(root, { recursive: true, force: true });
 	}
