@@ -5,6 +5,7 @@ import {
 	DEFAULT_THEME_ID,
 	isThemeId,
 	normalizeTheme,
+	themeAssetPack,
 	themeIds,
 	themeProfiles,
 	validateThemeProfiles,
@@ -24,6 +25,9 @@ void test('profile asset references point to registered themes', () => {
 			assert.ok(source === null || isThemeId(source));
 		}
 	}
+	assert.equal(themeAssetPack('classic', 'chromePack'), 'classic');
+	assert.equal(themeAssetPack('legbone', 'chromePack'), null);
+	assert.equal(themeAssetPack('legbone', 'catalogArtworkPack'), 'classic');
 });
 
 void test('theme normalization keeps the safe default for invalid values', () => {

@@ -2,19 +2,23 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import { parseInformationPresentation } from '$lib/information-content';
+import { themeAssetPack, type ThemeId } from '$lib/themes/profiles';
 
 import { env } from '$env/dynamic/private';
 
-export async function loadInformationPresentation(theme: string, id: string) {
+export async function loadInformationPresentation(theme: ThemeId, id: string) {
+	const referencePack = themeAssetPack(theme, 'referencePack');
 	if (
 		['company', 'server'].includes(id) ||
-		theme !== 'classic' ||
+		!referencePack ||
 		!env.THEME_ASSETS_ROOT ||
 		!/^[a-z]+(?:-[a-z_]+)?$/.test(id)
 	)
 		return null;
 	try {
-		const root = await fs.realpath(path.join(env.THEME_ASSETS_ROOT, 'classic'));
+		const root = await fs.realpath(
+			path.join(env.THEME_ASSETS_ROOT, referencePack),
+		);
 		const file = await fs.realpath(
 			path.join(root, 'reference', 'pages', `${id}.json`),
 		);

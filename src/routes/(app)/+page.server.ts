@@ -6,6 +6,7 @@ import {
 	loadNewsReference,
 	readArticlePresentation,
 } from '$lib/server/theme-assets/news-reference';
+import { themeProfile } from '$lib/themes/profiles';
 
 import type { PageServerLoad } from './$types';
 
@@ -43,6 +44,8 @@ export const load = (async ({ url, parent }) => {
 		};
 	}
 	const layout = await parent();
+	const latestNewsLimit = themeProfile(layout.selectedTheme).data
+		.latestNewsLimit;
 	const [news, recentTickers] = await Promise.all([
 		prisma.news.findMany({
 			where: {
@@ -53,7 +56,7 @@ export const load = (async ({ url, parent }) => {
 			},
 			include: { author: { select: { name: true } } },
 			orderBy: [{ created_at: 'desc' }, { id: 'desc' }],
-			take: requestedId ? 1 : layout.selectedTheme === 'classic' ? 8 : 5,
+			take: requestedId ? 1 : latestNewsLimit,
 		}),
 		prisma.news.findMany({
 			where: { published: true, type: 'ticker' },

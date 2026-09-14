@@ -2,17 +2,19 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import type { ClassicPresentation } from '$lib/themes/classic/reference-types';
+import { themeAssetPack, type ThemeId } from '$lib/themes/profiles';
 
 import { env } from '$env/dynamic/private';
 
 export async function loadPresentationReference(
-	theme: string,
+	theme: ThemeId,
 ): Promise<ClassicPresentation | null> {
-	if (theme !== 'classic' || !env.THEME_ASSETS_ROOT) return null;
+	const referencePack = themeAssetPack(theme, 'referencePack');
+	if (!referencePack || !env.THEME_ASSETS_ROOT) return null;
 	try {
 		const file = path.join(
 			env.THEME_ASSETS_ROOT,
-			'classic',
+			referencePack,
 			'reference',
 			'presentation.json',
 		);

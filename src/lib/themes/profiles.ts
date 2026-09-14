@@ -69,6 +69,8 @@ export const themeProfiles = {
 
 export type ThemeId = keyof typeof themeProfiles;
 
+export type ThemeAssetKind = keyof ThemeProfile['assets'];
+
 export const themeIds = Object.keys(themeProfiles) as ThemeId[];
 
 export const DEFAULT_THEME_ID: ThemeId = 'legbone';
@@ -86,6 +88,14 @@ export function normalizeTheme(value: unknown): ThemeId {
 
 export function themeProfile(theme: ThemeId): ThemeProfile {
 	return themeProfiles[theme];
+}
+
+export function themeAssetPack(
+	theme: ThemeId,
+	kind: ThemeAssetKind,
+): ThemeId | null {
+	const source = themeProfiles[theme].assets[kind];
+	return source !== null && isThemeId(source) ? source : null;
 }
 
 /**

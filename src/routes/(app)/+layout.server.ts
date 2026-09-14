@@ -23,6 +23,7 @@ import {
 } from '$lib/server/theme-assets/selection';
 import { parseTimeString } from '$lib/server/utils';
 import { serverName } from '$lib/server/worlds';
+import { themeAssetPack } from '$lib/themes/profiles';
 
 import { env } from '$env/dynamic/private';
 import { SERVER_SAVE_TIME } from '$env/static/private';
@@ -60,7 +61,8 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		{ boostedBoss, boostedCreature },
 		staticPages,
 		accountCharacters,
-		classicAssetMetadata,
+		serverIdentityAssetMetadata,
+		themeAssetMetadata,
 		informationPresentation,
 		selectedFansite,
 		selectedPoll,
@@ -98,7 +100,15 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 					}),
 				)
 			: Promise.resolve(null),
-		diagnosticStep('layout.assets', () => loadThemeAssetMetadata('classic')),
+		diagnosticStep('layout.identity-assets', () =>
+			loadThemeAssetMetadata('classic'),
+		),
+		diagnosticStep('layout.assets', () => {
+			const chromePack = themeAssetPack(selectedTheme, 'chromePack');
+			return chromePack
+				? loadThemeAssetMetadata(chromePack)
+				: Promise.resolve({ assets: {}, version: null, warning: null });
+		}),
 		diagnosticStep('layout.gallery', () =>
 			loadInformationPresentation('classic', 'screenshots'),
 		),
@@ -110,17 +120,13 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		),
 	]);
 	const screenshotGallery = informationPresentation?.gallery ?? null;
-	const themeAssetMetadata =
-		selectedTheme === 'classic'
-			? classicAssetMetadata
-			: { assets: {}, version: null, warning: null };
 
 	return {
 		siteLinks,
 		featuredFansite: selectedFansite,
 		currentPoll: selectedPoll,
 		serverName: selectedServerName,
-		serverLogo: classicAssetMetadata.assets.serverLogo ?? null,
+		serverLogo: serverIdentityAssetMetadata.assets.serverLogo ?? null,
 		screenshotGallery,
 		featuredScreenshot: dailyScreenshot(screenshotGallery?.items ?? []),
 		classicPresentation,

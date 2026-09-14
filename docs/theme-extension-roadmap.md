@@ -195,10 +195,10 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 
 ### Phase 4 — server and assets
 
-- [ ] Load the chrome pack declared by the selected profile.
-- [ ] Pass reference and catalog artwork sources by profile rather than by
-  comparing a concrete theme ID.
-- [ ] Preserve global server identity and administrator-only asset warnings.
+- [x] Load the chrome pack declared by the selected profile.
+- [x] Pass reference and catalog artwork sources by profile rather than by
+	comparing a concrete theme ID.
+- [x] Preserve global server identity and administrator-only asset warnings.
 - [ ] Preserve neutral missing-pack behavior and external asset boundaries.
 - [ ] Remove direct theme comparisons from page loads and asset loaders.
 - [ ] Verify filters, fragments and authentication return URLs.
@@ -274,6 +274,8 @@ loading/empty/offline/unavailable/error/stale states and animated outfits.
 | Date | Phase | Commit | Validation | Notes |
 | --- | --- | --- | --- | --- |
 | 2026-09-14 | Baseline/profile started | — | Source inventory and focused inspection | Current PR owns the merge gate |
+| 2026-09-14 | Semantic renderers | `b76d55e` | `npm run check`; targeted ESLint | Page framing, tables, section navigation, modal and radio presentation now resolve through the registry |
+| 2026-09-14 | Profile-driven server sources | — | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities |
 
 ## Completion criteria
 

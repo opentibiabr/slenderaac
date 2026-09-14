@@ -5,6 +5,7 @@ import { informationPageForPath, manualSections } from '$lib/information';
 import { loadCreatures } from '$lib/server/catalog';
 import { loadInformationPresentation } from '$lib/server/theme-assets/information';
 import { loadThemeAssetMetadata } from '$lib/server/theme-assets/manifest';
+import { themeAssetPack } from '$lib/themes/profiles';
 
 import type { PageServerLoad } from './$types';
 
@@ -51,11 +52,15 @@ export const load: PageServerLoad = async ({ url, parent }) => {
 				selectedTheme,
 				section ? `manual-${section}` : informationPage.id,
 			);
+	const catalogArtworkPack = themeAssetPack(
+		selectedTheme,
+		'catalogArtworkPack',
+	);
 	const artwork =
-		isLibrary && selectedTheme !== 'classic'
+		isLibrary && catalogArtworkPack
 			? Object.fromEntries(
 					Object.entries(
-						(await loadThemeAssetMetadata('classic')).assets,
+						(await loadThemeAssetMetadata(catalogArtworkPack)).assets,
 					).filter(
 						([key]) =>
 							key.startsWith('creatureIcon-') ||
