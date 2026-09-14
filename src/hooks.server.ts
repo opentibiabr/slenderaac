@@ -74,7 +74,7 @@ export const handle = (async ({ event, resolve }) => {
 		if (session) {
 			event.locals.session = session;
 		} else {
-			cookies.delete('sid');
+			cookies.delete('sid', { path: '/' });
 		}
 	}
 
