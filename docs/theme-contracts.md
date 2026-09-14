@@ -19,10 +19,15 @@ make a page complete.
 | Native catalogs, game configuration and data boundaries             | [Server library](server-library.md)                                                 |
 | News, guides and editable information                               | [News and content](news.md), [Support](support.md)                                  |
 | Implemented pages and remaining dependencies                        | [Page roadmap](page-roadmap.md)                                                     |
+| Extensible theme registry and merge gate                            | [Theme extension roadmap](theme-extension-roadmap.md)                               |
 
 Keep detailed rules in their owning document. Update that document when behavior
 changes; historical capture notes are evidence for their recorded conditions,
 not universal dimensions or proof of the current implementation.
+
+New layouts follow the [theme extension roadmap](theme-extension-roadmap.md).
+Routes and shared components consume semantic renderers and server-safe theme
+profiles; they do not compare a concrete layout ID to choose presentation.
 
 ## Shared structure and native behavior
 
