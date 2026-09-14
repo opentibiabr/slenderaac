@@ -607,19 +607,33 @@ checkout use existing Slender data and actions. `PagePanel` selects shared Class
 layout. Extend those wrappers for future pages with the same structure before
 adding route-specific CSS. Theme-specific native controls are scoped to Classic.
 
-Account information and character management share their native components and
-actions across themes. Their Classic panels use the existing list variant,
-bordered data tables and a single shadow surface; action buttons sit outside the
-table surface. Property labels align left. Character presence sits beside the
-name; the Status column shows reward collection and hidden state, as defined in
-[UI states](ui-states.md#account-character-status). Record actions retain the local
-account routes. Additional
-native actions may require taller rows than a reference with fewer controls.
-Classic highlights the selected row and shows its bracketed actions. Clicking a
-row selects it; the numbered button also supports keyboard selection. Character
-names remain links to native public profiles. Selection is local presentation
-state, independent of which character is the account's main character. Keep
-unselected rows compact and retain the keyed outfit instances while selecting.
+Account data, actions and character management remain shared across themes. The
+Classic overview follows the reference composition: a braced welcome line, Account
+Status, Download Client and Characters. Account Status must use the authenticated
+account name and current VIP expiry/balance, and its Manage Account control reveals
+the shared information, password, email and 2FA actions. Download Client keeps the
+local configured download flow. Do not replace either panel with captured reference
+copy or values. At the 1280x720 comparison viewport, the three principal panels use
+the measured `818px` width; Account Status is `190px` high, Download Client is
+`113px` high, and Characters starts at the same vertical coordinate as the
+reference. The responsive view may stack status actions and feature cells to avoid
+horizontal overflow.
+
+Classic character panels use the existing list variant, bordered data tables and a
+single shadow surface; action buttons sit outside the table surface. Property labels
+align left. Character presence sits beside the name; the Status column shows reward
+collection and hidden state, as defined in [UI
+states](ui-states.md#account-character-status). Record actions retain the local
+account routes. Additional native actions may require taller rows than a reference
+with fewer controls.
+
+Both layouts expose actions for one selected character at a time. Classic
+highlights that row and renders its actions in brackets; Legbone keeps its own row
+presentation. Clicking a row or focusing one of its controls selects it, and the
+Classic numbered button also supports keyboard selection. Character names remain
+links to native public profiles. Selection is local presentation state, independent
+of which character is the account's main character. Keep unselected rows compact
+and retain the keyed outfit instances while selecting.
 Both layouts render every character's outfit through the shared `AnimatedOutfit`
 component and the native player appearance data. Theme selection must not hide
 portraits or replace their animation with a static image. Legbone retains its own

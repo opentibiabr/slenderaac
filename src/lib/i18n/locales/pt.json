@@ -16,7 +16,25 @@
 		"reward-collected": "Recompensa diária coletada",
 		"reward-uncollected": "Recompensa diária não coletada",
 		"reward-unknown": "Status da recompensa diária indisponível",
-		"character-hidden": "Oculto na lista pública de personagens da conta"
+		"character-hidden": "Oculto na lista pública de personagens da conta",
+		"classic": {
+			"welcome": "Bem-vindo à sua conta {name}!",
+			"account-status": "Status da Conta",
+			"free-account": "Conta Gratuita",
+			"premium-account": "Conta Premium",
+			"vip-empty": "Sua conta não possui tempo VIP. ",
+			"vip-granted": "O acesso VIP está ativado pelo servidor. ",
+			"vip-expired": "Seu tempo VIP expirou em {date}. ",
+			"vip-active": "Seu tempo VIP expira em {date}. ",
+			"vip-balance": "(Saldo de tempo VIP: {days} dias)",
+			"manage-account": "Gerenciar Conta",
+			"close-management": "Fechar Gerenciamento",
+			"benefit-characters": "Gerencie seus personagens em um só lugar.",
+			"benefit-guilds": "Crie e lidere guilds com seus personagens.",
+			"benefit-security": "Proteja sua conta com autenticação em duas etapas.",
+			"download-client": "Baixar Cliente",
+			"download-prompt": "Clique aqui para baixar o cliente mais recente do {serverName}!"
+		}
 	},
 	"account-management": "Gerenciamento da Conta",
 	"account-name": "Nome da conta",

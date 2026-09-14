@@ -7,10 +7,14 @@ export type AccountCharacter = Player & {
 };
 
 export type AccountInfo = {
+	name: string;
 	email: string;
 	createdAt: Date;
 	lastLogin: Date;
+	isPremium: boolean;
+	premiumGranted: boolean;
 	premiumDays: number;
+	premiumExpiresAt?: Date;
 	coins: number;
 	coinsTransferable: number;
 	isVerified: boolean;

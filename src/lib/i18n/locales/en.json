@@ -16,7 +16,25 @@
     "reward-collected": "Daily Reward collected",
     "reward-uncollected": "Daily Reward not collected",
     "reward-unknown": "Daily Reward status unavailable",
-    "character-hidden": "Hidden from the public account character list"
+    "character-hidden": "Hidden from the public account character list",
+    "classic": {
+      "welcome": "Welcome to your account {name}!",
+      "account-status": "Account Status",
+      "free-account": "Free Account",
+      "premium-account": "Premium Account",
+      "vip-empty": "Your account currently has no VIP time. ",
+      "vip-granted": "VIP access is enabled by the server. ",
+      "vip-expired": "Your VIP time expired on {date}. ",
+      "vip-active": "Your VIP time expires on {date}. ",
+      "vip-balance": "(Balance of VIP time: {days} days)",
+      "manage-account": "Manage Account",
+      "close-management": "Close Management",
+      "benefit-characters": "Manage your characters in one place.",
+      "benefit-guilds": "Create and lead guilds with your characters.",
+      "benefit-security": "Protect your account with two-factor authentication.",
+      "download-client": "Download Client",
+      "download-prompt": "Click here to download the latest {serverName} client!"
+    }
   },
   "account-name": "Account name",
   "balance": "Balance",

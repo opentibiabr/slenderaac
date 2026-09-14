@@ -56,9 +56,8 @@
 						<tr
 							class:account-characters__selected={classic &&
 								selectedCharacterId === character.id}
-							on:pointerdown={() => {
-								if (classic) selectedCharacterId = character.id;
-							}}>
+							on:pointerdown={() => (selectedCharacterId = character.id)}
+							on:focusin={() => (selectedCharacterId = character.id)}>
 							<td class="account-characters__index">
 								{#if classic}
 									<button
@@ -106,7 +105,7 @@
 								<div
 									id={`character-actions-${character.id}`}
 									class="account-characters__links"
-									hidden={classic && selectedCharacterId !== character.id}>
+									hidden={selectedCharacterId !== character.id}>
 									{#if !character.deletion}
 										{#if !character.isMain}
 											<form
