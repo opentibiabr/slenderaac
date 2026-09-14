@@ -26,6 +26,7 @@
 	import ProgressBar from '$lib/components/ui/ProgressBar.svelte';
 	import { boostedStatus } from '$lib/stores/boosted';
 	import { loading } from '$lib/stores/loading';
+	import { createThemeContext } from '$lib/themes/context';
 	import { themeRegistry } from '$lib/themes/registry';
 	import { normalizeTheme } from '$lib/themes/theme-ids';
 	import ThemeSwitcher from '$lib/themes/ThemeSwitcher.svelte';
@@ -43,7 +44,9 @@
 
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: selectedTheme = normalizeTheme(data.selectedTheme);
-	$: activeTheme = themeRegistry[selectedTheme] ?? themeRegistry.legbone;
+	const activeThemeStore = createThemeContext(selectedTheme);
+	$: activeThemeStore.set(themeRegistry[selectedTheme]);
+	$: activeTheme = $activeThemeStore;
 	$: liveBoosted = $boostedStatus?.selections;
 	$: shellData = {
 		...data,
