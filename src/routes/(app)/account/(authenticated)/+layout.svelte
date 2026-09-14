@@ -2,7 +2,6 @@
 	import AccountActions from '$lib/components/ui/account/AccountActions.svelte';
 	import AccountCharacters from '$lib/components/ui/account/AccountCharacters.svelte';
 	import AccountInfoBox from '$lib/components/ui/account/AccountInfoBox.svelte';
-	import ClassicAccountOverview from '$lib/components/ui/account/ClassicAccountOverview.svelte';
 	import { getThemeContext } from '$lib/themes/context';
 
 	import type { LayoutData } from './$types';
@@ -10,11 +9,15 @@
 	export let data: LayoutData;
 	const theme = getThemeContext();
 	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
+	$: AccountOverviewRenderer = $theme.components.AccountOverview;
 </script>
 
 {#if classic}
 	<slot />
-	<ClassicAccountOverview account={data.account} characters={data.characters} />
+	<svelte:component
+		this={AccountOverviewRenderer}
+		account={data.account}
+		characters={data.characters} />
 {:else}
 	<div class="account-overview">
 		<AccountInfoBox account={data.account} />

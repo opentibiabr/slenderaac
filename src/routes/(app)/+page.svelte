@@ -7,10 +7,8 @@
 
 	import Markdoc from '$lib/components/markdoc/Markdoc.svelte';
 	import { serverText } from '$lib/site-identity';
-	import { classicNewsIcon } from '$lib/themes/classic/news-icons';
-	import NewsArticle from '$lib/themes/classic/NewsArticle.svelte';
-	import ReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
 	import { getThemeContext } from '$lib/themes/context';
+	import { themeNewsIcon } from '$lib/themes/news-icons';
 	import { formatDate } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -19,6 +17,8 @@
 	$: identity = { name: data.serverName, website: $page.url.origin };
 	const theme = getThemeContext();
 	$: isClassicTheme = $theme.profile.presentation.contentSource === 'reference';
+	$: NewsArticleRenderer = $theme.components.NewsArticle;
+	$: ReferenceContentRenderer = $theme.components.ReferenceContent;
 	$: themeAssets = $page.data.themeAssets as
 		| Record<string, string | undefined>
 		| undefined;
@@ -86,21 +86,24 @@
 
 	{#each data.articles as article, i (article.id)}
 		{#if isClassicTheme}
-			<NewsArticle
+			<svelte:component
+				this={NewsArticleRenderer}
 				id={article.id}
 				title={article.title}
 				date={formatClassicNewsDate(article.created_at)}
 				icon={data.classicReference
 					? article.presentation?.icon
-					: classicNewsIcon(themeAssets, article.category, true)}
+					: themeNewsIcon(themeAssets, article.category, true)}
 				commentHref={article.presentation?.commentHref ?? null}
 				reference={!!article.presentation}>
 				{#if article.presentation}
-					<ReferenceContent nodes={article.presentation.body} />
+					<svelte:component
+						this={ReferenceContentRenderer}
+						nodes={article.presentation.body} />
 				{:else}
 					<Markdoc content={article.content} />
 				{/if}
-			</NewsArticle>
+			</svelte:component>
 		{:else}
 			<header
 				id="news-{article.id}"
@@ -123,7 +126,9 @@
 
 			{#if data.classicReference}
 				<article class="prose classic-news-reference">
-					<ReferenceContent nodes={data.classicReference.articles[i].body} />
+					<svelte:component
+						this={ReferenceContentRenderer}
+						nodes={data.classicReference.articles[i].body} />
 				</article>
 			{:else}
 				<Markdoc content={article.content} />

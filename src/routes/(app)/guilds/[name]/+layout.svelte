@@ -4,7 +4,6 @@
 	import GuildCharacterRow from '$lib/components/guilds/GuildCharacterRow.svelte';
 	import GuildInfoBox from '$lib/components/guilds/GuildInfoBox.svelte';
 	import GuildOperations from '$lib/components/guilds/GuildOperations.svelte';
-	import ClassicGuildProfile from '$lib/themes/classic/GuildProfile.svelte';
 	import { getThemeContext } from '$lib/themes/context';
 
 	import type { LayoutData } from './$types';
@@ -18,6 +17,7 @@
 	$: isVice = data.rankLevelInGuild >= 2;
 	const theme = getThemeContext();
 	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
+	$: GuildProfileRenderer = $theme.components.GuildProfile;
 
 	function isSelf(name: string) {
 		return Boolean(
@@ -34,7 +34,8 @@
 </script>
 
 {#if classic}
-	<ClassicGuildProfile {data}><slot /></ClassicGuildProfile>
+	<svelte:component this={GuildProfileRenderer} {data}
+		><slot /></svelte:component>
 {:else}
 	<slot />
 

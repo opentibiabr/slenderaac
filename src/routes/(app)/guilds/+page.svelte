@@ -9,7 +9,6 @@
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 	import { serverAvailability } from '$lib/stores/online-status';
-	import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
 	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
@@ -19,10 +18,11 @@
 	$: results = data.results ?? [];
 	const theme = getThemeContext();
 	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
+	$: GuildListRenderer = $theme.components.GuildList;
 </script>
 
 {#if classic}
-	<ClassicGuildList {data} />
+	<svelte:component this={GuildListRenderer} {data} />
 {:else}
 	<div class="flex flex-col items-center gap-2">
 		<SearchQuerier label={`${$_('guilds.guild-name')}:`} />

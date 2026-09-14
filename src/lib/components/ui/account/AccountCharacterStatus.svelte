@@ -12,21 +12,21 @@
 	import { page } from '$app/stores';
 
 	import type { DailyRewardState } from '$lib/accounts';
-	import { classicAsset, type ClassicAssets } from '$lib/themes/classic/theme';
+	import { themeAsset, type ThemeAssets } from '$lib/themes/assets';
 
 	export let dailyReward: DailyRewardState;
 	export let hidden = false;
-	$: assets = $page.data.themeAssets as ClassicAssets | undefined;
+	$: assets = $page.data.themeAssets as ThemeAssets | undefined;
 	$: rewardIcon =
 		dailyReward === 'unknown'
 			? null
-			: classicAsset(
+			: themeAsset(
 					assets,
 					dailyReward === 'collected'
 						? 'accountRewardCollected'
 						: 'accountRewardUncollected',
 				);
-	$: hiddenIcon = classicAsset(assets, 'accountCharacterHidden');
+	$: hiddenIcon = themeAsset(assets, 'accountCharacterHidden');
 	$: rewardLabel = $_(`account.reward-${dailyReward}`);
 </script>
 

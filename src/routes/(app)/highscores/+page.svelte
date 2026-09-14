@@ -9,7 +9,6 @@
 	import Select from '$lib/components/ui/forms/Select.svelte';
 	import { highscoreCategories } from '$lib/highscores';
 	import { vocationFilters as vocations } from '$lib/players';
-	import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
 	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
@@ -17,6 +16,7 @@
 	export let data: PageData;
 	const theme = getThemeContext();
 	$: classic = $theme.profile.presentation.contentSource === 'reference';
+	$: HighscoresRenderer = $theme.components.Highscores;
 	$: previewParameters = new URL('/highscores', $currentPage.url).searchParams;
 
 	$: page = {
@@ -42,7 +42,7 @@
 </script>
 
 {#if classic}
-	<ClassicHighscores {data} />
+	<svelte:component this={HighscoresRenderer} {data} />
 {:else}
 	<div class="flex flex-col gap-2 min-w-0 max-w-full">
 		<form bind:this={form} class="flex flex-row flex-wrap gap-2" method="get">

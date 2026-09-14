@@ -4,10 +4,10 @@
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { serverText } from '$lib/site-identity';
-	import { classicNewsCategories } from '$lib/themes/classic/news-icons';
-	import { classicAsset } from '$lib/themes/classic/theme';
+	import { themeAsset } from '$lib/themes/assets';
 	import { getThemeContext } from '$lib/themes/context';
 	import { layoutDebugKeys } from '$lib/themes/navigation';
+	import { themeNewsCategories } from '$lib/themes/news-icons';
 
 	import type { PageData } from './$types';
 
@@ -36,12 +36,12 @@
 		| null
 		| undefined;
 	$: archiveButtonBackground =
-		classicAsset(themeAssets, 'newsArchiveButtonBackground') ??
-		classicAsset(themeAssets, 'smallButtonBackground');
+		themeAsset(themeAssets, 'newsArchiveButtonBackground') ??
+		themeAsset(themeAssets, 'smallButtonBackground');
 	$: archiveStyle = archiveButtonBackground
 		? `--classic-news-archive-button: url("${archiveButtonBackground}")`
 		: '';
-	$: categoryOptions = classicNewsCategories.map((option) => ({
+	$: categoryOptions = themeNewsCategories.map((option) => ({
 		...option,
 		icon: themeAssets?.[option.iconKey] ?? null,
 	}));

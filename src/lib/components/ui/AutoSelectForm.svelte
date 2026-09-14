@@ -3,8 +3,8 @@
 
 	import { page } from '$app/stores';
 
+	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
-	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
 
 	export let action: string;
 	export let name: string;

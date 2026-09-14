@@ -6,7 +6,7 @@
 	import TableFrame from '$lib/components/news/TableFrame.svelte';
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { serverText } from '$lib/site-identity';
-	import { classicAsset } from '$lib/themes/classic/theme';
+	import { themeAsset } from '$lib/themes/assets';
 	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
@@ -30,7 +30,7 @@
 		| Record<string, string | undefined>
 		| null
 		| undefined;
-	$: seasonalIcon = classicAsset(themeAssets, 'eventScheduleIconSeasonal');
+	$: seasonalIcon = themeAsset(themeAssets, 'eventScheduleIconSeasonal');
 	function tooltipAttrs(title: string, description: string) {
 		return {
 			title,

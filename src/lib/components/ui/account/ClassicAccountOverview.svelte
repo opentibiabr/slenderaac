@@ -8,7 +8,7 @@
 	import AccountCharacters from '$lib/components/ui/account/AccountCharacters.svelte';
 	import AccountInfoBox from '$lib/components/ui/account/AccountInfoBox.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
-	import { classicAsset, type ClassicAssets } from '$lib/themes/classic/theme';
+	import { themeAsset, type ThemeAssets } from '$lib/themes/assets';
 	import { formatDate } from '$lib/utils';
 
 	export let account: AccountInfo;
@@ -16,7 +16,7 @@
 
 	let showManagement = false;
 
-	$: assets = $page.data.themeAssets as ClassicAssets;
+	$: assets = $page.data.themeAssets as ThemeAssets;
 	$: isPremium = account.isPremium;
 	$: blueButtonStyle = buttonStyle(
 		assets,
@@ -35,7 +35,7 @@
 	);
 
 	function buttonStyle(
-		themeAssets: ClassicAssets,
+		themeAssets: ThemeAssets,
 		backgroundKey:
 			| 'smallButtonBackground'
 			| 'greenButtonBackground'
@@ -43,11 +43,11 @@
 		hoverKey: 'smallButtonHover' | 'greenButtonHover' | 'redButtonHover',
 	) {
 		return [
-			classicAsset(themeAssets, backgroundKey)
-				? `--classic-native-button: url("${classicAsset(themeAssets, backgroundKey)}")`
+			themeAsset(themeAssets, backgroundKey)
+				? `--classic-native-button: url("${themeAsset(themeAssets, backgroundKey)}")`
 				: '',
-			classicAsset(themeAssets, hoverKey)
-				? `--classic-native-button-hover: url("${classicAsset(themeAssets, hoverKey)}")`
+			themeAsset(themeAssets, hoverKey)
+				? `--classic-native-button-hover: url("${themeAsset(themeAssets, hoverKey)}")`
 				: '',
 		]
 			.filter(Boolean)
@@ -57,16 +57,16 @@
 
 <div class="classic-account-overview">
 	<div class="classic-account-overview__welcome">
-		{#if classicAsset(assets, 'headlineBracerLeft')}<img
-				src={classicAsset(assets, 'headlineBracerLeft') ?? ''}
+		{#if themeAsset(assets, 'headlineBracerLeft')}<img
+				src={themeAsset(assets, 'headlineBracerLeft') ?? ''}
 				alt=""
 				aria-hidden="true" />{/if}
 		<strong
 			>{$_('account.classic.welcome', {
 				values: { name: account.name },
 			})}</strong>
-		{#if classicAsset(assets, 'headlineBracerRight')}<img
-				src={classicAsset(assets, 'headlineBracerRight') ?? ''}
+		{#if themeAsset(assets, 'headlineBracerRight')}<img
+				src={themeAsset(assets, 'headlineBracerRight') ?? ''}
 				alt=""
 				aria-hidden="true" />{/if}
 	</div>
@@ -80,9 +80,9 @@
 			<div class="classic-account-overview__status-card">
 				<div class="classic-account-overview__status-main">
 					<div class="classic-account-overview__status-copy">
-						{#if classicAsset(assets, 'accountStatusFree')}<img
+						{#if themeAsset(assets, 'accountStatusFree')}<img
 								class:classic-account-overview__status-icon--premium={isPremium}
-								src={classicAsset(assets, 'accountStatusFree') ?? ''}
+								src={themeAsset(assets, 'accountStatusFree') ?? ''}
 								alt="" />{/if}
 						<div>
 							<strong
@@ -133,20 +133,20 @@
 
 				<div class="classic-account-overview__benefits">
 					<div>
-						{#if classicAsset(assets, 'accountBenefitTraining')}<img
-								src={classicAsset(assets, 'accountBenefitTraining') ?? ''}
+						{#if themeAsset(assets, 'accountBenefitTraining')}<img
+								src={themeAsset(assets, 'accountBenefitTraining') ?? ''}
 								alt="" />{/if}
 						<span>{$_('account.classic.benefit-characters')}</span>
 					</div>
 					<div>
-						{#if classicAsset(assets, 'accountBenefitGuild')}<img
-								src={classicAsset(assets, 'accountBenefitGuild') ?? ''}
+						{#if themeAsset(assets, 'accountBenefitGuild')}<img
+								src={themeAsset(assets, 'accountBenefitGuild') ?? ''}
 								alt="" />{/if}
 						<span>{$_('account.classic.benefit-guilds')}</span>
 					</div>
 					<div>
-						{#if classicAsset(assets, 'accountBenefitSecurity')}<img
-								src={classicAsset(assets, 'accountBenefitSecurity') ?? ''}
+						{#if themeAsset(assets, 'accountBenefitSecurity')}<img
+								src={themeAsset(assets, 'accountBenefitSecurity') ?? ''}
 								alt="" />{/if}
 						<span>{$_('account.classic.benefit-security')}</span>
 					</div>
@@ -178,8 +178,8 @@
 					values: { serverName: $page.data.serverName },
 				})}</span>
 			<span class="classic-account-overview__download-action">
-				{#if classicAsset(assets, 'accountDownloadWindows')}<img
-						src={classicAsset(assets, 'accountDownloadWindows') ?? ''}
+				{#if themeAsset(assets, 'accountDownloadWindows')}<img
+						src={themeAsset(assets, 'accountDownloadWindows') ?? ''}
 						alt="" />{/if}
 				<strong>{$_('download')}</strong>
 			</span>

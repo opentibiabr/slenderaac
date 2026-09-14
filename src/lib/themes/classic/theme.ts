@@ -147,9 +147,4 @@ export type ClassicAssetKey =
 export type ClassicAssets = Partial<Record<ClassicAssetKey, string>> &
 	Record<string, string | undefined>;
 
-export function classicAsset(
-	assets: Record<string, string | undefined> | null | undefined,
-	key: ClassicAssetKey,
-): string | null {
-	return assets?.[key] ?? null;
-}
+export { themeAsset as classicAsset } from '$lib/themes/assets';
