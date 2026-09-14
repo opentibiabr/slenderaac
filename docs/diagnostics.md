@@ -26,8 +26,12 @@ SLENDER_DIAGNOSTICS=true
 In Windows PowerShell, capture the same development command to a file:
 
 ```powershell
-npm.cmd run dev -- --host 127.0.0.1 --port 80 --clearScreen false 2>&1 | Tee-Object -FilePath slender-dev.log
+cmd /d /c "npm run dev -- --host 127.0.0.1 --port 80 --clearScreen false 2>&1" | Tee-Object -FilePath slender-dev.log
 ```
+
+Merging the output streams inside `cmd` keeps Windows PowerShell 5.1 from wrapping
+ordinary stderr output in a `NativeCommandError` record. Actual application errors
+remain in the captured output.
 
 On a POSIX shell:
 
@@ -71,6 +75,24 @@ A long named query or asset step narrows the wait to that dependency. If the
 document completes quickly but the page remains loading, inspect the browser's
 network requests and console. The appearance of the price-update log alone does
 not prove that it caused the wait: the update runs in the background.
+
+Vite's file watcher also runs during initialization. Its default exclusions do
+not follow `.gitignore`; a large ignored directory can delay unrelated source
+imports while Vite scans and registers its files. The development configuration
+excludes these directories at the application root:
+
+- `outfits_anim`, `items` and `static/images/store`: legacy runtime asset packs.
+- `build`: generated deployment output.
+- `.codex/visual`: local captures and disposable validation artifacts.
+
+Keep these exclusions scoped to their root locations, so source folders such as
+`src/routes/items` remain watched. Source edits must still invalidate modules and
+update the running development site. Asset serving and database polling do not
+depend on this watcher; installed assets are read by their existing handlers.
+Use the [asset installer](classic-assets.md) to keep new packs outside the checkout.
+Do not disable all watching to work around slow startup. If a long gap remains,
+capture Vite's module timings with `--debug transform` and follow its
+[performance diagnostics](https://v5.vite.dev/guide/performance).
 
 ## Boosted values remain unavailable
 

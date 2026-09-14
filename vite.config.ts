@@ -1,11 +1,31 @@
+import { fileURLToPath } from 'node:url';
+
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig, type PluginOption } from 'vite';
 
 import { devDiagnostics } from './src/lib/server/dev-diagnostics';
 
+const runtimeDirectories = [
+	'.codex/visual',
+	'outfits_anim',
+	'items',
+	'static/images/store',
+	'build',
+].map((directory) =>
+	fileURLToPath(new URL(directory, import.meta.url)).replaceAll('\\', '/'),
+);
+
 export default defineConfig({
 	plugins: [devDiagnostics(), sveltekit() as PluginOption],
 	server: {
+		watch: {
+			// Runtime assets and local artifacts are read on demand, not compiled.
+			// Git ignores do not stop Vite from walking these large directories.
+			ignored: (path) =>
+				runtimeDirectories.some(
+					(directory) => path === directory || path.startsWith(`${directory}/`),
+				),
+		},
 		warmup: {
 			clientFiles: [
 				'./src/routes/(app)/+layout.svelte',
