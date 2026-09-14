@@ -1,6 +1,6 @@
 import type { ComponentType } from 'svelte';
 
-import ClassicAccountOverview from '$lib/components/ui/account/ClassicAccountOverview.svelte';
+import ClassicAccountOverview from '$lib/themes/classic/AccountOverview.svelte';
 import ClassicCatalogDetails from '$lib/themes/classic/CatalogDetails.svelte';
 import ClassicCatalogFilters from '$lib/themes/classic/CatalogFilters.svelte';
 import ClassicCharacterList from '$lib/themes/classic/CharacterList.svelte';
@@ -11,9 +11,12 @@ import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
 import ClassicInformationTable from '$lib/themes/classic/InformationTable.svelte';
 import ClassicLogin from '$lib/themes/classic/Login.svelte';
 import ClassicNewsArticle from '$lib/themes/classic/NewsArticle.svelte';
+import ClassicNewsArchive from '$lib/themes/classic/NewsArchive.svelte';
+import ClassicEventSchedule from '$lib/themes/classic/EventSchedule.svelte';
 import ClassicPagePanel from '$lib/themes/classic/PagePanel.svelte';
 import ClassicRadioChoice from '$lib/themes/classic/RadioChoice.svelte';
 import ClassicReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
+import ClassicOnlinePlayers from '$lib/themes/classic/OnlinePlayers.svelte';
 import ClassicSectionNavigation from '$lib/themes/classic/SectionNavigation.svelte';
 import ClassicShell from '$lib/themes/classic/Shell.svelte';
 import ClassicSmallPanel from '$lib/themes/classic/SmallPanel.svelte';
@@ -25,6 +28,9 @@ import LegboneCatalogFilters from '$lib/themes/legbone/CatalogFilters.svelte';
 import LegboneCharacterList from '$lib/themes/legbone/CharacterList.svelte';
 import LegboneInformationTable from '$lib/themes/legbone/InformationTable.svelte';
 import LegboneLogin from '$lib/themes/legbone/Login.svelte';
+import LegboneNewsArchive from '$lib/themes/legbone/NewsArchive.svelte';
+import LegboneEventSchedule from '$lib/themes/legbone/EventSchedule.svelte';
+import LegboneOnlinePlayers from '$lib/themes/legbone/OnlinePlayers.svelte';
 import LegbonePagePanel from '$lib/themes/legbone/PagePanel.svelte';
 import LegboneRadioChoice from '$lib/themes/legbone/RadioChoice.svelte';
 import LegboneSectionNavigation from '$lib/themes/legbone/SectionNavigation.svelte';
@@ -60,6 +66,8 @@ export type ThemeComponents = {
 	CatalogDetails: ComponentType;
 	CharacterList: ComponentType;
 	NewsArticle: ComponentType;
+	NewsArchive: ComponentType;
+	EventSchedule: ComponentType;
 	ReferenceContent: ComponentType;
 	Login: ComponentType;
 	AccountOverview: ComponentType;
@@ -67,6 +75,7 @@ export type ThemeComponents = {
 	GuildList: ComponentType;
 	GuildProfile: ComponentType;
 	Highscores: ComponentType;
+	OnlinePlayers: ComponentType;
 };
 
 export const themeRegistry = {
@@ -88,6 +97,8 @@ export const themeRegistry = {
 			CatalogDetails: LegboneCatalogDetails,
 			CharacterList: LegboneCharacterList,
 			NewsArticle: ClassicNewsArticle,
+			NewsArchive: LegboneNewsArchive,
+			EventSchedule: LegboneEventSchedule,
 			ReferenceContent: ClassicReferenceContent,
 			Login: LegboneLogin,
 			AccountOverview: ClassicAccountOverview,
@@ -95,6 +106,7 @@ export const themeRegistry = {
 			GuildList: ClassicGuildList,
 			GuildProfile: ClassicGuildProfile,
 			Highscores: ClassicHighscores,
+			OnlinePlayers: LegboneOnlinePlayers,
 		},
 	},
 	classic: {
@@ -115,6 +127,8 @@ export const themeRegistry = {
 			CatalogDetails: ClassicCatalogDetails,
 			CharacterList: ClassicCharacterList,
 			NewsArticle: ClassicNewsArticle,
+			NewsArchive: ClassicNewsArchive,
+			EventSchedule: ClassicEventSchedule,
 			ReferenceContent: ClassicReferenceContent,
 			Login: ClassicLogin,
 			AccountOverview: ClassicAccountOverview,
@@ -122,6 +136,7 @@ export const themeRegistry = {
 			GuildList: ClassicGuildList,
 			GuildProfile: ClassicGuildProfile,
 			Highscores: ClassicHighscores,
+			OnlinePlayers: ClassicOnlinePlayers,
 		},
 	},
 } satisfies Record<ThemeId, ThemeDefinition>;

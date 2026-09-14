@@ -15,6 +15,7 @@
 	$: identity = { name: data.serverName, website: $page.url.origin };
 	const theme = getThemeContext();
 	$: isClassicTheme = $theme.profile.presentation.contentSource === 'reference';
+	$: EventScheduleRenderer = $theme.components.EventSchedule;
 
 	const weekdays = [
 		'Monday',
@@ -50,123 +51,125 @@
 	}
 </script>
 
-<div class="event-schedule" class:event-schedule--default={!isClassicTheme}>
-	<TableFrame assets={themeAssets} minWidth={883} minHeight={590}>
-		<svelte:fragment slot="caption">
-			<div class="event-schedule__caption-row">
-				<div class="event-schedule__month-nav">
-					{#if data.previous}
-						<a
-							class="event-schedule__month-arrow event-schedule__month-arrow--previous"
-							href={monthHref($page.url, data.previous)}
-							aria-label="Previous month">«</a>
-					{/if}
-					<span>{data.monthName} {data.year}</span>
-					{#if data.next}<a
-							class="event-schedule__month-arrow event-schedule__month-arrow--next"
-							href={monthHref($page.url, data.next)}
-							aria-label="Next month">»</a
-						>{/if}
+<svelte:component this={EventScheduleRenderer}>
+	<div class="event-schedule" class:event-schedule--default={!isClassicTheme}>
+		<TableFrame assets={themeAssets} minWidth={883} minHeight={590}>
+			<svelte:fragment slot="caption">
+				<div class="event-schedule__caption-row">
+					<div class="event-schedule__month-nav">
+						{#if data.previous}
+							<a
+								class="event-schedule__month-arrow event-schedule__month-arrow--previous"
+								href={monthHref($page.url, data.previous)}
+								aria-label="Previous month">«</a>
+						{/if}
+						<span>{data.monthName} {data.year}</span>
+						{#if data.next}<a
+								class="event-schedule__month-arrow event-schedule__month-arrow--next"
+								href={monthHref($page.url, data.next)}
+								aria-label="Next month">»</a
+							>{/if}
+					</div>
+					<div class="event-schedule__timestamp">
+						{data.generatedAtLabel}
+					</div>
 				</div>
-				<div class="event-schedule__timestamp">
-					{data.generatedAtLabel}
-				</div>
-			</div>
-		</svelte:fragment>
-		<div class="event-schedule__inner">
-			<TableSurface assets={themeAssets} width={862} bordered={false}>
-				<table id="eventscheduletable" class="event-schedule__calendar">
-					<thead>
-						<tr>
-							{#each weekdays as day}
-								<th scope="col">{day}</th>
-							{/each}
-						</tr>
-					</thead>
-					<tbody>
-						{#each Array.from({ length: 6 }) as _, rowIndex}
+			</svelte:fragment>
+			<div class="event-schedule__inner">
+				<TableSurface assets={themeAssets} width={862} bordered={false}>
+					<table id="eventscheduletable" class="event-schedule__calendar">
+						<thead>
 							<tr>
-								{#each data.cells.slice(rowIndex * 7, rowIndex * 7 + 7) as cell}
-									{@const eventTooltipSections = mergeCalendarTooltipSections(
-										cell.events.map((event) => ({
-											title: event.label.replace(/^\*/, ''),
-											description: event.description ?? '',
-										})),
-									)}
-									<td
-										class={`event-schedule__day${
-											cell.inMonth ? '' : ' event-schedule__day--outside'
-										}${cell.isToday ? ' event-schedule__day--today' : ''}`}>
-										<div class="event-schedule__day-line">
-											<span class="event-schedule__day-number"
-												>{cell.day}
-											</span>
-											{#if cell.hasSeasonalIcon}
-												<span
-													class="event-schedule__seasonal"
-													title={isClassicTheme
-														? undefined
-														: cell.seasonalDescription}>
-													{#if isClassicTheme}<Tooltip
-															calendar
-															calendarSections={cell.seasonalTooltipSections}
-															id={`calendar-tooltip-${cell.isoDate}-seasonal`}
-															attrs={tooltipAttrs(
-																'Seasonal event',
-																cell.seasonalDescription,
-															)}>
-															{#if seasonalIcon}<img
-																	src={seasonalIcon}
-																	alt="" />{:else}<span aria-hidden="true"
-																	>✦</span
-																>{/if}
-														</Tooltip>{:else if seasonalIcon}<img
-															src={seasonalIcon}
-															alt="Seasonal event" />{:else}<span
-															role="img"
-															aria-label="Seasonal event">✦</span
-														>{/if}</span>
-											{/if}
-										</div>
-										{#each cell.events as event, eventIndex}
-											<div
-												class="event-schedule__event"
-												style:background-color={event.color}
-												title={isClassicTheme
-													? undefined
-													: serverText(
-															event.description || event.label,
-															identity,
-														)}>
-												{#if isClassicTheme}<Tooltip
-														calendar
-														calendarSections={eventTooltipSections}
-														block
-														id={`calendar-tooltip-${cell.isoDate}-event-${eventIndex}`}
-														attrs={tooltipAttrs(
-															event.label.replace(/^\*/, ''),
-															event.description ?? '',
-														)}>{serverText(event.label, identity)}</Tooltip
-													>{:else}{serverText(event.label, identity)}{/if}
-											</div>
-										{/each}
-									</td>
+								{#each weekdays as day}
+									<th scope="col">{day}</th>
 								{/each}
 							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</TableSurface>
-		</div>
-	</TableFrame>
+						</thead>
+						<tbody>
+							{#each Array.from({ length: 6 }) as _, rowIndex}
+								<tr>
+									{#each data.cells.slice(rowIndex * 7, rowIndex * 7 + 7) as cell}
+										{@const eventTooltipSections = mergeCalendarTooltipSections(
+											cell.events.map((event) => ({
+												title: event.label.replace(/^\*/, ''),
+												description: event.description ?? '',
+											})),
+										)}
+										<td
+											class={`event-schedule__day${
+												cell.inMonth ? '' : ' event-schedule__day--outside'
+											}${cell.isToday ? ' event-schedule__day--today' : ''}`}>
+											<div class="event-schedule__day-line">
+												<span class="event-schedule__day-number"
+													>{cell.day}
+												</span>
+												{#if cell.hasSeasonalIcon}
+													<span
+														class="event-schedule__seasonal"
+														title={isClassicTheme
+															? undefined
+															: cell.seasonalDescription}>
+														{#if isClassicTheme}<Tooltip
+																calendar
+																calendarSections={cell.seasonalTooltipSections}
+																id={`calendar-tooltip-${cell.isoDate}-seasonal`}
+																attrs={tooltipAttrs(
+																	'Seasonal event',
+																	cell.seasonalDescription,
+																)}>
+																{#if seasonalIcon}<img
+																		src={seasonalIcon}
+																		alt="" />{:else}<span aria-hidden="true"
+																		>✦</span
+																	>{/if}
+															</Tooltip>{:else if seasonalIcon}<img
+																src={seasonalIcon}
+																alt="Seasonal event" />{:else}<span
+																role="img"
+																aria-label="Seasonal event">✦</span
+															>{/if}</span>
+												{/if}
+											</div>
+											{#each cell.events as event, eventIndex}
+												<div
+													class="event-schedule__event"
+													style:background-color={event.color}
+													title={isClassicTheme
+														? undefined
+														: serverText(
+																event.description || event.label,
+																identity,
+															)}>
+													{#if isClassicTheme}<Tooltip
+															calendar
+															calendarSections={eventTooltipSections}
+															block
+															id={`calendar-tooltip-${cell.isoDate}-event-${eventIndex}`}
+															attrs={tooltipAttrs(
+																event.label.replace(/^\*/, ''),
+																event.description ?? '',
+															)}>{serverText(event.label, identity)}</Tooltip
+														>{:else}{serverText(event.label, identity)}{/if}
+												</div>
+											{/each}
+										</td>
+									{/each}
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</TableSurface>
+			</div>
+		</TableFrame>
 
-	<p class="event-schedule__note">
-		{#if data.demo && data.capturedMonth}* Events start/end at server save.
-			Preview: reference events for layout comparison.
-		{:else if data.demo}Preview: no reference events captured for this month.
-		{:else}* Event starts/ends at server save of this day.{/if}
-	</p>
-</div>
+		<p class="event-schedule__note">
+			{#if data.demo && data.capturedMonth}* Events start/end at server save.
+				Preview: reference events for layout comparison.
+			{:else if data.demo}Preview: no reference events captured for this month.
+			{:else}* Event starts/ends at server save of this day.{/if}
+		</p>
+	</div>
+</svelte:component>
 
 <style>
 	.event-schedule--default {

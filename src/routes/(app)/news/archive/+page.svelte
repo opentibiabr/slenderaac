@@ -14,6 +14,7 @@
 	export let data: PageData;
 	const theme = getThemeContext();
 	$: isClassicTheme = $theme.profile.presentation.contentSource === 'reference';
+	$: NewsArchiveRenderer = $theme.components.NewsArchive;
 	let formUrl = '';
 	let selectedTypes: string[] = [];
 	let selectedCategories: string[] = [];
@@ -69,174 +70,179 @@
 	}
 </script>
 
-<div
-	class="news-archive w-full"
-	class:news-archive--default={!isClassicTheme}
-	style={archiveStyle}>
-	<form class="news-archive__form" method="get" action="/news/archive">
-		{#each layoutDebugKeys as key}
-			{#if $page.url.searchParams.has(key)}<input
-					type="hidden"
-					name={key}
-					value={$page.url.searchParams.get(key)} />{/if}
-		{/each}
-		<input type="hidden" name="archive" value="1" />
+<svelte:component this={NewsArchiveRenderer}>
+	<div
+		class="news-archive w-full"
+		class:news-archive--default={!isClassicTheme}
+		style={archiveStyle}>
+		<form class="news-archive__form" method="get" action="/news/archive">
+			{#each layoutDebugKeys as key}
+				{#if $page.url.searchParams.has(key)}<input
+						type="hidden"
+						name={key}
+						value={$page.url.searchParams.get(key)} />{/if}
+			{/each}
+			<input type="hidden" name="archive" value="1" />
 
-		<TableFrame assets={themeAssets} minWidth={698} minHeight={181}>
-			<span slot="caption">News Archive Search</span>
-			<div class="news-archive__inner">
-				<TableSurface assets={themeAssets} width="calc(100% - 13px)">
-					<div
-						class="news-archive__grid"
-						role="group"
-						aria-label="News Archive Search">
-						<section class="news-archive__column news-archive__column--time">
-							<h2>Time Period</h2>
-							<div
-								class="news-archive__date-grid news-archive__date-grid--labels">
-								<span></span>
-								<span>Day:</span>
-								<span>Month:</span>
-								<span>Year:</span>
-							</div>
-							<div class="news-archive__date-grid">
-								<label for="filter-begin-day">From:</label>
-								<select id="filter-begin-day" name="filter_begin_day">
-									{#each days as day}
-										<option value={day} selected={day === data.form.fromDay}
-											>{day}</option>
+			<TableFrame assets={themeAssets} minWidth={698} minHeight={181}>
+				<span slot="caption">News Archive Search</span>
+				<div class="news-archive__inner">
+					<TableSurface assets={themeAssets} width="calc(100% - 13px)">
+						<div
+							class="news-archive__grid"
+							role="group"
+							aria-label="News Archive Search">
+							<section class="news-archive__column news-archive__column--time">
+								<h2>Time Period</h2>
+								<div
+									class="news-archive__date-grid news-archive__date-grid--labels">
+									<span></span>
+									<span>Day:</span>
+									<span>Month:</span>
+									<span>Year:</span>
+								</div>
+								<div class="news-archive__date-grid">
+									<label for="filter-begin-day">From:</label>
+									<select id="filter-begin-day" name="filter_begin_day">
+										{#each days as day}
+											<option value={day} selected={day === data.form.fromDay}
+												>{day}</option>
+										{/each}
+									</select>
+									<select aria-label="From month" name="filter_begin_month">
+										{#each months as month}
+											<option
+												value={month}
+												selected={month === data.form.fromMonth}>
+												{month}
+											</option>
+										{/each}
+									</select>
+									<select
+										aria-label="From year"
+										name="filter_begin_year"
+										class="year">
+										{#each data.years as year}
+											<option
+												value={year}
+												selected={year === data.form.fromYear}>
+												{year}
+											</option>
+										{/each}
+									</select>
+								</div>
+
+								<div class="news-archive__spacer" aria-hidden="true"></div>
+
+								<div
+									class="news-archive__date-grid news-archive__date-grid--labels">
+									<span></span>
+									<span>Day:</span>
+									<span>Month:</span>
+									<span>Year:</span>
+								</div>
+								<div class="news-archive__date-grid">
+									<label for="filter-end-day">To:</label>
+									<select id="filter-end-day" name="filter_end_day">
+										{#each days as day}
+											<option value={day} selected={day === data.form.toDay}
+												>{day}</option>
+										{/each}
+									</select>
+									<select aria-label="To month" name="filter_end_month">
+										{#each months as month}
+											<option
+												value={month}
+												selected={month === data.form.toMonth}>
+												{month}
+											</option>
+										{/each}
+									</select>
+									<select
+										aria-label="To year"
+										name="filter_end_year"
+										class="year">
+										{#each data.years as year}
+											<option value={year} selected={year === data.form.toYear}>
+												{year}
+											</option>
+										{/each}
+									</select>
+								</div>
+							</section>
+
+							<section class="news-archive__column">
+								<h2>Type</h2>
+								<div class="news-archive__checks news-archive__checks--type">
+									{#each typeOptions as option}
+										<label>
+											<input
+												type="checkbox"
+												name={`filter_${option.key}`}
+												value={option.key}
+												bind:group={selectedTypes} />
+											<span>{option.label}</span>
+										</label>
 									{/each}
-								</select>
-								<select aria-label="From month" name="filter_begin_month">
-									{#each months as month}
-										<option
-											value={month}
-											selected={month === data.form.fromMonth}>
-											{month}
-										</option>
+								</div>
+							</section>
+
+							<section class="news-archive__column">
+								<h2>Category</h2>
+								<div class="news-archive__checks">
+									{#each categoryOptions as option}
+										<label>
+											<input
+												type="checkbox"
+												name={`filter_${option.key}`}
+												value={option.key}
+												bind:group={selectedCategories} />
+											{#if option.icon}
+												<img src={option.icon} alt="" aria-hidden="true" />
+											{/if}
+											<span>{option.label}</span>
+										</label>
 									{/each}
-								</select>
-								<select
-									aria-label="From year"
-									name="filter_begin_year"
-									class="year">
-									{#each data.years as year}
-										<option value={year} selected={year === data.form.fromYear}>
-											{year}
-										</option>
-									{/each}
-								</select>
-							</div>
-
-							<div class="news-archive__spacer" aria-hidden="true"></div>
-
-							<div
-								class="news-archive__date-grid news-archive__date-grid--labels">
-								<span></span>
-								<span>Day:</span>
-								<span>Month:</span>
-								<span>Year:</span>
-							</div>
-							<div class="news-archive__date-grid">
-								<label for="filter-end-day">To:</label>
-								<select id="filter-end-day" name="filter_end_day">
-									{#each days as day}
-										<option value={day} selected={day === data.form.toDay}
-											>{day}</option>
-									{/each}
-								</select>
-								<select aria-label="To month" name="filter_end_month">
-									{#each months as month}
-										<option
-											value={month}
-											selected={month === data.form.toMonth}>
-											{month}
-										</option>
-									{/each}
-								</select>
-								<select
-									aria-label="To year"
-									name="filter_end_year"
-									class="year">
-									{#each data.years as year}
-										<option value={year} selected={year === data.form.toYear}>
-											{year}
-										</option>
-									{/each}
-								</select>
-							</div>
-						</section>
-
-						<section class="news-archive__column">
-							<h2>Type</h2>
-							<div class="news-archive__checks news-archive__checks--type">
-								{#each typeOptions as option}
-									<label>
-										<input
-											type="checkbox"
-											name={`filter_${option.key}`}
-											value={option.key}
-											bind:group={selectedTypes} />
-										<span>{option.label}</span>
-									</label>
-								{/each}
-							</div>
-						</section>
-
-						<section class="news-archive__column">
-							<h2>Category</h2>
-							<div class="news-archive__checks">
-								{#each categoryOptions as option}
-									<label>
-										<input
-											type="checkbox"
-											name={`filter_${option.key}`}
-											value={option.key}
-											bind:group={selectedCategories} />
-										{#if option.icon}
-											<img src={option.icon} alt="" aria-hidden="true" />
-										{/if}
-										<span>{option.label}</span>
-									</label>
-								{/each}
-							</div>
-						</section>
-					</div>
-				</TableSurface>
-			</div>
-		</TableFrame>
-
-		<input class="news-archive__submit" type="submit" value="Submit" />
-	</form>
-
-	{#if data.submitted}
-		<section class="news-archive__results" aria-live="polite">
-			<TableFrame assets={themeAssets}>
-				<span slot="caption">Search Results</span>
-				<div class="news-archive__results-list">
-					{#if data.notice}<p>{data.notice}</p>{/if}
-					{#if data.articles.length > 0}
-						{#each data.articles as article}
-							<a href={newsHref($page.url, article.id, article.type)}>
-								<span>{formatClassicDate(article.created_at)}</span>
-								<strong
-									>{serverText(article.title, {
-										name: data.serverName,
-										website: $page.url.origin,
-									})}</strong>
-							</a>
-						{/each}
-					{:else}
-						<p>No news found for the selected search criteria.</p>
-					{/if}
-					{#if data.hasMore}<p>
-							Showing the first 50 results. Narrow the time period to see more.
-						</p>{/if}
+								</div>
+							</section>
+						</div>
+					</TableSurface>
 				</div>
 			</TableFrame>
-		</section>
-	{/if}
-</div>
+
+			<input class="news-archive__submit" type="submit" value="Submit" />
+		</form>
+
+		{#if data.submitted}
+			<section class="news-archive__results" aria-live="polite">
+				<TableFrame assets={themeAssets}>
+					<span slot="caption">Search Results</span>
+					<div class="news-archive__results-list">
+						{#if data.notice}<p>{data.notice}</p>{/if}
+						{#if data.articles.length > 0}
+							{#each data.articles as article}
+								<a href={newsHref($page.url, article.id, article.type)}>
+									<span>{formatClassicDate(article.created_at)}</span>
+									<strong
+										>{serverText(article.title, {
+											name: data.serverName,
+											website: $page.url.origin,
+										})}</strong>
+								</a>
+							{/each}
+						{:else}
+							<p>No news found for the selected search criteria.</p>
+						{/if}
+						{#if data.hasMore}<p>
+								Showing the first 50 results. Narrow the time period to see
+								more.
+							</p>{/if}
+					</div>
+				</TableFrame>
+			</section>
+		{/if}
+	</div>
+</svelte:component>
 
 <style>
 	.news-archive--default .news-archive__grid {
