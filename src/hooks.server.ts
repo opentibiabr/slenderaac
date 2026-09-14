@@ -4,6 +4,7 @@ import { locale } from 'svelte-i18n';
 
 import { AccountType, isAccountType } from '$lib/accounts';
 import { themeSwitcherEnabled } from '$lib/server/config';
+import { checkDatabaseConfiguration } from '$lib/server/database-config';
 import { diagnosticsEnabled, diagnosticStep } from '$lib/server/diagnostics';
 import { errorCode, log, startLogOperation } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
@@ -55,18 +56,7 @@ log(
 );
 void updateInternationalPrices();
 
-if (diagnosticsEnabled) {
-	void diagnosticStep('database.identity', async () => {
-		const identity = await prisma.$queryRaw<
-			{ database: string; host: string; port: string }[]
-		>`
-			SELECT DATABASE() AS \`database\`, @@hostname AS host, CAST(@@port AS CHAR) AS port
-		`;
-		log('debug', 'database.identity', JSON.stringify(identity));
-	}).catch(() => {
-		// The diagnostic records its error; it must not interrupt request handling.
-	});
-}
+void checkDatabaseConfiguration(diagnosticsEnabled);
 
 export const handle = (async ({ event, resolve }) => {
 	const lang =

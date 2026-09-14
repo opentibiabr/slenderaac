@@ -60,6 +60,7 @@ request retries, database timeouts or cache lifetimes.
 | `prices`                                 | The existing background international-price update; failure is logged without an unhandled background rejection                                            |
 | `sessions.cleanup`                       | Startup and hourly removal of expired sessions; includes the removed count or a sanitized failure code, and a failure leaves the next run scheduled        |
 | `database.identity`                      | A read-only query for the actual database name, database-server hostname and port; no user or password                                                     |
+| `database.config`                        | The selected configuration source and database name; warns when `config.lua` overrides conflicting URL connection settings                                 |
 | `request.locale`, `request.session`      | Language initialization and session lookup when needed                                                                                                     |
 | `request.resolve`                        | Framework route loading and response generation; the route template is logged without query strings or concrete account/character identifiers              |
 | `layout.*`                               | Shared page data: rankings, pages, account characters, assets, gallery, fansite, poll, server name and presentation                                        |
@@ -128,6 +129,14 @@ Unchanged source snapshots are logged once; inspection timings continue on each
 poll while unavailable, and changed snapshots are printed again. These extra
 read-only queries run only with diagnostics enabled and unavailable selections.
 No passwords, database connection URLs, account data or session tokens are logged.
+
+First check the `database.config` startup message. Prefer configuring
+`SERVER_CONFIG_FILE` so the website and package migration commands use the
+running game server's connection settings. A conflicting `DATABASE_URL` is
+ignored with a warning; an invalid configured file prevents startup instead of
+selecting another database. See [configuration and fallback rules](database.md).
+Unavailable snapshots also include a troubleshooting hint without diagnostic
+mode, but unchanged snapshots are not printed repeatedly.
 
 Compare the website's `database.identity` log with the running game server's
 database configuration. Hostname aliases alone do not establish a mismatch. In

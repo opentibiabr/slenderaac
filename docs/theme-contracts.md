@@ -152,6 +152,12 @@ Confirmed zero, empty results, service Offline and unavailable/stale data have
 different meanings. A server-status refresh does not turn page-load database
 snapshots into live player subscriptions.
 
+Both layouts must use the same database selected by the
+[database configuration contract](database.md). When `SERVER_CONFIG_FILE` is set,
+its connection settings govern runtime reads/writes and package migration commands.
+An invalid configured source must not fall back to another database or invented
+live data. Keep connection details server-only and omit credentials from logs.
+
 ## External artwork and installation
 
 Keep theme, outfit, item and store binary packs outside Git, served through the

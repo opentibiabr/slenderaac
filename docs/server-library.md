@@ -17,8 +17,10 @@ local day. The website exposes a valid non-placeholder row and refreshes open
 sessions through its local API; it does not generate or cache a substitute. Treat
 the stored day as server-owned metadata instead of comparing it with the website
 process clock.
-Keep `DATABASE_URL` aligned with the game server database so both processes share
-the same `boosted_creature` and `boosted_boss` rows.
+Use `SERVER_CONFIG_FILE` to share the running game server's database settings, or
+align `DATABASE_URL` when the file is not available. Both processes must share the
+same `boosted_creature` and `boosted_boss` rows. See the
+[database source and fallback rules](database.md).
 
 `/library/achievements` groups the server's public achievements by grade and
 sorts them by name. Grade point ranges and the secret total come from the server

@@ -123,10 +123,12 @@ function logBoostedSnapshot(
 	const fingerprint = JSON.stringify([creature, boss]);
 	if (fingerprint === lastLoggedSnapshot) return;
 	lastLoggedSnapshot = fingerprint;
+	const unavailable =
+		!creatureInspection.selection || !bossInspection.selection;
 	log(
-		'info',
+		unavailable ? 'warn' : 'info',
 		'boosted',
-		`${selectionLog('creature', creature, creatureInspection)}; ${selectionLog('boss', boss, bossInspection)}`,
+		`${selectionLog('creature', creature, creatureInspection)}; ${selectionLog('boss', boss, bossInspection)}${unavailable ? ". Verify that the game server has written its daily selections and check the database.config startup log. Set SERVER_CONFIG_FILE to the running server's config.lua to share its database settings. Unavailable selections alone do not prove a database mismatch." : ''}`,
 	);
 }
 

@@ -121,6 +121,9 @@ void test('unavailable source diagnostics are opt-in, bounded and cannot replace
 		const unavailable = { boostedCreature: null, boostedBoss: null };
 		assert.deepEqual(await loadBoostedSelections(), unavailable);
 		assert.equal(inspections, 0);
+		assert.ok(lines.some((line) => /\[warn\].*SERVER_CONFIG_FILE/.test(line)));
+		await loadBoostedSelections();
+		assert.equal(lines.filter((line) => line.includes('[boosted]')).length, 1);
 
 		assert.deepEqual(await loadBoostedSelections(true), unavailable);
 		assert.equal(inspections, 2);

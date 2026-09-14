@@ -38,7 +38,16 @@ bun install
 cp .env.dist .env
 ```
 
-Edit `.env` with your server and desired settings. Then migrate the database using the command below. Note that this assumes your current database already has the `canary` schema imported.
+Edit `.env` with your server and desired settings. Set `SERVER_CONFIG_FILE` to the
+`config.lua` actually used by your game server, for example `../canary/config.lua`
+for sibling checkouts. Its MySQL settings are the source for both the website and
+the package migration commands. If the file is not accessible to the website,
+leave that setting empty and point `DATABASE_URL` at the same game database.
+See [database configuration and safeguards](docs/database.md).
+
+Then migrate the selected database using the commands below. This assumes it
+already contains the game server's schema; the database does not need to be named
+`canary`.
 
 ```bash
 bun migrate:resolve
@@ -142,7 +151,10 @@ bun build
 
 ### Migrating the database
 
-At this point you should be ready to migrate the database. This will create the necessary tables and columns. Note that this assumes your current database already has the `canary` schema imported.
+At this point you should be ready to migrate the database. This creates the
+necessary tables and columns in the database selected by the
+[shared configuration](docs/database.md). It must already contain the game
+server's schema. Check the `database.config` message before proceeding.
 
 ```bash
 bun migrate:resolve
