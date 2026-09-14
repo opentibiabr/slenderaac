@@ -152,7 +152,7 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 - [x] Delegate `PagePanel`, `TableFrame`, `TableSurface` and `SmallPanel` to
 	registered renderers.
 - [x] Delegate section navigation, modal and radio-choice presentation.
-- [ ] Delegate information tables, catalog filters and catalog details.
+- [x] Delegate information tables, catalog filters and catalog details.
 - [ ] Keep behavior, slots, labels, focus and keyboard semantics shared.
 - [ ] Move theme-specific CSS under the owning theme directory.
 - [ ] Replace theme-named selectors in shared components with semantic hooks.
@@ -276,6 +276,7 @@ loading/empty/offline/unavailable/error/stale states and animated outfits.
 | 2026-09-14 | Baseline/profile started | — | Source inventory and focused inspection | Current PR owns the merge gate |
 | 2026-09-14 | Semantic renderers | `b76d55e` | `npm run check`; targeted ESLint | Page framing, tables, section navigation, modal and radio presentation now resolve through the registry |
 | 2026-09-14 | Profile-driven server sources | — | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities |
+| 2026-09-14 | Information/catalog renderers | — | `npm run check`; targeted ESLint | Information tables, catalog filters and catalog details keep their public props while moving layout markup and CSS into each theme |
 
 ## Completion criteria
 

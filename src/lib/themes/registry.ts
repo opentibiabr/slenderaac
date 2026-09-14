@@ -1,5 +1,8 @@
 import type { ComponentType } from 'svelte';
 
+import ClassicCatalogDetails from '$lib/themes/classic/CatalogDetails.svelte';
+import ClassicCatalogFilters from '$lib/themes/classic/CatalogFilters.svelte';
+import ClassicInformationTable from '$lib/themes/classic/InformationTable.svelte';
 import ClassicPagePanel from '$lib/themes/classic/PagePanel.svelte';
 import ClassicRadioChoice from '$lib/themes/classic/RadioChoice.svelte';
 import ClassicSectionNavigation from '$lib/themes/classic/SectionNavigation.svelte';
@@ -8,6 +11,9 @@ import ClassicSmallPanel from '$lib/themes/classic/SmallPanel.svelte';
 import ClassicStatelessModal from '$lib/themes/classic/StatelessModal.svelte';
 import ClassicTableFrame from '$lib/themes/classic/TableFrame.svelte';
 import ClassicTableSurface from '$lib/themes/classic/TableSurface.svelte';
+import LegboneCatalogDetails from '$lib/themes/legbone/CatalogDetails.svelte';
+import LegboneCatalogFilters from '$lib/themes/legbone/CatalogFilters.svelte';
+import LegboneInformationTable from '$lib/themes/legbone/InformationTable.svelte';
 import LegbonePagePanel from '$lib/themes/legbone/PagePanel.svelte';
 import LegboneRadioChoice from '$lib/themes/legbone/RadioChoice.svelte';
 import LegboneSectionNavigation from '$lib/themes/legbone/SectionNavigation.svelte';
@@ -38,6 +44,9 @@ export type ThemeComponents = {
 	SectionNavigation: ComponentType;
 	RadioChoice: ComponentType;
 	StatelessModal: ComponentType;
+	InformationTable: ComponentType;
+	CatalogFilters: ComponentType;
+	CatalogDetails: ComponentType;
 };
 
 export const themeRegistry = {
@@ -54,6 +63,9 @@ export const themeRegistry = {
 			SectionNavigation: LegboneSectionNavigation,
 			RadioChoice: LegboneRadioChoice,
 			StatelessModal: LegboneStatelessModal,
+			InformationTable: LegboneInformationTable,
+			CatalogFilters: LegboneCatalogFilters,
+			CatalogDetails: LegboneCatalogDetails,
 		},
 	},
 	classic: {
@@ -69,6 +81,9 @@ export const themeRegistry = {
 			SectionNavigation: ClassicSectionNavigation,
 			RadioChoice: ClassicRadioChoice,
 			StatelessModal: ClassicStatelessModal,
+			InformationTable: ClassicInformationTable,
+			CatalogFilters: ClassicCatalogFilters,
+			CatalogDetails: ClassicCatalogDetails,
 		},
 	},
 } satisfies Record<ThemeId, ThemeDefinition>;
