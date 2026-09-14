@@ -6,6 +6,7 @@ import { dailyScreenshot } from '$lib/gallery';
 import { PlayerGroup } from '$lib/players';
 import { loadBoostedSelections } from '$lib/server/boosted';
 import { siteLinks, themeSwitcherEnabled } from '$lib/server/config';
+import { diagnosticStep } from '$lib/server/diagnostics';
 import { featuredFansite } from '$lib/server/directories';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { currentPoll } from '$lib/server/polls';
@@ -53,6 +54,7 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 
 	const nextServerSave = parseTimeString(SERVER_SAVE_TIME || '00:00:00');
 	const isAdmin = locals.session?.type === AccountType.God;
+	const accountId = locals.session?.accountId;
 	const [
 		highscores,
 		{ boostedBoss, boostedCreature },
@@ -65,37 +67,47 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		selectedServerName,
 		classicPresentation,
 	] = await Promise.all([
-		prisma.players.findMany({
-			where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
-			select: PlayerSelectForList,
-			orderBy: { experience: 'desc' },
-			take: 5,
-		}),
-		loadBoostedSelections(),
-		prisma.staticPage.findMany({
-			where: {
-				hide: false,
-				NOT: [
-					{ slug: { startsWith: 'genesis-' } },
-					{ slug: { equals: 'fankit' } },
-					{ slug: { equals: 'soundtrack' } },
-					{ slug: { equals: 'maps' } },
-				],
-			},
-			orderBy: { order: 'asc' },
-		}),
-		locals.session?.accountId
-			? prisma.players.findMany({
-					where: { account_id: locals.session.accountId },
-					select: PlayerSelectForList,
-				})
+		diagnosticStep('layout.highscores', () =>
+			prisma.players.findMany({
+				where: { group_id: { lt: PlayerGroup.Gamemaster }, deletion: 0 },
+				select: PlayerSelectForList,
+				orderBy: { experience: 'desc' },
+				take: 5,
+			}),
+		),
+		diagnosticStep('database.boosted', () => loadBoostedSelections()),
+		diagnosticStep('layout.pages', () =>
+			prisma.staticPage.findMany({
+				where: {
+					hide: false,
+					NOT: [
+						{ slug: { startsWith: 'genesis-' } },
+						{ slug: { equals: 'fankit' } },
+						{ slug: { equals: 'soundtrack' } },
+						{ slug: { equals: 'maps' } },
+					],
+				},
+				orderBy: { order: 'asc' },
+			}),
+		),
+		accountId
+			? diagnosticStep('layout.account-characters', () =>
+					prisma.players.findMany({
+						where: { account_id: accountId },
+						select: PlayerSelectForList,
+					}),
+				)
 			: Promise.resolve(null),
-		loadThemeAssetMetadata('classic'),
-		loadInformationPresentation('classic', 'screenshots'),
-		featuredFansite(),
-		currentPoll(),
-		serverName(),
-		loadPresentationReference(selectedTheme),
+		diagnosticStep('layout.assets', () => loadThemeAssetMetadata('classic')),
+		diagnosticStep('layout.gallery', () =>
+			loadInformationPresentation('classic', 'screenshots'),
+		),
+		diagnosticStep('layout.fansite', () => featuredFansite()),
+		diagnosticStep('layout.poll', () => currentPoll()),
+		diagnosticStep('layout.server-name', () => serverName()),
+		diagnosticStep('layout.presentation', () =>
+			loadPresentationReference(selectedTheme),
+		),
 	]);
 	const screenshotGallery = informationPresentation?.gallery ?? null;
 	const themeAssetMetadata =

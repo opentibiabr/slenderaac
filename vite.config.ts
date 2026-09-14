@@ -1,8 +1,10 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig, type PluginOption } from 'vite';
 
+import { devDiagnostics } from './src/lib/server/dev-diagnostics';
+
 export default defineConfig({
-	plugins: [sveltekit() as PluginOption],
+	plugins: [devDiagnostics(), sveltekit() as PluginOption],
 	server: {
 		warmup: {
 			clientFiles: [

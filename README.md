@@ -74,6 +74,10 @@ Vite unchanged:
 npm.cmd run dev -- --host 127.0.0.1 --port 80
 ```
 
+Application logs include timestamps and stage durations. For a page that loads
+slowly or boosted values that remain unavailable, see
+[server logs and diagnostics](docs/diagnostics.md) for an opt-in detailed capture.
+
 </details>
 
 <details>

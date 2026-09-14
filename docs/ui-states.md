@@ -50,9 +50,9 @@ pending until the authoritative order state changes, even if a refresh times out
 - The game server owns the daily creature and boss selection and persists it in
   `boosted_creature` and `boosted_boss` during startup. The website reads those
   tables; it never chooses a replacement or keeps a presentation default.
-- The website and game server must use the same database. A successful server log
-  with a different website value is a connection/configuration mismatch until the
-  shared tables prove otherwise.
+- The website and game server must use the same database. If their values differ,
+  compare the actual connection identity and persisted rows before attributing
+  the difference to caching, configuration or a failed game-server write.
 - A seed placeholder, zero race ID or empty name is unavailable data. The row's
   `date` is the game server's day-of-month rotation marker. The website must not
   compare it with its own clock because the two processes can use different time
@@ -66,7 +66,8 @@ pending until the authoritative order state changes, even if a refresh times out
   labels each slot as active or unavailable with the precise reason (`missing`,
   `invalid-name`, `placeholder` or `invalid-race`) and the source day, without
   printing database credentials. Use this line to distinguish unchanged source
-  data from a website connected to another database.
+  data from a website connected to another database. For timestamps, query timing
+  and connection identity, see [server diagnostics](diagnostics.md).
 - The client login endpoint uses the same validation. It advertises no boosted
   selection when both rows are absent or placeholders, and never leaks a seed race
   ID as if it were active.

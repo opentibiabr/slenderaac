@@ -1,4 +1,5 @@
 import type { BoostedProps, BoostedSelections } from '$lib/boosted';
+import { log } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
 
 const selection = {
@@ -81,8 +82,10 @@ function logBoostedSnapshot(
 	const fingerprint = JSON.stringify([creature, boss]);
 	if (fingerprint === lastLoggedSnapshot) return;
 	lastLoggedSnapshot = fingerprint;
-	console.info(
-		`[boosted] ${selectionLog('creature', creature, creatureInspection)}; ${selectionLog('boss', boss, bossInspection)}`,
+	log(
+		'info',
+		'boosted',
+		`${selectionLog('creature', creature, creatureInspection)}; ${selectionLog('boss', boss, bossInspection)}`,
 	);
 }
 
