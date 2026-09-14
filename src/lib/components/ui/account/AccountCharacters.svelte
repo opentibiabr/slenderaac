@@ -16,6 +16,12 @@
 
 	export let characters: Player[];
 	$: classic = $page.data.selectedTheme === 'classic';
+	let selectedCharacterId: number | undefined;
+	$: if (
+		!characters.some((character) => character.id === selectedCharacterId)
+	) {
+		selectedCharacterId = characters[0]?.id;
+	}
 </script>
 
 {#if !classic}<h3 class="h3">{$_('characters')}</h3>{/if}
@@ -34,9 +40,8 @@
 					<tr>
 						<th scope="col" class="account-characters__number"
 							><span class="sr-only">#</span></th>
-						{#if !classic}<th scope="col" class="account-characters__outfit"
-								>{$_('outfit')}</th
-							>{/if}
+						<th scope="col" class="account-characters__outfit"
+							>{$_('outfit')}</th>
 						<th scope="col">{$_('name')}</th>
 						{#if classic}<th scope="col" class="account-characters__status"
 								>Status</th
@@ -48,19 +53,37 @@
 				</thead>
 				<tbody>
 					{#each characters as character, i (character.id)}
-						<tr>
-							<td>{i + 1}</td>
-							{#if !classic}<td>
-									<AnimatedOutfit outfit={character} alt={character.name} />
-								</td>{/if}
+						<tr
+							class:account-characters__selected={classic &&
+								selectedCharacterId === character.id}
+							on:pointerdown={() => {
+								if (classic) selectedCharacterId = character.id;
+							}}>
+							<td class="account-characters__index">
+								{#if classic}
+									<button
+										class="account-characters__select"
+										type="button"
+										aria-label={$_('account.select-character', {
+											values: { name: character.name },
+										})}
+										aria-expanded={selectedCharacterId === character.id}
+										aria-controls={`character-actions-${character.id}`}
+										on:click={() => (selectedCharacterId = character.id)}
+										>{i + 1}.</button>
+								{:else}{i + 1}{/if}
+							</td>
 							<td>
+								<AnimatedOutfit outfit={character} alt={character.name} />
+							</td>
+							<td class="account-characters__identity">
 								<div class="flex flex-col">
 									<span class="font-semibold flex flex-row gap-1 items-center">
 										{#if !classic}<OnlineIndicator
 												online={character.online} />{/if}
 										<a
 											href={`/characters/${encodeURIComponent(character.name)}`}
-											class="anchor">
+											class="anchor account-characters__name">
 											{character.name}
 										</a>
 										{#if pronounsEnabled}
@@ -79,7 +102,10 @@
 							{#if classic}<td><OnlineIndicator online={character.online} /></td
 								>{/if}
 							<td>
-								<div class="account-characters__links">
+								<div
+									id={`character-actions-${character.id}`}
+									class="account-characters__links"
+									hidden={classic && selectedCharacterId !== character.id}>
 									{#if !character.deletion}
 										{#if !character.isMain}
 											<form
@@ -137,7 +163,9 @@
 							</td>
 						</tr>
 					{:else}
-						<tr><td colspan="4">{$_('account.no-characters')}</td></tr>
+						<tr
+							><td colspan={classic ? 5 : 4}>{$_('account.no-characters')}</td
+							></tr>
 					{/each}
 				</tbody>
 			</table>
@@ -175,15 +203,86 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 0.25rem;
+		white-space: nowrap;
+	}
+	.account-characters__links[hidden] {
+		display: none;
 	}
 	:global(.theme-classic) .account-characters__links {
 		gap: 0;
+	}
+	:global(.theme-classic)
+		.account-characters__links:not([hidden])
+		> :is(a, form)::before {
+		content: '[';
+		color: rgb(90 40 0);
+		font-weight: normal;
+	}
+	:global(.theme-classic)
+		.account-characters__links:not([hidden])
+		> :is(a, form)::after {
+		content: ']';
+		color: rgb(90 40 0);
+		font-weight: normal;
+	}
+	:global(.theme-classic) .account-characters tbody tr {
+		height: 56px;
+		cursor: pointer;
+	}
+	:global(.theme-classic .classic-native-content)
+		.account-characters
+		tbody
+		tr:nth-child(even) {
+		background: rgb(213 192 161);
+	}
+	:global(.theme-classic .classic-native-content)
+		.account-characters
+		tbody
+		tr:hover {
+		background: rgb(255 237 209);
+	}
+	:global(.theme-classic .classic-native-content) .account-characters__name {
+		font-size: 13.333333px;
+		font-weight: normal;
+		color: inherit;
+		text-decoration: none;
+	}
+	:global(.theme-classic) .account-characters__identity {
+		white-space: nowrap;
+	}
+	:global(.theme-classic) .account-characters__identity > div {
+		gap: 4px;
+	}
+	:global(.theme-classic .classic-native-content)
+		.account-characters__selected
+		.account-characters__name {
+		font-size: 17.333333px;
+		font-weight: bold;
+	}
+	:global(.theme-classic) .account-characters__selected {
+		font-weight: bold;
+	}
+	.account-characters__select {
+		color: inherit;
+		font: inherit;
+		padding: 4px 0;
+	}
+	.account-characters__select:focus-visible {
+		outline: 1px solid currentColor;
+		outline-offset: 2px;
 	}
 	:global(.theme-classic) .account-characters :is(th, td) {
 		vertical-align: middle;
 	}
 	:global(.theme-classic) .account-characters__number {
-		width: 20px;
+		width: 28px;
+	}
+	:global(.theme-classic) .account-characters .account-characters__index {
+		padding: 4px 2px 2px;
+		text-align: center;
+	}
+	:global(.theme-classic) .account-characters__status {
+		width: 111px;
 	}
 	:global(.theme-classic) .account-characters__actions {
 		width: 130px;

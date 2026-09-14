@@ -8,6 +8,7 @@
   "2fa-not-enabled": "Two-factor auth is not currently enabled on this account",
   "account": {
     "character-actions": "Character actions",
+    "select-character": "Select {name}",
     "no-characters": "You have no characters yet.",
     "change-pending": "(verification pending for email change to {email}",
     "resend": "resend",

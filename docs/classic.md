@@ -613,7 +613,16 @@ bordered data tables and a single shadow surface; action buttons sit outside the
 table surface. Property labels align left, character presence has a labeled
 status column, and record actions retain the local account routes. Additional
 native actions may require taller rows than a reference with fewer controls.
-Legbone retains its own table typography, animated outfits and dialog forms.
+Classic highlights the selected row and shows its bracketed actions. Clicking a
+row selects it; the numbered button also supports keyboard selection. Character
+names remain links to native public profiles. Selection is local presentation
+state, independent of which character is the account's main character. Keep
+unselected rows compact and retain the keyed outfit instances while selecting.
+Both layouts render every character's outfit through the shared `AnimatedOutfit`
+component and the native player appearance data. Theme selection must not hide
+portraits or replace their animation with a static image. Legbone retains its own
+table typography and dialog forms. Keep each short record action on one line,
+including Portuguese labels, and contain wide tables within `CatalogTable`.
 Opening an account form scrolls to the form in Classic; Legbone dialogs preserve
 the background page position. Do not apply one scroll policy to both behaviors.
 
@@ -626,6 +635,9 @@ content; Legbone row headers use the same padding as its data cells. Let
 `PagePanel` own Classic spacing instead of adding a second flex
 gap. Verify multiple alternating rows, an empty account, long labels, light/dark
 Legbone, layout switching and the actual account actions after shared changes.
+Verify loaded and animated portraits in both themes, including after switching
+layouts, and the empty table's column span. A portrait visible in Legbone alone
+does not validate the shared character list.
 
 Organization and server-introduction tables use `InformationTable` to choose the
 same data rows in both themes. It retains the existing Classic panel geometry

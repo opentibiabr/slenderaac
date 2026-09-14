@@ -8,6 +8,7 @@
 	"2fa-not-enabled": "A autenticação em duas etapas não está atualmente ativada nesta conta",
 	"account": {
 		"character-actions": "Ações do personagem",
+		"select-character": "Selecionar {name}",
 		"no-characters": "Você ainda não tem personagens.",
 		"change-pending": "(verificação pendente para alteração de email para {email})",
 		"resend": "reenviar",
