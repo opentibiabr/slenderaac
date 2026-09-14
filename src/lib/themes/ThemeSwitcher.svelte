@@ -48,6 +48,7 @@
 				: 'none'}
 		style:--layout-menu-paper={paper ? `url("${paper}")` : 'none'}
 		aria-label="Layout"
+		data-sveltekit-reload
 		data-sveltekit-preload-data="off">
 		<details bind:open>
 			<summary

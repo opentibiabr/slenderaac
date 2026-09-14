@@ -37,6 +37,9 @@ not universal dimensions or proof of the current implementation.
   legacy selection URLs only as inbound compatibility. Do not propagate layout
   state through ordinary links, forms or redirects. Authentication redirects may
   carry a pending selection only until the root layout persists it.
+  Selection links use a document navigation so a redirect back to the same URL
+  renders the new cookie immediately. Verify both directions with real browser
+  clicks; separate HTTP requests do not exercise client-side layout reuse.
 - Choose an existing page family before adding page CSS. Reuse `ContentFrame`,
   `Headline`, `MenuLabel`, `PagePanel`, `TableFrame`, `TableSurface` and existing
   controls where they own the pattern. A shared problem belongs in that owner;
