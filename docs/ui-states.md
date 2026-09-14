@@ -57,6 +57,8 @@ pending until the authoritative order state changes, even if a refresh times out
   `date` is the game server's day-of-month rotation marker. The website must not
   compare it with its own clock because the two processes can use different time
   zones or start at different moments.
+- An unavailable selection keeps both portrait frames and labels in place in
+  both layouts. Do not remove the whole component or display a sample creature.
 - Active browser sessions poll the website endpoint and adopt the new persisted
   selection within one minute without a website restart. A failed refresh preserves
   the last valid value only when it is visibly marked stale.
