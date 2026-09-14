@@ -45,6 +45,29 @@ pending until the authoritative order state changes, even if a refresh times out
   and world tables refresh their data on navigation or reload; keep that distinction
   explicit when changing their refresh behavior.
 
+## Account character status
+
+The account table's Status column reports Daily Reward collection and the
+character's hidden setting. Presence is a separate indicator next to the name;
+an online/offline dot must never stand in for a reward or visibility status.
+Both layouts consume the same authenticated account data.
+
+For Canary, compare `player_storage` key `13412` with the server-save timestamp
+in `global_storage` key `14110`. A matching cycle means collected. A successful
+claim in `daily_reward_history` during that cycle also means collected: Canary
+inserts its `Claimed reward no.` entry immediately, before the player's next save.
+Other history entries, such as streak changes, are not evidence of collection.
+Do not rely on
+the saved `players.isreward` flag or reset rewards using the website's calendar.
+An absent/uninitialized cycle or failed query means unknown, not uncollected.
+Batch reads for the authenticated account's character IDs; never query per icon.
+
+The hidden icon follows `PlayerSettings.hidden`: the character is omitted from
+the public account character list. This does not mean its profile is inaccessible.
+Status labels/tooltips must describe that distinction. These values are page-load
+snapshots refreshed by navigation/reload, not independently polled per character.
+Do not write gameplay reward state from the website.
+
 ## Daily selections
 
 - The game server owns the daily creature and boss selection and persists it in

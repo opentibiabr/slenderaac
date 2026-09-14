@@ -1,3 +1,11 @@
+import type { Player } from '$lib/players';
+
+export type DailyRewardState = 'collected' | 'uncollected' | 'unknown';
+
+export type AccountCharacter = Player & {
+	dailyReward: DailyRewardState;
+};
+
 export type AccountInfo = {
 	email: string;
 	createdAt: Date;

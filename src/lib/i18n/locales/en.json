@@ -12,7 +12,11 @@
     "no-characters": "You have no characters yet.",
     "change-pending": "(verification pending for email change to {email}",
     "resend": "resend",
-    "unverified": "(unverified <a class=\"anchor\" href=\"/account/resend\">re-send</a>)"
+    "unverified": "(unverified <a class=\"anchor\" href=\"/account/resend\">re-send</a>)",
+    "reward-collected": "Daily Reward collected",
+    "reward-uncollected": "Daily Reward not collected",
+    "reward-unknown": "Daily Reward status unavailable",
+    "character-hidden": "Hidden from the public account character list"
   },
   "account-name": "Account name",
   "balance": "Balance",

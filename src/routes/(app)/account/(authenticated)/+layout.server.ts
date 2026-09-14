@@ -1,4 +1,5 @@
-import type { AccountInfo } from '$lib/accounts';
+import type { AccountCharacter, AccountInfo } from '$lib/accounts';
+import { loadAccountRewardStates } from '$lib/server/account-character-status';
 import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
@@ -21,7 +22,7 @@ export const load = (async ({ locals, url }) => {
 			is_verified: true,
 			token_secret: true,
 			players: {
-				select: PlayerSelectForList,
+				select: { ...PlayerSelectForList, settings: true },
 			},
 			emailVerifications: {
 				select: { new_email: true },
@@ -30,7 +31,13 @@ export const load = (async ({ locals, url }) => {
 		},
 	});
 
-	const characters = account.players.map(dbToPlayer);
+	const rewards = await loadAccountRewardStates(
+		account.players.map((player) => player.id),
+	);
+	const characters: AccountCharacter[] = account.players.map((player) => ({
+		...dbToPlayer(player),
+		dailyReward: rewards.get(player.id) ?? 'unknown',
+	}));
 	const now = Math.trunc(Date.now() / 1000);
 	const accountInfo: AccountInfo = {
 		email: account.email,

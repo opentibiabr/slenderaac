@@ -5,6 +5,8 @@
 
 	import { page } from '$app/stores';
 
+	import type { AccountCharacter } from '$lib/accounts';
+	import AccountCharacterStatus from '$lib/components/ui/account/AccountCharacterStatus.svelte';
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
@@ -12,9 +14,9 @@
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { pronounsEnabled } from '$lib/config';
-	import { getPronoun, type Player, vocationString } from '$lib/players';
+	import { getPronoun, vocationString } from '$lib/players';
 
-	export let characters: Player[];
+	export let characters: AccountCharacter[];
 	$: classic = $page.data.selectedTheme === 'classic';
 	let selectedCharacterId: number | undefined;
 	$: if (
@@ -43,9 +45,7 @@
 						<th scope="col" class="account-characters__outfit"
 							>{$_('outfit')}</th>
 						<th scope="col">{$_('name')}</th>
-						{#if classic}<th scope="col" class="account-characters__status"
-								>Status</th
-							>{/if}
+						<th scope="col" class="account-characters__status">Status</th>
 						<th scope="col" class="account-characters__actions"
 							><span class="sr-only">{$_('account.character-actions')}</span
 							></th>
@@ -79,8 +79,7 @@
 							<td class="account-characters__identity">
 								<div class="flex flex-col">
 									<span class="font-semibold flex flex-row gap-1 items-center">
-										{#if !classic}<OnlineIndicator
-												online={character.online} />{/if}
+										<OnlineIndicator online={character.online} />
 										<a
 											href={`/characters/${encodeURIComponent(character.name)}`}
 											class="anchor account-characters__name">
@@ -99,8 +98,10 @@
 									</span>
 								</div>
 							</td>
-							{#if classic}<td><OnlineIndicator online={character.online} /></td
-								>{/if}
+							<td
+								><AccountCharacterStatus
+									dailyReward={character.dailyReward}
+									hidden={character.settings?.hidden ?? false} /></td>
 							<td>
 								<div
 									id={`character-actions-${character.id}`}
@@ -163,9 +164,7 @@
 							</td>
 						</tr>
 					{:else}
-						<tr
-							><td colspan={classic ? 5 : 4}>{$_('account.no-characters')}</td
-							></tr>
+						<tr><td colspan="5">{$_('account.no-characters')}</td></tr>
 					{/each}
 				</tbody>
 			</table>

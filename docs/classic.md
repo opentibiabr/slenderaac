@@ -610,8 +610,10 @@ adding route-specific CSS. Theme-specific native controls are scoped to Classic.
 Account information and character management share their native components and
 actions across themes. Their Classic panels use the existing list variant,
 bordered data tables and a single shadow surface; action buttons sit outside the
-table surface. Property labels align left, character presence has a labeled
-status column, and record actions retain the local account routes. Additional
+table surface. Property labels align left. Character presence sits beside the
+name; the Status column shows reward collection and hidden state, as defined in
+[UI states](ui-states.md#account-character-status). Record actions retain the local
+account routes. Additional
 native actions may require taller rows than a reference with fewer controls.
 Classic highlights the selected row and shows its bracketed actions. Clicking a
 row selects it; the numbered button also supports keyboard selection. Character
@@ -834,6 +836,12 @@ Creature cards occupy 100x110px, with labels starting 67px below the card top.
 Do not let the inline image baseline increase the 64px detail heading to 67px.
 
 ## Publishing the fixed asset channel
+
+The optional `accountRewardCollected`, `accountRewardUncollected` and
+`accountCharacterHidden` manifest entries provide the account table's native
+11 × 19 status artwork. Keep the files in the external Classic pack. Older packs
+use accessible icon fallbacks; status meaning follows [UI states](ui-states.md#account-character-status)
+in both layouts and never depends on the availability of artwork.
 
 The checkout installer runs through `npm run install:assets` and does not require
 GitHub authentication. It uses the Node.js dependencies already installed for the

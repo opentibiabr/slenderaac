@@ -12,7 +12,11 @@
 		"no-characters": "Você ainda não tem personagens.",
 		"change-pending": "(verificação pendente para alteração de email para {email})",
 		"resend": "reenviar",
-		"unverified": "(não verificado <a class=\"anchor\" href=\"/account/resend\">reenviar</a>)"
+		"unverified": "(não verificado <a class=\"anchor\" href=\"/account/resend\">reenviar</a>)",
+		"reward-collected": "Recompensa diária coletada",
+		"reward-uncollected": "Recompensa diária não coletada",
+		"reward-unknown": "Status da recompensa diária indisponível",
+		"character-hidden": "Oculto na lista pública de personagens da conta"
 	},
 	"account-management": "Gerenciamento da Conta",
 	"account-name": "Nome da conta",
