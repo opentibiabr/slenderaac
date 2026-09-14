@@ -6,20 +6,21 @@
 
 	import { page } from '$app/stores';
 
-	import { classicAsset, type ClassicAssets } from '$lib/themes/classic/theme';
+	import { themeAsset, type ThemeAssets } from '$lib/themes/assets';
 	import { layoutSelectionHref } from '$lib/themes/navigation';
 	import { themeRegistry } from '$lib/themes/registry';
 	import { type ThemeId, themeIds } from '$lib/themes/theme-ids';
 
 	export let selectedTheme: ThemeId;
-	export let themeAssets: ClassicAssets = {};
+	export let themeAssets: ThemeAssets = {};
 	let open = false;
 	let trigger: HTMLElement;
 	let currentUrl = '';
-	$: classic = selectedTheme === 'classic';
-	$: buttonBackground = classicAsset(themeAssets, 'smallButtonBackground');
-	$: buttonHover = classicAsset(themeAssets, 'smallButtonHover');
-	$: paper = classicAsset(themeAssets, 'paperTexture');
+	$: classic =
+		themeRegistry[selectedTheme].profile.presentation.pageSurface === 'ornate';
+	$: buttonBackground = themeAsset(themeAssets, 'smallButtonBackground');
+	$: buttonHover = themeAsset(themeAssets, 'smallButtonHover');
+	$: paper = themeAsset(themeAssets, 'paperTexture');
 	$: if ($page.url.href !== currentUrl) {
 		currentUrl = $page.url.href;
 		open = false;

@@ -59,18 +59,20 @@
 		min-width: 0;
 		width: 100%;
 	}
-	:global(.theme-classic .classic-native-content)
+	:global(.layout-surface-ornate .classic-native-content)
 		.auto-select-form
 		tr:nth-child(n) {
 		background: transparent;
 	}
-	:global(.theme-classic .classic-native-content) .auto-select-form th {
+	:global(.layout-surface-ornate .classic-native-content) .auto-select-form th {
 		box-sizing: content-box;
 		width: 150px;
 		white-space: nowrap;
 		vertical-align: middle;
 	}
-	:global(.theme-classic .classic-native-content) .auto-select-form select {
+	:global(.layout-surface-ornate .classic-native-content)
+		.auto-select-form
+		select {
 		height: 19px;
 		padding: 0;
 		border: 1px solid #767676;
@@ -84,7 +86,9 @@
 			display: block;
 			width: 100%;
 		}
-		:global(.theme-classic .classic-native-content) .auto-select-form th {
+		:global(.layout-surface-ornate .classic-native-content)
+			.auto-select-form
+			th {
 			box-sizing: border-box;
 			width: 100%;
 		}

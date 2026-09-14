@@ -148,10 +148,10 @@
 		justify-content: center;
 		margin-top: 1em;
 	}
-	:global(.theme-classic) .catalog-actions {
+	:global(.layout-surface-ornate) .catalog-actions {
 		margin-top: 0;
 	}
-	:global(.theme-classic) .spells-list :is(th, td):not(:first-child) {
+	:global(.layout-surface-ornate) .spells-list :is(th, td):not(:first-child) {
 		text-align: center;
 		white-space: nowrap;
 	}

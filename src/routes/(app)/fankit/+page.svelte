@@ -69,13 +69,13 @@
 	.fankit-page__download p {
 		margin: 0 0 14px;
 	}
-	:global(.theme-classic) .fankit-page {
+	:global(.layout-surface-ornate) .fankit-page {
 		font:
 			12px Verdana,
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .fankit-page__download {
+	:global(.layout-surface-ornate) .fankit-page__download {
 		padding: 10px;
 		border: 1px solid #793d03;
 		border-radius: 0;
@@ -84,7 +84,7 @@
 			inset 1px 1px #f1e0c6,
 			inset -1px -1px #8f6f49;
 	}
-	:global(.theme-classic) .fankit-page__download h2 {
+	:global(.layout-surface-ornate) .fankit-page__download h2 {
 		font:
 			bold 12px Verdana,
 			Arial,

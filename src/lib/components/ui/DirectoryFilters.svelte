@@ -118,10 +118,10 @@
 	.directory-filters__choices a:hover {
 		text-decoration: underline;
 	}
-	:global(.theme-classic) .directory-filters__selected {
+	:global(.layout-surface-ornate) .directory-filters__selected {
 		background-color: #bc9a83;
 	}
-	:global(.theme-classic) .directory-filters__choices a:hover {
+	:global(.layout-surface-ornate) .directory-filters__choices a:hover {
 		background-color: #e6d3b5;
 	}
 	@media (max-width: 767px) {

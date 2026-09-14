@@ -166,7 +166,7 @@
 	.online-players__table tr {
 		scroll-margin-top: 12px;
 	}
-	:global(.theme-classic) .online-players {
+	:global(.layout-surface-ornate) .online-players {
 		margin-bottom: 0;
 	}
 	@media (max-width: 767px) {

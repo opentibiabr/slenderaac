@@ -75,7 +75,7 @@
 	});
 </script>
 
-<div class="theme-legbone">
+<div class="theme-legbone layout-surface-cards">
 	<div class="theme-legbone-background"></div>
 	<div class="theme-legbone-backdrop"></div>
 	<div class="theme-legbone-content">

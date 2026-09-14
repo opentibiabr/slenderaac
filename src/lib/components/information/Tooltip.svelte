@@ -52,7 +52,7 @@
 	onDestroy(hide);
 	function mountPanel(node: HTMLElement) {
 		if (calendar) {
-			const root = trigger.closest<HTMLElement>('.theme-classic');
+			const root = trigger.closest<HTMLElement>('.layout-surface-ornate');
 			if (root) return portal(node, root);
 		}
 	}
@@ -129,11 +129,11 @@
 </span>
 
 <style>
-	:global(.theme-classic) .information-tooltip {
+	:global(.layout-surface-ornate) .information-tooltip {
 		position: relative;
 		display: inline;
 	}
-	:global(.theme-classic) .information-tooltip button {
+	:global(.layout-surface-ornate) .information-tooltip button {
 		display: inline;
 		margin: 0;
 		padding: 0;
@@ -144,18 +144,18 @@
 		vertical-align: baseline;
 		cursor: help;
 	}
-	:global(.theme-classic) .information-tooltip--block,
-	:global(.theme-classic) .information-tooltip--block button {
+	:global(.layout-surface-ornate) .information-tooltip--block,
+	:global(.layout-surface-ornate) .information-tooltip--block button {
 		display: block;
 		width: 100%;
 		text-align: inherit;
 	}
-	:global(.theme-classic) .information-tooltip--block button {
+	:global(.layout-surface-ornate) .information-tooltip--block button {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 	}
-	:global(.theme-classic) .information-tooltip__panel {
+	:global(.layout-surface-ornate) .information-tooltip__panel {
 		position: absolute;
 		z-index: 100;
 		display: block;
@@ -171,7 +171,7 @@
 			sans-serif;
 		text-align: left;
 	}
-	:global(.theme-classic) .information-tooltip__panel::before {
+	:global(.layout-surface-ornate) .information-tooltip__panel::before {
 		position: absolute;
 		top: -1px;
 		left: -8px;
@@ -180,43 +180,43 @@
 		background-image: var(--tooltip-arrow);
 		content: '';
 	}
-	:global(.theme-classic) .information-tooltip__panel--left::before {
+	:global(.layout-surface-ornate) .information-tooltip__panel--left::before {
 		left: auto;
 		right: -8px;
 		transform: rotate(180deg);
 	}
-	:global(.theme-classic) .information-tooltip__panel strong {
+	:global(.layout-surface-ornate) .information-tooltip__panel strong {
 		display: block;
 		margin-bottom: 15px;
 		font-size: 16px;
 		font-weight: bold;
 	}
-	:global(.theme-classic) .information-tooltip__text {
+	:global(.layout-surface-ornate) .information-tooltip__text {
 		display: block;
 		white-space: pre-line;
 	}
-	:global(.theme-classic) .information-tooltip__section-title {
+	:global(.layout-surface-ornate) .information-tooltip__section-title {
 		display: block;
 		font-size: 16px;
 		font-weight: bold;
 		word-break: break-word;
 	}
-	:global(.theme-classic) .information-tooltip__section-text {
+	:global(.layout-surface-ornate) .information-tooltip__section-text {
 		display: block;
 		margin-bottom: 20px;
 		text-align: justify;
 		white-space: pre-line;
 	}
-	:global(.theme-classic) .information-tooltip__ornament {
+	:global(.layout-surface-ornate) .information-tooltip__ornament {
 		display: block;
 		text-align: center;
 	}
-	:global(.theme-classic) .information-tooltip__ornament img {
+	:global(.layout-surface-ornate) .information-tooltip__ornament img {
 		width: 220px;
 		max-width: 100%;
 		height: auto;
 	}
-	:global(.theme-classic)
+	:global(.layout-surface-ornate)
 		.information-tooltip__panel--calendar
 		.information-tooltip__ornament
 		img {

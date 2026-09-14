@@ -4,7 +4,7 @@
 	import { serverText, serverTextAttributes } from '$lib/site-identity';
 	import { siteHref } from '$lib/themes/navigation';
 
-	import type { ReferenceNode } from './reference-types';
+	import type { ReferenceNode } from '$lib/themes/reference-types';
 
 	export let nodes: ReferenceNode[];
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };

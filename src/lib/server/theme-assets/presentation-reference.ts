@@ -1,14 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { ClassicPresentation } from '$lib/themes/classic/reference-types';
+import type { ThemePresentation } from '$lib/themes/reference-types';
 import { themeAssetPack, type ThemeId } from '$lib/themes/profiles';
 
 import { env } from '$env/dynamic/private';
 
 export async function loadPresentationReference(
 	theme: ThemeId,
-): Promise<ClassicPresentation | null> {
+): Promise<ThemePresentation | null> {
 	const referencePack = themeAssetPack(theme, 'referencePack');
 	if (!referencePack || !env.THEME_ASSETS_ROOT) return null;
 	try {
@@ -20,7 +20,7 @@ export async function loadPresentationReference(
 		);
 		const value = JSON.parse(
 			await fs.readFile(file, 'utf8'),
-		) as ClassicPresentation;
+		) as ThemePresentation;
 		if (!value || typeof value !== 'object') return null;
 		const colors = value.calendarColors;
 		if (

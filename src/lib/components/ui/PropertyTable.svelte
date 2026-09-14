@@ -44,17 +44,17 @@
 		overflow-wrap: anywhere;
 		white-space: pre-wrap;
 	}
-	:global(.theme-classic .classic-native-content)
+	:global(.layout-surface-ornate .classic-native-content)
 		.property-table
 		tr:nth-child(n) {
 		background: transparent;
 	}
-	:global(.theme-classic .classic-native-content) .property-table th {
+	:global(.layout-surface-ornate .classic-native-content) .property-table th {
 		box-sizing: content-box;
 		width: 150px;
 	}
 	@media (max-width: 767px) {
-		:global(.theme-classic .classic-native-content) .property-table th {
+		:global(.layout-surface-ornate .classic-native-content) .property-table th {
 			width: 35%;
 		}
 	}

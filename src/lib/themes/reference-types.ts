@@ -7,7 +7,7 @@ export type ReferenceNode =
 			imageHref?: string;
 	  };
 
-export type ClassicNewsReference = {
+export type ThemeNewsReference = {
 	sourceUrl: string;
 	capturedAt: string;
 	articles: {
@@ -28,11 +28,11 @@ export type ClassicNewsReference = {
 	pollText: string;
 };
 
-export type ClassicPresentation = {
+export type ThemePresentation = {
 	calendarColors?: Record<string, string>;
 };
 
-export type ClassicArticlePresentation = {
+export type ThemeArticlePresentation = {
 	icon: string;
 	commentHref: string | null;
 	body: ReferenceNode[];

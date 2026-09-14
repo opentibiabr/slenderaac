@@ -106,11 +106,11 @@
 	.account-info th {
 		text-align: left;
 	}
-	:global(.theme-legbone) .account-info th {
+	:global(.layout-surface-cards) .account-info th {
 		width: 40%;
 	}
 	@media (min-width: 768px) {
-		:global(.theme-classic) .account-info th {
+		:global(.layout-surface-ornate) .account-info th {
 			white-space: nowrap;
 		}
 	}

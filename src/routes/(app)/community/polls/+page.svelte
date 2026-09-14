@@ -140,7 +140,7 @@
 		overflow: hidden;
 		clip-path: inset(50%);
 	}
-	:global(.theme-classic) .poll-page__intro {
+	:global(.layout-surface-ornate) .poll-page__intro {
 		font:
 			13.333333px/16px Verdana,
 			Arial,

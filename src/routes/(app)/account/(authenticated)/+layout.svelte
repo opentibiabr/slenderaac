@@ -38,7 +38,7 @@
 		flex-direction: column;
 		gap: 1rem;
 	}
-	:global(.theme-classic) .account-overview {
+	:global(.layout-surface-ornate) .account-overview {
 		display: block;
 	}
 </style>

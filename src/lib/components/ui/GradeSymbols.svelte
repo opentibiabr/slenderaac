@@ -28,7 +28,7 @@
 		height: 18px;
 		vertical-align: baseline;
 	}
-	:global(.theme-classic) img {
+	:global(.layout-surface-ornate) img {
 		width: 18px;
 		height: 18px;
 		max-width: none;

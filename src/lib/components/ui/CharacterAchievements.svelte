@@ -48,7 +48,7 @@
 		white-space: normal;
 		overflow-wrap: anywhere;
 	}
-	:global(.theme-classic) .character-achievements__grade {
+	:global(.layout-surface-ornate) .character-achievements__grade {
 		width: 175px;
 		box-sizing: content-box;
 	}

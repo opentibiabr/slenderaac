@@ -95,13 +95,13 @@
 </dialog>
 
 <style>
-	:global(.theme-legbone) .screenshot-gallery__cell {
+	:global(.layout-surface-cards) .screenshot-gallery__cell {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: center;
 		gap: 1rem;
 	}
-	:global(.theme-legbone) .screenshot-gallery__card {
+	:global(.layout-surface-cards) .screenshot-gallery__card {
 		width: 230px;
 		max-width: 100%;
 		overflow: hidden;
@@ -109,16 +109,16 @@
 		background: rgb(var(--color-surface-800));
 		color: rgb(var(--color-surface-50));
 	}
-	:global(.theme-legbone) .screenshot-gallery__card img {
+	:global(.layout-surface-cards) .screenshot-gallery__card img {
 		width: 100%;
 		height: 147px;
 		object-fit: cover;
 	}
-	:global(.theme-legbone) .screenshot-gallery__caption {
+	:global(.layout-surface-cards) .screenshot-gallery__caption {
 		display: block;
 		padding: 0.5rem;
 	}
-	:global(.theme-legbone) .screenshot-dialog {
+	:global(.layout-surface-cards) .screenshot-dialog {
 		width: min(900px, calc(100% - 2rem));
 		max-height: calc(100dvh - 2rem);
 		padding: 1rem;
@@ -126,41 +126,41 @@
 		background: rgb(var(--color-surface-800));
 		color: rgb(var(--color-surface-50));
 	}
-	:global(.theme-legbone) .screenshot-dialog::backdrop {
+	:global(.layout-surface-cards) .screenshot-dialog::backdrop {
 		background: rgb(0 0 0 / 0.75);
 	}
-	:global(.theme-legbone) .screenshot-dialog__navigation {
+	:global(.layout-surface-cards) .screenshot-dialog__navigation {
 		display: flex;
 		justify-content: space-between;
 		gap: 0.5rem;
 		margin: 0.5rem 0;
 	}
-	:global(.theme-legbone) .screenshot-dialog__navigation button {
+	:global(.layout-surface-cards) .screenshot-dialog__navigation button {
 		border-radius: var(--theme-rounded-base);
 		padding: 0.5rem 1rem;
 		background: rgb(var(--color-primary-500));
 		color: rgb(var(--color-primary-50));
 	}
-	:global(.theme-legbone) .screenshot-dialog__picture img {
+	:global(.layout-surface-cards) .screenshot-dialog__picture img {
 		display: block;
 		margin: 1rem auto;
 		max-width: 100%;
 		height: auto;
 	}
-	:global(.theme-legbone) .screenshot-dialog__caption {
+	:global(.layout-surface-cards) .screenshot-dialog__caption {
 		text-align: center;
 	}
-	:global(.theme-legbone) .screenshot-dialog__cross {
+	:global(.layout-surface-cards) .screenshot-dialog__cross {
 		display: none;
 	}
 
-	:global(.theme-classic) .screenshot-gallery {
+	:global(.layout-surface-ornate) .screenshot-gallery {
 		display: table;
 		width: 100%;
 		border-collapse: separate;
 		border-spacing: 2px;
 	}
-	:global(.theme-classic) .screenshot-gallery__cell {
+	:global(.layout-surface-ornate) .screenshot-gallery__cell {
 		display: table-cell;
 		padding: 1px;
 		text-align: center;
@@ -169,7 +169,7 @@
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .screenshot-gallery__card {
+	:global(.layout-surface-ornate) .screenshot-gallery__card {
 		display: inline-block;
 		box-sizing: content-box;
 		width: 232px;
@@ -179,7 +179,7 @@
 		background: var(--gallery-background);
 		vertical-align: baseline;
 	}
-	:global(.theme-classic) .screenshot-gallery__card img {
+	:global(.layout-surface-ornate) .screenshot-gallery__card img {
 		display: inline;
 		box-sizing: content-box;
 		width: 230px;
@@ -188,7 +188,7 @@
 		border: 1px solid rgb(123 110 76);
 		vertical-align: baseline;
 	}
-	:global(.theme-classic) .screenshot-gallery__caption {
+	:global(.layout-surface-ornate) .screenshot-gallery__caption {
 		display: table;
 		border-spacing: 2px;
 		width: 230px;
@@ -196,13 +196,13 @@
 		margin: auto;
 		color: rgb(201 189 171);
 	}
-	:global(.theme-classic) .screenshot-gallery__caption > span {
+	:global(.layout-surface-ornate) .screenshot-gallery__caption > span {
 		display: table-cell;
 		vertical-align: middle;
 		text-align: center;
 		font-weight: normal;
 	}
-	:global(.theme-classic) .screenshot-dialog {
+	:global(.layout-surface-ornate) .screenshot-dialog {
 		position: fixed;
 		top: 0;
 		width: 100%;
@@ -218,10 +218,10 @@
 			16px 'Times New Roman',
 			serif;
 	}
-	:global(.theme-classic) .screenshot-dialog::backdrop {
+	:global(.layout-surface-ornate) .screenshot-dialog::backdrop {
 		background: rgb(0 0 0 / 0.75);
 	}
-	:global(.theme-classic) .screenshot-dialog__navigation {
+	:global(.layout-surface-ornate) .screenshot-dialog__navigation {
 		display: flex;
 		width: 615px;
 		max-width: calc(100% - 24px);
@@ -230,7 +230,7 @@
 			16px Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .screenshot-dialog__navigation button {
+	:global(.layout-surface-ornate) .screenshot-dialog__navigation button {
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
@@ -243,16 +243,18 @@
 		color: rgb(242 175 78);
 		font: inherit;
 	}
-	:global(.theme-classic) .screenshot-dialog__navigation button:nth-child(2) {
+	:global(.layout-surface-ornate)
+		.screenshot-dialog__navigation
+		button:nth-child(2) {
 		margin: 0 2px;
 	}
-	:global(.theme-classic) .screenshot-dialog__picture {
+	:global(.layout-surface-ornate) .screenshot-dialog__picture {
 		position: relative;
 		width: 680px;
 		max-width: 100%;
 		margin: 0 auto;
 	}
-	:global(.theme-classic) .screenshot-dialog__caption {
+	:global(.layout-surface-ornate) .screenshot-dialog__caption {
 		box-sizing: content-box;
 		width: 611px;
 		max-width: calc(100% - 24px);
@@ -265,7 +267,7 @@
 			16px/25px Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .screenshot-dialog__picture img {
+	:global(.layout-surface-ornate) .screenshot-dialog__picture img {
 		display: inline;
 		box-sizing: content-box;
 		max-width: calc(100% - 24px);
@@ -274,7 +276,7 @@
 		border: 1px solid rgb(123 110 76);
 		vertical-align: baseline;
 	}
-	:global(.theme-classic) .screenshot-dialog__cross {
+	:global(.layout-surface-ornate) .screenshot-dialog__cross {
 		position: absolute;
 		z-index: 1;
 		right: -40px;
@@ -291,12 +293,12 @@
 			25px/60px Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .screenshot-gallery__card {
+	:global(.layout-surface-ornate) .screenshot-gallery__card {
 		text-decoration: none;
 		font-weight: normal;
 	}
 	@media (max-width: 800px) {
-		:global(.theme-classic) .screenshot-dialog__cross {
+		:global(.layout-surface-ornate) .screenshot-dialog__cross {
 			display: none;
 		}
 	}

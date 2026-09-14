@@ -160,25 +160,25 @@
 		margin: 8px 0 0;
 		text-align: center;
 	}
-	:global(.theme-classic) .maps-page {
+	:global(.layout-surface-ornate) .maps-page {
 		font:
 			12px Verdana,
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .maps-page__regions {
+	:global(.layout-surface-ornate) .maps-page__regions {
 		margin: 12px 0 18px;
 		padding-left: 20px;
 	}
-	:global(.theme-classic) .maps-page__regions > li + li {
+	:global(.layout-surface-ornate) .maps-page__regions > li + li {
 		margin-top: 12px;
 	}
-	:global(.theme-classic) .maps-page__regions ul {
+	:global(.layout-surface-ornate) .maps-page__regions ul {
 		margin: 0;
 		padding-left: 8px;
 	}
-	:global(.theme-classic) .maps-page__detail,
-	:global(.theme-classic) .maps-page__state {
+	:global(.layout-surface-ornate) .maps-page__detail,
+	:global(.layout-surface-ornate) .maps-page__state {
 		border: 1px solid #793d03;
 		background: #d4c0a1;
 	}

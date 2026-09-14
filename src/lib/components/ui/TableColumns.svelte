@@ -51,10 +51,10 @@
 	.table-columns__layout > tbody > tr > td:last-child .table-columns__column {
 		margin-right: 10px;
 	}
-	:global(.theme-classic) .table-columns {
+	:global(.layout-surface-ornate) .table-columns {
 		width: calc(100% + 2px);
 	}
-	:global(.theme-classic) .table-columns__body {
+	:global(.layout-surface-ornate) .table-columns__body {
 		margin: 5px -3px 0 3px;
 	}
 	@container (max-width: 720px) {

@@ -125,7 +125,7 @@
 		display: flex;
 		align-items: center;
 	}
-	:global(.theme-classic) .fansite-group__intro p {
+	:global(.layout-surface-ornate) .fansite-group__intro p {
 		border: 1px solid #faf0d7;
 		padding-left: 29px;
 	}
@@ -143,7 +143,7 @@
 		margin: 0;
 		padding-left: 13px;
 	}
-	:global(.theme-classic) .fansite-group__language {
+	:global(.layout-surface-ornate) .fansite-group__language {
 		font-weight: normal !important;
 		color: inherit !important;
 	}

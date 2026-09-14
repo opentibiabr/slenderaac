@@ -50,11 +50,11 @@
 		display: inline;
 		vertical-align: baseline;
 	}
-	:global(.theme-classic .catalog-navigation img[width='15']) {
+	:global(.layout-surface-ornate .catalog-navigation img[width='15']) {
 		width: 15px;
 		height: 11px;
 	}
-	:global(.theme-classic .catalog-navigation img[width='11']) {
+	:global(.layout-surface-ornate .catalog-navigation img[width='11']) {
 		width: 11px;
 		height: 15px;
 	}

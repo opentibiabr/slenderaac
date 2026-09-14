@@ -33,10 +33,10 @@
 </div>
 
 <style>
-	:global(.theme-classic) .fansites-page__intro {
+	:global(.layout-surface-ornate) .fansites-page__intro {
 		margin: 0;
 	}
-	:global(.theme-classic) .fansites-page__intro p,
+	:global(.layout-surface-ornate) .fansites-page__intro p,
 	.fansites-page__intro p {
 		margin: 0 0 15px;
 	}

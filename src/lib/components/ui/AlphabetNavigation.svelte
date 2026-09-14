@@ -18,7 +18,9 @@
 		flex-wrap: wrap;
 		gap: 4px;
 	}
-	:global(.theme-classic .classic-table-caption) .alphabet-navigation a {
+	:global(.layout-surface-ornate .classic-table-caption)
+		.alphabet-navigation
+		a {
 		color: white;
 	}
 	span {

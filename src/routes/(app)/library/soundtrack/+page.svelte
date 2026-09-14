@@ -73,20 +73,20 @@
 	.soundtrack-page__download p {
 		margin: 0 0 10px;
 	}
-	:global(.theme-classic) .soundtrack-page {
+	:global(.layout-surface-ornate) .soundtrack-page {
 		font:
 			12px Verdana,
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .soundtrack-page__download,
-	:global(.theme-classic) .soundtrack-page__empty {
+	:global(.layout-surface-ornate) .soundtrack-page__download,
+	:global(.layout-surface-ornate) .soundtrack-page__empty {
 		width: min(100%, 380px);
 		padding: 10px;
 		border: 2px ridge #70634f;
 		background: #d4c0a1;
 	}
-	:global(.theme-classic) .soundtrack-page__download h2 {
+	:global(.layout-surface-ornate) .soundtrack-page__download h2 {
 		font:
 			bold 12px Verdana,
 			Arial,

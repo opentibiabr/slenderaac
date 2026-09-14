@@ -205,7 +205,7 @@
 	.soundtrack-player__status:empty {
 		display: none;
 	}
-	:global(.theme-classic) .soundtrack-player {
+	:global(.layout-surface-ornate) .soundtrack-player {
 		width: min(100%, 380px);
 		margin-bottom: 16px;
 		border: 2px ridge #70634f;
@@ -215,21 +215,21 @@
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .soundtrack-player header {
+	:global(.layout-surface-ornate) .soundtrack-player header {
 		padding: 5px 8px;
 		color: #fff;
 		background: #4f463d;
 	}
-	:global(.theme-classic) .soundtrack-player__art {
+	:global(.layout-surface-ornate) .soundtrack-player__art {
 		aspect-ratio: 95 / 41;
 	}
-	:global(.theme-classic) .soundtrack-player__controls {
+	:global(.layout-surface-ornate) .soundtrack-player__controls {
 		min-height: 24px;
 		padding: 2px 5px;
 		color: #d6b85a;
 		background: #3b3b37;
 	}
-	:global(.theme-classic) .soundtrack-player__status {
+	:global(.layout-surface-ornate) .soundtrack-player__status {
 		color: #f0c060;
 		background: #3b3b37;
 	}

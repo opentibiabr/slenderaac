@@ -28,7 +28,7 @@
 			bold 18px Georgia,
 			serif;
 	}
-	:global(.theme-classic) .directory-logo > span {
+	:global(.layout-surface-ornate) .directory-logo > span {
 		color: #5a2800;
 		text-shadow: none;
 	}

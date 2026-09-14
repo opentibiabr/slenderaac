@@ -23,7 +23,7 @@
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
 	import type { LayoutData } from '../../../routes/(app)/$types';
-	import type { ClassicNewsReference } from './reference-types';
+	import type { ThemeNewsReference } from '$lib/themes/reference-types';
 	import ContentFrame from './ContentFrame.svelte';
 	import { headlineFontStyle } from './headline';
 	import InfoBar from './InfoBar.svelte';
@@ -86,7 +86,7 @@
 	let expandedTickers: boolean[] = [];
 	$: ({ isLoggedIn, isAdmin } = data);
 	$: classicReference = (
-		$page.data as { classicReference?: ClassicNewsReference | null }
+		$page.data as { classicReference?: ThemeNewsReference | null }
 	).classicReference;
 	$: title = typeof $page.data.title === 'string' ? $page.data.title : '';
 	$: information = (

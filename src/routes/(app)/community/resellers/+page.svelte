@@ -60,11 +60,11 @@
 		width: 100%;
 		min-width: 0;
 	}
-	:global(.theme-classic) .resellers-page__intro {
+	:global(.layout-surface-ornate) .resellers-page__intro {
 		margin: 0 0 30px;
 	}
 	.resellers-page__intro p,
-	:global(.theme-classic) .resellers-page__intro p {
+	:global(.layout-surface-ornate) .resellers-page__intro p {
 		margin: 0 0 15px;
 	}
 	.resellers-page__entry {

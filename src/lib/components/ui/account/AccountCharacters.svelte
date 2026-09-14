@@ -206,58 +206,59 @@
 	.account-characters__links[hidden] {
 		display: none;
 	}
-	:global(.theme-classic) .account-characters__links {
+	:global(.layout-surface-ornate) .account-characters__links {
 		gap: 0;
 	}
-	:global(.theme-classic)
+	:global(.layout-surface-ornate)
 		.account-characters__links:not([hidden])
 		> :is(a, form)::before {
 		content: '[';
 		color: rgb(90 40 0);
 		font-weight: normal;
 	}
-	:global(.theme-classic)
+	:global(.layout-surface-ornate)
 		.account-characters__links:not([hidden])
 		> :is(a, form)::after {
 		content: ']';
 		color: rgb(90 40 0);
 		font-weight: normal;
 	}
-	:global(.theme-classic) .account-characters tbody tr {
+	:global(.layout-surface-ornate) .account-characters tbody tr {
 		height: 56px;
 		cursor: pointer;
 	}
-	:global(.theme-classic .classic-native-content)
+	:global(.layout-surface-ornate .classic-native-content)
 		.account-characters
 		tbody
 		tr:nth-child(even) {
 		background: rgb(213 192 161);
 	}
-	:global(.theme-classic .classic-native-content)
+	:global(.layout-surface-ornate .classic-native-content)
 		.account-characters
 		tbody
 		tr:hover {
 		background: rgb(255 237 209);
 	}
-	:global(.theme-classic .classic-native-content) .account-characters__name {
+	:global(.layout-surface-ornate .classic-native-content)
+		.account-characters__name {
 		font-size: 13.333333px;
 		font-weight: normal;
 		color: inherit;
 		text-decoration: none;
 	}
-	:global(.theme-classic) .account-characters__identity {
+	:global(.layout-surface-ornate) .account-characters__identity {
 		white-space: nowrap;
 	}
-	:global(.theme-classic) .account-characters__identity > div {
+	:global(.layout-surface-ornate) .account-characters__identity > div {
 		gap: 4px;
 	}
-	:global(.theme-classic .classic-native-content)
+	:global(.layout-surface-ornate .classic-native-content)
 		.account-characters__selected
 		.account-characters__name {
 		font-size: 17.333333px;
 		font-weight: bold;
 	}
-	:global(.theme-classic) .account-characters__selected {
+	:global(.layout-surface-ornate) .account-characters__selected {
 		font-weight: bold;
 	}
 	.account-characters__select {
@@ -269,20 +270,22 @@
 		outline: 1px solid currentColor;
 		outline-offset: 2px;
 	}
-	:global(.theme-classic) .account-characters :is(th, td) {
+	:global(.layout-surface-ornate) .account-characters :is(th, td) {
 		vertical-align: middle;
 	}
-	:global(.theme-classic) .account-characters__number {
+	:global(.layout-surface-ornate) .account-characters__number {
 		width: 28px;
 	}
-	:global(.theme-classic) .account-characters .account-characters__index {
+	:global(.layout-surface-ornate)
+		.account-characters
+		.account-characters__index {
 		padding: 4px 2px 2px;
 		text-align: center;
 	}
-	:global(.theme-classic) .account-characters__status {
+	:global(.layout-surface-ornate) .account-characters__status {
 		width: 111px;
 	}
-	:global(.theme-classic) .account-characters__actions {
+	:global(.layout-surface-ornate) .account-characters__actions {
 		width: 130px;
 	}
 </style>

@@ -55,20 +55,20 @@
 		grid-column: 2;
 		text-align: right;
 	}
-	:global(.theme-classic) .genesis-page {
+	:global(.layout-surface-ornate) .genesis-page {
 		font:
 			13.333px Verdana,
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic) .genesis-page h1 {
+	:global(.layout-surface-ornate) .genesis-page h1 {
 		margin: 0 0 14px;
 		font:
 			bold 20px Verdana,
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic .genesis-page article.prose > p) {
+	:global(.layout-surface-ornate .genesis-page article.prose > p) {
 		display: flow-root;
 		margin: 0 0 14px;
 		font:
@@ -76,7 +76,9 @@
 			Arial,
 			sans-serif;
 	}
-	:global(.theme-classic .genesis-page article.prose > p::first-letter) {
+	:global(
+		.layout-surface-ornate .genesis-page article.prose > p::first-letter
+	) {
 		float: left;
 		margin: 1px 5px 0 0;
 		color: rgb(105 12 7);
@@ -85,7 +87,7 @@
 			'Times New Roman',
 			serif;
 	}
-	:global(.theme-classic) .genesis-page__chapters {
+	:global(.layout-surface-ornate) .genesis-page__chapters {
 		margin-top: 20px;
 		font:
 			12px Verdana,

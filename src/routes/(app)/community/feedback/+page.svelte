@@ -113,13 +113,13 @@
 		gap: 15px;
 		margin-top: 15px;
 	}
-	:global(.theme-classic) .feedback-page__intro {
+	:global(.layout-surface-ornate) .feedback-page__intro {
 		margin: 0;
 	}
-	:global(.theme-classic) .feedback-page__intro p {
+	:global(.layout-surface-ornate) .feedback-page__intro p {
 		margin: 0 0 15px;
 	}
-	:global(.theme-classic) .feedback-page__intro p:first-child {
+	:global(.layout-surface-ornate) .feedback-page__intro p:first-child {
 		margin-top: 5px;
 	}
 </style>

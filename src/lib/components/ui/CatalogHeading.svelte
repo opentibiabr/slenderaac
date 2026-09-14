@@ -32,7 +32,7 @@
 		font-weight: bold;
 		margin: 0.83em 0;
 	}
-	:global(.theme-classic) h2 {
+	:global(.layout-surface-ornate) h2 {
 		font:
 			bold 20px Verdana,
 			Arial,

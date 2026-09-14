@@ -4,10 +4,10 @@ import path from 'node:path';
 import { dev } from '$app/environment';
 
 import type {
-	ClassicArticlePresentation,
-	ClassicNewsReference,
+	ThemeArticlePresentation,
+	ThemeNewsReference,
 	ReferenceNode,
-} from '$lib/themes/classic/reference-types';
+} from '$lib/themes/reference-types';
 import { referenceDate } from '$lib/server/news/dates';
 
 import { env } from '$env/dynamic/private';
@@ -32,9 +32,9 @@ function validNodes(nodes: ReferenceNode[], depth = 0): boolean {
 
 export function readArticlePresentation(
 	value: unknown,
-): ClassicArticlePresentation | null {
+): ThemeArticlePresentation | null {
 	if (!value || typeof value !== 'object') return null;
-	const presentation = value as ClassicArticlePresentation;
+	const presentation = value as ThemeArticlePresentation;
 	return typeof presentation.icon === 'string' &&
 		presentation.icon.startsWith('/theme-assets/classic/') &&
 		(presentation.commentHref === null ||
@@ -47,7 +47,7 @@ export function readArticlePresentation(
 
 export async function loadNewsReference(
 	url: URL,
-): Promise<ClassicNewsReference | null> {
+): Promise<ThemeNewsReference | null> {
 	if (
 		!dev ||
 		url.searchParams.get('classicReference') !== '1' ||
@@ -65,7 +65,7 @@ export async function loadNewsReference(
 		);
 		const reference = JSON.parse(
 			await fs.readFile(file, 'utf8'),
-		) as ClassicNewsReference;
+		) as ThemeNewsReference;
 		if (
 			!reference ||
 			!Array.isArray(reference.articles) ||

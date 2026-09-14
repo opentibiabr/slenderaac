@@ -257,7 +257,7 @@
 		font-size: 0.875rem;
 	}
 
-	:global(.theme-classic) .event-schedule {
+	:global(.layout-surface-ornate) .event-schedule {
 		width: calc(100% + 2px);
 		margin: 0;
 		color: rgb(90 40 0);
@@ -266,13 +266,13 @@
 		line-height: normal;
 	}
 
-	:global(.theme-classic) .event-schedule__caption-row {
+	:global(.layout-surface-ornate) .event-schedule__caption-row {
 		position: relative;
 		width: 864px;
 		height: 16px;
 	}
 
-	:global(.theme-classic) .event-schedule__month-nav {
+	:global(.layout-surface-ornate) .event-schedule__month-nav {
 		position: absolute;
 		top: 0;
 		left: 340px;
@@ -282,21 +282,21 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-classic) .event-schedule__month-arrow {
+	:global(.layout-surface-ornate) .event-schedule__month-arrow {
 		color: white;
 		font-weight: 700;
 		text-decoration: none;
 	}
 
-	:global(.theme-classic) .event-schedule__month-arrow--previous {
+	:global(.layout-surface-ornate) .event-schedule__month-arrow--previous {
 		float: left;
 	}
 
-	:global(.theme-classic) .event-schedule__month-arrow--next {
+	:global(.layout-surface-ornate) .event-schedule__month-arrow--next {
 		float: right;
 	}
 
-	:global(.theme-classic) .event-schedule__timestamp {
+	:global(.layout-surface-ornate) .event-schedule__timestamp {
 		position: absolute;
 		top: 0;
 		right: 5px;
@@ -306,7 +306,7 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-classic) .event-schedule__inner {
+	:global(.layout-surface-ornate) .event-schedule__inner {
 		box-sizing: content-box;
 		position: relative;
 		width: 862px;
@@ -316,7 +316,7 @@
 		font-size: 10pt;
 	}
 
-	:global(.theme-classic) .event-schedule__calendar {
+	:global(.layout-surface-ornate) .event-schedule__calendar {
 		position: relative;
 		z-index: 1;
 		width: 862px;
@@ -329,15 +329,15 @@
 		line-height: normal;
 	}
 
-	:global(.theme-classic) .event-schedule__calendar th,
-	:global(.theme-classic) .event-schedule__calendar td {
+	:global(.layout-surface-ornate) .event-schedule__calendar th,
+	:global(.layout-surface-ornate) .event-schedule__calendar td {
 		box-sizing: border-box;
 		width: 123px;
 		border: 1px solid rgb(250 240 215);
 		padding: 1px;
 	}
 
-	:global(.theme-classic) .event-schedule__calendar th {
+	:global(.layout-surface-ornate) .event-schedule__calendar th {
 		height: 27px;
 		background: rgb(95 77 65);
 		color: white;
@@ -347,7 +347,7 @@
 		vertical-align: middle;
 	}
 
-	:global(.theme-classic) .event-schedule__calendar td {
+	:global(.layout-surface-ornate) .event-schedule__calendar td {
 		height: 85px;
 		background: rgb(231 209 175);
 		color: rgb(90 40 0);
@@ -358,33 +358,33 @@
 		background-clip: padding-box;
 	}
 
-	:global(.theme-classic)
+	:global(.layout-surface-ornate)
 		.event-schedule__calendar
 		td.event-schedule__day--outside {
 		background: rgb(212 192 161);
 	}
 
-	:global(.theme-classic)
+	:global(.layout-surface-ornate)
 		.event-schedule__calendar
 		td.event-schedule__day--today {
 		background: rgb(243 229 208);
 	}
 
-	:global(.theme-classic) .event-schedule__day-line {
+	:global(.layout-surface-ornate) .event-schedule__day-line {
 		margin: 0 0 2px 3px;
 		font-weight: 700;
 		line-height: normal;
 		white-space: nowrap;
 	}
 
-	:global(.theme-classic) .event-schedule__day-number {
+	:global(.layout-surface-ornate) .event-schedule__day-number {
 		vertical-align: text-bottom;
 	}
-	:global(.theme-classic) .event-schedule__seasonal {
+	:global(.layout-surface-ornate) .event-schedule__seasonal {
 		vertical-align: middle;
 	}
 
-	:global(.theme-classic) .event-schedule__day-line img {
+	:global(.layout-surface-ornate) .event-schedule__day-line img {
 		display: inline;
 		vertical-align: baseline;
 		width: 11px;
@@ -392,7 +392,7 @@
 		image-rendering: pixelated;
 	}
 
-	:global(.theme-classic) .event-schedule__event {
+	:global(.layout-surface-ornate) .event-schedule__event {
 		height: auto;
 		box-sizing: content-box;
 		width: 100%;
@@ -407,11 +407,13 @@
 		white-space: nowrap;
 	}
 
-	:global(.theme-classic) .event-schedule__day--outside .event-schedule__event {
+	:global(.layout-surface-ornate)
+		.event-schedule__day--outside
+		.event-schedule__event {
 		color: rgb(212 192 161);
 	}
 
-	:global(.theme-classic) .event-schedule__note {
+	:global(.layout-surface-ornate) .event-schedule__note {
 		margin: 15px 0 0;
 		color: rgb(90 40 0);
 		font-size: 12px;
