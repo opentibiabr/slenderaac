@@ -39,7 +39,7 @@ void test('account reward reads are bounded to owned players; missing cycles and
 		prisma.globalStorage.findUnique = (async () => {
 			queries++;
 			return { value: String(cycle) };
-		}) as typeof prisma.globalStorage.findUnique;
+		}) as unknown as typeof prisma.globalStorage.findUnique;
 		prisma.playerStorage.findMany = (async (query: unknown) => {
 			queries++;
 			assert.deepEqual(query, {
@@ -60,7 +60,7 @@ void test('account reward reads are bounded to owned players; missing cycles and
 				_max: { timestamp: true },
 			});
 			return [{ player_id: 20, _max: { timestamp: cycle + 30 } }];
-		}) as typeof prisma.dailyRewardHistory.groupBy;
+		}) as unknown as typeof prisma.dailyRewardHistory.groupBy;
 		assert.deepEqual(
 			[...(await loadAccountRewardStates([10, 20, 30]))],
 			[
