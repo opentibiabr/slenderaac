@@ -5,6 +5,17 @@
 		sans-serif;
 	color: rgb(90 40 0);
 }
+.theme-classic article.prose {
+	--tw-prose-headings: currentColor;
+	--tw-prose-lead: currentColor;
+	--tw-prose-bold: currentColor;
+	--tw-prose-counters: currentColor;
+	--tw-prose-bullets: currentColor;
+	--tw-prose-quotes: currentColor;
+	--tw-prose-captions: currentColor;
+	--tw-prose-code: currentColor;
+	color: inherit;
+}
 .theme-classic .classic-native-content .page-intro {
 	margin: 0 0 15px;
 	font:

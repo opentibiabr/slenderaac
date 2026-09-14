@@ -211,6 +211,14 @@ information pages retain their dedicated inner components. Add an optional nativ
 headline mapping when a matching raster asset is available; otherwise new titles
 use the shared dynamic heading treatment.
 
+Markdown document pages, including `/pages/[slug]`, reuse `DocumentContent` for
+Classic typography and spacing. The shared `article.prose` palette inherits the
+parchment's text color for body text, headings, emphasis and list markers even
+when the browser retains Legbone's dark-mode preference. Keep this palette in
+the Classic theme owner; do not add a color override to each rules, guide or
+static page. Verify body text, bold text, nested lists and links after switching
+between both layouts and Legbone's light/dark modes.
+
 The category-upgrade migration preserves the previous first news category as
 `server`. Fresh installations create the neutral category directly. Existing
 comparison content should be refreshed with the matching pack importer so image
