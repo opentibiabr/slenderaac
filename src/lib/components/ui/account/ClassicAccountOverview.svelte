@@ -18,14 +18,24 @@
 
 	$: assets = $page.data.themeAssets as ClassicAssets;
 	$: isPremium = account.isPremium;
-	$: blueButtonStyle = buttonStyle('smallButtonBackground', 'smallButtonHover');
+	$: blueButtonStyle = buttonStyle(
+		assets,
+		'smallButtonBackground',
+		'smallButtonHover',
+	);
 	$: greenButtonStyle = buttonStyle(
+		assets,
 		'greenButtonBackground',
 		'greenButtonHover',
 	);
-	$: redButtonStyle = buttonStyle('redButtonBackground', 'redButtonHover');
+	$: redButtonStyle = buttonStyle(
+		assets,
+		'redButtonBackground',
+		'redButtonHover',
+	);
 
 	function buttonStyle(
+		themeAssets: ClassicAssets,
 		backgroundKey:
 			| 'smallButtonBackground'
 			| 'greenButtonBackground'
@@ -33,11 +43,11 @@
 		hoverKey: 'smallButtonHover' | 'greenButtonHover' | 'redButtonHover',
 	) {
 		return [
-			classicAsset(assets, backgroundKey)
-				? `--classic-native-button: url("${classicAsset(assets, backgroundKey)}")`
+			classicAsset(themeAssets, backgroundKey)
+				? `--classic-native-button: url("${classicAsset(themeAssets, backgroundKey)}")`
 				: '',
-			classicAsset(assets, hoverKey)
-				? `--classic-native-button-hover: url("${classicAsset(assets, hoverKey)}")`
+			classicAsset(themeAssets, hoverKey)
+				? `--classic-native-button-hover: url("${classicAsset(themeAssets, hoverKey)}")`
 				: '',
 		]
 			.filter(Boolean)
