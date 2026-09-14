@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import SmallBox from '$lib/themes/classic/SmallBox.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let dense = false;
+
+	const theme = getThemeContext();
+	$: Renderer = $theme.components.SmallPanel;
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}<SmallBox
-		assets={$page.data.themeAssets}
-		{dense}><slot /></SmallBox
-	>{:else}<div class="card p-3"><slot /></div>{/if}
+<svelte:component this={Renderer} assets={$page.data.themeAssets} {dense}>
+	<slot />
+</svelte:component>

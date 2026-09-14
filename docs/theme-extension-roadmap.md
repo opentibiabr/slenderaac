@@ -132,7 +132,7 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
   shared markup or CSS.
 - [ ] Run the ponytail review against the proposed registry and remove any
   unused abstraction.
-- [ ] Commit the documentation and baseline separately.
+- [x] Commit the documentation and baseline separately (`63ee9ad`).
 
 ### Phase 1 — profile, registry and context
 
@@ -141,17 +141,17 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 - [x] Attach each current shell to its profile.
 - [ ] Define the complete `ThemeComponents` contract.
 - [ ] Make the registry map complete at TypeScript compile time.
-- [ ] Add the reactive theme context to the root layout.
-- [ ] Remove the root-level silent registry fallback.
+- [x] Add the reactive theme context to the root layout.
+- [x] Remove the root-level silent registry fallback.
 - [ ] Preserve cookies, aliases, canonical URLs and full-document switching.
 - [ ] Add focused profile, registry, selection and context tests.
 - [ ] Verify both switch directions with real browser clicks.
 
 ### Phase 2 — semantic shared components
 
-- [ ] Delegate `PagePanel`, `TableFrame`, `TableSurface` and `SmallPanel` to
-  registered renderers.
-- [ ] Delegate section navigation, modal and radio-choice presentation.
+- [x] Delegate `PagePanel`, `TableFrame`, `TableSurface` and `SmallPanel` to
+	registered renderers.
+- [x] Delegate section navigation, modal and radio-choice presentation.
 - [ ] Delegate information tables, catalog filters and catalog details.
 - [ ] Keep behavior, slots, labels, focus and keyboard semantics shared.
 - [ ] Move theme-specific CSS under the owning theme directory.
