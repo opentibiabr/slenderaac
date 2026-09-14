@@ -2,6 +2,7 @@ import { type Cookies, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
 import { AccountType, isAccountType } from '$lib/accounts';
+import { errorCode, startLogOperation } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
 
 export type SessionInfo = {
@@ -70,9 +71,16 @@ export async function getSession(sid: Sid): Promise<SessionInfo | undefined> {
 
 const cleanInterval = 1000 * 60 * 60; // 1 hour
 async function clean() {
-	await prisma.accountSessions.deleteMany({
-		where: { expires: { lt: Date.now() } },
-	});
+	const finish = startLogOperation('sessions.cleanup');
+	try {
+		const { count } = await prisma.accountSessions.deleteMany({
+			where: { expires: { lt: Date.now() } },
+		});
+		finish(`completed removed=${count}`);
+	} catch (error) {
+		// Background maintenance must not escape the request error boundary.
+		finish(`failed code=${errorCode(error)}`, 'error');
+	}
 }
 
 void clean();

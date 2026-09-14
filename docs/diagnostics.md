@@ -58,6 +58,7 @@ request retries, database timeouts or cache lifetimes.
 | `http.document`, `http.data`, `http.api` | Vite receiving a dynamic request until the response finishes, including framework/module initialization before the application hook runs; development only |
 | `startup`                                | Application server hooks have loaded; includes runtime and process ID                                                                                      |
 | `prices`                                 | The existing background international-price update; failure is logged without an unhandled background rejection                                            |
+| `sessions.cleanup`                       | Startup and hourly removal of expired sessions; includes the removed count or a sanitized failure code, and a failure leaves the next run scheduled        |
 | `database.identity`                      | A read-only query for the actual database name, database-server hostname and port; no user or password                                                     |
 | `request.locale`, `request.session`      | Language initialization and session lookup when needed                                                                                                     |
 | `request.resolve`                        | Framework route loading and response generation; the route template is logged without query strings or concrete account/character identifiers              |
@@ -75,6 +76,12 @@ A long named query or asset step narrows the wait to that dependency. If the
 document completes quickly but the page remains loading, inspect the browser's
 network requests and console. The appearance of the price-update log alone does
 not prove that it caused the wait: the update runs in the background.
+
+Background maintenance must handle rejected work at its launch boundary, log a
+sanitized failure, and preserve its next scheduled attempt. It must not leave an
+unhandled promise rejection or turn a database error into a successful login or
+an empty result. Session reads and account actions retain their normal error and
+authorization handling independently of the expired-session cleanup.
 
 Vite's file watcher also runs during initialization. Its default exclusions do
 not follow `.gitignore`; a large ignored directory can delay unrelated source
