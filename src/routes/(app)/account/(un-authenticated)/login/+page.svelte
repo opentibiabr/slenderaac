@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import Button from '$lib/components/ui/Button.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import { enhance } from '$lib/enchance';
 	import ClassicLogin from '$lib/themes/classic/Login.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { ActionData } from './$types';
 
 	export let form: ActionData;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}<ClassicLogin {form} />{:else}
+{#if classic}<ClassicLogin {form} />{:else}
 	<form class="flex flex-col gap-4" method="post" use:enhance>
 		{#if form?.errors?.global}
 			<p class="text-error-500">{form.errors.global}</p>

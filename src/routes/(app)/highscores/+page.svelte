@@ -10,10 +10,13 @@
 	import { highscoreCategories } from '$lib/highscores';
 	import { vocationFilters as vocations } from '$lib/players';
 	import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.contentSource === 'reference';
 	$: previewParameters = new URL('/highscores', $currentPage.url).searchParams;
 
 	$: page = {
@@ -38,7 +41,7 @@
 	let form: HTMLFormElement;
 </script>
 
-{#if $currentPage.data.selectedTheme === 'classic'}
+{#if classic}
 	<ClassicHighscores {data} />
 {:else}
 	<div class="flex flex-col gap-2 min-w-0 max-w-full">

@@ -3,8 +3,6 @@
 	import { _ } from 'svelte-i18n';
 	import { tooltip } from 'svooltip';
 
-	import { page } from '$app/stores';
-
 	import type { AccountCharacter } from '$lib/accounts';
 	import AccountCharacterStatus from '$lib/components/ui/account/AccountCharacterStatus.svelte';
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
@@ -15,9 +13,11 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, vocationString } from '$lib/players';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let characters: AccountCharacter[];
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	let selectedCharacterId: number | undefined;
 	$: if (
 		!characters.some((character) => character.id === selectedCharacterId)

@@ -18,6 +18,7 @@
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import { enhance } from '$lib/enchance';
 	import { type Player, vocationString } from '$lib/players';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let character: Player;
 	export let rankLevel: number;
@@ -31,6 +32,8 @@
 
 	$: leaving = $page.url.searchParams.get('leave') === character.name;
 	$: resigning = $page.data.resigning;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <tr
@@ -43,7 +46,7 @@
 		y: -20,
 		easing: cubicInOut,
 	}}>
-	{#if $page.data.selectedTheme !== 'classic'}<td>
+	{#if !classic}<td>
 			<AnimatedOutfit outfit={character} alt={character.name} />
 		</td>{/if}
 	<td class=" w-fit">

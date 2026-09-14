@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import Button from '$lib/components/ui/Button.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let is2faEnabled: boolean;
 	export let isVerified: boolean;
 	export let isChangingEmail: boolean;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <PagePanel title="Account Actions" variant="plain">

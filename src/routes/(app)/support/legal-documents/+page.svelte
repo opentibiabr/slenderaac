@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import { getThemeContext } from '$lib/themes/context';
+
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	let broken = false;
 </script>
 

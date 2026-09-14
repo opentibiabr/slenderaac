@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { _ } from 'svelte-i18n';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import { enhance } from '$lib/enchance';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { ActionData } from './$types';
 
 	export let form: ActionData;
-	import { _ } from 'svelte-i18n';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}<p>
+{#if classic}<p>
 		Enter your account’s email address to request a password reset.
 	</p>{/if}
 <form
@@ -32,10 +34,7 @@
 	</label>
 
 	<div class="flex flex-row justify-end items-center gap-2">
-		<Button
-			>{$page.data.selectedTheme === 'classic'
-				? 'Submit'
-				: $_('request-password-reset')}</Button>
+		<Button>{classic ? 'Submit' : $_('request-password-reset')}</Button>
 	</div>
 
 	<hr class="divider" />

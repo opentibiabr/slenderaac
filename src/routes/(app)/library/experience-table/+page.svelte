@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import TableColumns from '$lib/components/ui/TableColumns.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	const number = new Intl.NumberFormat('en-US');
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <svelte:head><title>{data.title}</title></svelte:head>
@@ -18,7 +19,7 @@
 <TableColumns title={data.title} columns={data.columns.length} let:column>
 	<table
 		class="classic-data-table classic-data-table--compact classic-data-table--numeric"
-		class:table={$page.data.selectedTheme !== 'classic'}
+		class:table={!classic}
 		aria-label={`Experience for levels ${data.columns[column][0].level} to ${data.columns[column].at(-1)?.level}`}>
 		<thead
 			><tr><th scope="col">Level</th><th scope="col">Experience</th></tr

@@ -8,10 +8,12 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 	import { formatDate } from '$lib/utils';
 
 	export let account: AccountInfo;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 {#if !classic}<h3 class="h3">{$_('general-information')}</h3>{/if}

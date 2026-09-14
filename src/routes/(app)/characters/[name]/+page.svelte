@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import CharacterAchievements from '$lib/components/ui/CharacterAchievements.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
@@ -12,6 +10,7 @@
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
 	import ClassicCharacterProfile from '$lib/themes/classic/CharacterProfile.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -27,6 +26,8 @@
 			])
 		: null;
 	$: inventory = data.inventory;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	function guildHref(name: string) {
 		return '/guilds/' + encodeURIComponent(name);
 	}
@@ -35,7 +36,7 @@
 	}
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}
+{#if classic}
 	<ClassicCharacterProfile {data} />
 {:else if character}
 	<div class="character-profile flex flex-col gap-2 w-full min-w-0">

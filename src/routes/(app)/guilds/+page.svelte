@@ -5,22 +5,23 @@
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import Button from '$lib/components/ui/Button.svelte';
 	import OnlineIndicator from '$lib/components/ui/OnlineIndicator.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 	import { serverAvailability } from '$lib/stores/online-status';
 	import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 
 	$: results = data.results ?? [];
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}
+{#if classic}
 	<ClassicGuildList {data} />
 {:else}
 	<div class="flex flex-col items-center gap-2">

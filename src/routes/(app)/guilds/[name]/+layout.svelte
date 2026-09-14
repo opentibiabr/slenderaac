@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import GuildCharacterRow from '$lib/components/guilds/GuildCharacterRow.svelte';
 	import GuildInfoBox from '$lib/components/guilds/GuildInfoBox.svelte';
 	import GuildOperations from '$lib/components/guilds/GuildOperations.svelte';
 	import ClassicGuildProfile from '$lib/themes/classic/GuildProfile.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { LayoutData } from './$types';
 
@@ -17,6 +16,8 @@
 	$: isOwner = data.rankLevelInGuild >= 4;
 	$: isLeader = data.rankLevelInGuild >= 3;
 	$: isVice = data.rankLevelInGuild >= 2;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 
 	function isSelf(name: string) {
 		return Boolean(
@@ -32,7 +33,7 @@
 	}
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}
+{#if classic}
 	<ClassicGuildProfile {data}><slot /></ClassicGuildProfile>
 {:else}
 	<slot />

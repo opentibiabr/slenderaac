@@ -5,12 +5,14 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import PropertyTable from '$lib/components/ui/PropertyTable.svelte';
 	import { resellerProperties } from '$lib/directories';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: parameters = new URL('/community/resellers', $page.url).searchParams;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <div class="resellers-page">

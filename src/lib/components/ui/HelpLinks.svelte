@@ -3,10 +3,12 @@
 
 	import SmallPanel from '$lib/components/ui/SmallPanel.svelte';
 	import { serverText } from '$lib/site-identity';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let title: string;
 	export let entries: { slug: string; title: string }[];
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <section class="help-links" class:classic>

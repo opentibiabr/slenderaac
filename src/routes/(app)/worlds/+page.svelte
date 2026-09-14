@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import CatalogDetails from '$lib/components/ui/CatalogDetails.svelte';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
@@ -8,13 +9,14 @@
 	import LabeledForm from '$lib/components/ui/LabeledForm.svelte';
 	import OnlinePlayers from '$lib/components/ui/OnlinePlayers.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
-	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 	import { worldHref, worldPvpTypes } from '$lib/worlds';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: world = data.world;
 	$: pvp = world.pvpType ? worldPvpTypes[world.pvpType] : 'Not specified';
 	$: preview = new URL('/worlds', $page.url).searchParams;

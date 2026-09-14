@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import { communityFormDate } from '$lib/community-forms';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let title: string;
 	export let topics: { id: string; title: string; ends_at: Date | null }[];
@@ -11,7 +10,8 @@
 	export let empty: string;
 	export let compact = false;
 	export let paged = false;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 {#if !classic}<h2 class="h2">{title}</h2>{/if}

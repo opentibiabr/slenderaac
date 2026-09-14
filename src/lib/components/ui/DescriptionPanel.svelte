@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
+	import TableSurface from '$lib/components/news/TableSurface.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import PagePanel from './PagePanel.svelte';
 
@@ -19,7 +20,8 @@
 	export let related = false;
 	export let plainEmpty = false;
 	export let anchorAliases: string[] = [];
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: emptyMessage = plainEmpty && !entries.length;
 </script>
 

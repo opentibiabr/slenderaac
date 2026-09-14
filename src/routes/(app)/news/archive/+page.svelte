@@ -6,12 +6,14 @@
 	import { serverText } from '$lib/site-identity';
 	import { classicNewsCategories } from '$lib/themes/classic/news-icons';
 	import { classicAsset } from '$lib/themes/classic/theme';
+	import { getThemeContext } from '$lib/themes/context';
 	import { layoutDebugKeys } from '$lib/themes/navigation';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: isClassicTheme = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: isClassicTheme = $theme.profile.presentation.contentSource === 'reference';
 	let formUrl = '';
 	let selectedTypes: string[] = [];
 	let selectedCategories: string[] = [];

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
-	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
+	import TableSurface from '$lib/components/news/TableSurface.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let title: string;
 	export let rows: {
@@ -11,12 +12,14 @@
 		external?: boolean;
 		strong?: boolean;
 	}[];
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <TableSurface assets={$page.data.themeAssets} width="100%">
 	<table
 		class="classic-data-table property-table"
-		class:table={$page.data.selectedTheme !== 'classic'}
+		class:table={!classic}
 		aria-label={title}>
 		<tbody
 			>{#each rows as row}<tr>

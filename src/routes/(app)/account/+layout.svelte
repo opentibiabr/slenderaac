@@ -2,9 +2,13 @@
 	import { page } from '$app/stores';
 
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { getThemeContext } from '$lib/themes/context';
+
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-{#if !$page.data.isLoggedIn && !($page.data.selectedTheme === 'classic' && $page.url.pathname === '/account/login')}
+{#if !$page.data.isLoggedIn && !(classic && $page.url.pathname === '/account/login')}
 	<PagePanel
 		title={$page.url.pathname === '/account/signup'
 			? 'Create New Account'

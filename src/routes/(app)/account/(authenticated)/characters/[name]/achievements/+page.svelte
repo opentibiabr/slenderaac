@@ -8,11 +8,14 @@
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
 	import { serverText } from '$lib/site-identity';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
 	export let form: ActionData;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	let selected: string[] = [];
 	let loadedSelection: string[] | undefined;
 	$: if (loadedSelection !== data.selected) {
@@ -40,7 +43,7 @@
 		</p>
 		<table
 			class="classic-data-table classic-data-table--grid"
-			class:table={$page.data.selectedTheme !== 'classic'}>
+			class:table={!classic}>
 			<tbody>
 				{#each data.earned as achievement}
 					<tr>

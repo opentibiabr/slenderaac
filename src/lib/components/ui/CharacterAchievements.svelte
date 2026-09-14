@@ -3,6 +3,7 @@
 
 	import type { AchievementRecord } from '$lib/achievements';
 	import { serverText } from '$lib/site-identity';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import GradeSymbols from './GradeSymbols.svelte';
 	import PagePanel from './PagePanel.svelte';
@@ -10,15 +11,17 @@
 	export let achievements: AchievementRecord[];
 	export let available = true;
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <PagePanel title="Character Achievements" surface variant="stack">
-	{#if $page.data.selectedTheme !== 'classic'}
+	{#if !classic}
 		<h3 class="h4">Character Achievements</h3>
 	{/if}
 	<table
 		class="classic-data-table classic-data-table--bordered character-achievements"
-		class:table={$page.data.selectedTheme !== 'classic'}>
+		class:table={!classic}>
 		<tbody>
 			{#each achievements as achievement}
 				<tr>

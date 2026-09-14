@@ -277,6 +277,7 @@ loading/empty/offline/unavailable/error/stale states and animated outfits.
 | 2026-09-14 | Semantic renderers | `b76d55e` | `npm run check`; targeted ESLint | Page framing, tables, section navigation, modal and radio presentation now resolve through the registry |
 | 2026-09-14 | Profile-driven server sources | — | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities |
 | 2026-09-14 | Information/catalog renderers | — | `npm run check`; targeted ESLint | Information tables, catalog filters and catalog details keep their public props while moving layout markup and CSS into each theme |
+| 2026-09-14 | Capability-based route decisions | — | `npm run check`; targeted ESLint | Route and shared-component presentation branches no longer compare `selectedTheme` with a concrete ID; they read profile capabilities |
 
 ## Completion criteria
 

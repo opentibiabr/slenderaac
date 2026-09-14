@@ -7,13 +7,15 @@
 	import DescriptionPanel from '$lib/components/ui/DescriptionPanel.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import SectionNavigation from '$lib/components/ui/SectionNavigation.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 	import { questDate, questHref } from '$lib/world-quests';
 	import { worldHref } from '$lib/worlds';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: quest = data.quest;
 	$: groups = [
 		{

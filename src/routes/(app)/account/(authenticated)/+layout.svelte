@@ -1,17 +1,18 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import AccountActions from '$lib/components/ui/account/AccountActions.svelte';
 	import AccountCharacters from '$lib/components/ui/account/AccountCharacters.svelte';
 	import AccountInfoBox from '$lib/components/ui/account/AccountInfoBox.svelte';
 	import ClassicAccountOverview from '$lib/components/ui/account/ClassicAccountOverview.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { LayoutData } from './$types';
 
 	export let data: LayoutData;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}
+{#if classic}
 	<slot />
 	<ClassicAccountOverview account={data.account} characters={data.characters} />
 {:else}

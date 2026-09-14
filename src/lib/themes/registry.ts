@@ -2,6 +2,7 @@ import type { ComponentType } from 'svelte';
 
 import ClassicCatalogDetails from '$lib/themes/classic/CatalogDetails.svelte';
 import ClassicCatalogFilters from '$lib/themes/classic/CatalogFilters.svelte';
+import ClassicCharacterList from '$lib/themes/classic/CharacterList.svelte';
 import ClassicInformationTable from '$lib/themes/classic/InformationTable.svelte';
 import ClassicPagePanel from '$lib/themes/classic/PagePanel.svelte';
 import ClassicRadioChoice from '$lib/themes/classic/RadioChoice.svelte';
@@ -13,6 +14,7 @@ import ClassicTableFrame from '$lib/themes/classic/TableFrame.svelte';
 import ClassicTableSurface from '$lib/themes/classic/TableSurface.svelte';
 import LegboneCatalogDetails from '$lib/themes/legbone/CatalogDetails.svelte';
 import LegboneCatalogFilters from '$lib/themes/legbone/CatalogFilters.svelte';
+import LegboneCharacterList from '$lib/themes/legbone/CharacterList.svelte';
 import LegboneInformationTable from '$lib/themes/legbone/InformationTable.svelte';
 import LegbonePagePanel from '$lib/themes/legbone/PagePanel.svelte';
 import LegboneRadioChoice from '$lib/themes/legbone/RadioChoice.svelte';
@@ -47,6 +49,7 @@ export type ThemeComponents = {
 	InformationTable: ComponentType;
 	CatalogFilters: ComponentType;
 	CatalogDetails: ComponentType;
+	CharacterList: ComponentType;
 };
 
 export const themeRegistry = {
@@ -66,6 +69,7 @@ export const themeRegistry = {
 			InformationTable: LegboneInformationTable,
 			CatalogFilters: LegboneCatalogFilters,
 			CatalogDetails: LegboneCatalogDetails,
+			CharacterList: LegboneCharacterList,
 		},
 	},
 	classic: {
@@ -84,6 +88,7 @@ export const themeRegistry = {
 			InformationTable: ClassicInformationTable,
 			CatalogFilters: ClassicCatalogFilters,
 			CatalogDetails: ClassicCatalogDetails,
+			CharacterList: ClassicCharacterList,
 		},
 	},
 } satisfies Record<ThemeId, ThemeDefinition>;

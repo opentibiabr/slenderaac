@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import Markdoc from '$lib/components/markdoc/Markdoc.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let content: string;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-<div
-	class="document-content"
-	class:classic={$page.data.selectedTheme === 'classic'}>
+<div class="document-content" class:classic>
 	{#key content}<Markdoc {content} />{/key}
 </div>
 

@@ -7,12 +7,14 @@
 	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import { serverText } from '$lib/site-identity';
 	import { classicAsset } from '$lib/themes/classic/theme';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: identity = { name: data.serverName, website: $page.url.origin };
-	$: isClassicTheme = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: isClassicTheme = $theme.profile.presentation.contentSource === 'reference';
 
 	const weekdays = [
 		'Monday',

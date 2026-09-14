@@ -10,13 +10,15 @@
 	import { classicNewsIcon } from '$lib/themes/classic/news-icons';
 	import NewsArticle from '$lib/themes/classic/NewsArticle.svelte';
 	import ReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 	import { formatDate } from '$lib/utils';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: identity = { name: data.serverName, website: $page.url.origin };
-	$: isClassicTheme = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: isClassicTheme = $theme.profile.presentation.contentSource === 'reference';
 	$: themeAssets = $page.data.themeAssets as
 		| Record<string, string | undefined>
 		| undefined;

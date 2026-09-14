@@ -3,6 +3,7 @@
 
 	import { type Player, vocationString } from '$lib/players';
 	import { type Order, type Sort, sortHref } from '$lib/sorting';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import AlphabetNavigation from './AlphabetNavigation.svelte';
 	import CatalogTable from './CatalogTable.svelte';
@@ -17,7 +18,8 @@
 		{ key: 'level', label: 'Level' },
 		{ key: 'vocation', label: 'Vocation' },
 	] as const;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	let nextOrder: Order;
 	$: nextOrder = order === 'asc' ? 'desc' : 'asc';
 	$: arrow =

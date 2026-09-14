@@ -1,16 +1,16 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-
 	import Button from '$lib/components/ui/Button.svelte';
 	import CommunityTopics from '$lib/components/ui/CommunityTopics.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { enhance } from '$lib/enchance';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
 	export let form: ActionData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
 <div class="feedback-page">

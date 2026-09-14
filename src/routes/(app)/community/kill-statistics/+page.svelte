@@ -4,11 +4,13 @@
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import LabeledForm from '$lib/components/ui/LabeledForm.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: parameters = new URL('/community/kill-statistics', $page.url).searchParams;
 	const timestamp = (value: number) =>
 		new Date(value * 1000)

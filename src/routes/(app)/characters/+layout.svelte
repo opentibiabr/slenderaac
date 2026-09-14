@@ -2,11 +2,10 @@
 	import { slide } from 'svelte/transition';
 	import { _ } from 'svelte-i18n';
 
-	import { page } from '$app/stores';
-
 	import CharacterSearch from '$lib/components/ui/CharacterSearch.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { LayoutData } from './$types';
 
@@ -15,9 +14,11 @@
 	let reset: () => void;
 
 	$: results = data.results ?? [];
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-{#if $page.data.selectedTheme === 'classic'}
+{#if classic}
 	<slot />
 	<CharacterSearch />
 	{#if results.length > 0}<CharactersTable characters={results} />{/if}

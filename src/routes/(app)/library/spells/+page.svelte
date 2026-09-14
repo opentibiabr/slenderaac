@@ -7,11 +7,13 @@
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { spellMana, spellSorts } from '$lib/spells';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: selected = data.selectedSpell;
 	$: query = new URLSearchParams(data.filters);
 	$: preview = new URL('/library/spells', $page.url).searchParams;

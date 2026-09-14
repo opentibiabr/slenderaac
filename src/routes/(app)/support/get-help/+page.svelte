@@ -6,11 +6,13 @@
 	import HelpLinks from '$lib/components/ui/HelpLinks.svelte';
 	import { helpTopics, isHelpTopic } from '$lib/help';
 	import { serverText } from '$lib/site-identity';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: help = data.help;
 	$: topic = help.entry?.topic || help.topic;
 	$: title = (text: string) =>

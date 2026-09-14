@@ -5,11 +5,14 @@
 	import GradeSymbols from '$lib/components/ui/GradeSymbols.svelte';
 	import SectionNavigation from '$lib/components/ui/SectionNavigation.svelte';
 	import { serverText } from '$lib/site-identity';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
 	$: identity = { name: $page.data.serverName, website: $page.url.origin };
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: sections = [
 		...data.groups.map((group) => ({
 			id: `Grade+${group.grade}`,
@@ -20,9 +23,7 @@
 </script>
 
 <svelte:head><title>{data.title}</title></svelte:head>
-<div
-	class="achievements-page"
-	class:achievements-page--default={$page.data.selectedTheme !== 'classic'}>
+<div class="achievements-page" class:achievements-page--default={!classic}>
 	<SectionNavigation {sections} />
 	<div class="achievements-page__intro page-prose">
 		<p>

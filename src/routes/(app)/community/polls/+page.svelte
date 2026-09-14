@@ -8,12 +8,14 @@
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import PollResults from '$lib/components/ui/PollResults.svelte';
 	import { enhance } from '$lib/enchance';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { ActionData, PageData } from './$types';
 
 	export let data: PageData;
 	export let form: ActionData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	function href(id: string) {
 		return `/community/polls?${new URLSearchParams({ poll: id }).toString()}`;
 	}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import AssetImage from '$lib/components/ui/AssetImage.svelte';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import DirectoryIcon from '$lib/components/ui/DirectoryIcon.svelte';
@@ -13,12 +14,13 @@
 		type DirectoryRecord,
 		directorySocials,
 	} from '$lib/directories';
-	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 
 	export let promoted: boolean;
 	export let entries: DirectoryRecord[];
 	$: title = promoted ? 'Promoted Fansites' : 'Supported Fansites';
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	const contentLabel = (key: string) =>
 		directoryContent[key as keyof typeof directoryContent];
 	const socialLabel = (key: string) =>

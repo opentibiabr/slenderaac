@@ -1,18 +1,20 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	import TableSurface from '$lib/components/news/TableSurface.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import CatalogTable from '$lib/components/ui/CatalogTable.svelte';
 	import IllustratedDetail from '$lib/components/ui/IllustratedDetail.svelte';
 	import PagePanel from '$lib/components/ui/PagePanel.svelte';
 	import { houseHref, houseOrders } from '$lib/houses';
-	import TableSurface from '$lib/themes/classic/TableSurface.svelte';
+	import { getThemeContext } from '$lib/themes/context';
 	import { layoutDebugKeys } from '$lib/themes/navigation';
 
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	$: classic = $page.data.selectedTheme === 'classic';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 	$: house = data.house;
 	$: resultTitle = `Available ${data.filters.type === 'guildhalls' ? 'Guildhalls' : 'Houses and Flats'} in ${data.filters.town} on ${data.world}`;
 	const gold = (amount: number) =>
