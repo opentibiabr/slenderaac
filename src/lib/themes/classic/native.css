@@ -127,11 +127,11 @@
 	opacity: 0.5;
 	cursor: default;
 }
-.theme-classic .classic-native-content a:not(.btn) {
+.theme-classic .classic-native-content :is(a, button.anchor):not(.btn) {
 	color: rgb(0 66 148);
 	font-weight: bold;
 }
-.theme-classic .classic-native-content a:not(.btn):hover {
+.theme-classic .classic-native-content :is(a, button.anchor):not(.btn):hover {
 	text-decoration: underline;
 }
 .theme-classic .classic-native-content .classic-data-table {
@@ -383,9 +383,6 @@
 	display: flex;
 	gap: 5px;
 	margin-top: 10px;
-}
-.theme-classic .classic-native-content .classic-account-section > .h3 {
-	display: none;
 }
 .theme-classic .classic-native-content .divider {
 	border-color: #7a6044;

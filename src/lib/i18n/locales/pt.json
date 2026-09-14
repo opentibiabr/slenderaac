@@ -7,6 +7,8 @@
 	"2fa-enabled-successfully": "2FA ativada com sucesso",
 	"2fa-not-enabled": "A autenticação em duas etapas não está atualmente ativada nesta conta",
 	"account": {
+		"character-actions": "Ações do personagem",
+		"no-characters": "Você ainda não tem personagens.",
 		"change-pending": "(verificação pendente para alteração de email para {email})",
 		"resend": "reenviar",
 		"unverified": "(não verificado <a class=\"anchor\" href=\"/account/resend\">reenviar</a>)"

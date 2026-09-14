@@ -607,6 +607,26 @@ checkout use existing Slender data and actions. `PagePanel` selects shared Class
 layout. Extend those wrappers for future pages with the same structure before
 adding route-specific CSS. Theme-specific native controls are scoped to Classic.
 
+Account information and character management share their native components and
+actions across themes. Their Classic panels use the existing list variant,
+bordered data tables and a single shadow surface; action buttons sit outside the
+table surface. Property labels align left, character presence has a labeled
+status column, and record actions retain the local account routes. Additional
+native actions may require taller rows than a reference with fewer controls.
+Legbone retains its own table typography, animated outfits and dialog forms.
+Opening an account form scrolls to the form in Classic; Legbone dialogs preserve
+the background page position. Do not apply one scroll policy to both behaviors.
+
+Keep Legbone table and definition-list rules under `.theme-legbone`. Applying its
+dark row backgrounds globally can override Classic stripes even when the outer
+panel looks correct. Do not combine Skeleton `table`/`table-container` classes
+with `classic-data-table` on the same rendered table. Both links and link-style
+buttons inherit the Classic action palette. Use `CatalogTable` to contain wide
+content; Legbone row headers use the same padding as its data cells. Let
+`PagePanel` own Classic spacing instead of adding a second flex
+gap. Verify multiple alternating rows, an empty account, long labels, light/dark
+Legbone, layout switching and the actual account actions after shared changes.
+
 Organization and server-introduction tables use `InformationTable` to choose the
 same data rows in both themes. It retains the existing Classic panel geometry
 and supplies a heading, padded table cells and a bounded table container in
