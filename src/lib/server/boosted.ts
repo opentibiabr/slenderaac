@@ -1,5 +1,5 @@
 import type { BoostedProps, BoostedSelections } from '$lib/boosted';
-import { log } from '$lib/server/logging';
+import { errorCode, log, startLogOperation } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
 
 const selection = {
@@ -30,6 +30,47 @@ export type BoostedSelectionInspection = {
 };
 
 let lastLoggedSnapshot = '';
+let lastLoggedSource = '';
+
+async function diagnoseUnavailableSource() {
+	const finish = startLogOperation('database.boosted.inspect', 'debug');
+	try {
+		// Read a bounded sample separately; never change which row supplies the UI.
+		const samples = await Promise.all([
+			prisma.boostedCreature.findMany({
+				select: selection,
+				orderBy: { date: 'asc' },
+				take: 6,
+			}),
+			prisma.boostedBoss.findMany({
+				select: selection,
+				orderBy: { date: 'asc' },
+				take: 6,
+			}),
+		]);
+		const source = JSON.stringify(
+			samples.map((rows, index) => ({
+				table: index === 0 ? 'boosted_creature' : 'boosted_boss',
+				moreRows: rows.length > 5,
+				rows: rows.slice(0, 5).map((row) => ({
+					...row,
+					date: row.date.slice(0, 32),
+					boostname: row.boostname?.slice(0, 128) ?? null,
+					raceid: row.raceid.slice(0, 32),
+					state: inspectBoostedSelection(row).state,
+				})),
+			})),
+		);
+		if (source !== lastLoggedSource) {
+			lastLoggedSource = source;
+			log('debug', 'boosted.source', source);
+		}
+		finish();
+	} catch (error) {
+		// Optional inspection must not discard the successfully loaded selections.
+		finish(`failed code=${errorCode(error)}`, 'warn');
+	}
+}
 
 export function inspectBoostedSelection(
 	stored: StoredSelection | null,
@@ -89,7 +130,9 @@ function logBoostedSnapshot(
 	);
 }
 
-export async function loadBoostedSelections(): Promise<BoostedSelections> {
+export async function loadBoostedSelections(
+	diagnoseUnavailable = false,
+): Promise<BoostedSelections> {
 	const [boostedCreature, boostedBoss] = await Promise.all([
 		prisma.boostedCreature.findFirst({ select: selection }),
 		prisma.boostedBoss.findFirst({ select: selection }),
@@ -102,6 +145,13 @@ export async function loadBoostedSelections(): Promise<BoostedSelections> {
 		creatureInspection,
 		bossInspection,
 	);
+	if (diagnoseUnavailable) {
+		if (!creatureInspection.selection || !bossInspection.selection) {
+			await diagnoseUnavailableSource();
+		} else {
+			lastLoggedSource = '';
+		}
+	}
 	return {
 		boostedCreature: creatureInspection.selection,
 		boostedBoss: bossInspection.selection,

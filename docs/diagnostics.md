@@ -101,6 +101,27 @@ not an active selection. An asset installation cannot turn that row into a daily
 creature. The game server owns `boosted_creature` and `boosted_boss`; the website
 never draws a replacement itself.
 
+With diagnostics enabled, the browser's `/api/boosted` poll additionally inspects
+both tables when either selection is unavailable. You can also open that endpoint
+directly. Look for these lines:
+
+- `database.boosted.inspect`: the inspection started, completed, or failed with a
+  sanitized error code; its failure does not replace the original API result.
+- `boosted.source`: up to five persisted rows per table, with their `date`,
+  `boostname`, `raceid`, appearance fields and validation state. `moreRows=true`
+  means the sample was truncated. Long text fields are also truncated.
+
+An empty `rows` array means that table had no rows at inspection time. One row
+with `date="0"`, `boostname="default"` and `raceid="0"` is the initial seed. Multiple
+rows reveal an unexpected source-table state to investigate in the game server;
+the website does not choose a replacement row or repair the table automatically.
+The sample is a separate read and may overlap a game-server update.
+
+Unchanged source snapshots are logged once; inspection timings continue on each
+poll while unavailable, and changed snapshots are printed again. These extra
+read-only queries run only with diagnostics enabled and unavailable selections.
+No passwords, database connection URLs, account data or session tokens are logged.
+
 Compare the website's `database.identity` log with the running game server's
 database configuration. Hostname aliases alone do not establish a mismatch. In
 the database used by each process, run these read-only queries:
