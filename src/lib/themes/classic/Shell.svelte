@@ -615,7 +615,7 @@
 </svelte:head>
 
 <div
-	class={`theme-classic${
+	class={`theme-classic layout-surface-ornate${
 		layout === 'compact-wide' ? ' theme-classic--wide' : ''
 	}${isCompactNewsToolPage ? ' theme-classic--compact-news' : ''}`}
 	style={shellStyle}>
