@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { type ThemeProfile, themeProfiles } from './profiles';
 import {
-	themeRegistry,
 	type ThemeComponents,
 	type ThemeDefinition,
+	themeRegistry,
 } from './registry';
-import { themeProfiles, type ThemeProfile } from './profiles';
 
 const contractFixture: ThemeDefinition = {
 	profile: {

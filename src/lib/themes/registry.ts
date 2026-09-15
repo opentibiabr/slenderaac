@@ -5,18 +5,18 @@ import ClassicCatalogDetails from '$lib/themes/classic/CatalogDetails.svelte';
 import ClassicCatalogFilters from '$lib/themes/classic/CatalogFilters.svelte';
 import ClassicCharacterList from '$lib/themes/classic/CharacterList.svelte';
 import ClassicCharacterProfile from '$lib/themes/classic/CharacterProfile.svelte';
+import ClassicEventSchedule from '$lib/themes/classic/EventSchedule.svelte';
 import ClassicGuildList from '$lib/themes/classic/GuildList.svelte';
 import ClassicGuildProfile from '$lib/themes/classic/GuildProfile.svelte';
 import ClassicHighscores from '$lib/themes/classic/Highscores.svelte';
 import ClassicInformationTable from '$lib/themes/classic/InformationTable.svelte';
 import ClassicLogin from '$lib/themes/classic/Login.svelte';
-import ClassicNewsArticle from '$lib/themes/classic/NewsArticle.svelte';
 import ClassicNewsArchive from '$lib/themes/classic/NewsArchive.svelte';
-import ClassicEventSchedule from '$lib/themes/classic/EventSchedule.svelte';
+import ClassicNewsArticle from '$lib/themes/classic/NewsArticle.svelte';
+import ClassicOnlinePlayers from '$lib/themes/classic/OnlinePlayers.svelte';
 import ClassicPagePanel from '$lib/themes/classic/PagePanel.svelte';
 import ClassicRadioChoice from '$lib/themes/classic/RadioChoice.svelte';
 import ClassicReferenceContent from '$lib/themes/classic/ReferenceContent.svelte';
-import ClassicOnlinePlayers from '$lib/themes/classic/OnlinePlayers.svelte';
 import ClassicSectionNavigation from '$lib/themes/classic/SectionNavigation.svelte';
 import ClassicShell from '$lib/themes/classic/Shell.svelte';
 import ClassicSmallPanel from '$lib/themes/classic/SmallPanel.svelte';
@@ -26,10 +26,10 @@ import ClassicTableSurface from '$lib/themes/classic/TableSurface.svelte';
 import LegboneCatalogDetails from '$lib/themes/legbone/CatalogDetails.svelte';
 import LegboneCatalogFilters from '$lib/themes/legbone/CatalogFilters.svelte';
 import LegboneCharacterList from '$lib/themes/legbone/CharacterList.svelte';
+import LegboneEventSchedule from '$lib/themes/legbone/EventSchedule.svelte';
 import LegboneInformationTable from '$lib/themes/legbone/InformationTable.svelte';
 import LegboneLogin from '$lib/themes/legbone/Login.svelte';
 import LegboneNewsArchive from '$lib/themes/legbone/NewsArchive.svelte';
-import LegboneEventSchedule from '$lib/themes/legbone/EventSchedule.svelte';
 import LegboneOnlinePlayers from '$lib/themes/legbone/OnlinePlayers.svelte';
 import LegbonePagePanel from '$lib/themes/legbone/PagePanel.svelte';
 import LegboneRadioChoice from '$lib/themes/legbone/RadioChoice.svelte';
@@ -39,12 +39,12 @@ import LegboneSmallPanel from '$lib/themes/legbone/SmallPanel.svelte';
 import LegboneStatelessModal from '$lib/themes/legbone/StatelessModal.svelte';
 import LegboneTableFrame from '$lib/themes/legbone/TableFrame.svelte';
 import LegboneTableSurface from '$lib/themes/legbone/TableSurface.svelte';
-import ThemeSwitcher from '$lib/themes/ThemeSwitcher.svelte';
 import {
 	type ThemeId,
 	type ThemeProfile,
 	themeProfiles,
 } from '$lib/themes/profiles';
+import ThemeSwitcher from '$lib/themes/ThemeSwitcher.svelte';
 
 export type ThemeDefinition = {
 	profile: ThemeProfile;

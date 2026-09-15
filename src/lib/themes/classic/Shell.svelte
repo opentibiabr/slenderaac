@@ -11,6 +11,7 @@
 	import { page } from '$app/stores';
 
 	import type { InformationPresentation } from '$lib/information-content';
+	import type { ThemeNewsReference } from '$lib/themes/reference-types';
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
 	import AssetImage from '$lib/components/ui/AssetImage.svelte';
 	import DirectoryLogo from '$lib/components/ui/DirectoryLogo.svelte';
@@ -23,7 +24,6 @@
 	import { PUBLIC_DOWNLOAD_URL } from '$env/static/public';
 
 	import type { LayoutData } from '../../../routes/(app)/$types';
-	import type { ThemeNewsReference } from '$lib/themes/reference-types';
 	import ContentFrame from './ContentFrame.svelte';
 	import { headlineFontStyle } from './headline';
 	import InfoBar from './InfoBar.svelte';

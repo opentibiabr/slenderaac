@@ -29,6 +29,15 @@ New layouts follow the [theme extension roadmap](theme-extension-roadmap.md).
 Routes and shared components consume semantic renderers and server-safe theme
 profiles; they do not compare a concrete layout ID to choose presentation.
 
+The registry is static and exhaustive. `ThemeDefinition` contains a profile and
+the complete `ThemeComponents` map; the browser-only registered definition adds
+the shell, label and validated ID. The root layout publishes that definition via
+typed Svelte context. Reuse is explicit, and missing renderers are compile-time
+errors. `npm run check:themes` rejects concrete ID comparisons, imports of theme
+implementations from routes/shared components and theme-ID CSS selectors outside
+the theme subsystem. `layout-surface-ornate` and `layout-surface-cards` are
+semantic capability hooks; they are not theme IDs.
+
 ## Shared structure and native behavior
 
 - Reuse the existing route, server load/action, authentication and data validation

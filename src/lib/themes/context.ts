@@ -1,11 +1,11 @@
 import { getContext, setContext } from 'svelte';
-import { writable, type Readable, type Writable } from 'svelte/store';
+import { type Readable, type Writable, writable } from 'svelte/store';
 
-import {
-	themeDefinition,
-	type RegisteredThemeDefinition,
-} from '$lib/themes/registry';
 import { type ThemeId } from '$lib/themes/profiles';
+import {
+	type RegisteredThemeDefinition,
+	themeDefinition,
+} from '$lib/themes/registry';
 
 const THEME_CONTEXT = Symbol('slender-theme');
 

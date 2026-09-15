@@ -69,3 +69,27 @@ That roadmap keeps route data, actions, permissions and server loads shared;
 only the selected profile and registered presentation components vary. It also
 contains the boundary check and the test-only third-theme fixture that prevent
 new routes from branching directly on a concrete theme ID.
+
+### Extension recipe
+
+Use this order for a real third layout:
+
+1. Add one profile entry in `src/lib/themes/profiles.ts`. Declare only the
+   asset packs, news limit, scroll policy and presentation capabilities the
+   layout actually uses. Do not add a speculative capability.
+2. Add the static shell and renderer implementations under
+   `src/lib/themes/<id>/`. A renderer may be reused from another layout only
+   through an explicit registry entry.
+3. Complete every property in `ThemeComponents` and add the definition to
+   `src/lib/themes/registry.ts`. The TypeScript contract must fail if a
+   renderer is missing; there is no implicit Legbone fallback.
+4. Let the root layout publish the definition through the existing theme
+   context. Routes should consume semantic wrappers and profile capabilities;
+   they must not import a concrete theme renderer or compare an ID.
+5. Add a test-only fixture first, run `npm run check:themes`, then validate
+   both existing layouts before adding the new ID to the production selector.
+
+The smallest safe change set is therefore a profile, a shell, a complete
+registry entry, focused renderer tests and visual evidence for the page families
+the new layout supports. The backend, database, actions, permissions and route
+loads stay shared.

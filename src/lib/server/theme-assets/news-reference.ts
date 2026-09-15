@@ -4,9 +4,9 @@ import path from 'node:path';
 import { dev } from '$app/environment';
 
 import type {
+	ReferenceNode,
 	ThemeArticlePresentation,
 	ThemeNewsReference,
-	ReferenceNode,
 } from '$lib/themes/reference-types';
 import { referenceDate } from '$lib/server/news/dates';
 

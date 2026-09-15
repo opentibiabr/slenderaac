@@ -1,3 +1,5 @@
+import { themeAsset } from '$lib/themes/assets';
+
 export type ClassicAssetKey =
 	| 'logo'
 	| 'serverLogo'
@@ -147,4 +149,9 @@ export type ClassicAssetKey =
 export type ClassicAssets = Partial<Record<ClassicAssetKey, string>> &
 	Record<string, string | undefined>;
 
-export { themeAsset as classicAsset } from '$lib/themes/assets';
+export function classicAsset(
+	assets: Record<string, string | undefined> | null | undefined,
+	key: ClassicAssetKey,
+): string | null {
+	return themeAsset(assets, key);
+}
