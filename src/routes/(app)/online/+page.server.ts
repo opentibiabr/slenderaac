@@ -1,33 +1,25 @@
-import invariant from 'tiny-invariant';
-
-import { PlayerGroup } from '$lib/players';
-import { dbToPlayer, PlayerSelectForList } from '$lib/server/players';
-import { prisma } from '$lib/server/prisma';
+import { loadOnlinePlayers } from '$lib/server/online-players';
+import { serverReachable } from '$lib/server/server-status';
 import { isOrder, isSort } from '$lib/sorting';
+
+import { SERVER_ADDRESS, SERVER_PORT } from '$env/static/private';
 
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ url }) => {
-	const sort = url.searchParams.get('sort') ?? 'name';
-	const order = url.searchParams.get('order') ?? 'asc';
-	invariant(isSort(sort), 'Invalid sort');
-	invariant(isOrder(order), 'Invalid order');
-
-	const characters = (
-		await prisma.playerOnline.findMany({
-			select: {
-				player: {
-					select: PlayerSelectForList,
-				},
-			},
-			where: { player: { group_id: { lt: PlayerGroup.Gamemaster } } },
-			orderBy: { player: { [sort]: order } },
-		})
-	).map(({ player }) => player);
+	const requestedSort = url.searchParams.get('sort');
+	const requestedOrder = url.searchParams.get('order');
+	const sort = isSort(requestedSort) ? requestedSort : 'name';
+	const order = isOrder(requestedOrder) ? requestedOrder : 'asc';
+	const [serverOnline, characters] = await Promise.all([
+		serverReachable(SERVER_ADDRESS, SERVER_PORT),
+		loadOnlinePlayers(sort, order),
+	]);
 
 	return {
 		title: "Who's online?",
-		characters: characters.map(dbToPlayer),
+		serverOnline,
+		characters,
 		sort,
 		order,
 	};

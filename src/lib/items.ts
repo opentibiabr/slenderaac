@@ -35,15 +35,36 @@ export type Item = {
 };
 
 export function itemURL(type: number | string) {
-	return `/api/items?id=${type.toString()}`;
+	return `/api/items?id=${encodeURIComponent(type.toString())}`;
 }
 
-export async function fetchBackground(): Promise<{ src: string }> {
-	const background = await fetch(itemURL('empty'));
-	return background.json() as Promise<{ src: string }>;
+export type ItemImage = { src: string; alt: string };
+
+export function fetchBackground() {
+	return fetchItem('empty');
 }
 
-export async function fetchItem(id: number | string) {
-	const item = await fetch(itemURL(id));
-	return item.json();
+export async function fetchItem(id: number | string): Promise<ItemImage> {
+	const fallback = { src: '', alt: typeof id === 'number' ? `Item ${id}` : '' };
+	try {
+		const response = await fetch(itemURL(id));
+		if (!response.ok) return fallback;
+		const data: unknown = await response.json();
+		if (
+			!data ||
+			typeof data !== 'object' ||
+			!('src' in data) ||
+			typeof data.src !== 'string'
+		)
+			return fallback;
+		return {
+			src: data.src,
+			alt:
+				'alt' in data && typeof data.alt === 'string' && data.alt
+					? data.alt
+					: fallback.alt,
+		};
+	} catch {
+		return fallback;
+	}
 }

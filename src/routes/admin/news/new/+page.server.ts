@@ -1,6 +1,7 @@
 import { type Actions, fail, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
+import { newsCategory, newsDate, newsType } from '$lib/news';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
 import {
@@ -45,6 +46,15 @@ export const actions = {
 		const title = data.get('title');
 		const content = data.get('content');
 		const published = data.get('published');
+		const type = newsType(data.get('type'));
+		const category = newsCategory(data.get('category'));
+		const created_at = newsDate(data.get('date'));
+		if (!type || !category || !created_at)
+			return fail(400, {
+				errors: {
+					global: ['Choose a valid type, category and publication date.'],
+				} as Record<string, string[]>,
+			});
 
 		const errors = await validate(
 			{
@@ -83,6 +93,9 @@ export const actions = {
 			await prisma.news.create({
 				data: {
 					title,
+					type,
+					category,
+					created_at,
 					content,
 					published: published === 'on',
 					author_id: author.id,

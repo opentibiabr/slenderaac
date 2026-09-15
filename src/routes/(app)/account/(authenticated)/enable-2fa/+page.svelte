@@ -37,7 +37,7 @@
 					{/each}
 				</code>
 			{/if}
-			<Button href="/account" color="secondary">{$_('close')}</Button>
+			<Button href={`/account`} color="secondary">{$_('close')}</Button>
 		</div>
 	{:else if data.qrCodeURL}
 		<Enable2FAForm

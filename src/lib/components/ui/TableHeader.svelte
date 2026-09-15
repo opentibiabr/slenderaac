@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { isSort, type Order, type Sort } from '$lib/sorting';
+	import { page } from '$app/stores';
+
+	import { isSort, type Order, type Sort, sortHref } from '$lib/sorting';
 
 	export let sort: Sort | null = null;
 	export let order: Order = 'asc';
@@ -10,12 +12,10 @@
 	let sortLink: string | null = null;
 	let sortClass = '';
 
-	$: if (!isSort(col)) {
+	$: if (!sort || !isSort(col)) {
 		sortLink = null;
-	} else if (sort === col) {
-		sortLink = `?sort=${col}&order=${order === 'asc' ? 'desc' : 'asc'}`;
 	} else {
-		sortLink = `?sort=${col}`;
+		sortLink = sortHref($page.url, col, sort, order);
 	}
 
 	$: if (sort === col) {

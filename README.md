@@ -2,157 +2,41 @@
 
 This project is a website for the [Canary](https://github.com/opentibiabr/canary) project. The main goal is to use modern technology to have something that is easy to maintain and extend. It is also meant to be efficient, secure and easy to deploy.
 
-[Features / Roadmap](https://github.com/luan/slenderaac/issues/24)
+## Getting started
 
-<details>
-<summary><h2>Getting started</h2></summary>
+New to SlenderAAC? Follow the **[beginner setup guide](docs/getting-started.md)**
+for the first installation, configuration, database setup, images, running and
+stopping the website, and updates. It includes Windows PowerShell commands and
+explains what each step does.
 
-### Requirements
+Already installed? Go straight to the [common commands](docs/getting-started.md#common-commands)
+or [troubleshooting](docs/getting-started.md#troubleshooting).
 
-- [Node.js](https://nodejs.org/en/)
-- [Bun](https://bun.sh/)
-- [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/)
-  - Running a database compatible with `canary`
+## Documentation
 
-### Installation
+| Guide                                                      | What it covers                                                                                                    |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| [Database configuration](docs/database.md)                 | Use the running game server's configuration, understand fallback behavior and check the selected database.        |
+| [Install website assets](docs/classic-assets.md)           | One-command installation and updates for Classic, outfits, items and store images from the fixed release channel. |
+| [Choose a layout](docs/themes.md)                          | Switch between Classic and Legbone, set a default or enforce one layout.                                          |
+| [Theme extension roadmap](docs/theme-extension-roadmap.md) | Registry, renderer and validation work required before adding another layout.                                     |
+| [Server library](docs/server-library.md)                   | Import spells, creatures, achievements and house definitions from the game server.                                |
+| [Game client connection](docs/client.md)                   | Configure the website login endpoint and store-image URL.                                                         |
+| [Deployment](docs/deployment.md)                           | Build and run the Node application behind a reverse proxy.                                                        |
+| [Logs and diagnostics](docs/diagnostics.md)                | Capture startup/request timings and investigate unavailable boosted data.                                         |
 
-Clone this repository and install the dependencies:
+## Website roadmap
 
-```bash
-git clone https://github.com/luan/slenderaac.git
-cd slenderaac
-bun install
-cp .env.dist .env
-```
+FAQ, Parents' Guide and Legal Documents are implemented in Classic and Legbone.
+The next priority is website-only work, followed by modules that need game rules
+or authoritative server integration.
 
-Edit `.env` with your server and desired settings. Then migrate the database using the command below. Note that this assumes your current database already has the `canary` schema imported.
-
-```bash
-bun migrate:resolve
-bun migrate
-bun generate
-```
-
-### Running
-
-At this point you should be ready to run the server:
-
-```bash
-bun dev
-```
-
-</details>
-
-<details>
-<summary><h2>Deployment</h2></summary>
-
-Deployment depends highly on your server setup. Assuming you are on a Linux dedicated server or VPS. You need the following:
-
-- [Nginx](https://nginx.org/en/)
-- [Node.js](https://nodejs.org/en/)
-- [Bun](https://bun.sh/)
-
-As well as a database compatible with `canary`. You can use either [MySQL](https://www.mysql.com/) or [MariaDB](https://mariadb.org/).
-
-### Installation
-
-```bash
-sudo apt update
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs
-curl -fsSL https://bun.sh/install | bash
-source ~/.bashrc
-sudo apt install -y nginx
-```
-
-Clone this repository and install the dependencies:
-
-```bash
-git clone https://github.com/luan/slenderaac.git
-cd slenderaac
-bun install
-cp .env.dist .env
-```
-
-### Nginx
-
-We're just using Nginx as a reverse proxy. You can use any other web server that supports reverse proxying if you'd like. The Nginx configuration is as follows (adjust port and domain as needed if you're not using the defaults):
-
-```nginx
-server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-        server_name _;
-
-        location / {
-                   proxy_pass http://127.0.0.1:3000;
-                   proxy_http_version 1.1;
-                   proxy_set_header Upgrade $http_upgrade;
-                   proxy_set_header Connection 'upgrade';
-                   proxy_set_header Host $host;
-                   proxy_cache_bypass $http_upgrade;
-       }
-}
-```
-
-### Building
-
-Because we're now in a production environment, we need to build the project. This will generate the static files that will be served by the nodejs server. This is a one time step, you only need to do this again if you change /update the code.
-
-```bash
-bun generate
-bun build
-```
-
-### Migrating the database
-
-At this point you should be ready to migrate the database. This will create the necessary tables and columns. Note that this assumes your current database already has the `canary` schema imported.
-
-```bash
-bun migrate:resolve
-bun migrate
-```
-
-### Running
-
-Finally, we need to run the server, this will run on port 3000 by defaul, which is what we configured Nginx to proxy to.
-
-```bash
-NODE_ENV=production node -r dotenv/config build
-```
-
-</details>
-
-<details>
-<summary><h2>Client config</h2></summary>
-
-Using your favorite method to edit the client (see [this tutorial](https://docs.opentibiabr.com/others/tutorials/infrastructure#client-with-notepad++-1) for help). Set the login webservice url to http://localhost:5173/api/login (or your appropraite server URL). This will make the client use the AAC to login.
-
-</details>
-
-<details>
-<summary><h2>Animated outfits</h2></summary>
-
-You'll need to download the spritesheet from [here](https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#animated-items-and-outfits) and place it in `outfits_anim`. These assets are not included in the repository because they can cause the repo to bloat, and are also not release under the same license as the code.
-
-</details>
-
-<details>
-<summary><h2>Inventory Items</h2></summary>
-
-You'll need to download the spritesheet from
-[here](https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#animated-items-and-outfits)
-the items in `items`. These assets are not included in the repository
-because they can cause the repo to bloat, and are also not release under the same license
-as the code.
-
-</details>
-
-<details>
-<summary><h2>Game store assets</h2></summary>
-
-Anything you put into the `static` folder in this repo will be served by the server. This is useful for storing assets for the game store. For example, you can put a `static/images/store` folder and then reference the images in the store using `/images/store/my-image.png`. For instance, you can use the store assets made available in the [canary docs](https://docs.opentibiabr.com/others/downloads/website-applications/applications#store-for-client-13)
-
-</details>
+- [Page roadmap — status, priorities and expandable details](docs/page-roadmap.md)
+- [Support pages — setup and content editing](docs/support.md)
+- [Fankit — publish the operator artwork package](docs/fankit.md)
+- [Soundtrack — publish and stream operator audio](docs/soundtrack.md)
+- [Maps — publish the operator world overview](docs/maps.md)
+- [Feature discussion](https://github.com/luan/slenderaac/issues/24)
 
 <details>
 <summary><h2>Screenshots</h2></summary>
@@ -223,6 +107,12 @@ https://github.com/luan/slenderaac/assets/223760/a2cb7aad-a3df-46a2-b284-1f38a91
 ## Contributing
 
 Contributions are welcome! Please open an issue or pull request. Be sure to post screenshots and logs of any issues you're having.
+
+Start with the [website and theme contracts](docs/theme-contracts.md) when adding
+or changing pages. They link the shared layout, native data, navigation, identity,
+asset delivery and verification rules. Follow the [UI state rules](docs/ui-states.md)
+for confirmed zero, empty results, offline services, unavailable data, errors and
+stale values in both layouts.
 
 ## License
 

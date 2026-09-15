@@ -38,6 +38,13 @@
 	let tag: 'a' | 'button';
 	$: tag = href ? 'a' : 'button';
 	$: role = href ? 'link' : 'button';
+	$: inactive = disabled || $loading;
+
+	function suppressInactiveActivation(event: MouseEvent) {
+		if (!inactive) return;
+		event.preventDefault();
+		event.stopImmediatePropagation();
+	}
 
 	// $: sizeClass = size === 'sm' ? 'btn-sm' : size === 'lg' ? 'btn-lg' : '';
 	$: sizeClass = {
@@ -55,15 +62,17 @@
 <svelte:element
 	this={tag}
 	{role}
-	aria-disabled={disabled || $loading}
-	tabindex="0"
-	{href}
+	aria-disabled={inactive}
+	tabindex={inactive ? -1 : 0}
+	href={href && !inactive ? href : null}
 	{type}
-	disabled={disabled || $loading}
+	disabled={inactive || undefined}
 	data-sveltekit-noscroll={noscroll ? true : undefined}
 	{form}
 	{formaction}
 	use:tooltip={{ content: tooltipText }}
+	on:click|capture={suppressInactiveActivation}
+	on:auxclick|capture={suppressInactiveActivation}
 	on:click
 	class="btn gap-1 {sizeClass} {variantClass} {klass}">
 	{#if iconBefore}

@@ -1,14 +1,24 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
+
 	import Button from '$lib/components/ui/Button.svelte';
 	import { enhance } from '$lib/enchance';
+	import { getThemeContext } from '$lib/themes/context';
 
 	import type { ActionData } from './$types';
 
 	export let form: ActionData;
-	import { _ } from 'svelte-i18n';
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
 
-<form class="flex flex-col gap-4" method="post" use:enhance>
+{#if classic}<p>
+		Enter your account’s email address to request a password reset.
+	</p>{/if}
+<form
+	class="classic-stacked-form flex flex-col gap-4"
+	method="post"
+	use:enhance>
 	{#if form?.errors?.global}
 		<p class="text-error-500">{form.errors.global}</p>
 	{/if}
@@ -24,14 +34,14 @@
 	</label>
 
 	<div class="flex flex-row justify-end items-center gap-2">
-		<Button>{$_('request-password-reset')}</Button>
+		<Button>{classic ? 'Submit' : $_('request-password-reset')}</Button>
 	</div>
 
 	<hr class="divider" />
 
 	<div class="flex flex-row justify-center items-center gap-2">
 		<h3 class="h3">{$_('dont-have-an-account')}</h3>
-		<Button href="/account/signup" size="sm" color="secondary"
+		<Button href={`/account/signup`} size="sm" color="secondary"
 			>{$_('create-account')}</Button>
 	</div>
 </form>

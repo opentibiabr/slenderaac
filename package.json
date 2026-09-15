@@ -2,18 +2,27 @@
 	"name": "slenderaac",
 	"version": "0.2.0",
 	"private": true,
+	"overrides": {
+		"baseline-browser-mapping": "2.11.23",
+		"caniuse-lite": "1.0.30001810"
+	},
 	"scripts": {
-		"dev": "bun --env-file=.env vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"generate": "prisma generate",
-		"migrate": "prisma migrate deploy",
-		"migrate:dev": "prisma migrate dev",
-		"migrate:resolve": "prisma migrate resolve --applied 000000000000_init_from_canary",
+		"install:assets": "node src/scripts/install-theme-assets.js",
+		"install:server-integration": "bun src/scripts/install-server-integration.ts",
+		"import:server-data": "bun src/scripts/import-server-data.ts",
+		"dev": "node src/scripts/with-server-config.js vite dev",
+		"build": "node src/scripts/with-server-config.js vite build",
+		"preview": "node src/scripts/with-server-config.js vite preview",
+		"generate": "node src/scripts/with-server-config.js prisma generate",
+		"migrate": "node src/scripts/with-server-config.js prisma migrate deploy",
+		"migrate:dev": "node src/scripts/with-server-config.js prisma migrate dev",
+		"migrate:resolve": "node src/scripts/with-server-config.js prisma migrate resolve --applied 000000000000_init_from_canary",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:themes": "node src/scripts/check-themes.mjs",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --plugin-search-dir . --write ."
+		"test:assets": "node --test src/scripts/install-theme-assets.test.js",
+		"lint": "npm run check:themes && prettier --check . && eslint .",
+		"format": "prettier --write ."
 	},
 	"devDependencies": {
 		"@floating-ui/dom": "^1.5.3",
@@ -26,6 +35,7 @@
 		"@tailwindcss/typography": "^0.5.10",
 		"@types/bcrypt": "^5.0.2",
 		"@types/js-yaml": "^4.0.9",
+		"@types/luaparse": "0.2.13",
 		"@types/node": "^20.10.3",
 		"@types/nodemailer": "^6.4.14",
 		"@types/qrcode": "^1.5.5",
@@ -33,6 +43,9 @@
 		"@typescript-eslint/eslint-plugin": "^6.13.2",
 		"@typescript-eslint/parser": "^6.13.2",
 		"autoprefixer": "^10.4.16",
+		"baseline-browser-mapping": "2.11.23",
+		"browserslist": "^4.28.9",
+		"caniuse-lite": "1.0.30001810",
 		"eslint": "^8.55.0",
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-import-resolver-typescript": "^3.6.1",
@@ -81,6 +94,7 @@
 		"devalue": "^4.3.2",
 		"dotenv": "^16.3.1",
 		"js-yaml": "^4.1.0",
+		"luaparse": "0.3.1",
 		"nodemailer": "^6.9.7",
 		"otplib": "^12.0.1",
 		"parse-duration": "^1.1.0",
@@ -90,8 +104,8 @@
 		"svelte-codemirror-editor": "^1.2.0",
 		"svelte-email": "^0.0.4",
 		"svelte-i18n": "^4.0.0",
-		"svelte-portal": "^2.2.0",
 		"tcp-port-used": "^1.0.2",
-		"tiny-invariant": "^1.3.1"
+		"tiny-invariant": "^1.3.1",
+		"yauzl": "^3.4.0"
 	}
 }

@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { enhance } from '$lib/enchance';
-
 	import Button from '$lib/components/ui/Button.svelte';
 	import CreateCharacterFormFields from '$lib/components/ui/create-character/CreateCharacterFormFields.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
+	import { enhance } from '$lib/enchance';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -13,7 +12,10 @@
 	export let form: ActionData;
 </script>
 
-<form class="flex flex-col gap-4" method="post" use:enhance>
+<form
+	class="classic-stacked-form flex flex-col gap-4"
+	method="post"
+	use:enhance>
 	{#if form?.errors?.global}
 		<p class="text-xs text-error-500">{form.errors.global}</p>
 	{/if}

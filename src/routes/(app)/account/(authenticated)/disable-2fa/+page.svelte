@@ -23,7 +23,7 @@
 		<p>{$_('disable-2fa.success')}</p>
 		<p />
 		<div class="flex flex-col items-center gap-4">
-			<Button href="/account" color="secondary">{$_('close')}</Button>
+			<Button href={`/account`} color="secondary">{$_('close')}</Button>
 		</div>
 	{:else}
 		<Disable2FaForm errors={form?.errors} />

@@ -1,20 +1,38 @@
 <!-- adapted from https://github.com/movingbrands/svelte-portable-text -->
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte';
+	import type { ComponentType } from 'svelte';
 	import {
 		default as Markdoc,
 		type RenderableTreeNode,
 	} from '@markdoc/markdoc';
 
-	import Callout from './Callout.svelte';
-	import Col from './Col.svelte';
-	import Row from './Row.svelte';
+	import { page } from '$app/stores';
 
-	type ComponentType = typeof Callout | typeof Col | typeof Row;
+	import { serverMarkupText, serverText } from '$lib/site-identity';
+	import { siteHref } from '$lib/themes/navigation';
+
+	import { PUBLIC_TITLE } from '$env/static/public';
 
 	export let node: RenderableTreeNode;
 	export let components: Map<string, ComponentType>;
 	export let isRoot = false;
+	$: identity = {
+		name: $page.data.serverName ?? PUBLIC_TITLE,
+		website: $page.url.origin,
+	};
+
+	function linkAttributes(value: unknown, url: URL) {
+		const attributes = Object.fromEntries(
+			Object.entries(value as Record<string, unknown>).map(([key, item]) => [
+				key,
+				typeof item === 'string' && ['alt', 'title', 'aria-label'].includes(key)
+					? serverText(item, identity)
+					: item,
+			]),
+		);
+		if (typeof attributes.href !== 'string') return attributes;
+		return { ...attributes, href: siteHref(url, attributes.href) };
+	}
 
 	const nodeName = (node: RenderableTreeNode) => {
 		if (typeof node === 'string' || typeof node === 'number') return 'text';
@@ -24,23 +42,19 @@
 		return node.name;
 	};
 
-	const filterAttributes = (attributes: { [key: string]: any }) => {
-		// Filter out any attributes that might cause type conflicts
-		const filtered: Record<string, never> = {} as Record<string, never>;
-		const validKeys = ['center'];
-
-		for (const [key, value] of Object.entries(attributes)) {
-			if (validKeys.includes(key)) {
-				(filtered as Record<string, any>)[key] = value;
-			}
-		}
-
-		return filtered;
+	const filterAttributes = (value: unknown) => {
+		const attributes = value as Record<string, unknown>;
+		return typeof attributes.center === 'boolean'
+			? { center: attributes.center }
+			: {};
 	};
 </script>
 
 {#if typeof node === 'string' || typeof node === 'number'}
-	{@html node}
+	{@html serverMarkupText(String(node), {
+		name: $page.data.serverName ?? PUBLIC_TITLE,
+		website: $page.url.origin,
+	})}
 {:else if Array.isArray(node)}
 	{#each node as child}
 		<svelte:self node={child} {components} />
@@ -59,10 +73,14 @@
 	{#if isRoot}
 		<svelte:self node={node.children} {components} />
 	{:else}
-		<svelte:element this={node.name} {...node.attributes}>
+		<svelte:element
+			this={node.name}
+			{...linkAttributes(node.attributes, $page.url)}>
 			<svelte:self node={node.children} {components} />
 		</svelte:element>
 	{/if}
 {:else}
-	<svelte:element this={node.name} {...node.attributes} />
+	<svelte:element
+		this={node.name}
+		{...linkAttributes(node.attributes, $page.url)} />
 {/if}

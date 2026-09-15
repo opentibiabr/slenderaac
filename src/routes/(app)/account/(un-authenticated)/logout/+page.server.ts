@@ -14,7 +14,7 @@ export const actions: Actions = {
 	async default({ cookies }) {
 		const sid = cookies.get('sid');
 		if (sid) {
-			cookies.delete('sid');
+			cookies.delete('sid', { path: '/' });
 			await deleteSession(sid);
 		}
 
