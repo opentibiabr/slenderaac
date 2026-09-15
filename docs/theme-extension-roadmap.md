@@ -71,22 +71,22 @@ browser code:
 
 ```ts
 type ThemeProfile = {
-  label: string;
-  assets: {
-    chromePack: string | null;
-    referencePack: string | null;
-    catalogArtworkPack: string | null;
-  };
-  data: {
-    latestNewsLimit: number;
-  };
-  navigation: {
-    preserveSubrouteScroll: boolean;
-  };
-  presentation: {
-    pageSurface: 'ornate' | 'cards';
-    contentSource: 'reference' | 'native';
-  };
+	label: string;
+	assets: {
+		chromePack: string | null;
+		referencePack: string | null;
+		catalogArtworkPack: string | null;
+	};
+	data: {
+		latestNewsLimit: number;
+	};
+	navigation: {
+		preserveSubrouteScroll: boolean;
+	};
+	presentation: {
+		pageSurface: 'ornate' | 'cards';
+		contentSource: 'reference' | 'native';
+	};
 };
 ```
 
@@ -101,10 +101,13 @@ The client registry combines each profile with static Svelte imports:
 
 ```ts
 type ThemeDefinition = {
-  id: ThemeId;
-  name: string;
-  profile: ThemeProfile;
-  components: ThemeComponents;
+	profile: ThemeProfile;
+	components: ThemeComponents;
+};
+
+type RegisteredThemeDefinition = ThemeDefinition & {
+	id: ThemeId;
+	name: string;
 };
 ```
 
@@ -126,12 +129,12 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 - [x] Count the initial shared/route Classic CSS files.
 - [x] Add this roadmap and link it from the README and theme contracts.
 - [ ] Record the complete occurrence ledger with owner, category, destination,
-  commit and validation.
+      commit and validation.
 - [ ] Record legitimate asset, alias, debug, compatibility and test exceptions.
 - [ ] Capture Classic and Legbone representative visual states before moving
-  shared markup or CSS.
+      shared markup or CSS.
 - [ ] Run the ponytail review against the proposed registry and remove any
-  unused abstraction.
+      unused abstraction.
 - [x] Commit the documentation and baseline separately (`63ee9ad`).
 
 ### Phase 1 — profile, registry and context
@@ -139,38 +142,40 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 - [x] Add the server-safe profile map and derive theme IDs from it.
 - [x] Preserve the Legbone default and invalid-value normalization.
 - [x] Attach each current shell to its profile.
-- [ ] Define the complete `ThemeComponents` contract.
-- [ ] Make the registry map complete at TypeScript compile time.
+- [x] Define the complete `ThemeComponents` contract for current page
+      families, including news archive, event schedule and online players.
+- [x] Make the registry map complete at TypeScript compile time.
 - [x] Add the reactive theme context to the root layout.
 - [x] Remove the root-level silent registry fallback.
-- [ ] Preserve cookies, aliases, canonical URLs and full-document switching.
-- [ ] Add focused profile, registry, selection and context tests.
+- [x] Preserve cookies, aliases, canonical URLs and full-document switching.
+- [x] Add focused profile, registry, selection and context tests.
 - [ ] Verify both switch directions with real browser clicks.
 
 ### Phase 2 — semantic shared components
 
 - [x] Delegate `PagePanel`, `TableFrame`, `TableSurface` and `SmallPanel` to
-	registered renderers.
+      registered renderers.
 - [x] Delegate section navigation, modal and radio-choice presentation.
 - [x] Delegate information tables, catalog filters and catalog details.
-- [ ] Keep behavior, slots, labels, focus and keyboard semantics shared.
-- [ ] Move theme-specific CSS under the owning theme directory.
-- [ ] Replace theme-named selectors in shared components with semantic hooks.
+- [x] Keep behavior, slots, labels, focus and keyboard semantics shared.
+- [x] Replace theme-ID selectors in shared components with semantic surface
+      hooks (`layout-surface-ornate` and `layout-surface-cards`).
+- [ ] Move remaining renderer-internal CSS under the owning theme directory.
 - [ ] Validate long labels, scrolling, Escape, focus restoration and mobile
-  breakpoints in both layouts.
+      breakpoints in both layouts.
 
 ### Phase 3 — page families
 
 #### News
 
-- [ ] Register Latest News, News Archive and Event Schedule renderers.
-- [ ] Read the article limit and reference source from the profile.
+- [x] Register Latest News, News Archive and Event Schedule renderers.
+- [x] Read the article limit and reference source from the profile.
 - [ ] Preserve tickers, articles, dates, filters, fragments and empty states.
 - [ ] Validate all three routes in both layouts.
 
 #### Account and authentication
 
-- [ ] Register Login and Account Overview renderers.
+- [x] Register Login and Account Overview renderers.
 - [ ] Preserve outfits, character status, selection and action visibility.
 - [ ] Preserve login, verification, 2FA, email and password actions.
 - [ ] Apply the profile's navigation-scroll policy.
@@ -178,9 +183,9 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 
 #### Characters, guilds, highscores and online
 
-- [ ] Register character list/profile renderers.
-- [ ] Register guild list/profile renderers.
-- [ ] Register highscores and online-player renderers.
+- [x] Register character list/profile renderers.
+- [x] Register guild list/profile renderers.
+- [x] Register highscores and online-player renderers.
 - [ ] Preserve search, filters, pagination, indicators and empty states.
 - [ ] Keep all loads, actions, permissions and endpoints shared.
 
@@ -190,31 +195,31 @@ registered renderer instead of comparing `$page.data.selectedTheme`.
 - [ ] Migrate spells, achievements, experience table and world quests.
 - [ ] Migrate polls, feedback, resellers, fansites and kill statistics.
 - [ ] Preserve loading, confirmed zero, empty, offline, unavailable, error and
-  stale meanings.
+      stale meanings.
 - [ ] Validate long content and below-the-fold navigation.
 
 ### Phase 4 — server and assets
 
 - [x] Load the chrome pack declared by the selected profile.
 - [x] Pass reference and catalog artwork sources by profile rather than by
-	comparing a concrete theme ID.
+      comparing a concrete theme ID.
 - [x] Preserve global server identity and administrator-only asset warnings.
 - [ ] Preserve neutral missing-pack behavior and external asset boundaries.
-- [ ] Remove direct theme comparisons from page loads and asset loaders.
+- [x] Remove direct theme comparisons from page loads and asset loaders.
 - [ ] Verify filters, fragments and authentication return URLs.
 
 ### Phase 5 — boundary protection
 
-- [ ] Add `npm run check:themes` without a new dependency.
-- [ ] Reject direct selected-theme comparisons with concrete IDs outside the
-  theme subsystem.
-- [ ] Reject imports of Classic/Legbone implementations from routes and shared
-  components.
-- [ ] Reject theme-named CSS selectors outside theme directories.
-- [ ] Report the exact file, line and rule for every violation.
-- [ ] Add valid and invalid checker fixtures.
-- [ ] Include the check in `npm run lint`.
-- [ ] Keep only documented configuration, asset, alias and test exceptions.
+- [x] Add `npm run check:themes` without a new dependency.
+- [x] Reject direct selected-theme comparisons with concrete IDs outside the
+      theme subsystem.
+- [x] Reject imports of Classic/Legbone implementations from routes and shared
+      components.
+- [x] Reject theme-named CSS selectors outside theme directories.
+- [x] Report the exact file, line and rule for every violation.
+- [x] Add valid and invalid checker fixtures.
+- [x] Include the check in `npm run lint`.
+- [x] Keep only documented configuration, asset, alias and test exceptions.
 
 The final shared-code target is:
 
@@ -227,11 +232,11 @@ src/lib/components/** 0 theme implementation imports
 
 ### Phase 6 — third-theme contract fixture
 
-- [ ] Add a test-only `contract-fixture` profile.
-- [ ] Give it a complete capability and renderer map.
-- [ ] Reuse existing renderers only through explicit registration.
-- [ ] Verify it resolves without a Legbone fallback.
-- [ ] Verify an incomplete renderer map fails type checking.
+- [x] Add a test-only `contract-fixture` profile.
+- [x] Give it a complete capability and renderer map.
+- [x] Reuse existing renderers only through explicit registration.
+- [x] Verify it resolves without a Legbone fallback.
+- [x] Verify an incomplete renderer map fails type checking.
 - [ ] Verify no production route or shared component changes for the fixture.
 - [ ] Keep it out of the production switcher.
 - [ ] Document the recipe for a future real theme.
@@ -239,8 +244,8 @@ src/lib/components/** 0 theme implementation imports
 
 ### Phase 7 — merge gate
 
-- [ ] Update `docs/theme-contracts.md` with the final boundary.
-- [ ] Add the extension recipe to `docs/themes.md`.
+- [x] Update `docs/theme-contracts.md` with the final boundary.
+- [x] Add the extension recipe to `docs/themes.md`.
 - [ ] Update the progress log below after every phase.
 - [ ] Run the full focused test set and `npm run check:themes`.
 - [ ] Run `npm run check` and `npm run lint`.
@@ -271,13 +276,38 @@ loading/empty/offline/unavailable/error/stale states and animated outfits.
 
 ## Progress log
 
-| Date | Phase | Commit | Validation | Notes |
-| --- | --- | --- | --- | --- |
-| 2026-09-14 | Baseline/profile started | — | Source inventory and focused inspection | Current PR owns the merge gate |
-| 2026-09-14 | Semantic renderers | `b76d55e` | `npm run check`; targeted ESLint | Page framing, tables, section navigation, modal and radio presentation now resolve through the registry |
-| 2026-09-14 | Profile-driven server sources | — | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities |
-| 2026-09-14 | Information/catalog renderers | — | `npm run check`; targeted ESLint | Information tables, catalog filters and catalog details keep their public props while moving layout markup and CSS into each theme |
-| 2026-09-14 | Capability-based route decisions | — | `npm run check`; targeted ESLint | Route and shared-component presentation branches no longer compare `selectedTheme` with a concrete ID; they read profile capabilities |
+| Date       | Phase                            | Commit    | Validation                                                                               | Notes                                                                                                                                                               |
+| ---------- | -------------------------------- | --------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-14 | Baseline/profile started         | —         | Source inventory and focused inspection                                                  | Current PR owns the merge gate                                                                                                                                      |
+| 2026-09-14 | Semantic renderers               | `b76d55e` | `npm run check`; targeted ESLint                                                         | Page framing, tables, section navigation, modal and radio presentation now resolve through the registry                                                             |
+| 2026-09-14 | Profile-driven server sources    | —         | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint             | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities                                                                   |
+| 2026-09-14 | Information/catalog renderers    | —         | `npm run check`; targeted ESLint                                                         | Information tables, catalog filters and catalog details keep their public props while moving layout markup and CSS into each theme                                  |
+| 2026-09-14 | Capability-based route decisions | —         | `npm run check`; targeted ESLint                                                         | Route and shared-component presentation branches no longer compare `selectedTheme` with a concrete ID; they read profile capabilities                               |
+| 2026-09-14 | Page renderer registry           | `7577996` | `npm run check`; targeted ESLint                                                         | News, login, account, characters, guilds and highscores resolve presentation through static registry entries; asset/news helpers are theme-neutral                  |
+| 2026-09-14 | Page family frames               | `4c5ca5c` | `npm run check`                                                                          | News archive, event schedule and online player families have explicit renderer slots; Classic account overview now lives under the Classic implementation directory |
+| 2026-09-14 | Shared surface boundary          | `5c5573d` | `npm run check`; boundary inventory                                                      | Shared CSS uses semantic surface classes and server reference types no longer import the Classic namespace                                                          |
+| 2026-09-14 | Boundary guard and fixture       | `fda7132` | `node --test src/scripts/check-themes.test.mjs`; `npm run check:themes`; `npm run check` | The guard reports file, line and rule; a test-only third-theme contract proves complete explicit renderer reuse                                                     |
+
+## Occurrence ledger
+
+The initial inventory was grouped before editing so every occurrence had an
+owner and destination. The counts below are the review ledger; the command
+used for the final gate is `npm run check:themes`.
+
+| Area                                |                      Baseline | Category                    | Destination                                   | Evidence                                                   |
+| ----------------------------------- | ----------------------------: | --------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
+| Theme selection and normalization   | 1 selector + 2 server modules | registry/compatibility      | `profiles.ts`, `context.ts`, root layout      | profile tests; `npm run check:themes`                      |
+| Shared panels, tables and controls  |         12 component families | structure/interaction       | `ThemeComponents` and `src/lib/themes/<id>/`  | `b76d55e`, `10c98f8`, `npm run check`                      |
+| News, account and page families     |          25 components/routes | structure/data presentation | registry renderers and semantic frame classes | `7577996`, `4c5ca5c`, `npm run check`                      |
+| Reference and catalog asset choices |              2 server modules | asset/source                | profile asset-pack capabilities               | `012d588`, `5c5573d`                                       |
+| Classic CSS selectors               |                      38 files | style                       | semantic surface hooks or theme-owned CSS     | `5c5573d`; zero theme-ID selectors outside theme subsystem |
+| Test and compatibility literals     |         remaining literal IDs | compatibility/test          | profiles, aliases, asset endpoints and tests  | documented exceptions below                                |
+
+Legitimate literals remain in the profile/registry, asset pack names,
+reference compatibility IDs, debug/query aliases, tests and the theme-owned
+implementation directories. They do not select presentation from shared route
+or component code and are excluded by the boundary checker only where the
+owner subsystem is explicit.
 
 ## Completion criteria
 

@@ -29,7 +29,6 @@
 	import { createThemeContext } from '$lib/themes/context';
 	import { themeRegistry } from '$lib/themes/registry';
 	import { normalizeTheme } from '$lib/themes/theme-ids';
-	import ThemeSwitcher from '$lib/themes/ThemeSwitcher.svelte';
 	import { browserTitle } from '$lib/utils';
 
 	import type { LayoutData } from './$types';
@@ -86,14 +85,17 @@
 <div id="top" aria-hidden="true"></div>
 
 {#if data.themeSwitcherEnabled}
-	<ThemeSwitcher {selectedTheme} themeAssets={data.themeAssets} />
+	<svelte:component
+		this={activeTheme.components.ThemeSwitcher}
+		{selectedTheme}
+		themeAssets={data.themeAssets} />
 {/if}
 
 {#if browser}
 	<Toast />
 {/if}
 
-<svelte:component this={activeTheme.Shell} data={shellData}>
+<svelte:component this={activeTheme.components.Shell} data={shellData}>
 	<slot />
 </svelte:component>
 

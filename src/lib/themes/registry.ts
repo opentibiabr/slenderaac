@@ -39,6 +39,7 @@ import LegboneSmallPanel from '$lib/themes/legbone/SmallPanel.svelte';
 import LegboneStatelessModal from '$lib/themes/legbone/StatelessModal.svelte';
 import LegboneTableFrame from '$lib/themes/legbone/TableFrame.svelte';
 import LegboneTableSurface from '$lib/themes/legbone/TableSurface.svelte';
+import ThemeSwitcher from '$lib/themes/ThemeSwitcher.svelte';
 import {
 	type ThemeId,
 	type ThemeProfile,
@@ -53,10 +54,11 @@ export type ThemeDefinition = {
 export type RegisteredThemeDefinition = ThemeDefinition & {
 	id: ThemeId;
 	name: string;
-	Shell: ComponentType;
 };
 
 export type ThemeComponents = {
+	Shell: ComponentType;
+	ThemeSwitcher: ComponentType;
 	PagePanel: ComponentType;
 	TableFrame: ComponentType;
 	TableSurface: ComponentType;
@@ -86,8 +88,9 @@ export const themeRegistry = {
 		id: 'legbone',
 		name: themeProfiles.legbone.label,
 		profile: themeProfiles.legbone,
-		Shell: LegboneShell,
 		components: {
+			Shell: LegboneShell,
+			ThemeSwitcher,
 			PagePanel: LegbonePagePanel,
 			TableFrame: LegboneTableFrame,
 			TableSurface: LegboneTableSurface,
@@ -116,8 +119,9 @@ export const themeRegistry = {
 		id: 'classic',
 		name: themeProfiles.classic.label,
 		profile: themeProfiles.classic,
-		Shell: ClassicShell,
 		components: {
+			Shell: ClassicShell,
+			ThemeSwitcher,
 			PagePanel: ClassicPagePanel,
 			TableFrame: ClassicTableFrame,
 			TableSurface: ClassicTableSurface,

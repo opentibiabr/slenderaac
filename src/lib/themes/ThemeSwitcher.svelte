@@ -8,8 +8,7 @@
 
 	import { themeAsset, type ThemeAssets } from '$lib/themes/assets';
 	import { layoutSelectionHref } from '$lib/themes/navigation';
-	import { themeRegistry } from '$lib/themes/registry';
-	import { type ThemeId, themeIds } from '$lib/themes/theme-ids';
+	import { type ThemeId, themeIds, themeProfile } from '$lib/themes/profiles';
 
 	export let selectedTheme: ThemeId;
 	export let themeAssets: ThemeAssets = {};
@@ -17,7 +16,7 @@
 	let trigger: HTMLElement;
 	let currentUrl = '';
 	$: classic =
-		themeRegistry[selectedTheme].profile.presentation.pageSurface === 'ornate';
+		themeProfile(selectedTheme).presentation.pageSurface === 'ornate';
 	$: buttonBackground = themeAsset(themeAssets, 'smallButtonBackground');
 	$: buttonHover = themeAsset(themeAssets, 'smallButtonHover');
 	$: paper = themeAsset(themeAssets, 'paperTexture');
@@ -58,7 +57,7 @@
 					? 'classic-native-button'
 					: 'btn btn-sm variant-filled-primary'}"
 				class:layout-switcher__trigger--fallback={classic && !buttonBackground}>
-				<span>Layout: {themeRegistry[selectedTheme].name}</span>
+				<span>Layout: {themeProfile(selectedTheme).label}</span>
 				<span
 					class="layout-switcher__chevron"
 					class:layout-switcher__chevron--open={open}
@@ -70,7 +69,7 @@
 						<a
 							href={layoutSelectionHref($page.url, id)}
 							aria-current={id === selectedTheme ? 'true' : undefined}
-							on:click={() => (open = false)}>{themeRegistry[id].name}</a>
+							on:click={() => (open = false)}>{themeProfile(id).label}</a>
 					</li>
 				{/each}
 			</ul>
