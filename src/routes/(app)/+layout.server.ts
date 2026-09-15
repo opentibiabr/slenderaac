@@ -127,6 +127,14 @@ export const load = loadFlashMessage(async ({ locals, url, cookies }) => {
 		currentPoll: selectedPoll,
 		serverName: selectedServerName,
 		serverLogo: serverIdentityAssetMetadata.assets.serverLogo ?? null,
+		accountStatusAssets: {
+			rewardCollected:
+				serverIdentityAssetMetadata.assets.accountRewardCollected ?? null,
+			rewardUncollected:
+				serverIdentityAssetMetadata.assets.accountRewardUncollected ?? null,
+			characterHidden:
+				serverIdentityAssetMetadata.assets.accountCharacterHidden ?? null,
+		},
 		screenshotGallery,
 		featuredScreenshot: dailyScreenshot(screenshotGallery?.items ?? []),
 		classicPresentation,

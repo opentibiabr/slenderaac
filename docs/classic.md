@@ -853,8 +853,10 @@ Do not let the inline image baseline increase the 64px detail heading to 67px.
 
 The optional `accountRewardCollected`, `accountRewardUncollected` and
 `accountCharacterHidden` manifest entries provide the account table's native
-11 × 19 status artwork. Keep the files in the external Classic pack. Older packs
-use accessible icon fallbacks; status meaning follows [UI states](ui-states.md#account-character-status)
+11 × 19 status artwork. Keep the files in the external Classic pack, but expose
+these three semantic assets through shared account layout data so both layouts
+render them independently of the selected theme's chrome pack. Older packs use
+accessible icon fallbacks; status meaning follows [UI states](ui-states.md#account-character-status)
 in both layouts and never depends on the availability of artwork.
 
 The checkout installer runs through `npm run install:assets` and does not require

@@ -99,6 +99,9 @@ string replacement that changes those contracts or third-party attribution.
 The logo is shared identity: use the shared `serverLogo` data and `ServerBrand`
 component in both layouts, including mobile. Themes own its slot dimensions and
 styling; they must not maintain separate logo copies or different fallback logic.
+Account reward and hidden-character symbols follow the same ownership rule:
+load their semantic URLs as shared account data. A theme may style the status
+slot, but selecting a layout must not decide whether the installed symbols exist.
 Dynamic menu/page titles inherit their common font, color, shadow and baseline.
 Keep the full configured name accessible when its visual label is truncated.
 
