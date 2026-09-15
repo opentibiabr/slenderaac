@@ -14,16 +14,16 @@ or [troubleshooting](docs/getting-started.md#troubleshooting).
 
 ## Documentation
 
-| Guide                                            | What it covers                                                                                                    |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| [Database configuration](docs/database.md)       | Use the running game server's configuration, understand fallback behavior and check the selected database.        |
-| [Install website assets](docs/classic-assets.md) | One-command installation and updates for Classic, outfits, items and store images from the fixed release channel. |
-| [Choose a layout](docs/themes.md)                | Switch between Classic and Legbone, set a default or enforce one layout.                                          |
-| [Theme extension roadmap](docs/theme-extension-roadmap.md) | Registry, renderer and validation work required before adding another layout.                                  |
-| [Server library](docs/server-library.md)         | Import spells, creatures, achievements and house definitions from the game server.                                |
-| [Game client connection](docs/client.md)         | Configure the website login endpoint and store-image URL.                                                         |
-| [Deployment](docs/deployment.md)                 | Build and run the Node application behind a reverse proxy.                                                        |
-| [Logs and diagnostics](docs/diagnostics.md)      | Capture startup/request timings and investigate unavailable boosted data.                                         |
+| Guide                                                      | What it covers                                                                                                    |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| [Database configuration](docs/database.md)                 | Use the running game server's configuration, understand fallback behavior and check the selected database.        |
+| [Install website assets](docs/classic-assets.md)           | One-command installation and updates for Classic, outfits, items and store images from the fixed release channel. |
+| [Choose a layout](docs/themes.md)                          | Switch between Classic and Legbone, set a default or enforce one layout.                                          |
+| [Theme extension roadmap](docs/theme-extension-roadmap.md) | Registry, renderer and validation work required before adding another layout.                                     |
+| [Server library](docs/server-library.md)                   | Import spells, creatures, achievements and house definitions from the game server.                                |
+| [Game client connection](docs/client.md)                   | Configure the website login endpoint and store-image URL.                                                         |
+| [Deployment](docs/deployment.md)                           | Build and run the Node application behind a reverse proxy.                                                        |
+| [Logs and diagnostics](docs/diagnostics.md)                | Capture startup/request timings and investigate unavailable boosted data.                                         |
 
 ## Website roadmap
 
