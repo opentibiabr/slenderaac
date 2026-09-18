@@ -134,6 +134,18 @@ If this image works but the page still uses fallbacks, verify the installed
 see a warning when the manifest cannot be loaded. Report the installer error,
 this asset's HTTP status and the theme being viewed; never send the full `.env`.
 
+The account table's Daily Reward and hidden-character symbols also come from the
+Classic pack, even when Legbone is selected. If both layouts show fallback symbols,
+check the pack's `accountRewardCollected`, `accountRewardUncollected` and
+`accountCharacterHidden` manifest entries. If the symbols load but the status is
+unknown, check the game server's Daily Reward cycle instead of reinstalling images;
+see [account character status](ui-states.md#account-character-status).
+
+Legbone's page background is bundled with the application at
+`/images/background-artwork.jpg`. A missing background there calls for checking the
+deployed application version and that URL; the external image installer does not
+supply it.
+
 Boosted creatures, bosses and player portraits use the outfit package installed
 by the default command, configured through
 `OUTFIT_ASSETS_ROOT`. They use the server database and `/api/outfits`; installing

@@ -63,12 +63,11 @@ For page implementation, manifest fields and verification, see
 
 ## Adding another layout
 
-The current two-layout PR must complete the
-[theme extension roadmap](theme-extension-roadmap.md) before it is merged.
-That roadmap keeps route data, actions, permissions and server loads shared;
-only the selected profile and registered presentation components vary. It also
-contains the boundary check and the test-only third-theme fixture that prevent
-new routes from branching directly on a concrete theme ID.
+The current two-layout PR has implemented the profile, renderer and context
+boundary in the [theme extension roadmap](theme-extension-roadmap.md). Route data,
+actions, permissions and server loads stay shared; only the selected profile and
+registered presentation components vary. The roadmap records the boundary check,
+test-only third-theme fixture and remaining repository-wide validation gate.
 
 ### Extension recipe
 

@@ -10,6 +10,11 @@ The roadmap deliberately stops short of publishing a third layout. A test-only
 contract fixture proves that a third registration can resolve without silently
 falling back to Legbone or changing a shared route.
 
+The profile, renderer and context migration and focused validation recorded below
+are complete. Repository-wide `npm run lint` still fails on unrelated baseline
+findings listed under [Completion criteria](#completion-criteria); that merge gate
+has not been marked as passing.
+
 ## How to use this document
 
 - Check a box only after the implementation and its validation are complete.
@@ -279,11 +284,11 @@ loading/empty/offline/unavailable/error/stale states and animated outfits.
 
 | Date       | Phase                            | Commit    | Validation                                                                                                     | Notes                                                                                                                                                               |
 | ---------- | -------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-14 | Baseline/profile started         | —         | Source inventory and focused inspection                                                                        | Current PR owns the merge gate                                                                                                                                      |
+| 2026-09-14 | Baseline/profile started         | `63ee9ad` | Source inventory and focused inspection                                                                        | Current PR owns the merge gate                                                                                                                                      |
 | 2026-09-14 | Semantic renderers               | `b76d55e` | `npm run check`; targeted ESLint                                                                               | Page framing, tables, section navigation, modal and radio presentation now resolve through the registry                                                             |
-| 2026-09-14 | Profile-driven server sources    | —         | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint                                   | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities                                                                   |
-| 2026-09-14 | Information/catalog renderers    | —         | `npm run check`; targeted ESLint                                                                               | Information tables, catalog filters and catalog details keep their public props while moving layout markup and CSS into each theme                                  |
-| 2026-09-14 | Capability-based route decisions | —         | `npm run check`; targeted ESLint                                                                               | Route and shared-component presentation branches no longer compare `selectedTheme` with a concrete ID; they read profile capabilities                               |
+| 2026-09-14 | Profile-driven server sources    | `012d588` | `npm run check`; `bun test src/lib/themes/profiles.test.ts`; targeted ESLint                                   | News limits, chrome/reference packs, catalog artwork and global logo now use profile capabilities                                                                   |
+| 2026-09-14 | Information/catalog renderers    | `10c98f8` | `npm run check`; targeted ESLint                                                                               | Information tables, catalog filters and catalog details keep their public props while moving layout markup and CSS into each theme                                  |
+| 2026-09-14 | Capability-based route decisions | `449f1d6` | `npm run check`; targeted ESLint                                                                               | Route and shared-component presentation branches no longer compare `selectedTheme` with a concrete ID; they read profile capabilities                               |
 | 2026-09-14 | Page renderer registry           | `7577996` | `npm run check`; targeted ESLint                                                                               | News, login, account, characters, guilds and highscores resolve presentation through static registry entries; asset/news helpers are theme-neutral                  |
 | 2026-09-14 | Page family frames               | `4c5ca5c` | `npm run check`                                                                                                | News archive, event schedule and online player families have explicit renderer slots; Classic account overview now lives under the Classic implementation directory |
 | 2026-09-14 | Shared surface boundary          | `5c5573d` | `npm run check`; boundary inventory                                                                            | Shared CSS uses semantic surface classes and server reference types no longer import the Classic namespace                                                          |
@@ -291,7 +296,7 @@ loading/empty/offline/unavailable/error/stale states and animated outfits.
 | 2026-09-14 | Shell and selector registry      | `2c7821b` | `npm run check`; browser switch smoke test                                                                     | Shell and selector presentation are static registry entries; switching remains a full-document navigation                                                           |
 | 2026-09-14 | Extension contract documentation | `1f6d44c` | documentation link inspection; `npm run check:themes`                                                          | The registry recipe, server-safe profile boundary and guard command are documented for a future layout                                                              |
 | 2026-09-14 | Surface capability fix           | `905d891` | `npm run check`; Classic and Legbone screenshots                                                               | Classic publishes its ornate surface capability at the shell root so shared semantic selectors cannot silently miss it                                              |
-| 2026-09-14 | Final route and interaction pass | —         | `bun test`; `npm run check:themes`; `npm run check`; HTTP smoke matrix (26 routes); CUA switch and screenshots | Both layouts returned 200 for representative page families; browser clicks switched in both directions and rendered distinct shells and content surfaces            |
+| 2026-09-14 | Final route and interaction pass | `89eac21` | `bun test`; `npm run check:themes`; `npm run check`; HTTP smoke matrix (26 routes); CUA switch and screenshots | Both layouts returned 200 for representative page families; browser clicks switched in both directions and rendered distinct shells and content surfaces            |
 
 ## Occurrence ledger
 
