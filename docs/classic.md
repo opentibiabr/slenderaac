@@ -883,6 +883,9 @@ versioned archives are never overwritten. A mismatched existing release stops
 publication. An interrupted first publication can be retried with the same arguments;
 the helper resumes an incomplete draft before activating the fixed channel.
 
+Subsequent package publications preserve the fixed channel's release description.
+Keep validation screenshots out of the rolling channel and runtime ZIPs.
+
 The dedicated channel does not change the repository-wide Latest release or move
 an existing Git tag. Keep old versioned releases for reproducible installs and
 rollback. The fixed channel is an explicit maintained selection; publishing an

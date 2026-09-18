@@ -251,24 +251,27 @@ def publish(args) -> None:
         (stage / f"{pack}.zip").write_bytes(payload)
         (stage / f"{pack}.zip.sha256").write_text(checksum + f"  {pack}.zip\n", encoding="utf-8")
         (stage / f"{pack}-assets.json").write_text(json.dumps(channel, indent=2) + "\n", encoding="utf-8")
-        notes = stage / "notes.md"
-        notes.write_text(
-            "Fixed download channel for Classic, animated outfits, animated items and game-store images.\n\n"
-            "From an application checkout with dependencies installed: `npm run install:assets`. "
-            "Use `npm run install:assets -- --packs classic` or append `--packs outfits items store` to select packages. "
-            "This is the only supported installation path.\n\n"
-            "Each package has a fixed ZIP and SHA-256 attachment, plus a JSON pointer to an immutable versioned archive. "
-            "All installation downloads stay in this repository's releases. Existing directories are backed up, "
-            "and configuration is activated only after all selected packages pass verification. Restart the website afterwards. "
-            "No database import or build is performed.\n\n"
-            f"[Installation guide](https://github.com/{REPOSITORY}/blob/{args.target}/docs/classic-assets.md)\n",
-            encoding="utf-8")
         current = get_release(CHANNEL_TAG)
         remove_legacy_installer = current is not None and any(
             asset.get("name") == "install-classic-assets.py"
             for asset in current.get("assets", [])
         )
         if current is None:
+            notes = stage / "notes.md"
+            notes.write_text(
+                "Rolling download channel for Classic artwork and shared outfit, item and store images.\n\n"
+                "## Install or update\n\n"
+                "From an updated application checkout with dependencies installed:\n\n"
+                "```sh\nnpm run install:assets\n```\n\n"
+                "Restart the website after installation. Use `--packs classic` or "
+                "`--packs outfits items store` after `--` to select packages.\n\n"
+                "## Attachments\n\n"
+                "For each pack, the JSON file points the installer to a verified versioned archive; "
+                "the fixed ZIP and SHA-256 files provide direct downloads. "
+                "The installer stages all selected packs outside the checkout before activation. "
+                "It does not run a build or database import.\n\n"
+                f"[Installation guide](https://github.com/{REPOSITORY}/blob/{args.target}/docs/classic-assets.md)\n",
+                encoding="utf-8")
             gh("release", "create", CHANNEL_TAG, "--repo", REPOSITORY, "--target", args.target,
                "--draft", "--prerelease", "--title", "Classic assets: current package",
                "--notes-file", str(notes))
@@ -277,8 +280,7 @@ def publish(args) -> None:
            "--clobber", "--repo", REPOSITORY)
         gh("release", "upload", CHANNEL_TAG, str(stage / f"{pack}-assets.json"),
            "--clobber", "--repo", REPOSITORY)
-        gh("release", "edit", CHANNEL_TAG, "--draft=false", "--latest=false",
-           "--notes-file", str(notes), "--repo", REPOSITORY)
+        gh("release", "edit", CHANNEL_TAG, "--draft=false", "--latest=false", "--repo", REPOSITORY)
         if remove_legacy_installer:
             gh("release", "delete-asset", CHANNEL_TAG, "install-classic-assets.py", "--yes", "--repo", REPOSITORY)
     print(RELEASE_BASE + CHANNEL_TAG + f"/{pack}.zip")

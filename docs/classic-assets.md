@@ -113,6 +113,10 @@ a build, database migration, content import or restart command.
 `npm run install:assets` is the only supported automated installation path. This keeps
 download validation, environment updates, activation and rollback in one implementation.
 Each ZIP also has a matching `.zip.sha256` attachment.
+The fixed channel has three files per pack: the JSON pointer used by the installer,
+the ZIP for a stable direct download, and its checksum for manual verification.
+GitHub adds the two source-code archive links automatically; they are not website
+asset packages.
 For manual installation, extract selected ZIPs outside the checkout, set their
 corresponding `.env` variables and restart. Automated installs read one small
 `<pack>-assets.json` file per package, pointing to an immutable versioned ZIP and

@@ -166,6 +166,7 @@ class ReleaseToolTests(unittest.TestCase):
         uploads = [call for call in calls if call[:2] == ("release", "upload")]
         self.assertIn("classic.zip", " ".join(uploads[0]))
         self.assertIn("classic-assets.json", " ".join(uploads[1]))
+        self.assertFalse(any("--notes-file" in call for call in calls))
         self.assertFalse(any("install-classic-assets.py" in " ".join(call) for call in uploads))
         self.assertIn(
             ("release", "delete-asset", assets.CHANNEL_TAG, "install-classic-assets.py", "--yes", "--repo", assets.REPOSITORY),
