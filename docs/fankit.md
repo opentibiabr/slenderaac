@@ -6,18 +6,11 @@ the source checkout and is never fetched from another website at request time.
 
 ## Configure the package
 
-Create a ZIP containing the artwork the operator is allowed to distribute, place
-it outside the repository and set its absolute path in `.env`:
-
-```env
-FANKIT_FILE=/var/lib/slender/downloads/canary-fankit.zip
-```
-
-On Windows, use an absolute path such as:
-
-```env
-FANKIT_FILE=D:\slender-data\downloads\canary-fankit.zip
-```
+Create a ZIP containing the artwork the operator is allowed to distribute and
+place it outside the repository. In `.env`, set `FANKIT_FILE` to that ZIP's
+absolute path on the host running the website. Use forward slashes for a Windows
+path. The value is specific to each installation; do not copy a path from another
+server.
 
 Restart the website after changing `.env`. `/fankit` then displays the archive
 name, size and modification date; `/fankit/download` serves it as a ZIP download.

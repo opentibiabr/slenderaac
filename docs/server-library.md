@@ -91,14 +91,16 @@ The corresponding buttons are visibly disabled, with an explanation and a local
 manual link; Back stays active and preserves the search filters and theme.
 
 Install the repository dependencies, then export the server definitions to a file
-outside the checkout and outside the public asset directory:
+outside the checkout and outside the public asset directory. For sibling `canary`
+and `slenderaac` checkouts, run this from the application root:
 
 ```sh
-bun run import:server-data --server-dir /path/to/server --ref main --output /path/to/server-data/library.json
+npm run import:server-data -- --server-dir ../canary --output ../slender-server-data/library.json
 ```
 
-Set `SERVER_DATA_FILE` to that output file in the application environment and
-restart the application when setting or changing this environment variable.
+Set `SERVER_DATA_FILE=../slender-server-data/library.json` in `.env` for this
+example; adjust both paths to your checkout. Restart the application when setting
+or changing this environment variable.
 Subsequent successful imports replace the file atomically; the running
 application reloads the changed snapshot on its next request.
 
@@ -154,8 +156,8 @@ The boss list describes registered Archfoe types, not a reconstructed runtime
 lottery: shared IDs and runtime registration order can affect that lottery.
 Runtime-generated variants and callbacks require an explicit server export.
 
-For renamed entries or existing links, optionally pass
-`--spell-aliases /path/to/spell-aliases.json`. This JSON object maps saved URL
+For renamed entries or existing links, optionally pass `--spell-aliases` with a
+JSON file outside the checkout. This object maps saved URL
 identifiers to a current server spell name or canonical ID. Aliases must resolve
 unambiguously to an imported spell and cannot collide with another identity:
 
@@ -165,13 +167,13 @@ unambiguously to an imported spell and cannot collide with another identity:
 }
 ```
 
-`--creature-aliases /path/to/creature-aliases.json` accepts the same mapping for
+`--creature-aliases` accepts the same mapping from a JSON file for
 registered creature names or canonical IDs. Each import validates spells,
 creatures and achievements before replacing the snapshot. A missing or malformed
 section cannot erase any previously installed section.
 
 For display names inherited in achievement descriptions, optionally pass
-`--display-text /path/to/display-text.json`. The JSON object maps whole words or
+`--display-text` with a JSON file. The object maps whole words or
 phrases, case-insensitively, to display text or identity placeholders:
 
 ```json
