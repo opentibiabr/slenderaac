@@ -76,9 +76,9 @@
 </script>
 
 <div class="theme-legbone layout-surface-cards">
-	<div class="theme-legbone-background"></div>
-	<div class="theme-legbone-backdrop"></div>
-	<div class="theme-legbone-content">
+	<div class="layout-surface-cards-background"></div>
+	<div class="layout-surface-cards-backdrop"></div>
+	<div class="layout-surface-cards-content">
 		{#if isAdmin}
 			<div
 				class="hidden md:flex flex-row justify-center items-start fixed top-0 left-0 right-0"
@@ -242,7 +242,7 @@
 
 <style>
 	@media (min-width: 768px) {
-		:global(.theme-legbone .theme-legbone-content),
+		:global(.theme-legbone .layout-surface-cards-content),
 		:global(.theme-legbone #appShell),
 		:global(.theme-legbone #appShell > div) {
 			overflow: visible;
@@ -258,7 +258,9 @@
 		}
 	}
 	/* Section navigation follows the document, so intermediate shells cannot own scrolling. */
-	:global(.theme-legbone:has(.section-navigation) .theme-legbone-content),
+	:global(
+		.theme-legbone:has(.section-navigation) .layout-surface-cards-content
+	),
 	:global(.theme-legbone:has(.section-navigation) #appShell),
 	:global(.theme-legbone:has(.section-navigation) #appShell > div),
 	:global(.theme-legbone:has(.section-navigation) #page),
