@@ -78,13 +78,9 @@ function scheduleInternationalPriceUpdate() {
 
 scheduleInternationalPriceUpdate();
 
-const internationalPriceUpdateInterval = setInterval(() => {
+setInterval(() => {
 	scheduleInternationalPriceUpdate();
 }, PRICE_UPDATE_INTERVAL_MS);
-
-process.on('SIGTERM', () => {
-	clearInterval(internationalPriceUpdateInterval);
-});
 
 void checkDatabaseConfiguration(diagnosticsEnabled);
 
