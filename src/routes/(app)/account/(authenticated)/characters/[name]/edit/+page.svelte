@@ -17,8 +17,9 @@
 	export let data: PageData;
 	export let form: ActionData;
 
-	const settings = data.player.settings;
-	const pronoun = data.player.pronoun.toString();
+	$: settings = data.player.settings;
+	$: pronoun = data.player.pronoun.toString();
+	$: errors = form?.errors as Record<string, string[]> | undefined;
 
 	async function close() {
 		await goto('/account', { noScroll: true });
@@ -29,8 +30,8 @@
 	title={$_('edit-character', { values: { name: data.player.name } })}
 	on:close={close}>
 	<form class="flex flex-col gap-4" method="post" use:enhance>
-		{#if form?.errors?.global}
-			<p class="text-xs text-error-500">{form.errors.global}</p>
+		{#if errors?.global}
+			<p class="text-xs text-error-500">{errors.global}</p>
 		{/if}
 
 		<div class="grid grid-cols-2 gap-2">
@@ -39,18 +40,18 @@
 					label={$_('character-hidden')}
 					name="characterHidden"
 					checked={settings.hidden}
-					errors={form?.errors?.characterHidden} />
+					errors={errors?.characterHidden} />
 
 				<Checkbox
 					label={$_('character-show-skills')}
 					name="showSkills"
 					checked={settings.show_skills}
-					errors={form?.errors?.showSkills} />
+					errors={errors?.showSkills} />
 				<Checkbox
 					label={$_('character-show-inventory')}
 					name="showInventory"
 					checked={settings.show_inventory}
-					errors={form?.errors?.showInventory} />
+					errors={errors?.showInventory} />
 			</div>
 
 			<div class="flex flex-col gap-2">
@@ -59,7 +60,7 @@
 						name="pronoun"
 						value={pronoun}
 						label={$_('character-pronoun')}
-						errors={form?.errors?.pronoun}>
+						errors={errors?.pronoun}>
 						{#each allPronouns as pronounValue}
 							<option value={pronounValue.toString()}>
 								{pronounString(pronounValue)}
@@ -72,7 +73,7 @@
 					name="comment"
 					label={$_('character-comment')}
 					value={settings.comment ?? ''}
-					errors={form?.errors?.comment} />
+					errors={errors?.comment} />
 			</div>
 		</div>
 

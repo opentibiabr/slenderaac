@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte';
+	import type { ComponentType } from 'svelte';
 	import {
 		type Config as MarkdocConfig,
 		default as Markdoc,
@@ -53,11 +53,10 @@
 			baseUrl: PUBLIC_BASE_URL,
 		},
 	};
-	let components = new Map<string, typeof SvelteComponent>([
-		['Callout', Callout],
-		['Row', Row],
-		['Col', Col],
-	]);
+	let components: Map<string, ComponentType> = new Map();
+	components.set('Callout', Callout);
+	components.set('Row', Row);
+	components.set('Col', Col);
 
 	const ast = Markdoc.parse(content);
 	const node = Markdoc.transform(ast, deepMerge(defaultConfig, config));

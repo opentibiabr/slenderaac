@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { faMars, faVenus } from '@fortawesome/free-solid-svg-icons';
-	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+	import { RadioGroup } from '@skeletonlabs/skeleton';
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 	import invariant from 'tiny-invariant';
 
 	import type { Town } from '$lib/towns';
+	import RadioChoice from '$lib/components/ui/forms/RadioChoice.svelte';
 	import Select from '$lib/components/ui/forms/Select.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import { pronounsEnabled, tutorialEnabled } from '$lib/config';
@@ -47,16 +48,19 @@
 	<div class="label flex flex-col gap-0">
 		<span>{$_('sex')}</span>
 		<RadioGroup>
-			<RadioItem bind:group={sex} name="characterSex" value={PlayerSex.Female}>
+			<RadioChoice
+				bind:group={sex}
+				name="characterSex"
+				value={PlayerSex.Female}>
 				<div class="flex flex-row gap-1 items-center">
 					<Fa icon={faVenus} />{sexString(PlayerSex.Female)}
 				</div>
-			</RadioItem>
-			<RadioItem bind:group={sex} name="characterSex" value={PlayerSex.Male}>
+			</RadioChoice>
+			<RadioChoice bind:group={sex} name="characterSex" value={PlayerSex.Male}>
 				<div class="flex flex-row gap-1 items-center">
 					<Fa icon={faMars} />{sexString(PlayerSex.Male)}
 				</div>
-			</RadioItem>
+			</RadioChoice>
 		</RadioGroup>
 	</div>
 
@@ -88,14 +92,14 @@
 		{#if availableTowns.length > 1}
 			<RadioGroup>
 				{#each availableTowns as town}
-					<RadioItem
+					<RadioChoice
 						bind:group={startingTown}
 						name="startingTown"
 						value={town.id}>
 						<div class="flex flex-row gap-1 items-center">
 							{town.name}
 						</div>
-					</RadioItem>
+					</RadioChoice>
 				{/each}
 			</RadioGroup>
 		{:else}

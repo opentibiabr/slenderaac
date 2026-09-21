@@ -23,7 +23,7 @@
 <div class="flex flex-row items-end gap-1">
 	{#if isVice}
 		<Button
-			href="/guilds/{name}/invite"
+			href={`/guilds/${encodeURIComponent(name)}/invite`}
 			size="sm"
 			iconBefore={faPersonCirclePlus}>
 			{$_('guilds.invite')}
@@ -31,7 +31,7 @@
 	{/if}
 	{#if isLeader}
 		<Button
-			href="/guilds/{name}/edit"
+			href={`/guilds/${encodeURIComponent(name)}/edit`}
 			size="sm"
 			color="secondary"
 			iconBefore={faEdit}>
@@ -41,7 +41,7 @@
 	{#if isOwner}
 		{#if resigning}
 			<Button
-				href="/guilds/{name}"
+				href={`/guilds/${encodeURIComponent(name)}`}
 				size="sm"
 				color="warning"
 				iconBefore={faRefresh}>
@@ -49,7 +49,7 @@
 			</Button>
 		{:else}
 			<Button
-				href="/guilds/{name}/resign"
+				href={`/guilds/${encodeURIComponent(name)}/resign`}
 				size="sm"
 				color="warning"
 				iconBefore={faHandHoldingHand}>
@@ -57,7 +57,7 @@
 			</Button>
 		{/if}
 		<Button
-			href="/guilds/{name}/disband"
+			href={`/guilds/${encodeURIComponent(name)}/disband`}
 			size="xs"
 			color="error"
 			iconBefore={faTrash}>

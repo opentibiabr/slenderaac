@@ -14,7 +14,7 @@
 
 <label
 	class="relative label flex {variant === 'horizontal'
-		? 'flex-row gap-2 items-center'
+		? 'flex-row flex-wrap gap-x-2 items-center'
 		: 'flex-col gap-0'} flex-grow {labelClass}">
 	{#if label}<span>{label}</span>{/if}
 	<textarea
@@ -22,11 +22,15 @@
 		{rows}
 		{placeholder}
 		{required}
-		class:input-error={Boolean(errors)}
+		class:input-error={Boolean(error)}
+		aria-invalid={error ? true : undefined}
 		class="textarea"
+		class:flex-1={variant === 'horizontal'}
 		bind:value />
 
 	{#if error}
-		<p class="absolute top-full text-xs text-error-500-400-token">{error}</p>
+		<p class="mt-1 w-full col-span-full text-xs text-error-500-400-token">
+			{error}
+		</p>
 	{/if}
 </label>

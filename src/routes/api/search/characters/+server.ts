@@ -32,7 +32,6 @@ export const GET: RequestHandler = async ({ url }) => {
 		.map(dbToPlayer)
 		.map((player) => ({
 			...player,
-			balance: player.balance?.toString(),
 			experience: player.experience?.toString(),
 		}));
 

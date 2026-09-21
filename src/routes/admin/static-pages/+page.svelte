@@ -21,7 +21,13 @@
 
 	export let data: PageData;
 
-	$: staticPages = data.staticPages;
+	type StaticPageListItem = {
+		id: string;
+		slug: string;
+		title: string;
+	};
+
+	$: staticPages = data.staticPages as StaticPageListItem[];
 
 	async function awaitConfirmation(): Promise<boolean> {
 		return new Promise((resolve) => {
@@ -44,8 +50,7 @@
 	let dragDisabled = true;
 	let form: HTMLFormElement;
 
-	// eslint-disable-next-line no-undef
-	function handleDndConsider(e: CustomEvent<DndEvent<StaticPage>>) {
+	function handleDndConsider(e: CustomEvent<DndEvent<StaticPageListItem>>) {
 		const {
 			items: newItems,
 			info: { source, trigger },
@@ -56,8 +61,7 @@
 			dragDisabled = true;
 		}
 	}
-	// eslint-disable-next-line no-undef
-	function handleDndFinalize(e: CustomEvent<DndEvent<StaticPage>>) {
+	function handleDndFinalize(e: CustomEvent<DndEvent<StaticPageListItem>>) {
 		const {
 			items: newItems,
 			info: { source, trigger },

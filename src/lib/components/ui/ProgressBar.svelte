@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
-	import { portal } from 'svelte-portal';
+
+	import { portal } from '$lib/actions/portal';
 
 	export let infinite = false;
 	export let progress = 0;

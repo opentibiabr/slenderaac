@@ -15,6 +15,7 @@
 	function updatePublished(id: string, published: boolean) {
 		return async () => {
 			const formData = new FormData();
+			formData.append('_method', 'PUBLISH');
 			formData.append('published', published ? 'on' : '');
 			const res = await fetch(`/admin/news/${id}`, {
 				method: 'POST',
@@ -24,6 +25,9 @@
 			if (res.ok) {
 				const news = data.news.find((n) => n.id === id);
 				if (news) news.published = published;
+			} else {
+				const news = data.news.find((n) => n.id === id);
+				if (news) news.published = !published;
 			}
 		};
 	}

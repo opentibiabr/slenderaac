@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { RadioGroup, RadioItem } from '@skeletonlabs/skeleton';
+	import { RadioGroup } from '@skeletonlabs/skeleton';
 	import Fa from 'svelte-fa';
 	import { _ } from 'svelte-i18n';
 
+	import RadioChoice from '$lib/components/ui/forms/RadioChoice.svelte';
 	import { getPaymentMethodIcon, getPaymentMethodName } from '$lib/utils';
 
 	export let enabledPaymentMethods: string[];
@@ -23,12 +24,15 @@
 		<h4 class="h4">{$_('shop.payment-method')}</h4>
 		<RadioGroup display="flex-col">
 			{#each enabledPaymentMethods as paymentMethod}
-				<RadioItem bind:group={value} name="offer" value={paymentMethod}>
+				<RadioChoice
+					bind:group={value}
+					name="payment-method-choice"
+					value={paymentMethod}>
 					<div class="flex flex-row gap-2 items-center p-1">
 						<Fa icon={getPaymentMethodIcon(paymentMethod)} />
 						{getPaymentMethodName(paymentMethod)}
 					</div>
-				</RadioItem>
+				</RadioChoice>
 			{/each}
 		</RadioGroup>
 	</div>

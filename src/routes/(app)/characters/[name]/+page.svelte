@@ -2,11 +2,14 @@
 	import { _ } from 'svelte-i18n';
 
 	import AnimatedOutfit from '$lib/components/ui/AnimatedOutfit.svelte';
+	import CharacterAchievements from '$lib/components/ui/CharacterAchievements.svelte';
 	import CharacterInventory from '$lib/components/ui/CharacterInventory.svelte';
 	import CharactersTable from '$lib/components/ui/CharactersTable.svelte';
+	import DeathNotice from '$lib/components/ui/DeathNotice.svelte';
 	import GuildMembership from '$lib/components/ui/GuildMembership.svelte';
 	import { pronounsEnabled } from '$lib/config';
 	import { getPronoun, sexString, vocationString } from '$lib/players';
+	import { getThemeContext } from '$lib/themes/context';
 	import { formatDate, formatGoldCoins } from '$lib/utils';
 
 	import type { PageData } from './$types';
@@ -19,17 +22,29 @@
 		? Object.entries(data.skills).map(([skill, level]) => [
 				$_(`skills.${skill}`),
 				level,
-		  ])
+			])
 		: null;
 	$: inventory = data.inventory;
+	const theme = getThemeContext();
+	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
+	$: CharacterProfileRenderer = $theme.components.CharacterProfile;
+	function guildHref(name: string) {
+		return '/guilds/' + encodeURIComponent(name);
+	}
+	function characterHref(name: string) {
+		return `/characters/${encodeURIComponent(name)}`;
+	}
 </script>
 
-{#if character}
-	<div class="flex flex-col gap-2">
+{#if classic}
+	<svelte:component this={CharacterProfileRenderer} {data} />
+{:else if character}
+	<div class="character-profile flex flex-col gap-2 w-full min-w-0">
 		<div class="data-table">
-			<div class="flex flex-row justify-center gap-4 items-center px-8">
+			<div
+				class="flex flex-row flex-wrap justify-center gap-4 items-center px-4 sm:px-8">
 				<span
-					class="text-primary-700-200-token font-heading-token text-xl font-semibold">
+					class="text-primary-700-200-token font-heading-token text-xl font-semibold max-w-full">
 					{character.name}
 				</span>
 				<AnimatedOutfit
@@ -59,15 +74,21 @@
 					<dd>{formatGoldCoins(data.balance)}</dd>
 				</div>
 			{/if}
+			<div class="data-row">
+				<dt>Achievement Points</dt>
+				<dd>{data.achievementPoints ?? 'Unavailable'}</dd>
+			</div>
 			{#if character.guild != null}
 				<div class="data-row">
 					<dt>{$_('guilds.membership')}</dt>
-					<dd><GuildMembership guild={character.guild} /></dd>
+					<dd>
+						<GuildMembership guild={character.guild} href={guildHref} />
+					</dd>
 				</div>
 			{/if}
 			<div class="data-row">
 				<dt>{$_('residence')}</dt>
-				<dd>{character.townName}</dd>
+				<dd>{character.townName ?? 'Unknown'}</dd>
 			</div>
 			<div class="data-row">
 				<dt>{$_('last-login')}</dt>
@@ -84,6 +105,10 @@
 						.settings.comment}</pre>
 			</div>
 		{/if}
+
+		<CharacterAchievements
+			achievements={data.achievements ?? []}
+			available={data.achievementsAvailable} />
 
 		{#if skills}
 			<h3 class="h4">{$_('skills.skills')}</h3>
@@ -116,35 +141,7 @@
 							<tr class="[&>td]:!p-2">
 								<td>{formatDate(death.time)}</td>
 								<td>
-									{#if death.mostdamage_by !== death.killed_by}
-										{@html $_('death-log-double', {
-											values: {
-												killer: death.is_player
-													? `<a href="/characters/${death.killed_by}" class="anchor">${death.killed_by}</a>`
-													: death.killed_by,
-												killerJust: death.unjustified
-													? '' + $_('unjustified')
-													: '',
-												mostdamage: death.mostdamage_is_player
-													? `<a href="/characters/${death.mostdamage_by}" class="anchor">${death.mostdamage_by}</a>`
-													: death.mostdamage_by,
-												mostdamageJust: death.mostdamage_unjustified
-													? '' + $_('unjustified')
-													: '',
-												level: death.level,
-											},
-										})}
-									{:else}
-										{@html $_('death-log-single', {
-											values: {
-												killer: death.is_player
-													? `<a href="/characters/${death.killed_by} class="anchor">${death.killed_by}</a>`
-													: death.killed_by,
-												just: death.unjustified ? '' + $_('unjustified') : '',
-												level: death.level,
-											},
-										})}
-									{/if}
+									<DeathNotice {death} href={characterHref} />
 								</td>
 							</tr>
 						{/each}
@@ -160,3 +157,12 @@
 {:else}
 	<h5 class="h4">{data.error}</h5>
 {/if}
+
+<style>
+	.character-profile {
+		overflow-wrap: anywhere;
+	}
+	.character-profile :is(dt, dd) {
+		min-width: 0;
+	}
+</style>

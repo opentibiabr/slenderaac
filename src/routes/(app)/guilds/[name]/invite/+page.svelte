@@ -3,12 +3,12 @@
 	import { slide } from 'svelte/transition';
 	import { _ } from 'svelte-i18n';
 
-	import { enhance } from '$lib/enchance';
 	import { goto } from '$app/navigation';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import SearchQuerier from '$lib/components/ui/SearchQuerier.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
+	import { enhance } from '$lib/enchance';
 	import { vocationString } from '$lib/players';
 
 	import type { PageData } from './$types';
@@ -19,7 +19,7 @@
 	$: results = data.results ?? [];
 
 	function close() {
-		guild && void goto(`/guilds/${guild.name}`);
+		guild && void goto(`/guilds/${encodeURIComponent(guild.name)}`);
 	}
 </script>
 
@@ -61,7 +61,8 @@
 			</div>
 		{/if}
 		<div class="flex flex-row w-full justify-end">
-			<Button size="sm" href="/guilds/{guild.name}">{$_('done')}</Button>
+			<Button size="sm" href={`/guilds/${encodeURIComponent(guild.name)}`}
+				>{$_('done')}</Button>
 		</div>
 	</StatelessModal>
 {/if}

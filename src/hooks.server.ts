@@ -3,8 +3,13 @@ import { randomUUID } from 'crypto';
 import { locale } from 'svelte-i18n';
 
 import { AccountType, isAccountType } from '$lib/accounts';
+import { themeSwitcherEnabled } from '$lib/server/config';
+import { checkDatabaseConfiguration } from '$lib/server/database-config';
+import { diagnosticsEnabled, diagnosticStep } from '$lib/server/diagnostics';
+import { errorCode, log, startLogOperation } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
 import { getSession, requireLogin } from '$lib/server/session';
+import { preserveLayoutSelectionRedirect } from '$lib/server/theme-assets/selection-redirect';
 
 const unauthorized = new Response(null, {
 	status: 401,
@@ -14,8 +19,8 @@ const unauthorized = new Response(null, {
 });
 
 async function updateInternationalPrices() {
+	const finish = startLogOperation('prices');
 	try {
-		console.log('Updating international prices');
 		const [rates, templateOffers] = await Promise.all([
 			prisma.currencyExchangeRates.findMany({
 				select: { currency: true, rate: true },
@@ -25,10 +30,8 @@ async function updateInternationalPrices() {
 			}),
 		]);
 
-		// Batch all upsert operations for parallel execution
 		const upsertOperations = [];
 		for (const { currency, rate } of rates) {
-			console.log(`Updating ${currency} prices (rate: ${rate.toString()})`);
 			for (const offer of templateOffers) {
 				upsertOperations.push(
 					prisma.coinOffers.upsert({
@@ -39,7 +42,7 @@ async function updateInternationalPrices() {
 						create: {
 							...offer,
 							id: randomUUID(),
-							currency: currency,
+							currency,
 							price: offer.price.mul(rate),
 						},
 					}),
@@ -47,16 +50,22 @@ async function updateInternationalPrices() {
 			}
 		}
 
-		// Execute all upserts in parallel
 		await Promise.all(upsertOperations);
+		finish(
+			`completed currencies=${rates.length} offers=${templateOffers.length}`,
+		);
 	} catch (error) {
-		console.error('Failed to update international prices', error);
+		finish(`failed code=${errorCode(error)}`, 'error');
 	}
 }
 
 const PRICE_UPDATE_INTERVAL_MS = 12 * 60 * 60 * 1000;
 
-console.log('Starting international price updater');
+log(
+	'info',
+	'startup',
+	`SlenderAAC server hooks loaded; runtime=${process.version} pid=${process.pid} diagnostics=${diagnosticsEnabled}`,
+);
 void updateInternationalPrices();
 
 const internationalPriceUpdateInterval = setInterval(() => {
@@ -67,21 +76,25 @@ process.on('SIGTERM', () => {
 	clearInterval(internationalPriceUpdateInterval);
 });
 
+void checkDatabaseConfiguration(diagnosticsEnabled);
+
 export const handle = (async ({ event, resolve }) => {
 	const lang =
 		event.request.headers.get('accept-language')?.split(',')[0] || 'en';
 	if (lang) {
-		await locale.set(lang);
+		await diagnosticStep('request.locale', () => locale.set(lang));
 	}
 
 	const { cookies, url } = event;
 	const sid = cookies.get('sid');
 	if (sid) {
-		const session = await getSession(sid);
+		const session = await diagnosticStep('request.session', () =>
+			getSession(sid),
+		);
 		if (session) {
 			event.locals.session = session;
 		} else {
-			cookies.delete('sid');
+			cookies.delete('sid', { path: '/' });
 		}
 	}
 
@@ -100,6 +113,16 @@ export const handle = (async ({ event, resolve }) => {
 		}
 	}
 
-	const response = await resolve(event);
-	return response;
+	const response = await diagnosticStep(
+		`request.resolve ${event.route.id ?? '(unmatched)'}`,
+		() => resolve(event),
+	);
+	return themeSwitcherEnabled && event.route.id?.startsWith('/(app)')
+		? preserveLayoutSelectionRedirect(
+				response,
+				url,
+				event.isDataRequest ||
+					event.request.headers.get('x-sveltekit-action') === 'true',
+			)
+		: response;
 }) satisfies Handle;

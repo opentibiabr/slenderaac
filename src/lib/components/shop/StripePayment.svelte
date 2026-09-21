@@ -54,7 +54,8 @@
 			elements,
 			redirect: 'always',
 			confirmParams: {
-				return_url: `${PUBLIC_BASE_URL}/shop/coins?step=confirmation`,
+				return_url: new URL('/shop/coins?step=confirmation', PUBLIC_BASE_URL)
+					.href,
 			},
 		});
 		if (result.error) {

@@ -23,7 +23,7 @@
 	$: errors = form?.errors ?? {};
 
 	function close() {
-		guild && void goto(`/guilds/${guild.name}`);
+		guild && void goto(`/guilds/${encodeURIComponent(guild.name)}`);
 	}
 
 	let tabSet = 0;
@@ -75,7 +75,7 @@
 					<form
 						id="info-form"
 						bind:this={infoForm}
-						action="/guilds/{guildName}/edit?/saveDescription"
+						action={`/guilds/${encodeURIComponent(guildName)}/edit?/saveDescription`}
 						class="flex flex-col gap-1"
 						method="post"
 						use:enhance={() => {
@@ -95,7 +95,7 @@
 					<form
 						id="ranks-form"
 						bind:this={ranksForm}
-						action="/guilds/{guildName}/edit?/saveRanks"
+						action={`/guilds/${encodeURIComponent(guildName)}/edit?/saveRanks`}
 						class="flex flex-col gap-2"
 						method="post"
 						use:enhance={() => {
@@ -115,7 +115,7 @@
 							<GuildRankEditing {rank} {guildName} />
 						{/each}
 						<Button
-							formaction="/guilds/{guildName}/edit?/addRank"
+							formaction={`/guilds/${encodeURIComponent(guildName)}/edit?/addRank`}
 							color="success"
 							size="sm"
 							variant="soft"
@@ -125,7 +125,7 @@
 					<form
 						id="members-form"
 						bind:this={membersForm}
-						action="/guilds/{guildName}/edit?/saveMembers"
+						action={`/guilds/${encodeURIComponent(guildName)}/edit?/saveMembers`}
 						class="flex flex-col gap-2"
 						method="post"
 						use:enhance={() => {

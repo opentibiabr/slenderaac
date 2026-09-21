@@ -4,73 +4,16 @@ import {
 	createCanvas,
 	loadImage,
 } from 'canvas';
-import fs from 'fs';
 import path from 'path';
 
-import { mounts, outfitColors } from '$lib/server/animations/config';
-
-export interface OutfitData {
-	files: string[];
-	framesNumber: number;
-	mountFramesNumber: number;
-}
-
-export function loadData(
-	outfitId: number,
-	outfitPath: string,
-	isMount = false,
-	data?: OutfitData,
-): OutfitData | null {
-	data ||= {
-		files: [],
-		framesNumber: 0,
-		mountFramesNumber: 0,
-	};
-
-	if (isMount) {
-		const mount = outfitId;
-
-		if (mount == 0 || mount >= 65535) {
-			outfitId = mount & 0xffff;
-		} else if (mount < 300) {
-			if (mounts[mount]) {
-				outfitId = mounts[mount];
-			} else {
-				return null;
-			}
-		}
-	}
-
-	const outfitDataPath = path.join(
-		outfitPath,
-		outfitId.toString(),
-		`outfit.data.json`,
-	);
-
-	if (!fs.existsSync(outfitDataPath)) {
-		throw new Error(`Outfit data not found: ${outfitDataPath}`);
-	}
-
-	const rawData = fs.readFileSync(outfitDataPath, 'utf8');
-	const tmp = JSON.parse(rawData) as OutfitData;
-
-	if (isMount) {
-		data.files = [...data.files, ...tmp.files];
-		data.mountFramesNumber = tmp.framesNumber;
-	} else {
-		data = { ...tmp };
-		data.mountFramesNumber = 1;
-	}
-
-	return data;
-}
+import { outfitColors } from '$lib/server/animations/config';
+import {
+	normalizedImagePath,
+	type OutfitData,
+} from '$lib/server/animations/metadata';
 
 function fileExists(filePath: string, outfitData: OutfitData): boolean {
-	const normalizedFilePath = filePath
-		.replace(/\\/g, '/')
-		.replace(/^\.\//, '')
-		.replace(/\/$/, '');
-	return outfitData.files.includes(normalizedFilePath);
+	return outfitData.files.includes(normalizedImagePath(filePath));
 }
 
 export async function outfit(
@@ -87,6 +30,7 @@ export async function outfit(
 	animation = 1,
 	resizeTo64px = false,
 ): Promise<CanvasRenderingContext2D | null> {
+	const outfitFrame = ((animation - 1) % outfitData.framesNumber) + 1;
 	let mountId: number;
 	let mountState: number;
 
@@ -94,14 +38,14 @@ export async function outfit(
 		mountId = 0;
 		mountState = 1;
 	} else {
-		mountId = mounts[mount];
+		mountId = mount;
 		mountState = 2;
 	}
 
 	const outfitImagePath = path.join(
 		outfitPath,
 		outfit.toString(),
-		`${animation}_${mountState}_1_${direction}.png`,
+		`${outfitFrame}_${mountState}_1_${direction}.png`,
 	);
 	if (!fileExists(outfitImagePath, outfitData)) {
 		console.warn('Outfit not found', outfit, addons, head, body, legs, feet);
@@ -122,7 +66,7 @@ export async function outfit(
 	const outfitTemplateImagePath = path.join(
 		outfitPath,
 		outfit.toString(),
-		`${animation}_${mountState}_1_${direction}_template.png`,
+		`${outfitFrame}_${mountState}_1_${direction}_template.png`,
 	);
 	outfitCtx.drawImage(imageOutfit, 0, 0);
 
@@ -136,7 +80,7 @@ export async function outfit(
 		const imageFirstPath = path.join(
 			outfitPath,
 			outfit.toString(),
-			`${animation}_${mountState}_2_${direction}.png`,
+			`${outfitFrame}_${mountState}_2_${direction}.png`,
 		);
 		if (fileExists(imageFirstPath, outfitData)) {
 			const imageFirst = await loadImage(imageFirstPath);
@@ -145,7 +89,7 @@ export async function outfit(
 			const imageFirstTemplatePath = path.join(
 				outfitPath,
 				outfit.toString(),
-				`${animation}_${mountState}_2_${direction}_template.png`,
+				`${outfitFrame}_${mountState}_2_${direction}_template.png`,
 			);
 			if (templateCtx && fileExists(imageFirstTemplatePath, outfitData)) {
 				const imageFirstTemplate = await loadImage(imageFirstTemplatePath);
@@ -155,7 +99,11 @@ export async function outfit(
 	}
 
 	if (addons == 2 || addons == 3) {
-		const imageSecondPath = `${outfitPath}${outfit}/${animation}_${mountState}_3_${direction}.png`;
+		const imageSecondPath = path.join(
+			outfitPath,
+			String(outfit),
+			`${outfitFrame}_${mountState}_3_${direction}.png`,
+		);
 		if (fileExists(imageSecondPath, outfitData)) {
 			const imageSecond = await loadImage(imageSecondPath);
 			outfitCtx.drawImage(imageSecond, 0, 0);
@@ -163,7 +111,7 @@ export async function outfit(
 			const imageSecondTemplatePath = path.join(
 				outfitPath,
 				outfit.toString(),
-				`${animation}_${mountState}_3_${direction}_template.png`,
+				`${outfitFrame}_${mountState}_3_${direction}_template.png`,
 			);
 			if (templateCtx && fileExists(imageSecondTemplatePath, outfitData)) {
 				const imageSecondTemplate = await loadImage(imageSecondTemplatePath);
@@ -175,13 +123,15 @@ export async function outfit(
 	templateCanvas &&
 		colorize(templateCanvas, outfitCanvas, head, body, legs, feet);
 
-	let mountAnimationFrame = animation;
-	while (mountAnimationFrame > outfitData.mountFramesNumber) {
-		mountAnimationFrame -= outfitData.mountFramesNumber;
-	}
+	const mountAnimationFrame =
+		((animation - 1) % outfitData.mountFramesNumber) + 1;
 
 	if (mountState == 2) {
-		const mountImagePath = `${outfitPath}${mountId}/${mountAnimationFrame}_1_1_${direction}.png`;
+		const mountImagePath = path.join(
+			outfitPath,
+			String(mountId),
+			`${mountAnimationFrame}_1_1_${direction}.png`,
+		);
 		if (fileExists(mountImagePath, outfitData)) {
 			const mountImage = await loadImage(mountImagePath);
 			const mountCanvas = createCanvas(width, height);

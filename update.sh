@@ -1,8 +1,9 @@
 #!/bin/bash
 
 git pull
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-pnpm install --frozen-lockfile
-pnpm dlx prisma migrate deploy
-pnpm dlx prisma generate
-pnpm build
+curl -fsSL https://bun.sh/install | bash
+source ~/.bashrc
+bun install
+bunx prisma migrate deploy
+bunx prisma generate
+bun build

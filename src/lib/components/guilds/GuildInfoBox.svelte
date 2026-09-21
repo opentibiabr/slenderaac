@@ -13,12 +13,22 @@
 	export let createdAt: Date;
 	export let balance: bigint;
 	export let ownerName: string;
+	export let ownerHref = (name: string) =>
+		`/characters/${encodeURIComponent(name)}`;
+	$: leaderParts = $_('guilds.leader-label', {
+		values: { name: '\uFFFC' },
+	}).split('\uFFFC');
 </script>
 
 <div class="text-sm font-light text-surface-800-100-token">
 	<span class="flex flex-row items-center gap-1">
 		<Fa icon={faCrown} class="text-primary-600-300-token" />
-		{@html $_('guilds.leader-label', { values: { name: ownerName } })}
+		{#each leaderParts as part, index}
+			{#if index > 0}<a
+					class="text-semibold text-primary-600-300-token"
+					href={ownerHref(ownerName)}>{ownerName}</a
+				>{/if}{part}
+		{/each}
 	</span>
 	<span class="flex flex-row items-center gap-1">
 		<Fa icon={faCalendarAlt} class="text-tertiary-500 dark:text-tertiary-300" />
