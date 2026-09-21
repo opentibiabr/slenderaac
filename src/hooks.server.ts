@@ -21,40 +21,66 @@ const unauthorized = new Response(null, {
 async function updateInternationalPrices() {
 	const finish = startLogOperation('prices');
 	try {
-		const rates = await prisma.currencyExchangeRates.findMany({
-			select: { currency: true, rate: true },
-		});
-		for (const { currency, rate } of rates) {
-			const templateOffers = await prisma.coinOffers.findMany({
+		const [rates, templateOffers] = await Promise.all([
+			prisma.currencyExchangeRates.findMany({
+				select: { currency: true, rate: true },
+			}),
+			prisma.coinOffers.findMany({
 				where: { currency: 'USD' },
-			});
+			}),
+		]);
+
+		const upsertOperations = [];
+		for (const { currency, rate } of rates) {
 			for (const offer of templateOffers) {
-				await prisma.coinOffers.upsert({
-					where: { amount_currency: { amount: offer.amount, currency } },
-					update: {
-						price: offer.price.mul(rate),
-					},
-					create: {
-						...offer,
-						id: randomUUID(),
-						currency: currency,
-						price: offer.price.mul(rate),
-					},
-				});
+				upsertOperations.push(
+					prisma.coinOffers.upsert({
+						where: { amount_currency: { amount: offer.amount, currency } },
+						update: {
+							price: offer.price.mul(rate),
+						},
+						create: {
+							...offer,
+							id: randomUUID(),
+							currency,
+							price: offer.price.mul(rate),
+						},
+					}),
+				);
 			}
 		}
-		finish(`completed currencies=${rates.length}`);
+
+		await Promise.all(upsertOperations);
+		finish(
+			`completed currencies=${rates.length} offers=${templateOffers.length}`,
+		);
 	} catch (error) {
 		finish(`failed code=${errorCode(error)}`, 'error');
 	}
 }
+
+const PRICE_UPDATE_INTERVAL_MS = 12 * 60 * 60 * 1000;
 
 log(
 	'info',
 	'startup',
 	`SlenderAAC server hooks loaded; runtime=${process.version} pid=${process.pid} diagnostics=${diagnosticsEnabled}`,
 );
-void updateInternationalPrices();
+let internationalPriceUpdateInFlight: Promise<void> | null = null;
+
+function scheduleInternationalPriceUpdate() {
+	if (internationalPriceUpdateInFlight) return;
+
+	internationalPriceUpdateInFlight = updateInternationalPrices().finally(() => {
+		internationalPriceUpdateInFlight = null;
+	});
+}
+
+scheduleInternationalPriceUpdate();
+
+setInterval(() => {
+	scheduleInternationalPriceUpdate();
+}, PRICE_UPDATE_INTERVAL_MS);
 
 void checkDatabaseConfiguration(diagnosticsEnabled);
 
