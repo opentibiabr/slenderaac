@@ -22,10 +22,10 @@ import { AUTO_ADMIN_EMAIL } from '$env/static/private';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (() => {
+export const load = (async () => {
 	return {
 		title: 'Create Account',
-		availableTowns: getAvailableTowns(),
+		availableTowns: await getAvailableTowns(),
 	};
 }) satisfies PageServerLoad;
 

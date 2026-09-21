@@ -11,6 +11,10 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /outfits_anim
 cache.generated.txt
+/slender-dev.log
 /static/images/store
 /items
 *.patch
+/.codex/visual
+__pycache__/
+*.pyc

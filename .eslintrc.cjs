@@ -22,6 +22,16 @@ module.exports = {
 	ignorePatterns: ['*.cjs', '*.config.js'],
 	overrides: [
 		{
+			files: ['src/scripts/install-theme-assets*.js'],
+			rules: {
+				'@typescript-eslint/no-unsafe-argument': 'off',
+				'@typescript-eslint/no-unsafe-assignment': 'off',
+				'@typescript-eslint/no-unsafe-call': 'off',
+				'@typescript-eslint/no-unsafe-member-access': 'off',
+				'@typescript-eslint/no-unsafe-return': 'off',
+			},
+		},
+		{
 			files: ['*.svelte'],
 			parser: 'svelte-eslint-parser',
 			parserOptions: {

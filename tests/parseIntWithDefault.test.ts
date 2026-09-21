@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { parseIntWithDefault } from '../src/routes/api/outfits/parseIntWithDefault.ts';
+import { parseIntWithDefault } from '../src/routes/api/outfits/parseIntWithDefault';
 
 type TestCase = {
 	readonly description: string;

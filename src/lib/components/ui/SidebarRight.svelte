@@ -20,9 +20,9 @@
 	</header>
 	<hr class="opacity-5" />
 	<article class="py-2 px-4 flex flex-col gap-2">
-		{#each highscores as character, i}
+		{#each highscores as character, i (character.id)}
 			<a
-				href="/characters/{character.name}"
+				href={`/characters/${encodeURIComponent(character.name)}`}
 				class="flex flex-row items-center hover:bg-tertiary-400/50 -mx-4 px-4">
 				<span
 					class="badge-icon variant-filled !text-white"
@@ -76,9 +76,9 @@
 		</header>
 		<hr class="opacity-5" />
 		<article class="py-2 px-4 flex flex-col gap-2">
-			{#each accountCharacters as character}
+			{#each accountCharacters as character (character.id)}
 				<a
-					href="/characters/{character.name}"
+					href={`/characters/${encodeURIComponent(character.name)}`}
 					class="flex flex-row items-center hover:bg-tertiary-400/50 -mx-4 px-4">
 					<AnimatedOutfit
 						outfit={character}

@@ -25,9 +25,15 @@ body {
 	@apply relative z-0;
 }
 
-body {
+.layout-surface-cards .layout-surface-cards-content {
+	@apply relative z-10 m-auto overflow-auto max-w-6xl;
+}
+
+.layout-surface-cards .layout-surface-cards-background {
+	@apply fixed inset-0 z-0 pointer-events-none;
 	@apply bg-cover md:bg-[100%] bg-fixed bg-no-repeat bg-top;
-	background-image: url('/images/background-artwork.jpg'),
+	background-image:
+		url('/images/background-artwork.jpg'),
 		radial-gradient(
 			at 0% 0%,
 			rgb(var(--color-tertiary-500)) 0px,
@@ -45,21 +51,21 @@ body {
 		);
 }
 
-a[disabled='true'],
-buttoa[disabled='true'],
-button:disabled {
-	@apply opacity-50 cursor-not-allowed pointer-events-none;
-}
-
-.backdrop {
-	@apply fixed inset-0 z-0;
+.layout-surface-cards .layout-surface-cards-backdrop {
+	@apply fixed inset-0 z-0 pointer-events-none;
 	@apply w-full h-[100vh];
 	@apply backdrop-brightness-150;
 	@apply transition-all;
 }
 
-.dark .backdrop {
+.dark .layout-surface-cards .layout-surface-cards-backdrop {
 	@apply backdrop-brightness-50;
+}
+
+a[disabled='true'],
+button[disabled='true'],
+button:disabled {
+	@apply opacity-50 cursor-not-allowed pointer-events-none;
 }
 
 @layer components {
@@ -95,51 +101,59 @@ button:disabled {
 		@apply !border-t-2 !border-secondary-900/30 my-2 -mx-8 rounded-full;
 	}
 
-	.table-container .table {
+	.layout-surface-cards .table-container .table {
 		@apply rounded-none;
 	}
 
-	.table-container,
-	.data-table {
+	.layout-surface-cards .table tbody th {
+		@apply p-4;
+	}
+
+	.layout-surface-cards .table-container,
+	.layout-surface-cards .data-table {
 		@apply rounded-container-token;
 		@apply ring-0 border-2 border-surface-600;
 	}
 
-	.table-container .table thead {
+	.layout-surface-cards .table-container .table thead {
 		@apply bg-surface-500 dark:bg-surface-800;
 		@apply border-surface-500 dark:border-surface-800;
 	}
 
-	.table-container .table:not(.table-noeven) tbody,
-	.data-table {
+	.layout-surface-cards .table-container .table:not(.table-noeven) tbody,
+	.layout-surface-cards .data-table {
 		@apply bg-surface-400 dark:bg-surface-700;
 	}
 
-	.table-container .table:not(.table-noeven) tbody > *:nth-child(even),
-	.data-row:nth-child(even) {
+	.layout-surface-cards
+		.table-container
+		.table:not(.table-noeven)
+		tbody
+		> *:nth-child(even),
+	.layout-surface-cards .data-row:nth-child(even) {
 		@apply bg-surface-500 dark:bg-surface-800;
 	}
 
-	.data-table {
+	.layout-surface-cards .data-table {
 		@apply flex flex-col gap-0 items-center justify-center justify-items-center;
 	}
-	.data-row {
+	.layout-surface-cards .data-row {
 		@apply flex flex-row items-stretch w-full;
 	}
-	.data-row dt,
-	.data-row dd {
+	.layout-surface-cards .data-row dt,
+	.layout-surface-cards .data-row dd {
 		@apply p-2;
 	}
-	.data-row dt {
+	.layout-surface-cards .data-row dt {
 		@apply font-bold flex-1 text-right;
 	}
-	.data-row dd {
+	.layout-surface-cards .data-row dd {
 		@apply flex-1;
 	}
-	.data-row:first-child {
+	.layout-surface-cards .data-row:first-child {
 		@apply !rounded-t-lg;
 	}
-	.data-row:last-child {
+	.layout-surface-cards .data-row:last-child {
 		@apply !rounded-b-lg;
 	}
 

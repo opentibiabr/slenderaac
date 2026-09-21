@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 
-	import { enhance } from '$lib/enchance';
 	import { goto } from '$app/navigation';
 
 	import Button from '$lib/components/ui/Button.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
+	import { enhance } from '$lib/enchance';
 
 	import type { ActionData, PageData } from './$types';
 
@@ -16,7 +16,7 @@
 	$: guild = data.guild;
 
 	function close() {
-		guild && void goto(`/guilds/${guild.name}`);
+		guild && void goto(`/guilds/${encodeURIComponent(guild.name)}`);
 	}
 </script>
 
@@ -48,8 +48,10 @@
 			</div>
 
 			<div class="flex flex-row justify-end gap-2">
-				<Button href="/guilds/{guild.name}" color="primary" variant="ringed"
-					>{$_('guilds.cancel-disband')}</Button>
+				<Button
+					href={`/guilds/${encodeURIComponent(guild.name)}`}
+					color="primary"
+					variant="ringed">{$_('guilds.cancel-disband')}</Button>
 				<Button color="error"
 					>{$_('guilds.confirm-disband', {
 						values: { name: guild.name },

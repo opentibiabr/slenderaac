@@ -4,9 +4,14 @@ import { authenticator } from 'otplib';
 import parseDuration from 'parse-duration';
 
 import { PlayerGroup, PlayerSex, vocationString } from '$lib/players';
+import {
+	boostedClientResponse,
+	loadBoostedSelections,
+} from '$lib/server/boosted';
 import { requireEmailVerification } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { comparePassword } from '$lib/server/utils';
+import { serverName } from '$lib/server/worlds';
 
 import {
 	DEPRECATED_USE_SHA1_PASSWORDS,
@@ -14,7 +19,6 @@ import {
 	GAME_SESSION_EXPIRATION_TIME,
 	PVP_TYPE,
 	SERVER_ADDRESS,
-	SERVER_NAME,
 	SERVER_PORT,
 } from '$env/static/private';
 
@@ -132,17 +136,7 @@ async function handleCacheInfo() {
 }
 
 async function handleBoostedCreature() {
-	const boostedCreature = await prisma.boostedCreature.findFirstOrThrow({
-		select: { raceid: true },
-	});
-	const boostedBoss = await prisma.boostedBoss.findFirstOrThrow({
-		select: { raceid: true },
-	});
-	return {
-		boostedcreature: true,
-		creatureraceid: Number(boostedCreature.raceid),
-		bossraceid: Number(boostedBoss.raceid),
-	};
+	return boostedClientResponse(await loadBoostedSelections());
 }
 
 async function handleLogin(
@@ -243,7 +237,7 @@ async function handleLogin(
 			worlds: [
 				{
 					id: 0,
-					name: SERVER_NAME,
+					name: await serverName(),
 					externaladdress: SERVER_ADDRESS,
 					externalport: serverPort,
 					externaladdressprotected: SERVER_ADDRESS,
