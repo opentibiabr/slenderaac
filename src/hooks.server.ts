@@ -66,10 +66,20 @@ log(
 	'startup',
 	`SlenderAAC server hooks loaded; runtime=${process.version} pid=${process.pid} diagnostics=${diagnosticsEnabled}`,
 );
-void updateInternationalPrices();
+let internationalPriceUpdateInFlight: Promise<void> | null = null;
+
+function scheduleInternationalPriceUpdate() {
+	if (internationalPriceUpdateInFlight) return;
+
+	internationalPriceUpdateInFlight = updateInternationalPrices().finally(() => {
+		internationalPriceUpdateInFlight = null;
+	});
+}
+
+scheduleInternationalPriceUpdate();
 
 const internationalPriceUpdateInterval = setInterval(() => {
-	void updateInternationalPrices();
+	scheduleInternationalPriceUpdate();
 }, PRICE_UPDATE_INTERVAL_MS);
 
 process.on('SIGTERM', () => {
