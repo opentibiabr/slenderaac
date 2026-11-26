@@ -4,7 +4,45 @@ SlenderAAC must read and write the same database as the running game server.
 Separate databases can both contain valid tables while only one receives daily
 boosted selections, character updates and other live data.
 
-## Recommended configuration
+## Separate site and migration credentials
+
+In a managed deployment, create a dedicated MySQL account for the site and
+another for migrations. Set the site connection in its service environment or
+`.env`. For example:
+
+```dotenv
+DATABASE_CREDENTIAL_MODE=separate
+DATABASE_URL="mysql://site_user:site_password@db.example:3306/game_world"
+```
+
+In separate mode, `DATABASE_URL` always selects the website connection,
+including development, build, preview and Prisma Client generation.
+`SERVER_CONFIG_FILE` does not override it. Set `DATABASE_MIGRATION_URL` only
+in the environment of the process running `migrate`, `migrate:resolve` or
+`migrate:dev`. Keep it out of the site's environment and shared `.env` files.
+For separated deployments, run these package commands as dedicated steps so the
+migration secret is available only to the migration step.
+
+Both URLs must specify a username and password, use different MySQL usernames,
+and select the same schema name. Different hosts or proxies can legitimately
+point to the same server. Verify both connections resolve to the same game
+database before migration. A matching schema name alone cannot distinguish
+different instances. Percent-encode special characters in the URLs.
+
+Grant the site account only the reads and writes used by its enabled features,
+including account and character changes, site and game sessions, and the shop
+when enabled. Keep schema changes and grant administration outside the site
+account. Give the migration account the schema privileges needed by the SQL in
+the upgrade path and access to Prisma's migration history table. A first
+installation over Canary runs historical SQL that includes routines and trigger
+changes. Validate permissions on a disposable copy before changing a deployed
+service. Use `migrate:dev` only in an isolated developer database, where Prisma
+also needs a disposable shadow database.
+
+## Legacy configuration
+
+Leaving `DATABASE_CREDENTIAL_MODE` unset or setting it to `legacy` keeps the
+shared connection setup.
 
 From the SlenderAAC repository root, set the path to the **actual `config.lua`
 loaded by the game server** in `.env`. For sibling checkouts:
@@ -36,7 +74,7 @@ only fallback; the application does not search other installations or infer the
 database from a catalog export. An available database with seed rows is not
 evidence that it is the correct game database.
 
-## Website and migrations use the same source
+## Package commands
 
 Keep using the package commands from the repository root:
 
@@ -46,14 +84,13 @@ npm run generate
 npm run dev -- --host 127.0.0.1 --port 80
 ```
 
-The same resolver prepares `dev`, `build`, `preview`, `generate`, `migrate`,
-`migrate:dev` and `migrate:resolve`. Bun's corresponding package commands work
-too. Command arguments and exit codes are preserved. The migration commands
-only run when explicitly invoked; website startup does not migrate, seed,
-copy databases or modify either configuration file.
+The same resolver chooses the appropriate credentials for `dev`, `build`,
+`preview`, `generate`, `migrate`, `migrate:dev` and `migrate:resolve`.
+Bun's corresponding package commands work too. Command arguments and exit
+codes are preserved. Migrations run only through an explicit migration command.
 
 Use these package commands instead of invoking `prisma` directly: the Prisma CLI
-alone reads `DATABASE_URL` from its schema and does not load the game configuration.
+alone reads `DATABASE_URL` from its schema and bypasses the credential selection.
 For initial setup, the selected database must already contain the game server's
 schema; follow the [beginner setup sequence](getting-started.md#3-prepare-the-website-tables).
 

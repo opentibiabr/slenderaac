@@ -8,7 +8,11 @@ import {
 	lockWebSessionAccount,
 	setWebSessionCookie,
 } from '$lib/server/session';
-import { check2faToken, comparePassword } from '$lib/server/utils';
+import {
+	check2faToken,
+	comparePassword,
+	migrateAuthenticatedPassword,
+} from '$lib/server/utils';
 import {
 	presenceValidator,
 	stringValidator,
@@ -80,6 +84,7 @@ export const actions: Actions = {
 					id: true,
 					type: true,
 					email: true,
+				is_verified: true,
 					password: true,
 					token_secret: true,
 				},
@@ -87,7 +92,8 @@ export const actions: Actions = {
 			if (
 				!current ||
 				current.email !== account.email ||
-				current.password !== account.password ||
+				(current.password !== account.password &&
+					!comparePassword(password, current.password)) ||
 				current.token_secret !== account.token_secret
 			) {
 				return { type: 'credentials-changed' } as const;
@@ -101,6 +107,7 @@ export const actions: Actions = {
 			}
 			return {
 				type: 'session',
+				account: current,
 				sid: await createWebSession(client, current),
 			} as const;
 		});
@@ -116,6 +123,7 @@ export const actions: Actions = {
 		}
 
 		setWebSessionCookie(cookies, result.sid);
+		await migrateAuthenticatedPassword(result.account, password);
 		throw redirect(302, returnTo);
 	},
 } satisfies Actions;
