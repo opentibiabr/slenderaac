@@ -7,6 +7,7 @@ import invariant from 'tiny-invariant';
 
 import { CoinTransactionType } from '$lib/coinTransactions';
 import { prisma } from '$lib/server/prisma';
+import { matchesStripeOrderPrice } from '$lib/server/shop-stripe-price';
 import { stripe } from '$lib/server/stripe';
 
 import { STRIPE_WEBHOOK_SECRET } from '$env/static/private';
@@ -65,6 +66,11 @@ async function handlePaymentSuccess(
 	const order = await prisma.coinOrders.findUnique({
 		where: { payment_token: event.data.object.id },
 	});
+
+	if (order && !matchesStripeOrderPrice(order, event.data.object)) {
+		console.warn('Stripe coin order amount or currency mismatch', order.id);
+		return;
+	}
 
 	if (!order) {
 		console.error('Order not found', event.data.object.id);

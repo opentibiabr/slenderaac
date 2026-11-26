@@ -11,6 +11,7 @@ import { isStep, stepIsAtOrAfter } from '$lib/payments';
 import { enableStripeCheckout, enableStripeCustom } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
+import { quoteStripePrice } from '$lib/server/shop-stripe-price';
 import { stripe } from '$lib/server/stripe';
 import { serverName } from '$lib/server/worlds';
 import { layoutLoginHref } from '$lib/themes/navigation';
@@ -31,13 +32,24 @@ export const load = (async ({ locals, url, depends }) => {
 	requireLogin(locals, '', layoutLoginHref(url));
 
 	const offers = groupBy(
-		(await prisma.coinOffers.findMany({ orderBy: { amount: 'asc' } })).map(
-			(offer): CoinOffer => ({
-				id: offer.id,
-				currency: offer.currency,
-				amount: offer.amount,
-				price: formatCurrency(offer.price.toNumber(), offer.currency),
-			}),
+		(await prisma.coinOffers.findMany({ orderBy: { amount: 'asc' } })).flatMap(
+			(offer): CoinOffer[] => {
+				const quote = quoteStripePrice(offer);
+				if (!quote) return [];
+
+				return [
+					{
+						id: offer.id,
+						currency: offer.currency,
+						amount: offer.amount,
+						price: formatCurrency(
+							quote.majorAmount,
+							quote.currency,
+							quote.fractionDigits,
+						),
+					},
+				];
+			},
 		),
 		'currency',
 	);
@@ -131,10 +143,15 @@ export const actions = {
 		let token: string | null;
 		let redirectURL: string | null = null;
 
-		const offer = await prisma.coinOffers.findUniqueOrThrow({
+		const selectedOffer = await prisma.coinOffers.findUniqueOrThrow({
 			where: { id: offerId },
 		});
+		const quote = quoteStripePrice(selectedOffer);
+		if (!quote) {
+			throw error(422, { message: 'Invalid offer price or currency' });
+		}
 
+		const offer = { ...selectedOffer, quote };
 		switch (paymentMethod) {
 			case 'stripe':
 				({ token, clientSecret } = await handleStripe(
@@ -158,7 +175,8 @@ export const actions = {
 			data: {
 				account: { connect: { id: locals.session?.accountId } },
 				price: offer.price,
-				currency: offer.currency,
+				currency: quote.currency,
+				stripe_amount_minor: BigInt(quote.amount),
 				amount: offer.amount,
 				status: CoinOrderStatus.PENDING,
 				payment_token: token,
@@ -181,12 +199,16 @@ export const actions = {
 	},
 } satisfies Actions;
 
-async function handleStripe(accountEmail: string, offer: CoinOffers) {
+type StripeOffer = CoinOffers & {
+	quote: NonNullable<ReturnType<typeof quoteStripePrice>>;
+};
+
+async function handleStripe(accountEmail: string, offer: StripeOffer) {
 	invariant(stripe, 'Stripe not enabled');
 
 	const paymentIntent = await stripe.paymentIntents.create({
-		amount: Number(offer.price.toString().replace('.', '')),
-		currency: offer.currency.toLowerCase(),
+		amount: offer.quote.amount,
+		currency: offer.quote.currency,
 		receipt_email: accountEmail,
 		description: `Purchase of ${offer.amount} ${await serverName()} Coins`,
 		statement_descriptor_suffix: `${PUBLIC_TITLE} Coins`,
@@ -198,7 +220,7 @@ async function handleStripe(accountEmail: string, offer: CoinOffers) {
 	return { token: paymentIntent.id, clientSecret: paymentIntent.client_secret };
 }
 
-async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
+async function handleStripeCheckout(accountEmail: string, offer: StripeOffer) {
 	invariant(stripe, 'Stripe not enabled');
 	const returnPath = '/shop/coins/?step=confirmation';
 	const redirectURL = new URL(returnPath, PUBLIC_BASE_URL).href;
@@ -206,11 +228,11 @@ async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
 		line_items: [
 			{
 				price_data: {
-					currency: offer.currency.toLowerCase(),
+					currency: offer.quote.currency,
 					product_data: {
 						name: `${offer.amount} ${await serverName()} Coins`,
 					},
-					unit_amount: Number(offer.price.toFixed(2).replace('.', '')),
+					unit_amount: offer.quote.amount,
 				},
 				quantity: 1,
 			},

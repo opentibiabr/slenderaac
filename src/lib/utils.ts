@@ -124,12 +124,19 @@ export function parseDate(timestamp: bigint | number) {
  * Format currency to string.
  * @param amount The amount to format.
  * @param currency The currency to format to.
+ * @param fractionDigits The precision to show, when different from ISO defaults.
  * @returns The formatted currency string.
  */
-export function formatCurrency(amount: number, currency: string) {
+export function formatCurrency(
+	amount: number,
+	currency: string,
+	fractionDigits?: number,
+) {
 	return new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency,
+		minimumFractionDigits: fractionDigits,
+		maximumFractionDigits: fractionDigits,
 	}).format(amount);
 }
 
