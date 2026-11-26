@@ -10,7 +10,10 @@ import {
 } from '$lib/server/boosted';
 import { requireEmailVerification } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
-import { comparePassword } from '$lib/server/utils';
+import {
+	comparePassword,
+	migrateAuthenticatedPassword,
+} from '$lib/server/utils';
 import { serverName } from '$lib/server/worlds';
 
 import {
@@ -212,6 +215,7 @@ async function handleLogin(
 				expires: Math.trunc((Date.now() + SESSION_DURATION) / 1000), // convert to seconds
 			},
 		});
+		await migrateAuthenticatedPassword(account, params.password);
 	}
 
 	const serverPort = parseInt(SERVER_PORT) ?? 7172;
