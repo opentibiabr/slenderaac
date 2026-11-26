@@ -43,6 +43,13 @@ cd slenderaac
 bun install --frozen-lockfile
 ```
 
+Use the Bun version recorded in `.bun-version`. To see the known advisories
+for the locked dependencies, including development dependencies, run
+`bun run audit:dependencies`. The audit reads `bun.lock` and queries the
+registry without installing packages. On pull requests the same check compares
+the result with the target branch and fails for newly introduced high or
+critical advisories. Main branch and scheduled runs report the full backlog.
+
 Run all remaining commands from this `slenderaac` folder, where `package.json`
 is located. Leave the game server and image packs outside this folder.
 
