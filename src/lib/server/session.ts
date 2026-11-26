@@ -1,4 +1,5 @@
 import { type Cookies, redirect } from '@sveltejs/kit';
+import { createHash, randomBytes } from 'node:crypto';
 import invariant from 'tiny-invariant';
 
 import { AccountType, isAccountType } from '$lib/accounts';
@@ -14,10 +15,29 @@ export type SessionInfo = {
 };
 type Sid = string;
 
+export const WEB_SESSION_COOKIE = 'sid';
+const webSessionCookieOptions = {
+	path: '/',
+	httpOnly: true,
+	sameSite: 'lax',
+} as const;
+const webSessionMaxAgeSeconds = 60 * 60 * 24 * 30;
+
+function webSessionId(sid: Sid) {
+	if (sid.length !== 46 || !/^v2\.[A-Za-z0-9_-]{43}$/.test(sid)) return;
+	return `v2:${createHash('sha256').update(sid).digest('hex')}`;
+}
+
 export async function performLogin(cookies: Cookies, email: string) {
-	const maxAgeSeconds = 60 * 60 * 24 * 30; // 30 days
-	const sid = await createSession(email, maxAgeSeconds);
-	cookies.set('sid', sid, { path: '/', maxAge: maxAgeSeconds });
+	const sid = await createSession(email, webSessionMaxAgeSeconds);
+	cookies.set(WEB_SESSION_COOKIE, sid, {
+		...webSessionCookieOptions,
+		maxAge: webSessionMaxAgeSeconds,
+	});
+}
+
+export function clearWebSessionCookie(cookies: Cookies) {
+	cookies.delete(WEB_SESSION_COOKIE, webSessionCookieOptions);
 }
 
 export async function createSession(
@@ -31,42 +51,44 @@ export async function createSession(
 	invariant(isAccountType(account.type), 'Invalid account type');
 
 	const expiresAt = Date.now() + maxAgeSeconds * 1000;
-	const session = await prisma.accountSessions.create({
+	const sid = `v2.${randomBytes(32).toString('base64url')}`;
+	const id = webSessionId(sid);
+	invariant(id, 'Invalid generated web session token');
+	await prisma.accountSessions.create({
 		data: {
+			id,
 			account_id: account.id,
 			expires: expiresAt,
 		},
 	});
-	return session.id;
+	return sid;
 }
 
 export async function deleteSession(sid: Sid) {
-	await prisma.accountSessions.deleteMany({ where: { id: sid } });
+	const id = webSessionId(sid);
+	if (id) await prisma.accountSessions.deleteMany({ where: { id } });
 }
 
 export async function getSession(sid: Sid): Promise<SessionInfo | undefined> {
+	const id = webSessionId(sid);
+	if (!id) return;
 	const session = await prisma.accountSessions.findUnique({
-		where: { id: sid },
+		where: { id },
 		include: { account: { select: { id: true, email: true, type: true } } },
 	});
 
-	if (session) {
-		const expires = Number(session.expires);
-		if (Date.now() > expires) {
-			await deleteSession(sid);
-			return undefined;
-		} else {
-			const sessionInfo: SessionInfo = {
-				accountId: session.account.id,
-				email: session.account.email,
-				type: session.account.type,
-				expires,
-			};
-			return sessionInfo;
-		}
-	} else {
-		return undefined;
+	if (!session) return;
+	const expires = Number(session.expires);
+	if (Date.now() >= expires) {
+		await deleteSession(sid);
+		return;
 	}
+	return {
+		accountId: session.account.id,
+		email: session.account.email,
+		type: session.account.type,
+		expires,
+	};
 }
 
 const cleanInterval = 1000 * 60 * 60; // 1 hour
@@ -74,7 +96,7 @@ async function clean() {
 	const finish = startLogOperation('sessions.cleanup');
 	try {
 		const { count } = await prisma.accountSessions.deleteMany({
-			where: { expires: { lt: Date.now() } },
+			where: { expires: { lte: Date.now() } },
 		});
 		finish(`completed removed=${count}`);
 	} catch (error) {

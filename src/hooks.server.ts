@@ -8,7 +8,12 @@ import { checkDatabaseConfiguration } from '$lib/server/database-config';
 import { diagnosticsEnabled, diagnosticStep } from '$lib/server/diagnostics';
 import { errorCode, log, startLogOperation } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
-import { getSession, requireLogin } from '$lib/server/session';
+import {
+	clearWebSessionCookie,
+	getSession,
+	requireLogin,
+	WEB_SESSION_COOKIE,
+} from '$lib/server/session';
 import { preserveLayoutSelectionRedirect } from '$lib/server/theme-assets/selection-redirect';
 
 const unauthorized = new Response(null, {
@@ -92,7 +97,10 @@ export const handle = (async ({ event, resolve }) => {
 	}
 
 	const { cookies, url } = event;
-	const sid = cookies.get('sid');
+	const sid =
+		event.route.id === '/api/login'
+			? undefined
+			: cookies.get(WEB_SESSION_COOKIE);
 	if (sid) {
 		const session = await diagnosticStep('request.session', () =>
 			getSession(sid),
@@ -100,7 +108,7 @@ export const handle = (async ({ event, resolve }) => {
 		if (session) {
 			event.locals.session = session;
 		} else {
-			cookies.delete('sid', { path: '/' });
+			clearWebSessionCookie(cookies);
 		}
 	}
 
