@@ -3,10 +3,13 @@ import invariant from 'tiny-invariant';
 
 import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
-import { performLogin } from '$lib/server/session';
+import {
+	createWebSession,
+	lockWebSessionAccount,
+	setWebSessionCookie,
+} from '$lib/server/session';
 import { check2faToken, comparePassword } from '$lib/server/utils';
 import {
-	numberValidator,
 	presenceValidator,
 	stringValidator,
 	validate,
@@ -37,7 +40,7 @@ export const actions: Actions = {
 			{
 				email: [presenceValidator, stringValidator],
 				password: [presenceValidator, stringValidator],
-				token: [numberValidator],
+				token: [stringValidator],
 			},
 			data,
 		);
@@ -45,7 +48,8 @@ export const actions: Actions = {
 		if (Object.keys(errors).length > 0) {
 			return fail(400, {
 				invalid: true,
-				tokenRequired: Boolean(token),
+				tokenRequired: Boolean(token) && typeof email === 'string',
+				email: typeof email === 'string' ? email : undefined,
 				errors: errors,
 			});
 		}
@@ -58,31 +62,60 @@ export const actions: Actions = {
 
 		const account = await prisma.accounts.findUnique({
 			where: { email },
+			select: { id: true, email: true, password: true, token_secret: true },
 		});
 
 		if (!account || !comparePassword(password, account.password)) {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}
-		if (account.token_secret) {
-			if (!token) {
-				return {
-					tokenRequired: true,
-					email,
-					password,
-				};
-			} else if (!(await check2faToken(token, account.id))) {
-				return fail(400, {
-					tokenRequired: true,
-					email,
-					password,
-					errors: {
-						token: [$_('invalid-token')],
-					} as Record<string, string[]>,
-				});
-			}
+		if (account.token_secret && !token) {
+			return { tokenRequired: true, email };
 		}
 
-		await performLogin(cookies, account.email);
+		const result = await prisma.$transaction(async (client) => {
+			await lockWebSessionAccount(client, account.id);
+			const current = await client.accounts.findUnique({
+				where: { id: account.id },
+				select: {
+					id: true,
+					type: true,
+					email: true,
+					password: true,
+					token_secret: true,
+				},
+			});
+			if (
+				!current ||
+				current.email !== account.email ||
+				current.password !== account.password ||
+				current.token_secret !== account.token_secret
+			) {
+				return { type: 'credentials-changed' } as const;
+			}
+			if (
+				current.token_secret &&
+				(!token ||
+					!(await check2faToken(token, current.id, true, true, client)))
+			) {
+				return { type: 'invalid-token' } as const;
+			}
+			return {
+				type: 'session',
+				sid: await createWebSession(client, current),
+			} as const;
+		});
+		if (result.type === 'credentials-changed') {
+			return fail(400, { errors: { global: ['Invalid email or password'] } });
+		}
+		if (result.type === 'invalid-token') {
+			return fail(400, {
+				tokenRequired: true,
+				email,
+				errors: { token: [$_('invalid-token')] } as Record<string, string[]>,
+			});
+		}
+
+		setWebSessionCookie(cookies, result.sid);
 		throw redirect(302, returnTo);
 	},
 } satisfies Actions;
