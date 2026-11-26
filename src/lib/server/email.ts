@@ -3,7 +3,6 @@ import type { ComponentProps } from 'svelte';
 import {
 	createTestAccount,
 	createTransport,
-	getTestMessageUrl,
 	type Transporter,
 } from 'nodemailer';
 import { render } from 'svelte-email';
@@ -38,7 +37,6 @@ export async function sendMail(to: string, template: EmailTemplate) {
 	});
 
 	console.log('Message sent: %s', info.messageId);
-	console.log('Preview URL: %s', getTestMessageUrl(info));
 }
 
 export async function sendVerificationEmail(to: string, token: string) {
