@@ -4,7 +4,11 @@ import invariant from 'tiny-invariant';
 import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
 import { performLogin } from '$lib/server/session';
-import { check2faToken, comparePassword } from '$lib/server/utils';
+import {
+	check2faToken,
+	comparePassword,
+	migrateAuthenticatedPassword,
+} from '$lib/server/utils';
 import {
 	numberValidator,
 	presenceValidator,
@@ -83,6 +87,7 @@ export const actions: Actions = {
 		}
 
 		await performLogin(cookies, account.email);
+		await migrateAuthenticatedPassword(account, password);
 		throw redirect(302, returnTo);
 	},
 } satisfies Actions;
