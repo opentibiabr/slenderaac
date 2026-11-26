@@ -18,8 +18,6 @@ import {
 	validate,
 } from '$lib/server/validations';
 
-import { AUTO_ADMIN_EMAIL } from '$env/static/private';
-
 import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async () => {
@@ -115,15 +113,13 @@ export const actions = {
 			});
 		}
 
-		const isAdmin = email === AUTO_ADMIN_EMAIL;
-
 		const created = await prisma.accounts.create({
 			data: {
 				email,
 				password: hashedPassword,
 				creation: Math.trunc(Date.now() / 1000),
 
-				type: isAdmin ? AccountType.God : AccountType.Normal,
+				type: AccountType.Normal,
 
 				players: {
 					createMany: {
