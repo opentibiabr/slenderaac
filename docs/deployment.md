@@ -66,7 +66,7 @@ server {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
@@ -80,6 +80,24 @@ can serve the same role.
 After deployment, check the public pages, login/forms and the
 [asset URLs](classic-assets.md#store-and-animation-checks). Use
 [diagnostics](diagnostics.md) if requests fail or live data is unavailable.
+
+### Login rate limits
+
+Web and game login share short-lived rate limits in the website database.
+The defaults allow 120 login submissions per address over one minute,
+20 password checks per account over two minutes, and eight second-factor
+checks per account over three minutes. Opening the second-factor prompt
+without a code uses no second-factor attempt. Game news, cache info, boosted
+creatures and the event schedule retain their usual request handling.
+
+For the single Nginx proxy shown above, set `ADDRESS_HEADER=x-forwarded-for`
+and `XFF_DEPTH=1` in the Node service environment. Keep the Node listener
+private and have the trusted proxy supply the client IP. For a proxy chain, set
+the depth to match the trusted hops and verify the resolved address before
+serving users. With a direct Node listener, leave `ADDRESS_HEADER` unset so
+the adapter uses the peer address. When the configured header is unavailable,
+login requests share a fallback address bucket. An incorrect proxy
+configuration can make unrelated players share a limit.
 
 ## Update an existing service
 

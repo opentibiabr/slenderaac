@@ -5,6 +5,7 @@ import {
 	verifyAccountFactor,
 	withLockedAccount,
 } from '$lib/server/account-2fa';
+import { allowLoginAttempt } from '$lib/server/login-attempts';
 import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
 import { createSessionForAccount, setLoginCookie } from '$lib/server/session';
@@ -28,8 +29,14 @@ export const load: PageServerLoad = ({ locals }) => {
 	};
 };
 
+const tryAgainLater = 'Too many login attempts. Try again later.';
+
 export const actions: Actions = {
-	default: async ({ url, cookies, request }) => {
+	default: async ({ url, cookies, request, getClientAddress }) => {
+		if (!(await allowLoginAttempt('source', getClientAddress))) {
+			return fail(429, { errors: { global: [tryAgainLater] } });
+		}
+
 		const data = await request.formData();
 		let email = data.get('email');
 		const password = data.get('password');
@@ -60,7 +67,11 @@ export const actions: Actions = {
 			where: { email },
 		});
 
-		if (!account || !comparePassword(password, account.password)) {
+		if (
+			!account ||
+			!(await allowLoginAttempt('password', account.id)) ||
+			!comparePassword(password, account.password)
+		) {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}
 		const result = await withLockedAccount(
@@ -76,6 +87,9 @@ export const actions: Actions = {
 				}
 				if (current.token_secret) {
 					if (!token) return { kind: 'challenge' } as const;
+					if (!(await allowLoginAttempt('factor', current.id, tx))) {
+						return { kind: 'limited' } as const;
+					}
 					if (
 						typeof token !== 'string' ||
 						!(await verifyAccountFactor(tx, current, token))
@@ -92,12 +106,15 @@ export const actions: Actions = {
 		}
 		if (result.kind === 'challenge')
 			return { tokenRequired: true, email, password };
-		if (result.kind === 'factor') {
-			return fail(400, {
+		if (result.kind === 'factor' || result.kind === 'limited') {
+			const limited = result.kind === 'limited';
+			return fail(limited ? 429 : 400, {
 				tokenRequired: true,
 				email,
 				password,
-				errors: { token: [$_('invalid-token')] } as Record<string, string[]>,
+				errors: {
+					token: [limited ? tryAgainLater : $_('invalid-token')],
+				} as Record<string, string[]>,
 			});
 		}
 
