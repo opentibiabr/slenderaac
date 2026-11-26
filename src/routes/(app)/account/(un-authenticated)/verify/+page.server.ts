@@ -3,7 +3,6 @@ import { redirect } from 'sveltekit-flash-message/server';
 import invariant from 'tiny-invariant';
 
 import { prisma } from '$lib/server/prisma';
-import { performLogin } from '$lib/server/session';
 import {
 	emailValidator,
 	presenceValidator,
@@ -36,7 +35,7 @@ export const load = (async ({ url }) => {
 
 export const actions: Actions = {
 	default: async (event) => {
-		const { request, cookies } = event;
+		const { request, locals } = event;
 
 		const data = await request.formData();
 		const email = data.get('email');
@@ -86,12 +85,8 @@ export const actions: Actions = {
 				where: { account_id: account.id },
 			}),
 		]);
-		const sessionEmail = newEmail || account.email;
-
-		await performLogin(cookies, sessionEmail);
-
 		throw redirect(
-			'/account',
+			locals.session ? '/account' : '/account/login',
 			{
 				type: 'success',
 				message: 'Your email has been verified.',
