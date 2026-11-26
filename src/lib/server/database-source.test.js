@@ -157,3 +157,77 @@ void test('a configured file never falls back after read, syntax, field or dynam
 			/DATABASE_URL was not used/,
 		);
 });
+
+const separated = Object.freeze({
+	DATABASE_CREDENTIAL_MODE: 'separate',
+	DATABASE_URL:
+		'mysql://site:site-secret@proxy:3306/game%5Fworld?connection_limit=3',
+	DATABASE_MIGRATION_URL: 'mysql://migrator:ddl-secret@server:3307/game_world',
+	SERVER_CONFIG_FILE: './missing-config.lua',
+});
+
+void test('separate credentials preserve each connection and skip the config.lua fallback', () => {
+	assert.deepEqual(
+		resolveDatabaseConfiguration({
+			...separated,
+			DATABASE_MIGRATION_URL: undefined,
+		}),
+		{
+			url: separated.DATABASE_URL,
+			database: 'game_world',
+			source: 'DATABASE_URL',
+			warning: null,
+		},
+	);
+	assert.deepEqual(resolveDatabaseConfiguration(separated, 'migration'), {
+		url: separated.DATABASE_MIGRATION_URL,
+		database: 'game_world',
+		source: 'DATABASE_MIGRATION_URL',
+		warning: null,
+	});
+});
+
+void test('separate credentials reject incomplete, shared or inconsistent settings without exposing secrets', () => {
+	/** @type {[Record<string, string | undefined>, RegExp][]} */
+	const cases = [
+		[
+			{ DATABASE_CREDENTIAL_MODE: 'unexpected' },
+			/Set DATABASE_CREDENTIAL_MODE/,
+		],
+		[{ DATABASE_CREDENTIAL_MODE: undefined }, /to use DATABASE_MIGRATION_URL/],
+		[{ DATABASE_URL: undefined }, /valid MySQL DATABASE_URL/],
+		[
+			{ DATABASE_MIGRATION_URL: undefined },
+			/valid MySQL DATABASE_MIGRATION_URL/,
+		],
+		[
+			{
+				DATABASE_MIGRATION_URL:
+					'mysql://migrator:ddl-secret@host/another_world',
+			},
+			/same database name/,
+		],
+		[
+			{ DATABASE_MIGRATION_URL: 'mysql://%73ite:ddl-secret@host/game_world' },
+			/different MySQL usernames/,
+		],
+		[
+			{ DATABASE_MIGRATION_URL: 'mysql://migrator:%ZZ@host/game_world' },
+			/valid MySQL DATABASE_MIGRATION_URL/,
+		],
+	];
+	for (const [overrides, expected] of cases)
+		assert.throws(
+			() =>
+				resolveDatabaseConfiguration(
+					{ ...separated, ...overrides },
+					'migration',
+				),
+			(error) => {
+				assert.ok(error instanceof Error);
+				assert.match(error.message, expected);
+				assert.doesNotMatch(error.message, /secret|mysql:\/\//);
+				return true;
+			},
+		);
+});
