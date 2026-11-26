@@ -90,7 +90,9 @@ export const actions: Actions = {
 			include: { account: true },
 		});
 		const invalidToken = () =>
-			fail(400, { errors: { global: ['Invalid reset password token.'] } });
+			fail<{ errors: Record<string, string[]> }>(400, {
+				errors: { global: ['Invalid reset password token.'] },
+			});
 		if (
 			!reset?.account ||
 			reset.account.email !== email ||
