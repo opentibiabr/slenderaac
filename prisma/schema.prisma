@@ -961,6 +961,7 @@ model CoinOrders {
   account_id    Int             @db.UnsignedInt
   price         Decimal
   currency      String          @default("USD")
+  stripe_amount_minor BigInt?   @db.UnsignedBigInt
   amount        Int             @default(0)
   created_at    DateTime        @default(now())
   updated_at    DateTime        @default(now()) @updatedAt
