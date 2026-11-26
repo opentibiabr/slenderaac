@@ -2,8 +2,17 @@ import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import invariant from 'tiny-invariant';
 
+import {
+	credentialChangeRejected,
+	reauthenticateCredentialChange,
+} from '$lib/server/credential-change';
+import { errorCode, log } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
-import { requireLogin } from '$lib/server/session';
+import {
+	clearWebSessionCookie,
+	requireLogin,
+	revokeWebSessions,
+} from '$lib/server/session';
 import { comparePassword, hashPassword } from '$lib/server/utils';
 import {
 	presenceValidator,
@@ -13,19 +22,20 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (() => {
-	return {};
+export const load = (async ({ parent }) => {
+	return { tokenRequired: (await parent()).account.is2faEnabled };
 }) satisfies PageServerLoad;
 
 export const actions = {
 	default: async (event) => {
-		const { request, locals } = event;
+		const { request, locals, cookies } = event;
 		requireLogin(locals);
 
 		const data = await request.formData();
 		const currentPassword = data.get('currentPassword');
 		const newPassword = data.get('newPassword');
 		const newPasswordConfirm = data.get('newPasswordConfirm');
+		const token = data.get('token');
 
 		const errors = await validate(
 			{
@@ -34,72 +44,71 @@ export const actions = {
 				newPasswordConfirm: [
 					presenceValidator,
 					stringValidator,
-					(value) => {
-						if (value !== newPassword) {
-							return 'Passwords do not match';
-						}
-						return null;
-					},
+					(value) => (value === newPassword ? null : 'Passwords do not match'),
 				],
 			},
 			data,
 		);
-
 		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+			return fail(400, { invalid: true, errors });
 		}
 
-		invariant(
-			currentPassword && newPassword && newPasswordConfirm,
-			'Missing required fields',
-		);
-		invariant(typeof currentPassword === 'string', 'Name must be a string');
-		invariant(typeof newPassword === 'string', 'Name must be a string');
-		invariant(typeof newPasswordConfirm === 'string', 'Name must be a string');
+		invariant(typeof currentPassword === 'string', 'Password must be a string');
+		invariant(typeof newPassword === 'string', 'New password must be a string');
 
-		const account = await prisma.accounts.findFirst({
-			where: {
-				id: locals.session?.accountId,
-			},
-		});
-		if (!account || !comparePassword(currentPassword, account.password)) {
-			return fail(400, {
-				errors: {
-					currentPassword: ['Invalid password'],
-				} as Record<string, string[]>,
+		const accountId = locals.session.accountId;
+		let result;
+		try {
+			result = await prisma.$transaction(async (client) => {
+				const auth = await reauthenticateCredentialChange(
+					client,
+					accountId,
+					cookies,
+					currentPassword,
+					token,
+				);
+				if (auth.status !== 'authenticated') return auth;
+				if (comparePassword(newPassword, auth.account.password)) {
+					return { status: 'same-password' } as const;
+				}
+				await client.accounts.update({
+					where: { id: accountId },
+					data: { password: hashPassword(newPassword) },
+				});
+				await revokeWebSessions(client, accountId);
+				return { status: 'changed' } as const;
+			});
+		} catch (error) {
+			log(
+				'error',
+				'account.change-password',
+				`failed code=${errorCode(error)}`,
+			);
+			return fail(500, {
+				errors: { global: ['Failed to update password'] } as Record<
+					string,
+					string[]
+				>,
 			});
 		}
-		if (comparePassword(newPassword, account.password)) {
+
+		if (result.status === 'same-password') {
 			return fail(400, {
 				errors: {
 					newPassword: ['New password cannot be the same as the old password'],
 				} as Record<string, string[]>,
 			});
 		}
-
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+		if (result.status !== 'changed') {
+			return credentialChangeRejected(cookies, result, 'currentPassword');
 		}
 
-		try {
-			await prisma.accounts.update({
-				where: { id: locals.session?.accountId },
-				data: { password: hashPassword(newPassword) },
-			});
-		} catch (e) {
-			console.error(e);
-			return fail(500, {
-				errors: {
-					global: ['Failed to update password'],
-				} as Record<string, string[]>,
-			});
-		}
-
+		clearWebSessionCookie(cookies);
 		throw redirect(
-			'/account',
+			'/account/login',
 			{
 				type: 'success',
-				message: 'Password changed successfully',
+				message: 'Password changed successfully. Please sign in again.',
 			},
 			event,
 		);
