@@ -42,7 +42,7 @@
 	{:else if data.qrCodeURL}
 		<Enable2FAForm
 			qrCodeURL={data.qrCodeURL}
-			secret={data.secret}
+			challengeId={data.challengeId}
 			errors={form?.errors} />
 	{/if}
 </StatelessModal>

@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { type Cookies, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
@@ -14,10 +15,15 @@ export type SessionInfo = {
 };
 type Sid = string;
 
+export const LOGIN_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
+
 export async function performLogin(cookies: Cookies, email: string) {
-	const maxAgeSeconds = 60 * 60 * 24 * 30; // 30 days
-	const sid = await createSession(email, maxAgeSeconds);
-	cookies.set('sid', sid, { path: '/', maxAge: maxAgeSeconds });
+	const sid = await createSession(email, LOGIN_MAX_AGE_SECONDS);
+	setLoginCookie(cookies, sid);
+}
+
+export function setLoginCookie(cookies: Cookies, sid: string) {
+	cookies.set('sid', sid, { path: '/', maxAge: LOGIN_MAX_AGE_SECONDS });
 }
 
 export async function createSession(
@@ -28,10 +34,18 @@ export async function createSession(
 		where: { email },
 	});
 	invariant(account, 'Account not found');
+	return createSessionForAccount(prisma, account, maxAgeSeconds);
+}
+
+export async function createSessionForAccount(
+	database: Pick<Prisma.TransactionClient, 'accountSessions'>,
+	account: { id: number; type: number },
+	maxAgeSeconds = LOGIN_MAX_AGE_SECONDS,
+): Promise<string> {
 	invariant(isAccountType(account.type), 'Invalid account type');
 
 	const expiresAt = Date.now() + maxAgeSeconds * 1000;
-	const session = await prisma.accountSessions.create({
+	const session = await database.accountSessions.create({
 		data: {
 			account_id: account.id,
 			expires: expiresAt,

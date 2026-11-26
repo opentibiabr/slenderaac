@@ -91,17 +91,19 @@ cannot access that file, leave the path empty and configure `DATABASE_URL` with
 the same database used by the game server. See [database configuration](database.md)
 for the fallback and validation rules.
 
-Review the other `.env` options before making the site public, particularly
-`AUTO_ADMIN_EMAIL`, email settings, public links and payment settings. A newly
-registered account matching `AUTO_ADMIN_EMAIL` receives administrator privileges;
-choose an address you control. Changing that value does not promote an existing
-account. For local browsing without payments, set `ENABLE_STRIPE_CUSTOM=false`
-and `ENABLE_STRIPE_CHECKOUT=false`.
+Review the other `.env` options before making the site public, particularly email
+settings, public links and payment settings. For local browsing without payments,
+set `ENABLE_STRIPE_CUSTOM=false` and `ENABLE_STRIPE_CHECKOUT=false`.
 
-Account roles follow the game server: type `5` is Community Manager and type `6`
-is God. Both can sign in, but website administration requires God (`6`). Updating
-the website does not promote existing accounts; review staff roles in the game
-database when upgrading from an older role mapping.
+Public registration creates a normal account. To provision the first website
+administrator, register an account you control. As a trusted game database
+operator, confirm the account's `accounts.id` and set `accounts.type` to `6`
+for that account using your database administration tool.
+
+Account roles follow the game server. Community Manager is type `5` and God is
+type `6`. Both can sign in. Website administration requires God (`6`). When
+upgrading, remove `AUTO_ADMIN_EMAIL` from your environment and review existing
+staff roles, including accounts the old signup flow may have promoted.
 
 ### 3. Prepare the website tables
 

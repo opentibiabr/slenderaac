@@ -4,7 +4,7 @@
 	import { enhance } from '$lib/enchance';
 
 	export let qrCodeURL: string;
-	export let secret: string;
+	export let challengeId: string;
 	export let errors: Record<string, string[]> | undefined;
 
 	import { _ } from 'svelte-i18n';
@@ -15,7 +15,7 @@
 		<p class="text-xs text-error-500">{errors.global}</p>
 	{/if}
 
-	<input type="hidden" name="secret" value={secret} />
+	<input type="hidden" name="challengeId" value={challengeId} />
 
 	<div class="flex flex-wrap gap-4 items-center justify-center">
 		<p>{$_('enable-2fa-description')}</p>
@@ -34,7 +34,7 @@
 			required
 			label={$_('token')}
 			name="token"
-			type="number"
+			type="text"
 			autocomplete="one-time-code"
 			errors={errors?.token} />
 	</div>
