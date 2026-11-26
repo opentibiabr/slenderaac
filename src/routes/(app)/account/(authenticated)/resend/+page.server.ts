@@ -1,44 +1,66 @@
 import { redirect } from 'sveltekit-flash-message/server';
 
-import { sendVerificationEmail } from '$lib/server/email';
-import { prisma } from '$lib/server/prisma';
+import {
+	resendEmailVerification,
+	sendEmailVerificationLinks,
+} from '$lib/server/email-verification';
+import { allowRecoveryRequest } from '$lib/server/recovery-token';
 import { requireLogin } from '$lib/server/session';
 
-import type { PageServerLoad } from './$types';
+import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async (event) => {
-	const { locals } = event;
+export const load: PageServerLoad = ({ locals }) => {
 	requireLogin(locals);
+	throw redirect(302, '/account');
+};
 
-	const account = await prisma.accounts.findUniqueOrThrow({
-		where: { id: locals.session?.accountId },
-	});
-	const oldVerification = await prisma.emailVerification.findFirst({
-		where: { account_id: account.id },
-		orderBy: { created_at: 'desc' },
-	});
-	if (account.is_verified && !oldVerification) {
-		await prisma.emailVerification.deleteMany({
-			where: { account_id: account.id },
-		});
-		throw redirect(302, '/account');
-	}
-	const verification = await prisma.emailVerification.create({
-		data: {
-			account_id: account.id,
-			expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-			new_email: oldVerification?.new_email,
-		},
-	});
-
-	await sendVerificationEmail(account.email, verification.token);
-	throw redirect(
-		`/account`,
-		{
-			type: 'success',
-			message:
-				'Verification re-sent. Check your email to confirm your account.',
-		},
-		event,
-	);
-}) satisfies PageServerLoad;
+export const actions = {
+	default: async (event) => {
+		const { locals } = event;
+		requireLogin(locals);
+		if (!allowRecoveryRequest('email-resend', event.getClientAddress, 20)) {
+			throw redirect(
+				'/account',
+				{ type: 'error', message: 'Too many requests. Try again later.' },
+				event,
+			);
+		}
+		const result = await resendEmailVerification(locals.session.accountId);
+		if (result.status === 'cooldown') {
+			throw redirect(
+				'/account',
+				{
+					type: 'error',
+					message: 'Wait a minute before requesting another email.',
+				},
+				event,
+			);
+		}
+		if (result.status === 'none') {
+			throw redirect(
+				'/account',
+				{
+					type: 'error',
+					message:
+						'No active confirmation. Start a new email change if needed.',
+				},
+				event,
+			);
+		}
+		const delivered = await sendEmailVerificationLinks(result.mail);
+		throw redirect(
+			'/account',
+			delivered
+				? {
+						type: 'success',
+						message: 'Check the email addresses that still need to confirm.',
+					}
+				: {
+						type: 'error',
+						message:
+							'Could not send all confirmation emails. Try resending in a minute.',
+					},
+			event,
+		);
+	},
+} satisfies Actions;

@@ -17,10 +17,9 @@
 	{/if}
 
 	<input type="hidden" name="token" value={data.token} />
-	<input type="hidden" name="email" value={data.email} />
 	<span class="h4">
 		{$_('verify.welcome')}
 	</span>
 
-	<Button>{$_('verify-account')}</Button>
+	<Button>{$_('verify.confirm')}</Button>
 </form>

@@ -75,7 +75,7 @@ model Accounts {
   players             Players[]
   backupCodes         AccountBackupCodes[]
   coinOrders          CoinOrders[]
-  emailVerifications  EmailVerification[]
+  emailVerification   EmailVerification?
   passwordReset       PasswordReset?
   accountSessions     AccountSessions[]
   store_history       StoreHistory[]
@@ -1002,12 +1002,19 @@ model PasswordReset {
 }
 
 model EmailVerification {
-  token      String   @id @default(cuid())
-  account_id Int      @db.UnsignedInt
-  expires    DateTime
-  new_email  String?  @db.VarChar(255)
-  created_at DateTime @default(now())
-  account    Accounts @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                        String   @id @default(cuid()) @map("token")
+  account_id                Int      @unique @db.UnsignedInt
+  expires                   DateTime
+  new_email                 String?  @db.VarChar(255)
+  created_at                DateTime @default(now())
+  current_email             String   @db.VarChar(255)
+  authorization_fingerprint String?  @db.Char(64)
+  current_digest            String?  @unique @db.Char(64)
+  target_digest             String?  @unique @db.Char(64)
+  current_approved          Boolean  @default(false)
+  target_approved           Boolean  @default(false)
+  last_sent                 DateTime @default(now())
+  account                   Accounts @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@map("slender_email_verifications")
 }

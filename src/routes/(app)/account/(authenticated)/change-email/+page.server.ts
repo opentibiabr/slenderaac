@@ -1,11 +1,12 @@
-import { fail } from '@sveltejs/kit';
+import { type ActionFailure, fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
-import invariant from 'tiny-invariant';
 
-import { sendVerificationEmail } from '$lib/server/email';
-import { prisma } from '$lib/server/prisma';
+import {
+	requestEmailChange,
+	sendEmailVerificationLinks,
+} from '$lib/server/email-verification';
+import { allowRecoveryRequest } from '$lib/server/recovery-token';
 import { requireLogin } from '$lib/server/session';
-import { comparePassword } from '$lib/server/utils';
 import {
 	emailValidator,
 	presenceValidator,
@@ -15,19 +16,17 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (() => {
-	return {};
-}) satisfies PageServerLoad;
+export const load: PageServerLoad = () => ({});
 
 export const actions = {
-	default: async (event) => {
-		const { request, locals } = event;
+	default: async (
+		event,
+	): Promise<ActionFailure<{ errors: Record<string, string[]> }>> => {
+		const { locals } = event;
 		requireLogin(locals);
-
-		const data = await request.formData();
+		const data = await event.request.formData();
 		const password = data.get('password');
 		const newEmail = data.get('newEmail');
-
 		const errors = await validate(
 			{
 				password: [presenceValidator, stringValidator],
@@ -35,65 +34,70 @@ export const actions = {
 			},
 			data,
 		);
-
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+		if (
+			Object.keys(errors).length > 0 ||
+			typeof password !== 'string' ||
+			typeof newEmail !== 'string'
+		) {
+			return fail(400, { errors });
 		}
-
-		invariant(password && newEmail, 'Missing required fields');
-		invariant(typeof password === 'string', 'Name must be a string');
-		invariant(typeof newEmail === 'string', 'Name must be a string');
-
-		const account = await prisma.accounts.findFirst({
-			where: {
-				id: locals.session?.accountId,
-			},
-		});
-		if (!account || !comparePassword(password, account.password)) {
+		if (newEmail.trim().length > 255) {
 			return fail(400, {
-				errors: {
-					password: ['Invalid password'],
-				} as Record<string, string[]>,
+				errors: { newEmail: ['Enter a valid email address.'] },
 			});
 		}
-		if (account.email === newEmail.toLowerCase()) {
-			return fail(400, {
-				errors: {
-					newEmail: ['New email must be different from current email'],
-				} as Record<string, string[]>,
+		if (
+			!allowRecoveryRequest('email-change', event.getClientAddress, 20) ||
+			!allowRecoveryRequest(
+				'email-change-account',
+				() => String(locals.session.accountId),
+				8,
+			)
+		) {
+			return fail(429, {
+				errors: { global: ['Too many requests. Try again later.'] },
 			});
 		}
-
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+		const result = await requestEmailChange(
+			locals.session.accountId,
+			newEmail.trim().toLowerCase(),
+			password,
+			data.get('factor'),
+		);
+		switch (result.status) {
+			case 'password':
+				return fail(400, { errors: { password: ['Invalid password'] } });
+			case 'address':
+				return fail(400, {
+					errors: { newEmail: ['Enter a different available email address.'] },
+				});
+			case 'factor':
+				return fail(400, {
+					errors: { factor: ['Enter a valid authenticator or recovery code.'] },
+				});
+			case 'cooldown':
+				return fail(429, {
+					errors: {
+						global: [
+							'Wait a minute before changing or resending confirmation emails.',
+						],
+					},
+				});
 		}
-
-		if (!account.is_verified) {
-			await prisma.accounts.update({
-				where: { id: locals.session?.accountId },
-				data: { email: newEmail.toLowerCase() },
-			});
-		}
-
-		await prisma.emailVerification.deleteMany({
-			where: { account_id: account.id },
-		});
-		const verification = await prisma.emailVerification.create({
-			data: {
-				account_id: account.id,
-				expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-				new_email: newEmail.toLowerCase(),
-			},
-		});
-
-		await sendVerificationEmail(account.email, verification.token);
+		const delivered = await sendEmailVerificationLinks(result.mail);
 		throw redirect(
 			'/account',
-			{
-				type: 'success',
-				message:
-					'Email changed requested. Please check your email for a confirmation link.',
-			},
+			delivered
+				? {
+						type: 'success',
+						message:
+							'Email change requested. Follow the confirmation instructions in your inbox.',
+					}
+				: {
+						type: 'error',
+						message:
+							'Email change requested. Use resend in your account if a confirmation email is missing.',
+					},
 			event,
 		);
 	},

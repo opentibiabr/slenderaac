@@ -8,9 +8,10 @@
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
 
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	export let form: ActionData;
+	export let data: PageData;
 
 	async function close() {
 		await goto('/account', { noScroll: true });
@@ -30,7 +31,7 @@
 				label={$_('password')}
 				name="password"
 				type="password"
-				autocomplete="password"
+				autocomplete="current-password"
 				errors={form?.errors?.password} />
 			<TextField
 				required
@@ -40,6 +41,17 @@
 				errors={form?.errors?.newEmail} />
 		</div>
 
+		{#if data.account.is2faEnabled}
+			<TextField
+				required
+				label={$_('account.recovery-factor')}
+				name="factor"
+				type="text"
+				autocomplete="one-time-code"
+				errors={form?.errors?.factor} />
+		{:else if data.account.isVerified}
+			<p>{$_('account.approve-both-emails')}</p>
+		{/if}
 		<div class="flex flex-row justify-end">
 			<Button>{$_('change-email')}</Button>
 		</div>

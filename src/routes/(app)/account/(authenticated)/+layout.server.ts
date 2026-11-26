@@ -27,9 +27,8 @@ export const load = (async ({ locals, url }) => {
 			players: {
 				select: { ...PlayerSelectForList, settings: true },
 			},
-			emailVerifications: {
-				select: { new_email: true },
-				orderBy: { created_at: 'desc' },
+			emailVerification: {
+				select: { new_email: true, current_email: true, expires: true },
 			},
 		},
 	});
@@ -43,6 +42,7 @@ export const load = (async ({ locals, url }) => {
 	}));
 	const now = Math.trunc(Date.now() / 1000);
 	const premiumGranted = FREE_PREMIUM === 'true';
+	const pendingEmail = account.emailVerification;
 	const accountInfo: AccountInfo = {
 		name: account.name,
 		email: account.email,
@@ -58,7 +58,12 @@ export const load = (async ({ locals, url }) => {
 		premiumExpiresAt:
 			account.lastday > 0 ? new Date(account.lastday * 1000) : undefined,
 		isVerified: account.is_verified,
-		newEmail: account.emailVerifications[0]?.new_email ?? undefined,
+		newEmail:
+			pendingEmail &&
+			pendingEmail.current_email === account.email &&
+			pendingEmail.expires > new Date()
+				? (pendingEmail.new_email ?? undefined)
+				: undefined,
 		is2faEnabled: Boolean(account.token_secret),
 		lastLogin: new Date(
 			characters.reduce(
