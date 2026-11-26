@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { test } from 'node:test';
 import { runInNewContext } from 'node:vm';
 import ts from 'typescript';
@@ -18,6 +19,7 @@ const source = readFileSync(
 const routeCode = ts.transpileModule(source, {
 	compilerOptions: { module: ts.ModuleKind.CommonJS, esModuleInterop: true },
 }).outputText;
+const requireLocal = createRequire(import.meta.url);
 
 function routeFixture(accountId = 1) {
 	const statuses = {
@@ -44,7 +46,11 @@ function routeFixture(accountId = 1) {
 	const createdOrders: unknown[] = [];
 	const intentReads: string[] = [];
 	const headers = new Headers();
-	const price = { toString: () => '1.99' };
+	const price = {
+		toString: () => '1.99',
+		toFixed: () => '1.99',
+		isPositive: () => true,
+	};
 	const modules = new Map<string, unknown>([
 		['@prisma/client', { CoinOrderStatus: statuses }],
 		[
@@ -103,8 +109,10 @@ function routeFixture(accountId = 1) {
 	runInNewContext(routeCode, {
 		exports: route,
 		require: (name: string) => {
-			assert.ok(modules.has(name), `Unexpected route dependency ${name}`);
-			return modules.get(name);
+			if (modules.has(name)) return modules.get(name);
+			// Run pure shop helpers with the same fixtures as the route.
+			assert.equal(name, '$lib/server/shop-stripe-price');
+			return requireLocal('./server/shop-stripe-price');
 		},
 		URL,
 	});
