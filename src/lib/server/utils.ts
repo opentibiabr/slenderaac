@@ -1,8 +1,5 @@
 import { compareSync, hashSync } from 'bcrypt';
 import { createHash } from 'crypto';
-import { authenticator } from 'otplib';
-
-import { prisma } from '$lib/server/prisma';
 
 import {
 	ALLOW_LEGACY_SHA1_PASSWORDS,
@@ -49,59 +46,6 @@ export function comparePassword(password: string, hash: string) {
 		return true;
 	}
 	return compareSync(password, hash);
-}
-
-/**
- * Checks 2fa token or backup code against an account.
- * @param token The token to check.
- * @param account The account to check against.
- * @param allowBackupCodes Whether to allow backup codes.
- * @returns Whether the token is valid.
- */
-export async function check2faToken(
-	token: string,
-	accountId: number,
-	allowBackupCodes = true,
-	consumeBackupCode = true,
-) {
-	const account = await prisma.accounts.findUnique({
-		where: { id: accountId },
-		include: { backupCodes: { where: { used: false } } },
-	});
-	if (!account) {
-		return false;
-	}
-	if (!account.token_secret) {
-		return true;
-	}
-
-	if (allowBackupCodes) {
-		const backupCode = account.backupCodes.find((code) => code.code === token);
-		if (backupCode) {
-			account.backupCodes = account.backupCodes.filter(
-				(code) => code.code !== token,
-			);
-			if (consumeBackupCode) {
-				if (account.backupCodes.length > 1) {
-					await prisma.accountBackupCodes.update({
-						where: { id: backupCode.id },
-						data: { used: true },
-					});
-				} else {
-					// all backup codes used, disable 2fa
-					await prisma.accounts.update({
-						where: { id: accountId },
-						data: {
-							token_secret: null,
-							backupCodes: { deleteMany: { account_id: accountId } },
-						},
-					});
-				}
-			}
-			return true;
-		}
-	}
-	return authenticator.check(token, account.token_secret);
 }
 
 /**

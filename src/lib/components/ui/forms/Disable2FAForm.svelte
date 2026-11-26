@@ -31,7 +31,7 @@
 			required
 			label={$_('token')}
 			name="token"
-			type="number"
+			type="text"
 			autocomplete="one-time-code"
 			errors={errors?.token} />
 	</div>

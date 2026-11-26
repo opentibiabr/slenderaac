@@ -28,9 +28,9 @@
 					value={form.password} />
 				<TextField
 					required
-					label="Authenticator Token"
+					label="Authenticator Token or Recovery Code"
 					name="token"
-					type="number"
+					type="text"
 					autocomplete="one-time-code"
 					errors={form?.errors?.token} />
 				<Button type="submit">Login</Button>
