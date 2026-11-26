@@ -84,7 +84,7 @@ export const actions: Actions = {
 					id: true,
 					type: true,
 					email: true,
-				is_verified: true,
+					is_verified: true,
 					password: true,
 					token_secret: true,
 				},
