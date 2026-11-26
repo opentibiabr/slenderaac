@@ -7,6 +7,7 @@
 		"caniuse-lite": "1.0.30001810"
 	},
 	"scripts": {
+		"audit:dependencies": "bun src/scripts/audit-dependencies.js",
 		"install:assets": "node src/scripts/install-theme-assets.js",
 		"install:server-integration": "bun src/scripts/install-server-integration.ts",
 		"import:server-data": "bun src/scripts/import-server-data.ts",
