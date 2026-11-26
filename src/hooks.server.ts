@@ -112,7 +112,8 @@ export const handle = (async ({ event, resolve }) => {
 		}
 	}
 
-	if (url.pathname.startsWith('/admin')) {
+	const routeId = event.route.id;
+	if (routeId === '/admin' || routeId?.startsWith('/admin/')) {
 		requireLogin(event.locals, 'admin');
 
 		const account = await prisma.accounts.findUnique({

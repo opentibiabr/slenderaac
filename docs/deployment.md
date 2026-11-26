@@ -13,9 +13,9 @@ dependencies, configuration, database migrations and external assets. Use the
 game database you intend to serve and back it up before migrations.
 
 Run the commands below from the application root. Configure `.env` for the public
-site before building, including `PUBLIC_BASE_URL`, public links, administrator
-email, SMTP and any enabled payment integration. Public/static environment values
-can be compiled into the application, so changing them requires another build.
+site before building, including `PUBLIC_BASE_URL`, public links, SMTP and any
+enabled payment integration. Public/static environment values can be compiled
+into the application, so changing them requires another build.
 Keep private values outside version control.
 
 The runtime must be able to read `SERVER_CONFIG_FILE` when configured, plus the
