@@ -18,10 +18,12 @@ enabled payment integration. Public/static environment values can be compiled
 into the application, so changing them requires another build.
 Keep private values outside version control.
 
-The runtime must be able to read `SERVER_CONFIG_FILE` when configured, plus the
-external asset directories and optional server catalog. If the service uses
-different paths or its own environment variables, configure those runtime paths
-there too; a checkout's `.env` does not override service-supplied variables.
+Use the [separate database credential mode](database.md#separate-site-and-migration-credentials)
+to give the running site its own limited MySQL account. Supply the migration
+credential only during the migration step. In legacy mode, the runtime must
+be able to read `SERVER_CONFIG_FILE` when configured. Give it read access to
+the external asset directories and optional server catalog. A checkout's
+`.env` does not override service-supplied variables.
 See [database configuration](database.md) and [asset installation](classic-assets.md).
 
 ## Build and start
