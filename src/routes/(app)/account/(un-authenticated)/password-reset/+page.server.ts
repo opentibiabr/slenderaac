@@ -1,9 +1,9 @@
 import { error, fail } from '@sveltejs/kit';
+import { Prisma } from '@prisma/client';
 import { redirect } from 'sveltekit-flash-message/server';
 import invariant from 'tiny-invariant';
 
 import { prisma } from '$lib/server/prisma';
-import { performLogin } from '$lib/server/session';
 import { hashPassword } from '$lib/server/utils';
 import {
 	emailValidator,
@@ -28,7 +28,7 @@ export const load = (async ({ url }) => {
 	if (!reset || !reset.account) {
 		throw error(422, 'Invalid email or token');
 	}
-	if (reset.expires < new Date()) {
+	if (reset.expires <= new Date()) {
 		throw error(422, 'Token expired');
 	}
 	if (reset.account.email !== email) {
@@ -42,7 +42,7 @@ export const load = (async ({ url }) => {
 
 export const actions: Actions = {
 	default: async (event) => {
-		const { request, cookies } = event;
+		const { request } = event;
 
 		const data = await request.formData();
 		const email = data.get('email');
@@ -89,26 +89,41 @@ export const actions: Actions = {
 			where: { token },
 			include: { account: true },
 		});
-		if (!reset || !reset.account) {
-			return fail(400, {
-				errors: {
-					global: ['Invalid reset password token.'],
-				} as Record<string, string[]>,
+		const invalidToken = () =>
+			fail<{ errors: Record<string, string[]> }>(400, {
+				errors: { global: ['Invalid reset password token.'] },
 			});
+		if (
+			!reset?.account ||
+			reset.account.email !== email ||
+			reset.expires <= new Date()
+		) {
+			return invalidToken();
 		}
 
 		const hashedPassword = hashPassword(password);
-		await prisma.$transaction([
-			prisma.passwordReset.delete({ where: { token } }),
-			prisma.accounts.update({
-				where: { id: reset.account.id },
-				data: { password: hashedPassword },
-			}),
-		]);
+		try {
+			await prisma.$transaction([
+				prisma.passwordReset.delete({
+					where: { token, expires: { gt: new Date() } },
+				}),
+				prisma.accounts.update({
+					where: { id: reset.account.id, email },
+					data: { password: hashedPassword },
+				}),
+			]);
+		} catch (cause) {
+			if (
+				cause instanceof Prisma.PrismaClientKnownRequestError &&
+				cause.code === 'P2025'
+			) {
+				return invalidToken();
+			}
+			throw cause;
+		}
 
-		await performLogin(cookies, reset.account.email);
 		throw redirect(
-			'/account',
+			'/account/login',
 			{
 				type: 'success',
 				message: 'Your password has been updated.',
