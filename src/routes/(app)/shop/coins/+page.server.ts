@@ -1,8 +1,4 @@
-import {
-	type CoinOffers,
-	type CoinOrders,
-	CoinOrderStatus,
-} from '@prisma/client';
+import { type CoinOffers, CoinOrderStatus } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
@@ -18,14 +14,14 @@ import { formatCurrency, groupBy } from '$lib/utils';
 
 import { PUBLIC_BASE_URL, PUBLIC_TITLE } from '$env/static/public';
 
-import type { Actions, PageServerLoad } from '../$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const enabledPaymentMethods = [
 	stripe && enableStripeCustom ? 'stripe' : null,
 	stripe && enableStripeCheckout ? 'stripe-checkout' : null,
 ].filter(Boolean) as string[];
 
-export const load = (async ({ locals, url, depends }) => {
+export const load = (async ({ locals, url, depends, setHeaders }) => {
 	depends('shop:order');
 
 	requireLogin(locals, '', layoutLoginHref(url));
@@ -50,9 +46,6 @@ export const load = (async ({ locals, url, depends }) => {
 
 	const token =
 		url.searchParams.get('token') || url.searchParams.get('payment_intent');
-	const clientSecret =
-		url.searchParams.get('clientSecret') ||
-		url.searchParams.get('payment_intent_client_secret');
 	const paymentMethod = url.searchParams.get('paymentMethod');
 	if (
 		stepIsAtOrAfter(step, 'payment') &&
@@ -71,29 +64,41 @@ export const load = (async ({ locals, url, depends }) => {
 		}
 	}
 
-	let order: CoinOrders | null = null;
-	if (step === 'confirmation') {
-		invariant(token, 'No payment token found');
-		order = await prisma.coinOrders.findUniqueOrThrow({
-			where: { payment_token: token },
-		});
-	} else if (token) {
-		order = await prisma.coinOrders.findUniqueOrThrow({
-			where: { payment_token: token },
-		});
-		if (
-			order.status !== CoinOrderStatus.PENDING &&
-			order.status !== CoinOrderStatus.FAILED_ATTEMPT
-		) {
-			throw redirect(302, '/shop/coins');
-		}
+	const order = token
+		? await prisma.coinOrders.findUnique({
+				where: { payment_token: token, account_id: locals.session.accountId },
+				select: { amount: true, status: true, payment_token: true },
+			})
+		: null;
+	if (token && !order) {
+		throw error(404, { message: 'Order not found' });
+	}
+	if (
+		order &&
+		step !== 'confirmation' &&
+		order.status !== CoinOrderStatus.PENDING &&
+		order.status !== CoinOrderStatus.FAILED_ATTEMPT
+	) {
+		throw redirect(302, '/shop/coins');
+	}
+
+	if (order) setHeaders({ 'cache-control': 'private, no-store' });
+	let clientSecret: string | null = null;
+	if (
+		step === 'payment' &&
+		paymentMethod === 'stripe' &&
+		order?.payment_token.startsWith('pi_') &&
+		stripe
+	) {
+		const intent = await stripe.paymentIntents.retrieve(order.payment_token);
+		clientSecret = intent.client_secret;
 	}
 
 	return {
 		step,
 		offers,
 		enabledPaymentMethods,
-		accountEmail: locals.session?.email,
+		accountEmail: locals.session.email,
 		offerId,
 		token,
 		clientSecret,
@@ -127,7 +132,6 @@ export const actions = {
 			throw error(422, { message: 'Invalid payment method' });
 		}
 
-		let clientSecret: string | null = null;
 		let token: string | null;
 		let redirectURL: string | null = null;
 
@@ -137,10 +141,7 @@ export const actions = {
 
 		switch (paymentMethod) {
 			case 'stripe':
-				({ token, clientSecret } = await handleStripe(
-					locals.session.email,
-					offer,
-				));
+				token = await handleStripe(locals.session.email, offer);
 				break;
 			case 'stripe-checkout':
 				({ token, redirectURL } = await handleStripeCheckout(
@@ -174,9 +175,6 @@ export const actions = {
 		paymentUrl.searchParams.set('paymentMethod', paymentMethod);
 		paymentUrl.searchParams.set('token', token);
 		paymentUrl.searchParams.set('offerId', offerId);
-		if (clientSecret) {
-			paymentUrl.searchParams.set('clientSecret', clientSecret);
-		}
 		throw redirect(302, `${paymentUrl.pathname}${paymentUrl.search}`);
 	},
 } satisfies Actions;
@@ -195,7 +193,7 @@ async function handleStripe(accountEmail: string, offer: CoinOffers) {
 		},
 	});
 
-	return { token: paymentIntent.id, clientSecret: paymentIntent.client_secret };
+	return paymentIntent.id;
 }
 
 async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
