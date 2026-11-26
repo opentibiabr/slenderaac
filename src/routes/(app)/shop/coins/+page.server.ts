@@ -1,8 +1,4 @@
-import {
-	type CoinOffers,
-	type CoinOrders,
-	CoinOrderStatus,
-} from '@prisma/client';
+import { type CoinOffers, CoinOrderStatus } from '@prisma/client';
 import { error, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
@@ -11,6 +7,7 @@ import { isStep, stepIsAtOrAfter } from '$lib/payments';
 import { enableStripeCheckout, enableStripeCustom } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
 import { requireLogin } from '$lib/server/session';
+import { quoteStripePrice } from '$lib/server/shop-stripe-price';
 import { stripe } from '$lib/server/stripe';
 import { serverName } from '$lib/server/worlds';
 import { layoutLoginHref } from '$lib/themes/navigation';
@@ -18,26 +15,37 @@ import { formatCurrency, groupBy } from '$lib/utils';
 
 import { PUBLIC_BASE_URL, PUBLIC_TITLE } from '$env/static/public';
 
-import type { Actions, PageServerLoad } from '../$types';
+import type { Actions, PageServerLoad } from './$types';
 
 const enabledPaymentMethods = [
 	stripe && enableStripeCustom ? 'stripe' : null,
 	stripe && enableStripeCheckout ? 'stripe-checkout' : null,
 ].filter(Boolean) as string[];
 
-export const load = (async ({ locals, url, depends }) => {
+export const load = (async ({ locals, url, depends, setHeaders }) => {
 	depends('shop:order');
 
 	requireLogin(locals, '', layoutLoginHref(url));
 
 	const offers = groupBy(
-		(await prisma.coinOffers.findMany({ orderBy: { amount: 'asc' } })).map(
-			(offer): CoinOffer => ({
-				id: offer.id,
-				currency: offer.currency,
-				amount: offer.amount,
-				price: formatCurrency(offer.price.toNumber(), offer.currency),
-			}),
+		(await prisma.coinOffers.findMany({ orderBy: { amount: 'asc' } })).flatMap(
+			(offer): CoinOffer[] => {
+				const quote = quoteStripePrice(offer);
+				if (!quote) return [];
+
+				return [
+					{
+						id: offer.id,
+						currency: offer.currency,
+						amount: offer.amount,
+						price: formatCurrency(
+							quote.majorAmount,
+							quote.currency,
+							quote.fractionDigits,
+						),
+					},
+				];
+			},
 		),
 		'currency',
 	);
@@ -50,9 +58,6 @@ export const load = (async ({ locals, url, depends }) => {
 
 	const token =
 		url.searchParams.get('token') || url.searchParams.get('payment_intent');
-	const clientSecret =
-		url.searchParams.get('clientSecret') ||
-		url.searchParams.get('payment_intent_client_secret');
 	const paymentMethod = url.searchParams.get('paymentMethod');
 	if (
 		stepIsAtOrAfter(step, 'payment') &&
@@ -71,29 +76,41 @@ export const load = (async ({ locals, url, depends }) => {
 		}
 	}
 
-	let order: CoinOrders | null = null;
-	if (step === 'confirmation') {
-		invariant(token, 'No payment token found');
-		order = await prisma.coinOrders.findUniqueOrThrow({
-			where: { payment_token: token },
-		});
-	} else if (token) {
-		order = await prisma.coinOrders.findUniqueOrThrow({
-			where: { payment_token: token },
-		});
-		if (
-			order.status !== CoinOrderStatus.PENDING &&
-			order.status !== CoinOrderStatus.FAILED_ATTEMPT
-		) {
-			throw redirect(302, '/shop/coins');
-		}
+	const order = token
+		? await prisma.coinOrders.findUnique({
+				where: { payment_token: token, account_id: locals.session.accountId },
+				select: { amount: true, status: true, payment_token: true },
+			})
+		: null;
+	if (token && !order) {
+		throw error(404, { message: 'Order not found' });
+	}
+	if (
+		order &&
+		step !== 'confirmation' &&
+		order.status !== CoinOrderStatus.PENDING &&
+		order.status !== CoinOrderStatus.FAILED_ATTEMPT
+	) {
+		throw redirect(302, '/shop/coins');
+	}
+
+	if (order) setHeaders({ 'cache-control': 'private, no-store' });
+	let clientSecret: string | null = null;
+	if (
+		step === 'payment' &&
+		paymentMethod === 'stripe' &&
+		order?.payment_token.startsWith('pi_') &&
+		stripe
+	) {
+		const intent = await stripe.paymentIntents.retrieve(order.payment_token);
+		clientSecret = intent.client_secret;
 	}
 
 	return {
 		step,
 		offers,
 		enabledPaymentMethods,
-		accountEmail: locals.session?.email,
+		accountEmail: locals.session.email,
 		offerId,
 		token,
 		clientSecret,
@@ -127,20 +144,21 @@ export const actions = {
 			throw error(422, { message: 'Invalid payment method' });
 		}
 
-		let clientSecret: string | null = null;
 		let token: string | null;
 		let redirectURL: string | null = null;
 
-		const offer = await prisma.coinOffers.findUniqueOrThrow({
+		const selectedOffer = await prisma.coinOffers.findUniqueOrThrow({
 			where: { id: offerId },
 		});
+		const quote = quoteStripePrice(selectedOffer);
+		if (!quote) {
+			throw error(422, { message: 'Invalid offer price or currency' });
+		}
 
+		const offer = { ...selectedOffer, quote };
 		switch (paymentMethod) {
 			case 'stripe':
-				({ token, clientSecret } = await handleStripe(
-					locals.session.email,
-					offer,
-				));
+				token = await handleStripe(locals.session.email, offer);
 				break;
 			case 'stripe-checkout':
 				({ token, redirectURL } = await handleStripeCheckout(
@@ -158,10 +176,12 @@ export const actions = {
 			data: {
 				account: { connect: { id: locals.session?.accountId } },
 				price: offer.price,
-				currency: offer.currency,
+				currency: quote.currency,
+				stripe_amount_minor: BigInt(quote.amount),
 				amount: offer.amount,
 				status: CoinOrderStatus.PENDING,
 				payment_token: token,
+				stripe_fulfillment_enabled: true,
 			},
 		});
 
@@ -174,19 +194,20 @@ export const actions = {
 		paymentUrl.searchParams.set('paymentMethod', paymentMethod);
 		paymentUrl.searchParams.set('token', token);
 		paymentUrl.searchParams.set('offerId', offerId);
-		if (clientSecret) {
-			paymentUrl.searchParams.set('clientSecret', clientSecret);
-		}
 		throw redirect(302, `${paymentUrl.pathname}${paymentUrl.search}`);
 	},
 } satisfies Actions;
 
-async function handleStripe(accountEmail: string, offer: CoinOffers) {
+type StripeOffer = CoinOffers & {
+	quote: NonNullable<ReturnType<typeof quoteStripePrice>>;
+};
+
+async function handleStripe(accountEmail: string, offer: StripeOffer) {
 	invariant(stripe, 'Stripe not enabled');
 
 	const paymentIntent = await stripe.paymentIntents.create({
-		amount: Number(offer.price.toString().replace('.', '')),
-		currency: offer.currency.toLowerCase(),
+		amount: offer.quote.amount,
+		currency: offer.quote.currency,
 		receipt_email: accountEmail,
 		description: `Purchase of ${offer.amount} ${await serverName()} Coins`,
 		statement_descriptor_suffix: `${PUBLIC_TITLE} Coins`,
@@ -195,10 +216,10 @@ async function handleStripe(accountEmail: string, offer: CoinOffers) {
 		},
 	});
 
-	return { token: paymentIntent.id, clientSecret: paymentIntent.client_secret };
+	return paymentIntent.id;
 }
 
-async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
+async function handleStripeCheckout(accountEmail: string, offer: StripeOffer) {
 	invariant(stripe, 'Stripe not enabled');
 	const returnPath = '/shop/coins/?step=confirmation';
 	const redirectURL = new URL(returnPath, PUBLIC_BASE_URL).href;
@@ -206,11 +227,11 @@ async function handleStripeCheckout(accountEmail: string, offer: CoinOffers) {
 		line_items: [
 			{
 				price_data: {
-					currency: offer.currency.toLowerCase(),
+					currency: offer.quote.currency,
 					product_data: {
 						name: `${offer.amount} ${await serverName()} Coins`,
 					},
-					unit_amount: Number(offer.price.toFixed(2).replace('.', '')),
+					unit_amount: offer.quote.amount,
 				},
 				quantity: 1,
 			},
