@@ -30,16 +30,6 @@ function webSessionId(sid: Sid) {
 	return `v2:${createHash('sha256').update(sid).digest('hex')}`;
 }
 
-export async function performLogin(cookies: Cookies, email: string) {
-	const account = await prisma.accounts.findUnique({
-		where: { email },
-		select: { id: true, type: true },
-	});
-	invariant(account, 'Account not found');
-	const sid = await createWebSession(prisma, account);
-	setWebSessionCookie(cookies, sid);
-}
-
 export function setWebSessionCookie(cookies: Cookies, sid: Sid) {
 	cookies.set(WEB_SESSION_COOKIE, sid, {
 		...webSessionCookieOptions,
