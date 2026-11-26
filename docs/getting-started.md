@@ -84,8 +84,9 @@ Adjust these values for your installation and keep the other entries from `.env.
 | `SERVER_NAME`                    | Your game world's display name.                                                                                                        |
 | `SERVER_ADDRESS` / `SERVER_PORT` | The game server address and game port. These also drive the online/offline check.                                                      |
 
-`SERVER_CONFIG_FILE` supplies the database connection for the website **and its
-migration commands**, overriding conflicting connection settings in `DATABASE_URL`.
+In legacy mode, `SERVER_CONFIG_FILE` supplies the database connection for the
+website **and its migration commands**, overriding conflicting connection
+settings in `DATABASE_URL`.
 It does not automatically replace every other `.env` setting. If the website
 cannot access that file, leave the path empty and configure `DATABASE_URL` with
 the same database used by the game server. See [database configuration](database.md)
