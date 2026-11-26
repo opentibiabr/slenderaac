@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 
 	import { goto } from '$app/navigation';
+
 	import Button from '$lib/components/ui/Button.svelte';
 	import CredentialPasswordField from '$lib/components/ui/forms/CredentialPasswordField.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';

@@ -34,7 +34,6 @@ export const actions = {
 		const data = await request.formData();
 		const currentPassword = data.get('currentPassword');
 		const newPassword = data.get('newPassword');
-		const newPasswordConfirm = data.get('newPasswordConfirm');
 		const token = data.get('token');
 
 		const errors = await validate(
