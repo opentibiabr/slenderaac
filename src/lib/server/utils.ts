@@ -1,15 +1,20 @@
 import { compareSync, hashSync } from 'bcrypt';
-import { createHash } from 'crypto';
 import { authenticator } from 'otplib';
 
+import { requireEmailVerification } from '$lib/server/config';
+import { errorCode, log } from '$lib/server/logging';
+import {
+	BCRYPT_ROUNDS,
+	hashPasswordSHA1,
+	rehashLegacyPassword,
+} from '$lib/server/password-migration';
 import { prisma } from '$lib/server/prisma';
 
+import { env } from '$env/dynamic/private';
 import {
 	ALLOW_LEGACY_SHA1_PASSWORDS,
 	DEPRECATED_USE_SHA1_PASSWORDS,
 } from '$env/static/private';
-
-const BCRYPT_ROUNDS = 12;
 
 /**
  * Hashes a password.
@@ -21,17 +26,6 @@ export function hashPassword(password: string) {
 		return hashPasswordSHA1(password);
 	}
 	return hashSync(password, BCRYPT_ROUNDS);
-}
-
-/**
- * Hashes a password with SHA1.
- * @param password The password to hash.
- * @returns The hashed password.
- * @deprecated SHA1 is insecure, use bcrypt instead.
- * @see hashPassword
- */
-function hashPasswordSHA1(password: string) {
-	return createHash('sha1').update(password).digest('hex');
 }
 
 /**
@@ -49,6 +43,29 @@ export function comparePassword(password: string, hash: string) {
 		return true;
 	}
 	return compareSync(password, hash);
+}
+
+/** Call only after all login checks pass and the session has been created. */
+export async function migrateAuthenticatedPassword(
+	account: { id: number; password: string; is_verified: boolean },
+	password: string,
+): Promise<void> {
+	if (
+		env.UPGRADE_LEGACY_SHA1_PASSWORDS !== 'true' ||
+		ALLOW_LEGACY_SHA1_PASSWORDS !== 'true' ||
+		DEPRECATED_USE_SHA1_PASSWORDS === 'true' ||
+		(requireEmailVerification && !account.is_verified)
+	) {
+		return;
+	}
+
+	try {
+		await rehashLegacyPassword(account, password, (args) =>
+			prisma.accounts.updateMany(args),
+		);
+	} catch (error) {
+		log('warn', 'password.migration', `failed code=${errorCode(error)}`);
+	}
 }
 
 /**
