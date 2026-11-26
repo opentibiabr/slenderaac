@@ -162,6 +162,7 @@ export const actions = {
 				amount: offer.amount,
 				status: CoinOrderStatus.PENDING,
 				payment_token: token,
+				stripe_fulfillment_enabled: true,
 			},
 		});
 
