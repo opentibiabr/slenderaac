@@ -1,19 +1,22 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
+
 	import { goto } from '$app/navigation';
 
 	import Button from '$lib/components/ui/Button.svelte';
+	import CredentialPasswordField from '$lib/components/ui/forms/CredentialPasswordField.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
 
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	export let form: ActionData;
+	export let data: PageData;
 
 	async function close() {
 		await goto('/account', { noScroll: true });
 	}
-	import { _ } from 'svelte-i18n';
 </script>
 
 <StatelessModal title={$_('change-password')} on:close={close}>
@@ -23,28 +26,30 @@
 		{/if}
 
 		<div class="flex flex-wrap gap-4 items-center">
-			<TextField
-				required
-				labelClass="w-full"
+			<CredentialPasswordField
 				label={$_('current-password')}
 				name="currentPassword"
-				type="password"
 				autocomplete="current-password"
 				errors={form?.errors?.currentPassword} />
-			<TextField
-				required
+			<CredentialPasswordField
 				label={$_('new-password')}
 				name="newPassword"
-				type="password"
 				autocomplete="new-password"
 				errors={form?.errors?.newPassword} />
-			<TextField
-				required
+			<CredentialPasswordField
 				label={$_('confirm-new-password')}
 				name="newPasswordConfirm"
-				type="password"
 				autocomplete="new-password"
 				errors={form?.errors?.newPasswordConfirm} />
+			{#if data.tokenRequired || (form && 'tokenRequired' in form && form.tokenRequired)}
+				<TextField
+					required
+					labelClass="w-full"
+					label={$_('token')}
+					name="token"
+					autocomplete="one-time-code"
+					errors={form?.errors?.token} />
+			{/if}
 		</div>
 
 		<div class="flex flex-row justify-end">

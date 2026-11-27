@@ -48,6 +48,28 @@ export async function lockWebSessionAccount(
 	await client.$queryRaw`SELECT id FROM accounts WHERE id = ${accountId} FOR UPDATE`;
 }
 
+export async function lockActiveWebSession(
+	client: Prisma.TransactionClient,
+	accountId: number,
+	sid: Sid | undefined,
+) {
+	const id = sid && webSessionId(sid);
+	if (!id) return false;
+
+	const [session] = await client.$queryRaw<{ expires: bigint }[]>`
+		SELECT expires FROM slender_sessions
+		WHERE id = ${id} AND account_id = ${accountId} FOR UPDATE
+	`;
+	return Boolean(session && session.expires > BigInt(Date.now()));
+}
+
+export async function revokeWebSessions(
+	client: Prisma.TransactionClient,
+	accountId: number,
+) {
+	await client.accountSessions.deleteMany({ where: { account_id: accountId } });
+}
+
 export async function createWebSession(
 	client: Prisma.TransactionClient,
 	account: { id: number; type: number },
