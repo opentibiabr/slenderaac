@@ -1,12 +1,16 @@
-import { error, fail } from '@sveltejs/kit';
-import { Prisma } from '@prisma/client';
+import { type ActionFailure, error, fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
-import invariant from 'tiny-invariant';
 
-import { prisma } from '$lib/server/prisma';
-import { hashPassword } from '$lib/server/utils';
 import {
-	emailValidator,
+	completePasswordReset,
+	getPasswordResetChallenge,
+	notifyPasswordReset,
+} from '$lib/server/password-recovery';
+import {
+	allowRecoveryRequest,
+	recoveryPageHeaders,
+} from '$lib/server/recovery-token';
+import {
 	presenceValidator,
 	stringValidator,
 	validate,
@@ -14,120 +18,68 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({ url }) => {
-	const email = url.searchParams.get('email');
-	const token = url.searchParams.get('token');
-	if (!email || !token) {
-		throw error(422, 'Invalid email or token');
-	}
+const INVALID_LINK =
+	'This password reset link is invalid or expired. Request a new link.';
 
-	const reset = await prisma.passwordReset.findUnique({
-		where: { token },
-		include: { account: true },
-	});
-	if (!reset || !reset.account) {
-		throw error(422, 'Invalid email or token');
-	}
-	if (reset.expires <= new Date()) {
-		throw error(422, 'Token expired');
-	}
-	if (reset.account.email !== email) {
-		throw error(422, 'Invalid email or token');
-	}
-	return {
-		token,
-		email,
-	};
+export const load = (async ({ setHeaders, url }) => {
+	setHeaders(recoveryPageHeaders);
+	const token = url.searchParams.get('token');
+	const challenge = await getPasswordResetChallenge(token);
+	if (!challenge) throw error(422, INVALID_LINK);
+	return { token, ...challenge };
 }) satisfies PageServerLoad;
 
-export const actions: Actions = {
-	default: async (event) => {
-		const { request } = event;
-
-		const data = await request.formData();
-		const email = data.get('email');
-		const token = data.get('token');
+export const actions = {
+	default: async (
+		event,
+	): Promise<ActionFailure<{ errors: Record<string, string[]> }>> => {
+		const data = await event.request.formData();
 		const password = data.get('password');
-		const passwordConfirmation = data.get('passwordConfirmation');
-
 		const errors = await validate(
 			{
-				token: [presenceValidator, stringValidator],
-				email: [presenceValidator, emailValidator],
 				password: [presenceValidator, stringValidator],
 				passwordConfirmation: [
 					presenceValidator,
 					stringValidator,
-					(value) => {
-						if (value !== password) {
-							return 'Passwords do not match';
-						}
-						return null;
-					},
+					(value) => (value === password ? null : 'Passwords do not match'),
 				],
 			},
 			data,
 		);
-
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+		if (Object.keys(errors).length > 0 || typeof password !== 'string') {
+			return fail(400, { errors });
 		}
-
-		invariant(
-			token && email && password && passwordConfirmation,
-			'Missing required fields',
-		);
-		invariant(typeof token === 'string', 'Token must be a string');
-		invariant(typeof email === 'string', 'Email must be a string');
-		invariant(typeof password === 'string', 'Passsword must be a string');
-		invariant(
-			typeof passwordConfirmation === 'string',
-			'Passsword must be a string',
-		);
-
-		const reset = await prisma.passwordReset.findUnique({
-			where: { token },
-			include: { account: true },
-		});
-		const invalidToken = () =>
-			fail<{ errors: Record<string, string[]> }>(400, {
-				errors: { global: ['Invalid reset password token.'] },
+		if (!allowRecoveryRequest('reset-submit', event.getClientAddress, 30)) {
+			return fail(429, {
+				errors: { global: ['Too many attempts. Try again later.'] },
 			});
-		if (
-			!reset?.account ||
-			reset.account.email !== email ||
-			reset.expires <= new Date()
-		) {
-			return invalidToken();
 		}
 
-		const hashedPassword = hashPassword(password);
-		try {
-			await prisma.$transaction([
-				prisma.passwordReset.delete({
-					where: { token, expires: { gt: new Date() } },
-				}),
-				prisma.accounts.update({
-					where: { id: reset.account.id, email },
-					data: { password: hashedPassword },
-				}),
-			]);
-		} catch (cause) {
-			if (
-				cause instanceof Prisma.PrismaClientKnownRequestError &&
-				cause.code === 'P2025'
-			) {
-				return invalidToken();
-			}
-			throw cause;
+		const result = await completePasswordReset(
+			data.get('token'),
+			password,
+			data.get('factor'),
+		);
+		if (result.status === 'invalid')
+			return fail(400, { errors: { global: [INVALID_LINK] } });
+		if (result.status === 'same-password') {
+			return fail(400, {
+				errors: { password: ['Choose a different password.'] },
+			});
+		}
+		if (result.status === 'factor') {
+			return fail(400, {
+				errors: { factor: ['Enter a valid authenticator or recovery code.'] },
+			});
 		}
 
+		if (event.locals.session?.accountId === result.accountId) {
+			event.cookies.delete('sid', { path: '/' });
+		}
+		void notifyPasswordReset(result.email);
 		throw redirect(
 			'/account/login',
-			{
-				type: 'success',
-				message: 'Your password has been updated.',
-			},
+			{ type: 'success', message: 'Your password has been updated.' },
 			event,
 		);
 	},

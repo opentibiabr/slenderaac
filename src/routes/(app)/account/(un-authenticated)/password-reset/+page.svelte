@@ -17,7 +17,15 @@
 	{/if}
 
 	<input type="hidden" name="token" value={data.token} />
-	<input type="hidden" name="email" value={data.email} />
+	{#if data.factorRequired}
+		<TextField
+			required
+			label="Authenticator or recovery code"
+			name="factor"
+			type="text"
+			autocomplete="one-time-code"
+			errors={form?.errors?.factor} />
+	{/if}
 
 	<div class="flex flex-row gap-2">
 		<TextField
