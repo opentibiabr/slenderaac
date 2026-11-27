@@ -22,15 +22,20 @@
 					{form.errors.global}
 				</p>{/if}
 			{#if form?.tokenRequired}
-				<input type="hidden" name="email" value={form.email} /><input
-					type="hidden"
-					name="password"
-					value={form.password} />
+				<input type="hidden" name="email" value={form.email} />
+				<label class="label">
+					<span>Password</span>
+					<input
+						required
+						class="input"
+						name="password"
+						type="password"
+						autocomplete="current-password" />
+				</label>
 				<TextField
 					required
 					label="Authenticator Token or Recovery Code"
 					name="token"
-					type="text"
 					autocomplete="one-time-code"
 					errors={form?.errors?.token} />
 				<Button type="submit">Login</Button>

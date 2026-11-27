@@ -1,6 +1,10 @@
 import { type Actions, redirect } from '@sveltejs/kit';
 
-import { deleteSession } from '$lib/server/session';
+import {
+	clearWebSessionCookie,
+	deleteSession,
+	WEB_SESSION_COOKIE,
+} from '$lib/server/session';
 
 import type { PageServerLoad } from './$types';
 
@@ -12,10 +16,10 @@ export const load = (() => {
 
 export const actions: Actions = {
 	async default({ cookies }) {
-		const sid = cookies.get('sid');
+		const sid = cookies.get(WEB_SESSION_COOKIE);
 		if (sid) {
-			cookies.delete('sid', { path: '/' });
 			await deleteSession(sid);
+			clearWebSessionCookie(cookies);
 		}
 
 		throw redirect(302, '/');

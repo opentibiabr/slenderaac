@@ -78,6 +78,7 @@ model Accounts {
   emailVerifications  EmailVerification[]
   passwordReset       PasswordReset?
   accountSessions     AccountSessions[]
+  webChangeAttempt    WebCredentialChangeAttempt?
   store_history       StoreHistory[]
   feedback_responses  FeedbackResponse[]
   poll_votes          PollVote[]
@@ -816,6 +817,24 @@ model AccountTwoFactorSetup {
   @@map("slender_account_2fa_setup")
 }
 
+model WebCredentialChangeAttempt {
+  account_id   Int      @id @db.UnsignedInt
+  failures     Int      @db.UnsignedInt
+  window_until BigInt   @db.UnsignedBigInt
+  account      Accounts @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "slender_credential_change_attempt_account_fk")
+
+  @@map("slender_credential_change_attempts")
+}
+
+model LoginAttemptBucket {
+  bucket     String @id @db.VarChar(80)
+  attempts   Int    @db.UnsignedInt
+  expires_at BigInt @db.UnsignedBigInt
+
+  @@index([expires_at], map: "slender_login_limits_expires_at_idx")
+  @@map("slender_login_limits")
+}
+
 enum NewsType {
   news
   ticker
@@ -972,10 +991,12 @@ model CoinOrders {
   account_id    Int             @db.UnsignedInt
   price         Decimal
   currency      String          @default("USD")
+  stripe_amount_minor BigInt?   @db.UnsignedBigInt
   amount        Int             @default(0)
   created_at    DateTime        @default(now())
   updated_at    DateTime        @default(now()) @updatedAt
   payment_token String          @unique
+  stripe_fulfillment_enabled Boolean @default(false)
   account       Accounts        @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([account_id], map: "slender_coin_orders_account_id_fkey")

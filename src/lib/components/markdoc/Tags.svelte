@@ -8,10 +8,11 @@
 
 	import { page } from '$app/stores';
 
-	import { serverMarkupText, serverText } from '$lib/site-identity';
-	import { siteHref } from '$lib/themes/navigation';
+	import { serverText } from '$lib/site-identity';
 
 	import { PUBLIC_TITLE } from '$env/static/public';
+
+	import { markdocAttributes } from './rendering';
 
 	export let node: RenderableTreeNode;
 	export let components: Map<string, ComponentType>;
@@ -20,67 +21,39 @@
 		name: $page.data.serverName ?? PUBLIC_TITLE,
 		website: $page.url.origin,
 	};
-
-	function linkAttributes(value: unknown, url: URL) {
-		const attributes = Object.fromEntries(
-			Object.entries(value as Record<string, unknown>).map(([key, item]) => [
-				key,
-				typeof item === 'string' && ['alt', 'title', 'aria-label'].includes(key)
-					? serverText(item, identity)
-					: item,
-			]),
-		);
-		if (typeof attributes.href !== 'string') return attributes;
-		return { ...attributes, href: siteHref(url, attributes.href) };
-	}
-
-	const nodeName = (node: RenderableTreeNode) => {
-		if (typeof node === 'string' || typeof node === 'number') return 'text';
-		if (Array.isArray(node)) return 'fragment';
-		if (node === null || typeof node !== 'object') return 'empty';
-		if (!Markdoc.Tag.isTag(node)) return 'empty';
-		return node.name;
-	};
-
-	const filterAttributes = (value: unknown) => {
-		const attributes = value as Record<string, unknown>;
-		return typeof attributes.center === 'boolean'
-			? { center: attributes.center }
-			: {};
-	};
 </script>
 
 {#if typeof node === 'string' || typeof node === 'number'}
-	{@html serverMarkupText(String(node), {
-		name: $page.data.serverName ?? PUBLIC_TITLE,
-		website: $page.url.origin,
-	})}
+	{serverText(String(node), identity)}
 {:else if Array.isArray(node)}
 	{#each node as child}
 		<svelte:self node={child} {components} />
 	{/each}
 {:else if node === null || typeof node !== 'object' || !Markdoc.Tag.isTag(node)}
 	{''}
-{:else if !node.name}
+{:else if isRoot || !node.name}
 	<svelte:self node={node.children} {components} />
-{:else if components.has(nodeName(node))}
-	{@const component = components.get(nodeName(node))}
-	{@const filteredAttrs = filterAttributes(node.attributes)}
-	<svelte:component this={component} {...filteredAttrs}>
+{:else if components.has(node.name)}
+	{@const component = components.get(node.name)}
+	{@const props =
+		node.name === 'Row' ? { center: node.attributes.center === true } : {}}
+	<svelte:component this={component} {...props}>
 		<svelte:self node={node.children} {components} />
 	</svelte:component>
-{:else if node.children.length > 0}
-	{#if isRoot}
+{:else}
+	{@const attributes = markdocAttributes(
+		node.name,
+		node.attributes,
+		$page.url,
+		identity,
+	)}
+	{#if !attributes}
 		<svelte:self node={node.children} {components} />
+	{:else if node.name === 'br' || node.name === 'hr' || node.name === 'img'}
+		<svelte:element this={node.name} {...attributes} />
 	{:else}
-		<svelte:element
-			this={node.name}
-			{...linkAttributes(node.attributes, $page.url)}>
+		<svelte:element this={node.name} {...attributes}>
 			<svelte:self node={node.children} {components} />
 		</svelte:element>
 	{/if}
-{:else}
-	<svelte:element
-		this={node.name}
-		{...linkAttributes(node.attributes, $page.url)} />
 {/if}
