@@ -92,10 +92,75 @@ function databaseUrl(value) {
 	return null;
 }
 
-/** Shared by the server and package commands; never executes Lua or changes files.
+/** @param {string | undefined} value */
+function explicitDatabaseUrl(value) {
+	const url = databaseUrl(value ?? '');
+	if (!url) return null;
+	try {
+		const account = decodeURIComponent(url.username);
+		const password = decodeURIComponent(url.password);
+		const database = decodeURIComponent(url.pathname.slice(1));
+		if (
+			account.trim() &&
+			password &&
+			database.trim() &&
+			!controlCharacters.test(account + password + database) &&
+			!/[\\/]/.test(database)
+		)
+			return { url: url.href, account, database };
+	} catch {
+		/* Invalid percent encoding must not expose the URL. */
+	}
+	return null;
+}
+
+/** Shared by the server and package commands. Only migrations use the migration account.
  * @param {Record<string, string | undefined>} environment
+ * @param {'runtime' | 'migration'} purpose
  */
-export function resolveDatabaseConfiguration(environment) {
+export function resolveDatabaseConfiguration(environment, purpose = 'runtime') {
+	const mode = environment.DATABASE_CREDENTIAL_MODE?.trim();
+	if (mode === 'separate') {
+		const runtime = explicitDatabaseUrl(environment.DATABASE_URL);
+		if (!runtime)
+			throw new Error(
+				'Separate database credentials require a valid MySQL DATABASE_URL with a username and password.',
+			);
+		if (purpose === 'runtime')
+			return {
+				url: runtime.url,
+				database: runtime.database,
+				source: 'DATABASE_URL',
+				warning: null,
+			};
+
+		const migration = explicitDatabaseUrl(environment.DATABASE_MIGRATION_URL);
+		if (!migration)
+			throw new Error(
+				'Separate database credentials require a valid MySQL DATABASE_MIGRATION_URL with a username and password for migrations.',
+			);
+		if (runtime.database !== migration.database)
+			throw new Error(
+				'Separate database credentials must select the same database name.',
+			);
+		if (runtime.account === migration.account)
+			throw new Error(
+				'Separate database credentials must use different MySQL usernames.',
+			);
+		return {
+			url: migration.url,
+			database: migration.database,
+			source: 'DATABASE_MIGRATION_URL',
+			warning: null,
+		};
+	}
+	if (mode && mode !== 'legacy')
+		throw new Error('Set DATABASE_CREDENTIAL_MODE to legacy or separate.');
+	if (purpose === 'migration' && environment.DATABASE_MIGRATION_URL?.trim())
+		throw new Error(
+			'Set DATABASE_CREDENTIAL_MODE to separate to use DATABASE_MIGRATION_URL.',
+		);
+
 	const previous = databaseUrl(environment.DATABASE_URL ?? '');
 	const configFile = environment.SERVER_CONFIG_FILE?.trim();
 	if (!configFile) {

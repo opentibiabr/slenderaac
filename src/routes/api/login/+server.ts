@@ -13,7 +13,10 @@ import {
 } from '$lib/server/boosted';
 import { requireEmailVerification } from '$lib/server/config';
 import { prisma } from '$lib/server/prisma';
-import { comparePassword } from '$lib/server/utils';
+import {
+	comparePassword,
+	migrateAuthenticatedPassword,
+} from '$lib/server/utils';
 import { serverName } from '$lib/server/worlds';
 
 import {
@@ -177,11 +180,16 @@ async function handleLogin(
 	}
 
 	const authentication = await withLockedAccount<
-		ErrorResponse | { sessionKey: string }
+		| ErrorResponse
+		| {
+				sessionKey: string;
+				account: { id: number; password: string; is_verified: boolean };
+		  }
 	>(prisma, account.id, async (tx, current) => {
 		if (
 			!current ||
-			current.password !== account.password ||
+			(current.password !== account.password &&
+				!comparePassword(params.password, current.password)) ||
 			current.email !== account.email
 		) {
 			return {
@@ -212,7 +220,10 @@ async function handleLogin(
 		}
 
 		if (DEPRECATED_USE_SHA1_PASSWORDS === 'true') {
-			return { sessionKey: `${params.email}\n${params.password}` };
+			return {
+				sessionKey: `${params.email}\n${params.password}`,
+				account: current,
+			};
 		}
 		const sessionKey = crypto.randomUUID();
 		await tx.gameAccountSessions.create({
@@ -222,12 +233,15 @@ async function handleLogin(
 				expires: Math.trunc((Date.now() + SESSION_DURATION) / 1000),
 			},
 		});
-		return { sessionKey };
+		return { sessionKey, account: current };
 	});
 	if ('errorCode' in authentication) {
 		return authentication;
 	}
 	const { sessionKey } = authentication;
+	if (DEPRECATED_USE_SHA1_PASSWORDS !== 'true') {
+		await migrateAuthenticatedPassword(authentication.account, params.password);
+	}
 
 	const serverPort = parseInt(SERVER_PORT) ?? 7172;
 	const pvptype = ['pvp', 'no-pvp', 'pvp-enforced'].indexOf(PVP_TYPE);

@@ -22,26 +22,3 @@ export function serverTextAttributes(
 		]),
 	);
 }
-
-/** Escape configuration values before inserting them into rendered Markdown text. */
-export function serverMarkupText(
-	value: string,
-	identity: ServerIdentity,
-): string {
-	const escape = (text: string) =>
-		text.replace(
-			/[&<>"']/g,
-			(character) =>
-				({
-					'&': '&amp;',
-					'<': '&lt;',
-					'>': '&gt;',
-					'"': '&quot;',
-					"'": '&#39;',
-				})[character]!,
-		);
-	return serverText(value, {
-		name: escape(identity.name),
-		website: escape(identity.website),
-	});
-}

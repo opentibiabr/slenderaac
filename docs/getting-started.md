@@ -43,6 +43,13 @@ cd slenderaac
 bun install --frozen-lockfile
 ```
 
+Use the Bun version recorded in `.bun-version`. To see the known advisories
+for the locked dependencies, including development dependencies, run
+`bun run audit:dependencies`. The audit reads `bun.lock` and queries the
+registry without installing packages. On pull requests the same check compares
+the result with the target branch and fails for newly introduced high or
+critical advisories. Main branch and scheduled runs report the full backlog.
+
 Run all remaining commands from this `slenderaac` folder, where `package.json`
 is located. Leave the game server and image packs outside this folder.
 
@@ -84,24 +91,27 @@ Adjust these values for your installation and keep the other entries from `.env.
 | `SERVER_NAME`                    | Your game world's display name.                                                                                                        |
 | `SERVER_ADDRESS` / `SERVER_PORT` | The game server address and game port. These also drive the online/offline check.                                                      |
 
-`SERVER_CONFIG_FILE` supplies the database connection for the website **and its
-migration commands**, overriding conflicting connection settings in `DATABASE_URL`.
+In legacy mode, `SERVER_CONFIG_FILE` supplies the database connection for the
+website **and its migration commands**, overriding conflicting connection
+settings in `DATABASE_URL`.
 It does not automatically replace every other `.env` setting. If the website
 cannot access that file, leave the path empty and configure `DATABASE_URL` with
 the same database used by the game server. See [database configuration](database.md)
 for the fallback and validation rules.
 
-Review the other `.env` options before making the site public, particularly
-`AUTO_ADMIN_EMAIL`, email settings, public links and payment settings. A newly
-registered account matching `AUTO_ADMIN_EMAIL` receives administrator privileges;
-choose an address you control. Changing that value does not promote an existing
-account. For local browsing without payments, set `ENABLE_STRIPE_CUSTOM=false`
-and `ENABLE_STRIPE_CHECKOUT=false`.
+Review the other `.env` options before making the site public, particularly email
+settings, public links and payment settings. For local browsing without payments,
+set `ENABLE_STRIPE_CUSTOM=false` and `ENABLE_STRIPE_CHECKOUT=false`.
 
-Account roles follow the game server: type `5` is Community Manager and type `6`
-is God. Both can sign in, but website administration requires God (`6`). Updating
-the website does not promote existing accounts; review staff roles in the game
-database when upgrading from an older role mapping.
+Public registration creates a normal account. To provision the first website
+administrator, register an account you control. As a trusted game database
+operator, confirm the account's `accounts.id` and set `accounts.type` to `6`
+for that account using your database administration tool.
+
+Account roles follow the game server. Community Manager is type `5` and God is
+type `6`. Both can sign in. Website administration requires God (`6`). When
+upgrading, remove `AUTO_ADMIN_EMAIL` from your environment and review existing
+staff roles, including accounts the old signup flow may have promoted.
 
 ### 3. Prepare the website tables
 

@@ -7,8 +7,11 @@ import {
 } from '$lib/server/account-2fa';
 import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
-import { createSessionForAccount, setLoginCookie } from '$lib/server/session';
-import { comparePassword } from '$lib/server/utils';
+import { createWebSession, setWebSessionCookie } from '$lib/server/session';
+import {
+	comparePassword,
+	migrateAuthenticatedPassword,
+} from '$lib/server/utils';
 import {
 	presenceValidator,
 	stringValidator,
@@ -40,6 +43,7 @@ export const actions: Actions = {
 			{
 				email: [presenceValidator, stringValidator],
 				password: [presenceValidator, stringValidator],
+				token: [stringValidator],
 			},
 			data,
 		);
@@ -47,61 +51,69 @@ export const actions: Actions = {
 		if (Object.keys(errors).length > 0) {
 			return fail(400, {
 				invalid: true,
+				tokenRequired: Boolean(token) && typeof email === 'string',
+				email: typeof email === 'string' ? email : undefined,
 				errors: errors,
 			});
 		}
 
 		invariant(email && password, 'Missing required fields');
 		invariant(typeof email === 'string', 'Email must be a string');
+		invariant(!token || typeof token === 'string', 'Token must be a string');
 		invariant(typeof password === 'string', 'Passsword must be a string');
 		email = email.toLowerCase();
 
 		const account = await prisma.accounts.findUnique({
 			where: { email },
+			select: { id: true, email: true, password: true, token_secret: true },
 		});
 
 		if (!account || !comparePassword(password, account.password)) {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}
+		if (account.token_secret && !token) {
+			return { tokenRequired: true, email };
+		}
+
 		const result = await withLockedAccount(
 			prisma,
 			account.id,
-			async (tx, current) => {
+			async (client, current) => {
 				if (
 					!current ||
-					current.password !== account.password ||
-					current.email !== account.email
+					current.email !== account.email ||
+					(current.password !== account.password &&
+						!comparePassword(password, current.password)) ||
+					current.token_secret !== account.token_secret
 				) {
-					return { kind: 'credentials' } as const;
+					return { type: 'credentials-changed' } as const;
 				}
-				if (current.token_secret) {
-					if (!token) return { kind: 'challenge' } as const;
-					if (
-						typeof token !== 'string' ||
-						!(await verifyAccountFactor(tx, current, token))
-					) {
-						return { kind: 'factor' } as const;
-					}
+				if (
+					current.token_secret &&
+					(!token || !(await verifyAccountFactor(client, current, token)))
+				) {
+					return { type: 'invalid-token' } as const;
 				}
-				const sid = await createSessionForAccount(tx, current);
-				return { kind: 'session', sid } as const;
+				return {
+					type: 'session',
+					account: current,
+					sid: await createWebSession(client, current),
+				} as const;
 			},
 		);
-		if (result.kind === 'credentials') {
+		if (result.type === 'credentials-changed') {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}
-		if (result.kind === 'challenge')
-			return { tokenRequired: true, email, password };
-		if (result.kind === 'factor') {
+		if (result.type === 'invalid-token') {
 			return fail(400, {
 				tokenRequired: true,
 				email,
-				password,
 				errors: { token: [$_('invalid-token')] } as Record<string, string[]>,
 			});
 		}
 
-		setLoginCookie(cookies, result.sid);
+		setWebSessionCookie(cookies, result.sid);
+		await migrateAuthenticatedPassword(result.account, password);
 		throw redirect(302, returnTo);
 	},
 } satisfies Actions;
