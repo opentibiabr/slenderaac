@@ -1,9 +1,12 @@
 import { json } from '@sveltejs/kit';
 import { createHash } from 'crypto';
-import { authenticator } from 'otplib';
 import parseDuration from 'parse-duration';
 
 import { PlayerGroup, PlayerSex, vocationString } from '$lib/players';
+import {
+	checkAuthenticatorToken,
+	withLockedAccount,
+} from '$lib/server/account-2fa';
 import {
 	boostedClientResponse,
 	loadBoostedSelections,
@@ -176,46 +179,68 @@ async function handleLogin(
 		};
 	}
 
-	if (requireEmailVerification && !account.is_verified) {
-		return {
-			errorCode: 5,
-			errorMessage:
-				'Your account has not been verified. Please check your email to verify your account.',
-		};
-	}
+	const authentication = await withLockedAccount<
+		| ErrorResponse
+		| {
+				sessionKey: string;
+				account: { id: number; password: string; is_verified: boolean };
+		  }
+	>(prisma, account.id, async (tx, current) => {
+		if (
+			!current ||
+			(current.password !== account.password &&
+				!comparePassword(params.password, current.password)) ||
+			current.email !== account.email
+		) {
+			return {
+				errorCode: 3,
+				errorMessage: 'Email or password is not correct.',
+			};
+		}
+		if (requireEmailVerification && !current.is_verified) {
+			return {
+				errorCode: 5,
+				errorMessage:
+					'Your account has not been verified. Please check your email to verify your account.',
+			};
+		}
+		if (current.token_secret) {
+			if (!params.token) {
+				return {
+					errorCode: 6,
+					errorMessage: 'Two-factor token required for authentication',
+				};
+			}
+			if (!checkAuthenticatorToken(params.token, current.token_secret)) {
+				return {
+					errorCode: 6,
+					errorMessage: 'Two-factor token is not correct.',
+				};
+			}
+		}
 
-	if (account.token_secret && !params.token) {
-		return {
-			errorCode: 6,
-			errorMessage: 'Two-factor token required for authentication',
-		};
-	}
-
-	if (
-		account.token_secret &&
-		params.token &&
-		!authenticator.check(params.token, account.token_secret)
-	) {
-		return {
-			errorCode: 6,
-			errorMessage: 'Two-factor token is not correct.',
-		};
-	}
-
-	let sessionKey: string = crypto.randomUUID();
-	const hashedSessionId = createHash('sha1').update(sessionKey).digest('hex');
-
-	if (DEPRECATED_USE_SHA1_PASSWORDS === 'true') {
-		sessionKey = `${params.email}\n${params.password}`;
-	} else {
-		await prisma.gameAccountSessions.create({
+		if (DEPRECATED_USE_SHA1_PASSWORDS === 'true') {
+			return {
+				sessionKey: `${params.email}\n${params.password}`,
+				account: current,
+			};
+		}
+		const sessionKey = crypto.randomUUID();
+		await tx.gameAccountSessions.create({
 			data: {
-				id: hashedSessionId,
+				id: createHash('sha1').update(sessionKey).digest('hex'),
 				account_id: account.id,
-				expires: Math.trunc((Date.now() + SESSION_DURATION) / 1000), // convert to seconds
+				expires: Math.trunc((Date.now() + SESSION_DURATION) / 1000),
 			},
 		});
-		await migrateAuthenticatedPassword(account, params.password);
+		return { sessionKey, account: current };
+	});
+	if ('errorCode' in authentication) {
+		return authentication;
+	}
+	const { sessionKey } = authentication;
+	if (DEPRECATED_USE_SHA1_PASSWORDS !== 'true') {
+		await migrateAuthenticatedPassword(authentication.account, params.password);
 	}
 
 	const serverPort = parseInt(SERVER_PORT) ?? 7172;

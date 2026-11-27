@@ -25,7 +25,7 @@ const webSessionCookieOptions = {
 } as const;
 const webSessionMaxAgeSeconds = 60 * 60 * 24 * 30;
 
-function webSessionId(sid: Sid) {
+export function webSessionId(sid: Sid) {
 	if (sid.length !== 46 || !/^v2\.[A-Za-z0-9_-]{43}$/.test(sid)) return;
 	return `v2:${createHash('sha256').update(sid).digest('hex')}`;
 }

@@ -797,13 +797,24 @@ model AccountBackupCodes {
 }
 
 model AccountSessions {
-  id         String   @id @default(cuid())
-  expires    BigInt   @db.UnsignedBigInt
-  account_id Int      @db.UnsignedInt
-  account    Accounts @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  id             String                 @id @default(cuid())
+  expires        BigInt                 @db.UnsignedBigInt
+  account_id     Int                    @db.UnsignedInt
+  account        Accounts               @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  twoFactorSetup AccountTwoFactorSetup?
 
   @@index([account_id], map: "slender_sessions_account_id_fkey")
   @@map("slender_sessions")
+}
+
+model AccountTwoFactorSetup {
+  session_id String          @id
+  id         String          @unique @default(cuid())
+  secret     String          @db.VarChar(255)
+  expires_at DateTime
+  session    AccountSessions @relation(fields: [session_id], references: [id], onDelete: Cascade)
+
+  @@map("slender_account_2fa_setup")
 }
 
 model WebCredentialChangeAttempt {

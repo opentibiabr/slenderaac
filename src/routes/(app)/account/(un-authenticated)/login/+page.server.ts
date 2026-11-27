@@ -1,15 +1,14 @@
 import { fail, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
+import {
+	verifyAccountFactor,
+	withLockedAccount,
+} from '$lib/server/account-2fa';
 import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
+import { createWebSession, setWebSessionCookie } from '$lib/server/session';
 import {
-	createWebSession,
-	lockWebSessionAccount,
-	setWebSessionCookie,
-} from '$lib/server/session';
-import {
-	check2faToken,
 	comparePassword,
 	migrateAuthenticatedPassword,
 } from '$lib/server/utils';
@@ -76,41 +75,32 @@ export const actions: Actions = {
 			return { tokenRequired: true, email };
 		}
 
-		const result = await prisma.$transaction(async (client) => {
-			await lockWebSessionAccount(client, account.id);
-			const current = await client.accounts.findUnique({
-				where: { id: account.id },
-				select: {
-					id: true,
-					type: true,
-					email: true,
-					is_verified: true,
-					password: true,
-					token_secret: true,
-				},
-			});
-			if (
-				!current ||
-				current.email !== account.email ||
-				(current.password !== account.password &&
-					!comparePassword(password, current.password)) ||
-				current.token_secret !== account.token_secret
-			) {
-				return { type: 'credentials-changed' } as const;
-			}
-			if (
-				current.token_secret &&
-				(!token ||
-					!(await check2faToken(token, current.id, true, true, client)))
-			) {
-				return { type: 'invalid-token' } as const;
-			}
-			return {
-				type: 'session',
-				account: current,
-				sid: await createWebSession(client, current),
-			} as const;
-		});
+		const result = await withLockedAccount(
+			prisma,
+			account.id,
+			async (client, current) => {
+				if (
+					!current ||
+					current.email !== account.email ||
+					(current.password !== account.password &&
+						!comparePassword(password, current.password)) ||
+					current.token_secret !== account.token_secret
+				) {
+					return { type: 'credentials-changed' } as const;
+				}
+				if (
+					current.token_secret &&
+					(!token || !(await verifyAccountFactor(client, current, token)))
+				) {
+					return { type: 'invalid-token' } as const;
+				}
+				return {
+					type: 'session',
+					account: current,
+					sid: await createWebSession(client, current),
+				} as const;
+			},
+		);
 		if (result.type === 'credentials-changed') {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}

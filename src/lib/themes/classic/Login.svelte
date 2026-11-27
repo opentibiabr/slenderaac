@@ -34,7 +34,7 @@
 				</label>
 				<TextField
 					required
-					label="Authenticator Token"
+					label="Authenticator Token or Recovery Code"
 					name="token"
 					autocomplete="one-time-code"
 					errors={form?.errors?.token} />

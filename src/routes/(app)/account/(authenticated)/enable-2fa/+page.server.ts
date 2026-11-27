@@ -3,128 +3,157 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import invariant from 'tiny-invariant';
 
-import { prisma } from '$lib/server/prisma';
-import { requireLogin } from '$lib/server/session';
-import { comparePassword } from '$lib/server/utils';
 import {
-	numberValidator,
-	presenceValidator,
-	stringValidator,
-	validate,
-} from '$lib/server/validations';
-import { $_, chunkString } from '$lib/utils';
+	checkAuthenticatorToken,
+	newRecoveryCodes,
+	TWO_FACTOR_SETUP_TTL_MS,
+	withLockedAccount,
+} from '$lib/server/account-2fa';
+import { prisma } from '$lib/server/prisma';
+import {
+	requireLogin,
+	WEB_SESSION_COOKIE,
+	webSessionId,
+} from '$lib/server/session';
+import { comparePassword } from '$lib/server/utils';
+import { $_ } from '$lib/utils';
 
 import { PUBLIC_TITLE } from '$env/static/public';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({ locals }) => {
-	invariant(locals.session?.email, 'Missing email in session');
-	const accountId = locals.session?.accountId;
-	invariant(accountId, 'accountId must be set');
-	const account = await prisma.accounts.findUniqueOrThrow({
-		where: { id: accountId },
-	});
-	if (!account.is_verified) {
-		throw error(403, 'Account is not verified');
-	}
-	if (account.token_secret) {
-		return { enabled: true };
-	}
+export const load = (async ({ locals, cookies, setHeaders }) => {
+	requireLogin(locals);
+	const sid = cookies.get(WEB_SESSION_COOKIE);
+	const sessionId = sid && webSessionId(sid);
+	invariant(sessionId, 'Missing session cookie');
 
-	const secret = authenticator.generateSecret();
-	const otpauth = authenticator.keyuri(
-		locals.session?.email,
-		PUBLIC_TITLE,
-		secret,
+	const setup = await withLockedAccount(
+		prisma,
+		locals.session.accountId,
+		async (tx, account) => {
+			if (!account?.is_verified) throw error(403, 'Account is not verified');
+			if (account.token_secret) return null;
+
+			const now = Date.now();
+			const current = await tx.accountTwoFactorSetup.findUnique({
+				where: { session_id: sessionId },
+			});
+			if (current && current.expires_at.getTime() > now) return current;
+
+			const pending = {
+				id: crypto.randomUUID(),
+				secret: authenticator.generateSecret(),
+				expires_at: new Date(now + TWO_FACTOR_SETUP_TTL_MS),
+			};
+			return tx.accountTwoFactorSetup.upsert({
+				where: { session_id: sessionId },
+				create: { session_id: sessionId, ...pending },
+				update: pending,
+			});
+		},
 	);
+	if (!setup) return { enabled: true };
 
-	let qrCodeURL = '';
-	try {
-		qrCodeURL = await toDataURL(otpauth);
-	} catch (e) {
-		throw error(500, 'Failed to generate QR code');
-	}
-
-	return { secret, qrCodeURL };
+	setHeaders({ 'cache-control': 'private, no-store' });
+	const uri = authenticator.keyuri(
+		locals.session.email,
+		PUBLIC_TITLE,
+		setup.secret,
+	);
+	return { challengeId: setup.id, qrCodeURL: await toDataURL(uri) };
 }) satisfies PageServerLoad;
 
 export const actions = {
-	default: async (event) => {
-		const { request, locals } = event;
+	default: async ({ request, locals, cookies }) => {
 		requireLogin(locals);
-		const accountId = locals.session?.accountId;
-		invariant(accountId, 'accountId must be set');
+		const accountId = locals.session.accountId;
+		const sid = cookies.get(WEB_SESSION_COOKIE);
+		const sessionId = sid && webSessionId(sid);
+		invariant(sessionId, 'Missing session cookie');
 
 		const data = await request.formData();
 		const password = data.get('password');
-		const secret = data.get('secret');
+		const challengeId = data.get('challengeId');
 		const token = data.get('token');
-
-		const errors = await validate(
-			{
-				password: [presenceValidator, stringValidator],
-				secret: [presenceValidator, stringValidator],
-				token: [presenceValidator, numberValidator],
-			},
-			data,
-		);
-
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
-		}
-
-		invariant(password && secret && token, 'Missing required fields');
-		invariant(typeof password === 'string', 'Password must be a string');
-		invariant(typeof secret === 'string', 'Secret must be a string');
-		invariant(typeof token === 'string', 'Token must be a string');
-
-		const account = await prisma.accounts.findFirst({
-			where: {
-				id: locals.session?.accountId,
-			},
-		});
-		if (!account || !comparePassword(password, account.password)) {
+		if (typeof password !== 'string' || !password) {
 			return fail(400, {
-				errors: {
-					password: [$_('invalid-password')],
-				} as Record<string, string[]>,
+				errors: { password: [$_('invalid-password')] } as Record<
+					string,
+					string[]
+				>,
+			});
+		}
+		if (typeof challengeId !== 'string' || typeof token !== 'string') {
+			return fail(400, {
+				errors: { token: [$_('invalid-token')] } as Record<string, string[]>,
 			});
 		}
 
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
-		}
-
-		if (!authenticator.check(token, secret)) {
-			return fail(400, {
-				errors: {
-					token: [$_('invalid-token')],
-				} as Record<string, string[]>,
-			});
-		}
-
-		const recoveryCodes = chunkString(
-			crypto.randomUUID().replaceAll('-', ''),
-			5,
-		);
-
-		await prisma.accounts.update({
+		const account = await prisma.accounts.findUnique({
 			where: { id: accountId },
-			data: {
-				token_secret: secret,
-				backupCodes: {
-					deleteMany: { account_id: accountId },
-					createMany: {
-						data: recoveryCodes.map((code) => ({ code })),
-					},
-				},
-			},
+			select: { password: true, token_secret: true, is_verified: true },
 		});
+		if (!account?.is_verified) throw error(403, 'Account is not verified');
+		if (account.token_secret)
+			return fail(409, { errors: {} as Record<string, string[]> });
+		if (!comparePassword(password, account.password)) {
+			return fail(400, {
+				errors: { password: [$_('invalid-password')] } as Record<
+					string,
+					string[]
+				>,
+			});
+		}
 
-		return {
-			success: true,
-			recoveryCodes,
-		};
+		const result = await withLockedAccount(
+			prisma,
+			accountId,
+			async (tx, current) => {
+				if (!current?.is_verified) return 'unverified';
+				if (current.token_secret || current.password !== account.password)
+					return 'changed';
+				const setup = await tx.accountTwoFactorSetup.findUnique({
+					where: { session_id: sessionId },
+				});
+				if (
+					!setup ||
+					setup.id !== challengeId ||
+					setup.expires_at.getTime() <= Date.now() ||
+					!checkAuthenticatorToken(token, setup.secret)
+				) {
+					return 'invalid';
+				}
+				const consumed = await tx.accountTwoFactorSetup.deleteMany({
+					where: {
+						id: setup.id,
+						session_id: sessionId,
+						expires_at: { gt: new Date() },
+					},
+				});
+				if (consumed.count !== 1) return 'invalid';
+				await tx.accountTwoFactorSetup.deleteMany({
+					where: { session: { account_id: accountId } },
+				});
+				const { codes, rows } = newRecoveryCodes();
+				await tx.accounts.update({
+					where: { id: accountId },
+					data: {
+						token_secret: setup.secret,
+						backupCodes: { deleteMany: {}, createMany: { data: rows } },
+					},
+				});
+				return codes;
+			},
+		);
+		if (result === 'unverified') throw error(403, 'Account is not verified');
+		if (result === 'changed')
+			return fail(409, { errors: {} as Record<string, string[]> });
+		if (result === 'invalid') {
+			return fail(400, {
+				errors: { token: [$_('invalid-token')] } as Record<string, string[]>,
+			});
+		}
+		return { success: true, recoveryCodes: result };
 	},
 } satisfies Actions;
