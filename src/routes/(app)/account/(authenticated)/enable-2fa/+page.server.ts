@@ -10,7 +10,11 @@ import {
 	withLockedAccount,
 } from '$lib/server/account-2fa';
 import { prisma } from '$lib/server/prisma';
-import { requireLogin } from '$lib/server/session';
+import {
+	requireLogin,
+	WEB_SESSION_COOKIE,
+	webSessionId,
+} from '$lib/server/session';
 import { comparePassword } from '$lib/server/utils';
 import { $_ } from '$lib/utils';
 
@@ -20,7 +24,8 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load = (async ({ locals, cookies, setHeaders }) => {
 	requireLogin(locals);
-	const sessionId = cookies.get('sid');
+	const sid = cookies.get(WEB_SESSION_COOKIE);
+	const sessionId = sid && webSessionId(sid);
 	invariant(sessionId, 'Missing session cookie');
 
 	const setup = await withLockedAccount(
@@ -63,7 +68,8 @@ export const actions = {
 	default: async ({ request, locals, cookies }) => {
 		requireLogin(locals);
 		const accountId = locals.session.accountId;
-		const sessionId = cookies.get('sid');
+		const sid = cookies.get(WEB_SESSION_COOKIE);
+		const sessionId = sid && webSessionId(sid);
 		invariant(sessionId, 'Missing session cookie');
 
 		const data = await request.formData();
