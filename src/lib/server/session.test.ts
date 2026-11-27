@@ -8,7 +8,7 @@ void test(
 	{ skip: process.env.SLENDER_TEST_DATABASE !== 'true' },
 	async () => {
 		const { prisma } = await import('./prisma');
-		const { createSession, deleteSession, getSession } = await import(
+		const { createWebSession, deleteSession, getSession } = await import(
 			'./session'
 		);
 		const marker = `session-test-${randomUUID().slice(0, 12)}`;
@@ -37,11 +37,15 @@ void test(
 					where: { id: account.id },
 					data: { type },
 				});
-				const staffSession = await createSession(account.email, 60);
+				const staffSession = await createWebSession(
+					prisma,
+					{ id: account.id, type },
+					60,
+				);
 				assert.equal((await getSession(staffSession))?.type, type);
 				await deleteSession(staffSession);
 			}
-			const sid = await createSession(account.email, 60);
+			const sid = await createWebSession(prisma, account, 60);
 			assert.match(sid, /^v2\.[A-Za-z0-9_-]{43}$/);
 			const id = `v2:${createHash('sha256').update(sid).digest('hex')}`;
 			const stored = await prisma.accountSessions.findUniqueOrThrow({
@@ -68,7 +72,7 @@ void test(
 			);
 			await Promise.all([deleteSession(sid), deleteSession(sid)]);
 
-			const expired = await createSession(account.email, 60);
+			const expired = await createWebSession(prisma, account, 60);
 			const expiredId = `v2:${createHash('sha256').update(expired).digest('hex')}`;
 			const now = Date.now();
 			await prisma.accountSessions.update({
@@ -99,7 +103,7 @@ void test(
 				gameSession.expires,
 			);
 
-			const deleted = await createSession(account.email, 60);
+			const deleted = await createWebSession(prisma, account, 60);
 			await prisma.accounts.delete({ where: { id: account.id } });
 			assert.equal(
 				await getSession(deleted),

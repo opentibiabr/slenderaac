@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { compareSync, hashSync } from 'bcrypt';
 import { authenticator } from 'otplib';
 
@@ -80,8 +81,9 @@ export async function check2faToken(
 	accountId: number,
 	allowBackupCodes = true,
 	consumeBackupCode = true,
+	client: Prisma.TransactionClient = prisma,
 ) {
-	const account = await prisma.accounts.findUnique({
+	const account = await client.accounts.findUnique({
 		where: { id: accountId },
 		include: { backupCodes: { where: { used: false } } },
 	});
@@ -100,13 +102,13 @@ export async function check2faToken(
 			);
 			if (consumeBackupCode) {
 				if (account.backupCodes.length > 1) {
-					await prisma.accountBackupCodes.update({
+					await client.accountBackupCodes.update({
 						where: { id: backupCode.id },
 						data: { used: true },
 					});
 				} else {
 					// all backup codes used, disable 2fa
-					await prisma.accounts.update({
+					await client.accounts.update({
 						where: { id: accountId },
 						data: {
 							token_secret: null,

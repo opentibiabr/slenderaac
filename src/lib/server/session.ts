@@ -1,5 +1,7 @@
-import { type Cookies, redirect } from '@sveltejs/kit';
 import { createHash, randomBytes } from 'node:crypto';
+
+import type { Prisma } from '@prisma/client';
+import { type Cookies, redirect } from '@sveltejs/kit';
 import invariant from 'tiny-invariant';
 
 import { AccountType, isAccountType } from '$lib/accounts';
@@ -28,8 +30,7 @@ function webSessionId(sid: Sid) {
 	return `v2:${createHash('sha256').update(sid).digest('hex')}`;
 }
 
-export async function performLogin(cookies: Cookies, email: string) {
-	const sid = await createSession(email, webSessionMaxAgeSeconds);
+export function setWebSessionCookie(cookies: Cookies, sid: Sid) {
 	cookies.set(WEB_SESSION_COOKIE, sid, {
 		...webSessionCookieOptions,
 		maxAge: webSessionMaxAgeSeconds,
@@ -40,21 +41,25 @@ export function clearWebSessionCookie(cookies: Cookies) {
 	cookies.delete(WEB_SESSION_COOKIE, webSessionCookieOptions);
 }
 
-export async function createSession(
-	email: string,
-	maxAgeSeconds: number,
+export async function lockWebSessionAccount(
+	client: Prisma.TransactionClient,
+	accountId: number,
+) {
+	await client.$queryRaw`SELECT id FROM accounts WHERE id = ${accountId} FOR UPDATE`;
+}
+
+export async function createWebSession(
+	client: Prisma.TransactionClient,
+	account: { id: number; type: number },
+	maxAgeSeconds = webSessionMaxAgeSeconds,
 ): Promise<string> {
-	const account = await prisma.accounts.findUnique({
-		where: { email },
-	});
-	invariant(account, 'Account not found');
 	invariant(isAccountType(account.type), 'Invalid account type');
 
 	const expiresAt = Date.now() + maxAgeSeconds * 1000;
 	const sid = `v2.${randomBytes(32).toString('base64url')}`;
 	const id = webSessionId(sid);
 	invariant(id, 'Invalid generated web session token');
-	await prisma.accountSessions.create({
+	await client.accountSessions.create({
 		data: {
 			id,
 			account_id: account.id,

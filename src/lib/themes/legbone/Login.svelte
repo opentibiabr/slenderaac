@@ -8,7 +8,6 @@
 	type LoginForm = {
 		tokenRequired?: boolean;
 		email?: string;
-		password?: string;
 		errors?: Record<string, string[]>;
 	};
 
@@ -22,12 +21,19 @@
 
 	{#if form?.tokenRequired}
 		<input type="hidden" name="email" value={form.email} />
-		<input type="hidden" name="password" value={form.password} />
+		<label class="label">
+			<span>{$_('password')}</span>
+			<input
+				required
+				class="input"
+				name="password"
+				type="password"
+				autocomplete="current-password" />
+		</label>
 		<TextField
 			required
 			label={$_('token')}
 			name="token"
-			type="number"
 			autocomplete="one-time-code"
 			errors={form?.errors?.token} />
 	{:else}
@@ -48,7 +54,7 @@
 				name="password"
 				class="input"
 				type="password"
-				autocomplete="new-password" />
+				autocomplete="current-password" />
 		</label>
 	{/if}
 
