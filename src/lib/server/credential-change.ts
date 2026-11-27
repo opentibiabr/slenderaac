@@ -40,7 +40,12 @@ export async function reauthenticateCredentialChange(
 
 	const account = await client.accounts.findUniqueOrThrow({
 		where: { id: accountId },
-		select: { password: true, token_secret: true },
+		select: {
+			email: true,
+			is_verified: true,
+			password: true,
+			token_secret: true,
+		},
 	});
 	const where = { account_id: accountId };
 	const now = BigInt(Date.now());

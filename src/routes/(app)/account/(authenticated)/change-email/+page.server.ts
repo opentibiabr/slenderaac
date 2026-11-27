@@ -2,10 +2,18 @@ import { fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 import invariant from 'tiny-invariant';
 
+import {
+	credentialChangeRejected,
+	reauthenticateCredentialChange,
+} from '$lib/server/credential-change';
 import { sendVerificationEmail } from '$lib/server/email';
+import { errorCode, log } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
-import { requireLogin } from '$lib/server/session';
-import { comparePassword } from '$lib/server/utils';
+import {
+	clearWebSessionCookie,
+	requireLogin,
+	revokeWebSessions,
+} from '$lib/server/session';
 import {
 	emailValidator,
 	presenceValidator,
@@ -15,18 +23,19 @@ import {
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (() => {
-	return {};
+export const load = (async ({ parent }) => {
+	return { tokenRequired: (await parent()).account.is2faEnabled };
 }) satisfies PageServerLoad;
 
 export const actions = {
 	default: async (event) => {
-		const { request, locals } = event;
+		const { request, locals, cookies } = event;
 		requireLogin(locals);
 
 		const data = await request.formData();
 		const password = data.get('password');
 		const newEmail = data.get('newEmail');
+		const token = data.get('token');
 
 		const errors = await validate(
 			{
@@ -35,64 +44,135 @@ export const actions = {
 			},
 			data,
 		);
-
 		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+			return fail(400, { invalid: true, errors });
 		}
 
-		invariant(password && newEmail, 'Missing required fields');
-		invariant(typeof password === 'string', 'Name must be a string');
-		invariant(typeof newEmail === 'string', 'Name must be a string');
+		invariant(typeof password === 'string', 'Password must be a string');
+		invariant(typeof newEmail === 'string', 'Email must be a string');
 
-		const account = await prisma.accounts.findFirst({
-			where: {
-				id: locals.session?.accountId,
-			},
-		});
-		if (!account || !comparePassword(password, account.password)) {
+		const accountId = locals.session.accountId;
+		const email = newEmail.toLowerCase();
+		let result;
+		try {
+			result = await prisma.$transaction(async (client) => {
+				const auth = await reauthenticateCredentialChange(
+					client,
+					accountId,
+					cookies,
+					password,
+					token,
+				);
+				if (auth.status !== 'authenticated') return auth;
+				if (auth.account.email.toLowerCase() === email) {
+					return { status: 'same-email' } as const;
+				}
+				const existing = await client.accounts.findUnique({
+					where: { email },
+					select: { id: true },
+				});
+				if (existing) return { status: 'email-unavailable' } as const;
+
+				const updated = !auth.account.is_verified;
+				if (updated) {
+					await client.accounts.update({
+						where: { id: accountId },
+						data: { email },
+					});
+					await revokeWebSessions(client, accountId);
+				}
+				await client.emailVerification.deleteMany({
+					where: { account_id: accountId },
+				});
+				const verification = await client.emailVerification.create({
+					data: {
+						account_id: accountId,
+						expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+						new_email: email,
+					},
+					select: { token: true },
+				});
+				return {
+					status: 'requested',
+					updated,
+					recipient: auth.account.email,
+					verificationToken: verification.token,
+				} as const;
+			});
+		} catch (error) {
+			const code = errorCode(error);
+			if (code === 'P2002') {
+				return fail(400, {
+					errors: { newEmail: ['This email is unavailable'] } as Record<
+						string,
+						string[]
+					>,
+				});
+			}
+			log('error', 'account.change-email', `failed code=${code}`);
+			return fail(500, {
+				errors: { global: ['Failed to request email change'] } as Record<
+					string,
+					string[]
+				>,
+			});
+		}
+
+		if (
+			result.status === 'same-email' ||
+			result.status === 'email-unavailable'
+		) {
 			return fail(400, {
 				errors: {
-					password: ['Invalid password'],
+					newEmail: [
+						result.status === 'same-email'
+							? 'New email must be different from current email'
+							: 'This email is unavailable',
+					],
 				} as Record<string, string[]>,
 			});
 		}
-		if (account.email === newEmail.toLowerCase()) {
-			return fail(400, {
+		if (result.status !== 'requested') {
+			return credentialChangeRejected(cookies, result, 'password');
+		}
+
+		if (result.updated) clearWebSessionCookie(cookies);
+
+		try {
+			await sendVerificationEmail(result.recipient, result.verificationToken);
+		} catch (error) {
+			log(
+				'error',
+				'account.change-email.mail',
+				`failed code=${errorCode(error)}`,
+			);
+			if (result.updated) {
+				throw redirect(
+					'/account/login',
+					{
+						type: 'error',
+						message:
+							'Email updated, but the confirmation email could not be sent. Sign in with your new email to request another confirmation.',
+					},
+					event,
+				);
+			}
+			return fail(503, {
 				errors: {
-					newEmail: ['New email must be different from current email'],
+					global: [
+						'Your request was saved, but the confirmation email could not be sent. Submit the request again to retry.',
+					],
 				} as Record<string, string[]>,
 			});
 		}
 
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
-		}
-
-		if (!account.is_verified) {
-			await prisma.accounts.update({
-				where: { id: locals.session?.accountId },
-				data: { email: newEmail.toLowerCase() },
-			});
-		}
-
-		await prisma.emailVerification.deleteMany({
-			where: { account_id: account.id },
-		});
-		const verification = await prisma.emailVerification.create({
-			data: {
-				account_id: account.id,
-				expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-				new_email: newEmail.toLowerCase(),
-			},
-		});
-
-		await sendVerificationEmail(account.email, verification.token);
 		throw redirect(
-			'/account',
+			result.updated ? '/account/login' : '/account',
 			{
 				type: 'success',
-				message:
-					'Email changed requested. Please check your email for a confirmation link.',
+				message: result.updated
+					? 'Email updated. Please sign in again with your new email.'
+					: 'Email change requested. Please check your email for a confirmation link.',
 			},
 			event,
 		);

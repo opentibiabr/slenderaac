@@ -4,13 +4,15 @@
 	import { goto } from '$app/navigation';
 
 	import Button from '$lib/components/ui/Button.svelte';
+	import CredentialPasswordField from '$lib/components/ui/forms/CredentialPasswordField.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
 
-	import type { ActionData } from './$types';
+	import type { ActionData, PageData } from './$types';
 
 	export let form: ActionData;
+	export let data: PageData;
 
 	async function close() {
 		await goto('/account', { noScroll: true });
@@ -24,13 +26,10 @@
 		{/if}
 
 		<div class="flex flex-wrap gap-4 items-center">
-			<TextField
-				required
-				labelClass="w-full"
+			<CredentialPasswordField
 				label={$_('password')}
 				name="password"
-				type="password"
-				autocomplete="password"
+				autocomplete="current-password"
 				errors={form?.errors?.password} />
 			<TextField
 				required
@@ -38,6 +37,15 @@
 				name="newEmail"
 				type="email"
 				errors={form?.errors?.newEmail} />
+			{#if data.tokenRequired || (form && 'tokenRequired' in form && form.tokenRequired)}
+				<TextField
+					required
+					labelClass="w-full"
+					label={$_('token')}
+					name="token"
+					autocomplete="one-time-code"
+					errors={form?.errors?.token} />
+			{/if}
 		</div>
 
 		<div class="flex flex-row justify-end">
