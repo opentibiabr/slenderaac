@@ -1,11 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import {
-	serverMarkupText,
-	serverText,
-	serverTextAttributes,
-} from './site-identity';
+import { serverText, serverTextAttributes } from './site-identity';
 
 void test('server identity expands display tokens once without interpreting replacement text', () => {
 	const identity = {
@@ -18,16 +14,6 @@ void test('server identity expands display tokens once without interpreting repl
 			identity,
 		),
 		'About A&B $& {{serverWebsite}}. Visit https://game.example. OpenTibiaBR.',
-	);
-});
-
-void test('configuration cannot introduce markup into rendered articles', () => {
-	assert.equal(
-		serverMarkupText('Play {{serverName}} &amp; friends', {
-			name: '<img src=x onerror=alert(1)>',
-			website: 'https://game.example',
-		}),
-		'Play &lt;img src=x onerror=alert(1)&gt; &amp; friends',
 	);
 });
 

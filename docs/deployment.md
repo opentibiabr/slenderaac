@@ -18,10 +18,12 @@ enabled payment integration. Public/static environment values can be compiled
 into the application, so changing them requires another build.
 Keep private values outside version control.
 
-The runtime must be able to read `SERVER_CONFIG_FILE` when configured, plus the
-external asset directories and optional server catalog. If the service uses
-different paths or its own environment variables, configure those runtime paths
-there too; a checkout's `.env` does not override service-supplied variables.
+Use the [separate database credential mode](database.md#separate-site-and-migration-credentials)
+to give the running site its own limited MySQL account. Supply the migration
+credential only during the migration step. In legacy mode, the runtime must
+be able to read `SERVER_CONFIG_FILE` when configured. Give it read access to
+the external asset directories and optional server catalog. A checkout's
+`.env` does not override service-supplied variables.
 See [database configuration](database.md) and [asset installation](classic-assets.md).
 
 ## Build and start
@@ -62,11 +64,14 @@ server {
     listen [::]:80;
     server_name your-server.example;
 
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
@@ -77,9 +82,49 @@ origin consistent with that public URL. The example above alone does not configu
 HTTPS. Keep the Node listener private behind the proxy. Another reverse proxy
 can serve the same role.
 
+## Browser security headers
+
+The application supplies the Content Security Policy for rendered pages. The
+example proxy supplies `X-Content-Type-Options` and `Referrer-Policy`. Check the
+response from the outermost proxy for duplicate headers and verify that the
+headers are still present on redirects, errors and static assets. Nginx
+locations with their own `add_header` directives may need the headers repeated.
+
+The application blocks plugins and limits the document base URL to its own
+origin. To evaluate the stricter policy, route a same-origin POST path to your
+CSP report collector and set `CSP_REPORT_URI=/csp-reports` in the build
+environment before running `npm run build`. The built application sends the
+candidate policy in `Content-Security-Policy-Report-Only`. Limit access to
+reports and set retention at the collector because reports can include URLs.
+
+Check navigation and enhanced forms in Classic and Legbone, Classic fonts and
+trailers, configured image and audio origins, and Stripe test checkout,
+including 3-D Secure where enabled. Resolve violations for required resources
+before enforcing a stronger policy. Enable HSTS at the HTTPS proxy after
+verifying HTTPS on the domain. Include subdomains only when they all support
+HTTPS.
+
 After deployment, check the public pages, login/forms and the
 [asset URLs](classic-assets.md#store-and-animation-checks). Use
 [diagnostics](diagnostics.md) if requests fail or live data is unavailable.
+
+### Login rate limits
+
+Web and game login share short-lived rate limits in the website database.
+The defaults allow 120 login submissions per address over one minute,
+20 password checks per account over two minutes, and eight second-factor
+checks per account over three minutes. Opening the second-factor prompt
+without a code uses no second-factor attempt. Game news, cache info, boosted
+creatures and the event schedule retain their usual request handling.
+
+For the single Nginx proxy shown above, set `ADDRESS_HEADER=x-forwarded-for`
+and `XFF_DEPTH=1` in the Node service environment. Keep the Node listener
+private and have the trusted proxy supply the client IP. For a proxy chain, set
+the depth to match the trusted hops and verify the resolved address before
+serving users. With a direct Node listener, leave `ADDRESS_HEADER` unset so
+the adapter uses the peer address. When the configured header is unavailable,
+login requests share a fallback address bucket. An incorrect proxy
+configuration can make unrelated players share a limit.
 
 ## Update an existing service
 

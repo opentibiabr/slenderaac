@@ -1,6 +1,8 @@
 import { type ActionFailure, fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
 
+import { credentialChangeRejected } from '$lib/server/credential-change';
+
 import {
 	requestEmailChange,
 	sendEmailVerificationLinks,
@@ -22,7 +24,7 @@ export const actions = {
 	default: async (
 		event,
 	): Promise<ActionFailure<{ errors: Record<string, string[]> }>> => {
-		const { locals } = event;
+		const { cookies, locals } = event;
 		requireLogin(locals);
 		const data = await event.request.formData();
 		const password = data.get('password');
@@ -63,15 +65,18 @@ export const actions = {
 			newEmail.trim().toLowerCase(),
 			password,
 			data.get('factor'),
+			cookies,
 		);
 		switch (result.status) {
-			case 'password':
-				return fail(400, { errors: { password: ['Invalid password'] } });
+			case 'session-ended':
+			case 'rate-limited':
+			case 'invalid-password':
+				return credentialChangeRejected(cookies, result, 'password');
 			case 'address':
 				return fail(400, {
 					errors: { newEmail: ['Enter a different available email address.'] },
 				});
-			case 'factor':
+			case 'invalid-token':
 				return fail(400, {
 					errors: { factor: ['Enter a valid authenticator or recovery code.'] },
 				});

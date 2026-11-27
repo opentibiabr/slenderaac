@@ -55,9 +55,9 @@ void test('background session cleanup contains database failures and retries on 
 			2,
 			'a failed startup must not disable cleanup',
 		);
-		const query = queries[1] as { where: { expires: { lt: number } } };
-		assert.ok(query.where.expires.lt >= before);
-		assert.ok(query.where.expires.lt <= Date.now());
+		const query = queries[1] as { where: { expires: { lte: number } } };
+		assert.ok(query.where.expires.lte >= before);
+		assert.ok(query.where.expires.lte <= Date.now());
 		assert.equal(errors.length, 1, 'successful cleanup must not log a failure');
 
 		fail = true;

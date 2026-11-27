@@ -21,8 +21,17 @@ try {
 		(tool === 'vite' && ['build', 'preview'].includes(args[0])
 			? 'production'
 			: 'development');
+	// Keep the process-only migration secret out of Vite's dotenv expansion and
+	// mask the name if the subprocess loads dotenv again.
+	const migrationUrl = process.env.DATABASE_MIGRATION_URL;
+	process.env.DATABASE_MIGRATION_URL = '';
 	const environment = { ...loadEnv(mode, process.cwd(), ''), ...process.env };
-	const configuration = resolveDatabaseConfiguration(environment);
+	const purpose =
+		tool === 'prisma' && args[0] === 'migrate' ? 'migration' : 'runtime';
+	const configuration = resolveDatabaseConfiguration(
+		{ ...environment, DATABASE_MIGRATION_URL: migrationUrl },
+		purpose,
+	);
 	environment.DATABASE_URL = configuration.url;
 	console.info(
 		`[database.config] source=${configuration.source} database=${JSON.stringify(configuration.database)}`,
@@ -56,7 +65,7 @@ try {
 	// Only resolver-owned messages are safe; tool/parser errors may contain credentials.
 	const message =
 		error instanceof Error &&
-		/^(Set SERVER_CONFIG_FILE|Cannot read static database settings|Invalid (mysql|database name))/.test(
+		/^(Set (SERVER_CONFIG_FILE|DATABASE_CREDENTIAL_MODE)|Separate database credentials|Cannot read static database settings|Invalid (mysql|database name))/.test(
 			error.message,
 		)
 			? error.message

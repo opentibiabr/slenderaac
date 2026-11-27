@@ -1,9 +1,8 @@
 import { Prisma } from '@prisma/client';
+import type { Cookies } from '@sveltejs/kit';
 
-import {
-	verifyAccountFactor,
-	withLockedAccount,
-} from '$lib/server/account-2fa';
+import { withLockedAccount } from '$lib/server/account-2fa';
+import { reauthenticateCredentialChange } from '$lib/server/credential-change';
 import { sendMail } from '$lib/server/email';
 import { log } from '$lib/server/logging';
 import { prisma } from '$lib/server/prisma';
@@ -13,7 +12,7 @@ import {
 	recoveryLink,
 	recoveryTokenDigest,
 } from '$lib/server/recovery-token';
-import { comparePassword } from '$lib/server/utils';
+import { revokeWebSessions } from '$lib/server/session';
 
 import type { EmailVerification } from '@prisma/client';
 
@@ -94,89 +93,93 @@ function isCurrent(
 	);
 }
 
+class EmailChangeRejected extends Error {
+	constructor(readonly status: 'address' | 'cooldown') {
+		super(status);
+	}
+}
+
 export async function requestEmailChange(
 	accountId: number,
 	newEmail: string,
 	password: string,
-	factor: unknown,
+	factor: FormDataEntryValue | null,
+	cookies: Cookies,
 ) {
-	const snapshot = await prisma.accounts.findUnique({
-		where: { id: accountId },
-		select: { email: true, password: true },
-	});
-	if (!snapshot || !comparePassword(password, snapshot.password))
-		return { status: 'password' } as const;
+	try {
+		return await prisma.$transaction(async (tx) => {
+			const auth = await reauthenticateCredentialChange(
+				tx,
+				accountId,
+				cookies,
+				password,
+				factor,
+				true,
+			);
+			if (auth.status !== 'authenticated') return auth;
 
-	return withLockedAccount(prisma, accountId, async (tx, account) => {
-		if (
-			!account ||
-			account.email !== snapshot.email ||
-			account.password !== snapshot.password
-		) {
-			return { status: 'password' } as const;
-		}
-		if (
-			account.email.toLowerCase() === newEmail ||
-			(await tx.accounts.findUnique({
-				where: { email: newEmail },
-				select: { id: true },
-			}))
-		) {
-			return { status: 'address' } as const;
-		}
+			const account = { id: accountId, ...auth.account };
+			if (
+				account.email.toLowerCase() === newEmail ||
+				(await tx.accounts.findUnique({
+					where: { email: newEmail },
+					select: { id: true },
+				}))
+			) {
+				throw new EmailChangeRejected('address');
+			}
 
-		const existing = await tx.emailVerification.findUnique({
-			where: { account_id: account.id },
-		});
-		if (
-			existing &&
-			isCurrent(existing, account) &&
-			existing.last_sent.getTime() > Date.now() - RESEND_DELAY_MS
-		) {
-			return { status: 'cooldown' } as const;
-		}
-		if (
-			account.token_secret &&
-			(typeof factor !== 'string' ||
-				!(await verifyAccountFactor(tx, account, factor.trim())))
-		)
-			return { status: 'factor' } as const;
-
-		const target = newRecoveryToken();
-		const current =
-			account.is_verified && !account.token_secret
-				? newRecoveryToken()
-				: undefined;
-		const now = new Date();
-		const data = {
-			current_email: account.email,
-			new_email: newEmail,
-			authorization_fingerprint: accountRecoveryFingerprint(account),
-			current_approved: !current,
-			current_digest: current?.digest ?? null,
-			target_approved: false,
-			target_digest: target.digest,
-			last_sent: now,
-			expires: new Date(now.getTime() + VERIFY_TTL_MS),
-		};
-		await tx.emailVerification.upsert({
-			where: { account_id: account.id },
-			create: { account_id: account.id, ...data },
-			update: data,
-		});
-		const mail: VerificationMail[] = [
-			{ email: newEmail, kind: 'new', token: target.token },
-		];
-		if (current)
-			mail.push({
-				email: account.email,
-				kind: 'current',
-				token: current.token,
+			const existing = await tx.emailVerification.findUnique({
+				where: { account_id: account.id },
 			});
-		else if (account.is_verified)
-			mail.push({ email: account.email, kind: 'notice' });
-		return { status: 'pending', mail } as const;
-	});
+			if (
+				existing &&
+				isCurrent(existing, account) &&
+				existing.last_sent.getTime() > Date.now() - RESEND_DELAY_MS
+			) {
+				throw new EmailChangeRejected('cooldown');
+			}
+
+			const target = newRecoveryToken();
+			const current =
+				account.is_verified && !account.token_secret
+					? newRecoveryToken()
+					: undefined;
+			const now = new Date();
+			const data = {
+				current_email: account.email,
+				new_email: newEmail,
+				authorization_fingerprint: accountRecoveryFingerprint(account),
+				current_approved: !current,
+				current_digest: current?.digest ?? null,
+				target_approved: false,
+				target_digest: target.digest,
+				last_sent: now,
+				expires: new Date(now.getTime() + VERIFY_TTL_MS),
+			};
+			await tx.emailVerification.upsert({
+				where: { account_id: account.id },
+				create: { account_id: account.id, ...data },
+				update: data,
+			});
+			const mail: VerificationMail[] = [
+				{ email: newEmail, kind: 'new', token: target.token },
+			];
+			if (current)
+				mail.push({
+					email: account.email,
+					kind: 'current',
+					token: current.token,
+				});
+			else if (account.is_verified)
+				mail.push({ email: account.email, kind: 'notice' });
+			return { status: 'pending', mail } as const;
+		});
+	} catch (cause) {
+		// A rejected request must not consume a recovery code.
+		if (cause instanceof EmailChangeRejected) return { status: cause.status };
+		throw cause;
+	}
 }
 
 export async function resendEmailVerification(accountId: number) {
@@ -291,10 +294,12 @@ export async function confirmEmailVerification(token: unknown) {
 					where: { id: account.id },
 					data: { email: intent.new_email ?? account.email, is_verified: true },
 				});
-				if (intent.new_email)
+				if (intent.new_email) {
 					await tx.passwordReset.deleteMany({
 						where: { account_id: account.id },
 					});
+					await revokeWebSessions(tx, account.id);
+				}
 				return 'confirmed';
 			},
 		);

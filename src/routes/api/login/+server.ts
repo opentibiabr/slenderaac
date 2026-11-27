@@ -12,8 +12,12 @@ import {
 	loadBoostedSelections,
 } from '$lib/server/boosted';
 import { requireEmailVerification } from '$lib/server/config';
+import { allowLoginAttempt } from '$lib/server/login-attempts';
 import { prisma } from '$lib/server/prisma';
-import { comparePassword } from '$lib/server/utils';
+import {
+	comparePassword,
+	migrateAuthenticatedPassword,
+} from '$lib/server/utils';
 import { serverName } from '$lib/server/worlds';
 
 import {
@@ -104,7 +108,12 @@ interface ErrorResponse {
 	errorMessage: string;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+const invalidCredentials = {
+	errorCode: 3,
+	errorMessage: 'Email or password is not correct.',
+};
+
+export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 	const params = (await request.json()) as Params;
 	switch (params.type) {
 		case 'news':
@@ -116,6 +125,9 @@ export const POST: RequestHandler = async ({ request }) => {
 		case 'eventschedule':
 			return json({});
 		case 'login':
+			if (!(await allowLoginAttempt('source', getClientAddress))) {
+				return json(invalidCredentials);
+			}
 			return json(await handleLogin(params));
 		default:
 			// eslint-disable-next-line no-case-declarations
@@ -145,6 +157,9 @@ async function handleBoostedCreature() {
 async function handleLogin(
 	params: LoginParams,
 ): Promise<LoginResponse | ErrorResponse> {
+	if (typeof params.email !== 'string' || typeof params.password !== 'string') {
+		return invalidCredentials;
+	}
 	const account = await prisma.accounts.findUnique({
 		where: { email: params.email },
 		include: {
@@ -169,25 +184,28 @@ async function handleLogin(
 			},
 		},
 	});
-	if (!account || !comparePassword(params.password, account.password)) {
-		return {
-			errorCode: 3,
-			errorMessage: 'Email or password is not correct.',
-		};
+	if (
+		!account ||
+		!(await allowLoginAttempt('password', account.id)) ||
+		!comparePassword(params.password, account.password)
+	) {
+		return invalidCredentials;
 	}
 
 	const authentication = await withLockedAccount<
-		ErrorResponse | { sessionKey: string }
+		| ErrorResponse
+		| {
+				sessionKey: string;
+				account: { id: number; password: string; is_verified: boolean };
+		  }
 	>(prisma, account.id, async (tx, current) => {
 		if (
 			!current ||
-			current.password !== account.password ||
+			(current.password !== account.password &&
+				!comparePassword(params.password, current.password)) ||
 			current.email !== account.email
 		) {
-			return {
-				errorCode: 3,
-				errorMessage: 'Email or password is not correct.',
-			};
+			return invalidCredentials;
 		}
 		if (requireEmailVerification && !current.is_verified) {
 			return {
@@ -203,6 +221,12 @@ async function handleLogin(
 					errorMessage: 'Two-factor token required for authentication',
 				};
 			}
+			if (!(await allowLoginAttempt('factor', current.id, tx))) {
+				return {
+					errorCode: 6,
+					errorMessage: 'Too many authentication attempts. Try again later.',
+				};
+			}
 			if (!checkAuthenticatorToken(params.token, current.token_secret)) {
 				return {
 					errorCode: 6,
@@ -212,7 +236,10 @@ async function handleLogin(
 		}
 
 		if (DEPRECATED_USE_SHA1_PASSWORDS === 'true') {
-			return { sessionKey: `${params.email}\n${params.password}` };
+			return {
+				sessionKey: `${params.email}\n${params.password}`,
+				account: current,
+			};
 		}
 		const sessionKey = crypto.randomUUID();
 		await tx.gameAccountSessions.create({
@@ -222,12 +249,15 @@ async function handleLogin(
 				expires: Math.trunc((Date.now() + SESSION_DURATION) / 1000),
 			},
 		});
-		return { sessionKey };
+		return { sessionKey, account: current };
 	});
 	if ('errorCode' in authentication) {
 		return authentication;
 	}
 	const { sessionKey } = authentication;
+	if (DEPRECATED_USE_SHA1_PASSWORDS !== 'true') {
+		await migrateAuthenticatedPassword(authentication.account, params.password);
+	}
 
 	const serverPort = parseInt(SERVER_PORT) ?? 7172;
 	const pvptype = ['pvp', 'no-pvp', 'pvp-enforced'].indexOf(PVP_TYPE);

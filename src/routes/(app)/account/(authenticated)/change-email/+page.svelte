@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 
 	import Button from '$lib/components/ui/Button.svelte';
+	import CredentialPasswordField from '$lib/components/ui/forms/CredentialPasswordField.svelte';
 	import TextField from '$lib/components/ui/forms/TextField.svelte';
 	import StatelessModal from '$lib/components/ui/StatelessModal.svelte';
 	import { enhance } from '$lib/enchance';
@@ -25,12 +26,9 @@
 		{/if}
 
 		<div class="flex flex-wrap gap-4 items-center">
-			<TextField
-				required
-				labelClass="w-full"
+			<CredentialPasswordField
 				label={$_('password')}
 				name="password"
-				type="password"
 				autocomplete="current-password"
 				errors={form?.errors?.password} />
 			<TextField

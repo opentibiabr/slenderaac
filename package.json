@@ -7,6 +7,7 @@
 		"caniuse-lite": "1.0.30001810"
 	},
 	"scripts": {
+		"audit:dependencies": "bun src/scripts/audit-dependencies.js",
 		"install:assets": "node src/scripts/install-theme-assets.js",
 		"install:server-integration": "bun src/scripts/install-server-integration.ts",
 		"import:server-data": "bun src/scripts/import-server-data.ts",
@@ -37,7 +38,7 @@
 		"@types/js-yaml": "^4.0.9",
 		"@types/luaparse": "0.2.13",
 		"@types/node": "^20.10.3",
-		"@types/nodemailer": "^6.4.14",
+		"@types/nodemailer": "^8.0.2",
 		"@types/qrcode": "^1.5.5",
 		"@types/tcp-port-used": "^1.0.4",
 		"@typescript-eslint/eslint-plugin": "^6.13.2",
@@ -73,7 +74,7 @@
 		"ts-node": "^10.9.1",
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.2",
-		"vite": "^5.0.5"
+		"vite": "^5.4.21"
 	},
 	"type": "module",
 	"dependencies": {
@@ -95,10 +96,10 @@
 		"dotenv": "^16.3.1",
 		"js-yaml": "^4.1.0",
 		"luaparse": "0.3.1",
-		"nodemailer": "^6.9.7",
+		"nodemailer": "^10.6.1",
 		"otplib": "^12.0.1",
 		"parse-duration": "^1.1.0",
-		"protobufjs": "^7.2.5",
+		"protobufjs": "^7.6.6",
 		"qrcode": "^1.5.3",
 		"stripe-event-types": "^3.1.0",
 		"svelte-codemirror-editor": "^1.2.0",
