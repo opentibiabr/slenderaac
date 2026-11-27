@@ -78,6 +78,7 @@ model Accounts {
   emailVerifications  EmailVerification[]
   passwordReset       PasswordReset?
   accountSessions     AccountSessions[]
+  webChangeAttempt    WebCredentialChangeAttempt?
   store_history       StoreHistory[]
   feedback_responses  FeedbackResponse[]
   poll_votes          PollVote[]
@@ -814,6 +815,15 @@ model AccountTwoFactorSetup {
   session    AccountSessions @relation(fields: [session_id], references: [id], onDelete: Cascade)
 
   @@map("slender_account_2fa_setup")
+}
+
+model WebCredentialChangeAttempt {
+  account_id   Int      @id @db.UnsignedInt
+  failures     Int      @db.UnsignedInt
+  window_until BigInt   @db.UnsignedBigInt
+  account      Accounts @relation(fields: [account_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "slender_credential_change_attempt_account_fk")
+
+  @@map("slender_credential_change_attempts")
 }
 
 model LoginAttemptBucket {
