@@ -10,9 +10,11 @@
 		"character-actions": "Ações do personagem",
 		"select-character": "Selecionar {name}",
 		"no-characters": "Você ainda não tem personagens.",
-		"change-pending": "(verificação pendente para alteração de email para {email})",
-		"resend": "reenviar",
-		"unverified": "(não verificado <a class=\"anchor\" href=\"/account/resend\">reenviar</a>)",
+		"change-pending": "Confirmação pendente para {email}",
+		"resend": "Reenviar confirmação",
+		"unverified": "E-mail não verificado",
+		"recovery-factor": "Código do autenticador ou de recuperação",
+		"approve-both-emails": "Confirme a alteração nos seus endereços de e-mail atual e novo.",
 		"reward-collected": "Recompensa diária coletada",
 		"reward-uncollected": "Recompensa diária não coletada",
 		"reward-unknown": "Status da recompensa diária indisponível",
@@ -214,7 +216,8 @@
 		"title-case": ":campo deve estar em maiúsculas e minúsculas"
 	},
 	"verify": {
-		"welcome": "Bem-vindo! Por favor, verifique sua conta clicando no botão abaixo."
+		"confirm": "Confirmar solicitação de e-mail",
+		"welcome": "Confirme esta solicitação somente se você esperava este e-mail."
 	},
 	"verify-account": "Verificar Conta",
 	"view-more": "Ver mais",

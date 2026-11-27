@@ -33,21 +33,20 @@
 						<th scope="row">{$_('email')}</th>
 						<td>
 							{account.email}
-							{#if !account.isVerified}
-								<div class="text-error-500">
-									{@html $_('account.unverified')}
-								</div>
-							{:else if account.newEmail}
+							{#if account.newEmail}
 								<div class="text-warning-800-100-token">
 									{$_('account.change-pending', {
 										values: { email: account.newEmail },
 									})}
-									<form action={`/account/resend`} method="post">
-										<button class="anchor" type="submit"
-											>{$_('account.resend')}</button>
-									</form>
-									)
 								</div>
+							{:else if !account.isVerified}
+								<div class="text-error-500">{$_('account.unverified')}</div>
+							{/if}
+							{#if !account.isVerified || account.newEmail}
+								<form action="/account/resend" method="post">
+									<button class="anchor" type="submit"
+										>{$_('account.resend')}</button>
+								</form>
 							{/if}
 						</td>
 					</tr>

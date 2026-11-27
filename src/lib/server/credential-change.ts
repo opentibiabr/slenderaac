@@ -1,7 +1,10 @@
 import type { Prisma } from '@prisma/client';
 import { type Cookies, fail, redirect } from '@sveltejs/kit';
-import { authenticator } from 'otplib';
 
+import {
+	checkAuthenticatorToken,
+	verifyAccountFactor,
+} from '$lib/server/account-2fa';
 import {
 	clearWebSessionCookie,
 	lockActiveWebSession,
@@ -25,6 +28,7 @@ export async function reauthenticateCredentialChange(
 	cookies: Cookies,
 	password: string,
 	token: FormDataEntryValue | null,
+	allowRecoveryCodes = false,
 ) {
 	// Serialize with web login and other credential changes for this account.
 	await lockWebSessionAccount(client, accountId);
@@ -64,11 +68,15 @@ export async function reauthenticateCredentialChange(
 	}
 	const tokenValid =
 		!account.token_secret ||
-		(typeof token === 'string' &&
-			token.length === 6 &&
-			/^\d{6}$/.test(token) &&
-			authenticator.check(token, account.token_secret));
-
+		(passwordValid &&
+			typeof token === 'string' &&
+			(allowRecoveryCodes
+				? await verifyAccountFactor(
+						client,
+						{ id: accountId, token_secret: account.token_secret },
+						token.trim(),
+					)
+				: checkAuthenticatorToken(token, account.token_secret)));
 	if (!passwordValid || !tokenValid) {
 		const failure = {
 			failures: (active?.failures ?? 0) + 1,

@@ -1,96 +1,54 @@
 import { error, fail } from '@sveltejs/kit';
 import { redirect } from 'sveltekit-flash-message/server';
-import invariant from 'tiny-invariant';
 
-import { prisma } from '$lib/server/prisma';
 import {
-	emailValidator,
-	presenceValidator,
-	stringValidator,
-	validate,
-} from '$lib/server/validations';
+	confirmEmailVerification,
+	hasEmailVerification,
+} from '$lib/server/email-verification';
+import {
+	allowRecoveryRequest,
+	recoveryPageHeaders,
+} from '$lib/server/recovery-token';
 
 import type { Actions, PageServerLoad } from './$types';
 
-export const load = (async ({ url }) => {
-	const email = url.searchParams.get('email');
+const INVALID_LINK =
+	'This email confirmation link is invalid or expired. Request a new link from your account.';
+
+export const load = (async ({ setHeaders, url }) => {
+	setHeaders(recoveryPageHeaders);
 	const token = url.searchParams.get('token');
-	if (!email || !token) {
-		throw error(422, 'Invalid email or token');
-	}
-
-	const verification = await prisma.emailVerification.findFirst({
-		where: { token, expires: { gt: new Date() } },
-		include: { account: true },
-	});
-	if (!verification || !verification.account) {
-		throw error(422, 'Invalid email or token');
-	}
-	if (verification.expires < new Date()) {
-		throw error(422, 'Token expired');
-	}
-
-	return { email, token };
+	if (!(await hasEmailVerification(token))) throw error(422, INVALID_LINK);
+	return { token };
 }) satisfies PageServerLoad;
 
-export const actions: Actions = {
+export const actions = {
 	default: async (event) => {
-		const { request, locals } = event;
-
-		const data = await request.formData();
-		const email = data.get('email');
-		const token = data.get('token');
-
-		const errors = await validate(
-			{
-				token: [presenceValidator, stringValidator],
-				email: [presenceValidator, emailValidator],
-			},
-			data,
-		);
-
-		if (Object.keys(errors).length > 0) {
-			return fail(400, { invalid: true, errors: errors });
+		if (!allowRecoveryRequest('email-verify', event.getClientAddress, 30)) {
+			return fail(429, {
+				errors: { global: ['Too many attempts. Try again later.'] },
+			});
 		}
-
-		invariant(token && email, 'Missing required fields');
-		invariant(typeof token === 'string', 'Token must be a string');
-		invariant(typeof email === 'string', 'Email must be a string');
-
-		const verification = await prisma.emailVerification.findFirst({
-			where: { token, expires: { gt: new Date() } },
-			include: { account: true },
-		});
-		if (!verification || !verification.account) {
-			throw error(422, 'Invalid email or token');
-		}
-		if (verification.expires < new Date()) {
-			throw error(422, 'Token expired');
-		}
-
-		const newEmail = verification.new_email;
-		const account = verification.account;
-
-		await prisma.$transaction([
-			prisma.accounts.update({
-				where: { id: account.id },
-				data: {
-					...(newEmail && newEmail !== account.email
-						? { email: newEmail }
-						: {}),
-					is_verified: true,
+		const data = await event.request.formData();
+		const result = await confirmEmailVerification(data.get('token'));
+		if (result === 'invalid')
+			return fail(400, { errors: { global: [INVALID_LINK] } });
+		if (result === 'unavailable') {
+			return fail(400, {
+				errors: {
+					global: [
+						'This address is unavailable. Request another email change from your account.',
+					],
 				},
-			}),
-			prisma.emailVerification.deleteMany({
-				where: { account_id: account.id },
-			}),
-		]);
+			});
+		}
+		const message =
+			result === 'pending'
+				? 'Address confirmed. The other address must also confirm this change.'
+				: 'Your email address has been confirmed.';
 		throw redirect(
-			locals.session ? '/account' : '/account/login',
-			{
-				type: 'success',
-				message: 'Your email has been verified.',
-			},
+			event.locals.session ? '/account' : '/account/login',
+			{ type: 'success', message },
 			event,
 		);
 	},

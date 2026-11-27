@@ -37,17 +37,19 @@
 				name="newEmail"
 				type="email"
 				errors={form?.errors?.newEmail} />
-			{#if data.tokenRequired || (form && 'tokenRequired' in form && form.tokenRequired)}
-				<TextField
-					required
-					labelClass="w-full"
-					label={$_('token')}
-					name="token"
-					autocomplete="one-time-code"
-					errors={form?.errors?.token} />
-			{/if}
 		</div>
 
+		{#if data.account.is2faEnabled}
+			<TextField
+				required
+				label={$_('account.recovery-factor')}
+				name="factor"
+				type="text"
+				autocomplete="one-time-code"
+				errors={form?.errors?.factor} />
+		{:else if data.account.isVerified}
+			<p>{$_('account.approve-both-emails')}</p>
+		{/if}
 		<div class="flex flex-row justify-end">
 			<Button>{$_('change-email')}</Button>
 		</div>

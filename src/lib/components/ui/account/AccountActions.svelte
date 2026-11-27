@@ -7,7 +7,6 @@
 
 	export let is2faEnabled: boolean;
 	export let isVerified: boolean;
-	export let isChangingEmail: boolean;
 	const theme = getThemeContext();
 	$: classic = $theme.profile.presentation.pageSurface === 'ornate';
 </script>
@@ -36,10 +35,8 @@
 		<Button href={`/account/change-password`} size="sm" noscroll={!classic}>
 			{$_('change-password')}
 		</Button>
-		{#if !isChangingEmail}
-			<Button href={`/account/change-email`} size="sm" noscroll={!classic}>
-				{$_('change-email')}
-			</Button>
-		{/if}
+		<Button href={`/account/change-email`} size="sm" noscroll={!classic}>
+			{$_('change-email')}
+		</Button>
 	</div>
 </PagePanel>

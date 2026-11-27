@@ -39,22 +39,6 @@ export async function sendMail(to: string, template: EmailTemplate) {
 	console.log('Message sent: %s', info.messageId);
 }
 
-export async function sendVerificationEmail(to: string, token: string) {
-	await sendMail(to, {
-		subject: 'Verify your account',
-		props: {
-			title: 'Verify your account',
-			buttonText: 'Verify Email',
-			href: `/account/verify?email=${to}&token=${token}`,
-			previewText: 'Click the button below to verify your email address.',
-			paragraphs: [
-				'Welcome to the game! We just need to verify your email address before you can start playing.',
-				'If you did not create an account, you can safely ignore this email.',
-			],
-		},
-	});
-}
-
 const transporter: Record<
 	string,
 	Transporter<SMTPTransport.SentMessageInfo>

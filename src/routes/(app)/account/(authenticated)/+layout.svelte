@@ -23,8 +23,7 @@
 		<AccountInfoBox account={data.account} />
 		<AccountActions
 			is2faEnabled={data.account.is2faEnabled}
-			isVerified={data.account.isVerified}
-			isChangingEmail={Boolean(data.account.newEmail)} />
+			isVerified={data.account.isVerified} />
 		<AccountCharacters characters={data.characters} />
 	</div>
 	<slot />

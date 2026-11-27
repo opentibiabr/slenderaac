@@ -10,9 +10,11 @@
     "character-actions": "Character actions",
     "select-character": "Select {name}",
     "no-characters": "You have no characters yet.",
-    "change-pending": "(verification pending for email change to {email}",
-    "resend": "resend",
-    "unverified": "(unverified <a class=\"anchor\" href=\"/account/resend\">re-send</a>)",
+    "change-pending": "Confirmation pending for {email}",
+    "resend": "Resend confirmation",
+    "unverified": "Email not verified",
+    "recovery-factor": "Authenticator or recovery code",
+    "approve-both-emails": "Confirm this change from both your current and your new email addresses.",
     "reward-collected": "Daily Reward collected",
     "reward-uncollected": "Daily Reward not collected",
     "reward-unknown": "Daily Reward status unavailable",
@@ -216,7 +218,8 @@
     "title-case": ":field must be in title case"
   },
   "verify": {
-    "welcome": "Welcome! Please verify your account by clicking the button below."
+    "confirm": "Confirm email request",
+    "welcome": "Confirm this request only if you expected this email."
   },
   "verify-account": "Verify Account",
   "view-more": "View more",

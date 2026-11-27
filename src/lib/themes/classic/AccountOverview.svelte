@@ -162,8 +162,7 @@
 			<AccountInfoBox {account} />
 			<AccountActions
 				is2faEnabled={account.is2faEnabled}
-				isVerified={account.isVerified}
-				isChangingEmail={Boolean(account.newEmail)} />
+				isVerified={account.isVerified} />
 		</div>
 	{/if}
 
