@@ -5,6 +5,7 @@ import {
 	verifyAccountFactor,
 	withLockedAccount,
 } from '$lib/server/account-2fa';
+import { allowLoginAttempt } from '$lib/server/login-attempts';
 import { localReturnTo } from '$lib/server/navigation';
 import { prisma } from '$lib/server/prisma';
 import { createWebSession, setWebSessionCookie } from '$lib/server/session';
@@ -31,8 +32,14 @@ export const load: PageServerLoad = ({ locals }) => {
 	};
 };
 
+const tryAgainLater = 'Too many login attempts. Try again later.';
+
 export const actions: Actions = {
-	default: async ({ url, cookies, request }) => {
+	default: async ({ url, cookies, request, getClientAddress }) => {
+		if (!(await allowLoginAttempt('source', getClientAddress))) {
+			return fail(429, { errors: { global: [tryAgainLater] } });
+		}
+
 		const data = await request.formData();
 		let email = data.get('email');
 		const password = data.get('password');
@@ -68,7 +75,11 @@ export const actions: Actions = {
 			select: { id: true, email: true, password: true, token_secret: true },
 		});
 
-		if (!account || !comparePassword(password, account.password)) {
+		if (
+			!account ||
+			!(await allowLoginAttempt('password', account.id)) ||
+			!comparePassword(password, account.password)
+		) {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}
 		if (account.token_secret && !token) {
@@ -88,11 +99,14 @@ export const actions: Actions = {
 				) {
 					return { type: 'credentials-changed' } as const;
 				}
-				if (
-					current.token_secret &&
-					(!token || !(await verifyAccountFactor(client, current, token)))
-				) {
-					return { type: 'invalid-token' } as const;
+				if (current.token_secret) {
+					if (!token) return { type: 'invalid-token' } as const;
+					if (!(await allowLoginAttempt('factor', current.id, client))) {
+						return { type: 'factor-limited' } as const;
+					}
+					if (!(await verifyAccountFactor(client, current, token))) {
+						return { type: 'invalid-token' } as const;
+					}
 				}
 				return {
 					type: 'session',
@@ -104,11 +118,14 @@ export const actions: Actions = {
 		if (result.type === 'credentials-changed') {
 			return fail(400, { errors: { global: ['Invalid email or password'] } });
 		}
-		if (result.type === 'invalid-token') {
-			return fail(400, {
+		if (result.type === 'invalid-token' || result.type === 'factor-limited') {
+			const limited = result.type === 'factor-limited';
+			return fail(limited ? 429 : 400, {
 				tokenRequired: true,
 				email,
-				errors: { token: [$_('invalid-token')] } as Record<string, string[]>,
+				errors: {
+					token: [limited ? tryAgainLater : $_('invalid-token')],
+				} as Record<string, string[]>,
 			});
 		}
 

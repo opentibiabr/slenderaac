@@ -826,6 +826,15 @@ model WebCredentialChangeAttempt {
   @@map("slender_credential_change_attempts")
 }
 
+model LoginAttemptBucket {
+  bucket     String @id @db.VarChar(80)
+  attempts   Int    @db.UnsignedInt
+  expires_at BigInt @db.UnsignedBigInt
+
+  @@index([expires_at], map: "slender_login_limits_expires_at_idx")
+  @@map("slender_login_limits")
+}
+
 enum NewsType {
   news
   ticker
