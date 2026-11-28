@@ -1862,11 +1862,6 @@
 		bottom: auto !important;
 	}
 
-	:global(.theme-classic .theme-classic__boosted-avatar canvas) {
-		width: 64px !important;
-		height: 64px !important;
-	}
-
 	.theme-classic .theme-classic__network-links a:hover {
 		filter: brightness(1.12);
 	}

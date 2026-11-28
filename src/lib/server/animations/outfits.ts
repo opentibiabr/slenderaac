@@ -134,35 +134,34 @@ export async function outfit(
 		);
 		if (fileExists(mountImagePath, outfitData)) {
 			const mountImage = await loadImage(mountImagePath);
-			const mountCanvas = createCanvas(width, height);
+			const mountCanvas = createCanvas(
+				Math.max(width, mountImage.width),
+				Math.max(height, mountImage.height),
+			);
 			const mountCtx = mountCanvas.getContext('2d');
-			mountCtx.clearRect(0, 0, width, height);
-			mountCtx.drawImage(mountImage, 0, 0);
-			mountCtx.drawImage(outfitCanvas, 0, 0);
+			mountCtx.drawImage(
+				mountImage,
+				mountCanvas.width - mountImage.width,
+				mountCanvas.height - mountImage.height,
+			);
+			mountCtx.drawImage(
+				outfitCanvas,
+				mountCanvas.width - width,
+				mountCanvas.height - height,
+			);
 			outfitCanvas = mountCanvas;
 		}
 	}
 
-	const imageOutfitTCanvas = createCanvas(
-		resizeTo64px ? 64 : width,
-		resizeTo64px ? 64 : height,
-	);
-	const imageOutfitTContext = imageOutfitTCanvas.getContext('2d');
-	imageOutfitTContext.clearRect(0, 0, width, height);
-	imageOutfitTContext.globalCompositeOperation = 'destination-in';
-	imageOutfitTContext.drawImage(
+	if (!resizeTo64px) return outfitCanvas.getContext('2d');
+
+	const resized = createCanvas(64, 64).getContext('2d');
+	resized.drawImage(
 		outfitCanvas,
-		imageOutfitTCanvas.width - width,
-		imageOutfitTCanvas.height - height,
+		64 - outfitCanvas.width,
+		64 - outfitCanvas.height,
 	);
-	imageOutfitTContext.globalCompositeOperation = 'source-over';
-	imageOutfitTContext.globalAlpha = 1;
-	imageOutfitTContext.drawImage(
-		outfitCanvas,
-		imageOutfitTCanvas.width - width,
-		imageOutfitTCanvas.height - height,
-	);
-	return imageOutfitTContext;
+	return resized;
 }
 
 function colorizePixel(color: number, r: number, g: number, b: number) {

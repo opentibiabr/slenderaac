@@ -65,10 +65,6 @@
 		left: 0;
 		bottom: auto;
 	}
-	.library-boosted__content :global(canvas) {
-		width: 64px;
-		height: 64px;
-	}
 	:global(.layout-surface-ornate) .library-boosted {
 		width: calc(100% + 2px);
 	}
