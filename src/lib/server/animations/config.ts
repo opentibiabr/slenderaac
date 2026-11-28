@@ -8,18 +8,12 @@ export function mountOutfitId(value: number): number {
 	return value < 300 ? (mounts[value] ?? 0) : value;
 }
 
-export const walkSpeeds = [
-	0, // Adjust the index to start from 0 instead of 1
-	400,
-	300,
-	300,
-	150,
-	150,
-	150,
-	150,
-	100,
-	80,
-];
+export function outfitWalkFrameDuration(frames: number): number {
+	// The OTClient outfit window uses a 1000 ms static walk with enhanced animations.
+	if (frames <= 2) return 205;
+	const footPhases = Math.floor(frames / 1.5);
+	return Math.min(80, Math.max(30, Math.floor(1000 / footPhases)));
+}
 
 export function getImagePath(outfitId: number): string {
 	return `${outfitImagesPath + outfitId.toString()}.gif`;

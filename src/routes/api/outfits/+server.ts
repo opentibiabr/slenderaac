@@ -6,7 +6,7 @@ import {
 	mountOutfitId,
 	outfitColors,
 	outfitImagesPath,
-	walkSpeeds,
+	outfitWalkFrameDuration,
 } from '$lib/server/animations/config';
 import { animationFrameCount, loadData } from '$lib/server/animations/metadata';
 import { outfit } from '$lib/server/animations/outfits';
@@ -80,8 +80,9 @@ export const GET = (async ({ url, request }) => {
 		};
 	const frames: { image: string; duration: number }[] = [];
 	const count = animationFrameCount(data.framesNumber, data.mountFramesNumber);
-	const duration =
-		walkSpeeds[Math.max(data.framesNumber, data.mountFramesNumber)] ?? 100;
+	const duration = outfitWalkFrameDuration(
+		data.mountFramesNumber > 1 ? data.mountFramesNumber : data.framesNumber,
+	);
 	for (let frame = 1; frame <= count; frame++) {
 		const rendered = await outfit(
 			data,

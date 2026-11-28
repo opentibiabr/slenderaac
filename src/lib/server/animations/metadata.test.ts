@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
-import { mountOutfitId } from './config';
+import { mountOutfitId, outfitWalkFrameDuration } from './config';
 import { animationFrameCount, loadData } from './metadata';
 
 void test('sprite lookup tolerates absent packs and indexes complete animations without writing cache files', async () => {
@@ -54,4 +54,11 @@ void test('a mounted animation includes both complete loops, including a station
 	assert.equal(animationFrameCount(8, 10), 40);
 	assert.equal(animationFrameCount(12), 12);
 	assert.throws(() => animationFrameCount(127, 128), /frame limit/);
+});
+
+void test('walk frames use the OTClient outfit preview cadence', () => {
+	assert.equal(outfitWalkFrameDuration(2), 205);
+	assert.equal(outfitWalkFrameDuration(8), 80);
+	assert.equal(outfitWalkFrameDuration(24), 62);
+	assert.equal(outfitWalkFrameDuration(64), 30);
 });

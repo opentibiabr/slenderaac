@@ -28,9 +28,7 @@
 		image: HTMLImageElement;
 		duration: number;
 	};
-	let canvas: HTMLCanvasElement | null = null;
 	let frames: Frame[] = [];
-	$: context = canvas?.getContext('2d', {});
 
 	// Parent data can be replaced during navigation without changing the portrait.
 	$: source = outfit?.looktype
@@ -42,7 +40,6 @@
 				looklegs: outfit.looklegs ?? 0,
 				lookfeet: outfit.lookfeet ?? 0,
 				mount: outfit.mount ?? outfit.lookmount ?? 0,
-				resize: true,
 			})
 		: '';
 	$: void sourceChanged(source);
@@ -50,9 +47,6 @@
 	let controller: AbortController | null = null;
 	let requestId = 0;
 	let loading = false;
-	let index = 0;
-	let shownFor = 0;
-	let renderedIndex = -1;
 	let actualMount: boolean | null = null;
 	$: hasMount = actualMount ?? Boolean(outfit?.lookmount || outfit?.mount);
 
@@ -60,9 +54,6 @@
 		controller?.abort();
 		const current = ++requestId;
 		frames = [];
-		index = 0;
-		renderedIndex = -1;
-		shownFor = 0;
 		actualMount = null;
 		loading = false;
 		if (!source || !browser) return;
@@ -96,41 +87,52 @@
 		}
 	}
 
-	onMount(() => {
-		const interval = setInterval(() => {
-			if (!canvas || !context || frames.length === 0) {
-				return;
-			}
+	function playFrames(canvas: HTMLCanvasElement, sequence: Frame[]) {
+		canvas.width = Math.max(...sequence.map(({ image }) => image.naturalWidth));
+		canvas.height = Math.max(
+			...sequence.map(({ image }) => image.naturalHeight),
+		);
+		const context = canvas.getContext('2d');
+		if (!context) return;
 
-			shownFor += 50;
-			if (shownFor >= frames[index].duration) {
-				shownFor = 0;
-				index++;
-				if (index >= frames.length) {
-					index = 0;
-				}
-			}
-			if (renderedIndex === index) return;
-			renderedIndex = index;
-			const frame = frames[index];
-			context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+		let shown = -1;
+		const draw = (index: number) => {
+			if (shown === index) return;
+			const { image } = sequence[index];
+			context.clearRect(0, 0, canvas.width, canvas.height);
 			context.drawImage(
-				frame.image,
-				0,
-				0,
-				frame.image.width,
-				frame.image.height,
-				0,
-				0,
-				context.canvas.width,
-				context.canvas.height,
+				image,
+				canvas.width - image.naturalWidth,
+				canvas.height - image.naturalHeight,
 			);
-		}, 50);
-		return () => {
-			controller?.abort();
-			requestId++;
-			clearInterval(interval);
+			shown = index;
 		};
+
+		draw(0);
+		if (sequence.length === 1) return;
+
+		let duration = 0;
+		const frameEnds = sequence.map((frame) => (duration += frame.duration));
+		const start = performance.now();
+		let timer = window.setTimeout(tick, frameEnds[0]);
+
+		function tick() {
+			const elapsed = (performance.now() - start) % duration;
+			const index = frameEnds.findIndex((end) => end > elapsed);
+			draw(index);
+			timer = window.setTimeout(tick, Math.ceil(frameEnds[index] - elapsed));
+		}
+
+		return {
+			destroy() {
+				window.clearTimeout(timer);
+			},
+		};
+	}
+
+	onMount(() => () => {
+		controller?.abort();
+		requestId++;
 	});
 </script>
 
@@ -140,15 +142,12 @@
 		<div
 			role="img"
 			aria-label={alt}
-			class="absolute {hasMount
-				? '-left-7 -bottom-1'
-				: '-left-10 bottom-1'} {innerClass}">
-			<canvas
-				bind:this={canvas}
-				width={frames[0].image.naturalWidth}
-				height={frames[0].image.naturalHeight}
-				class="w-20 h-20"
-				aria-hidden="true" />
+			class="absolute w-16 h-16 {hasMount
+				? '-left-3 -bottom-1'
+				: '-left-6 bottom-1'} {innerClass}">
+			{#key frames}
+				<canvas use:playFrames={frames} aria-hidden="true" />
+			{/key}
 		</div>
 	{:else if loading}
 		<div class="absolute inset-0 grid place-items-center" aria-hidden="true">
@@ -156,3 +155,13 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	canvas {
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		max-width: none;
+		image-rendering: auto;
+	}
+</style>
